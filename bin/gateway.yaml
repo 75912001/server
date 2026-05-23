@@ -24,6 +24,13 @@ net:
     type: tcp
 
 custom:
+  # 用户 verify 过期时间-秒
+  verifyExpireTimeSecond: 864000
+
+  # 用户心跳 过期时间-秒
+  heartBeatExpireTimeSecond: 864000
+
+  # 服务-消息映射
   cmdMapping:
     online: [0x200000, 0x2fffff] # 在线服务命令范围
 
