@@ -1,0 +1,30 @@
+# ETCD 配置
+etcd:
+  endpoints: [127.0.0.1:2379]  # ETCD 地址列表 e.g.: 127.0.0.x:2379,127.0.0.y:2379
+  ttl: 33000000 # ttl 秒 [default]: xetcd.TtlSecondDefault 秒, e.g.:系统每10秒续约一次,该参数至少为11秒
+# 基础配置
+base:
+  projectName: project  # 项目名称
+  groupID: 1 # 分组ID
+  name: gateway # 服务名称
+  serverID: 1 # 服务ID
+  version: v.0.0.1.2025.03.21.12.21          # 项目版本
+  packetLengthMax: 100000        # 数据包最大长度
+  sendChannelCapacity: 100000      # 发送通道容量
+  runMode: 1                        # 运行模式 [0:release, 1:debug]
+  availableLoad: 100000            # 可用负载
+  processingMode: 1 # 处理-模式 [0:bus, 1:actor]
+# 日志
+log:
+  level: 7        # 日志级别
+# 网络配置
+net:
+  - listenAddr: 127.0.0.1:10101 # TCP 地址 e.g.:127.0.0.x:10101
+    externalAddr: 127.0.0.1:10101
+    type: tcp
+
+custom:
+  cmdMapping:
+    online: [0x200000, 0x2fffff] # 在线服务命令范围
+
+
