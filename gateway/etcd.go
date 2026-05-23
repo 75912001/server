@@ -25,7 +25,7 @@ func onEtcdAdd(args ...any) error {
 			xlog.GLog.Errorf("onEtcdAdd serverName=%s key=%s: %v", serverName, key, err)
 			return err
 		}
-		gGatewayHandlerGrpc.resetStream()
+		GGatewayHandlerGrpc.resetStream()
 	}
 	return nil
 }
@@ -42,7 +42,7 @@ func onEtcdDel(args ...any) error {
 	switch serverName {
 	case common.OnlineServerName:
 		GOnlineMgr.Remove(key)
-		gGatewayHandlerGrpc.resetStream()
+		GGatewayHandlerGrpc.resetStream()
 	}
 	return nil
 }
