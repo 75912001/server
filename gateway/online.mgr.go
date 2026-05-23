@@ -10,8 +10,6 @@ import (
 	xgrpcutil "github.com/75912001/xlib/grpc/util"
 	xlog "github.com/75912001/xlib/log"
 	xmap "github.com/75912001/xlib/map"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 // GOnlineMgr 全局 online 服务管理器
@@ -21,7 +19,7 @@ var GOnlineMgr = &OnlineMgr{
 
 // Online 记录一条 online 实例的连接信息
 type Online struct {
-	conn        *grpcClientConn
+	client      *grpcClient
 	groupID     uint32
 	serverName  string
 	serverID    uint32
@@ -55,16 +53,14 @@ func (mgr *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	}
 
 	connID := fmt.Sprintf("%d.%s.%d", groupID, serverName, serverID)
-
-	clientConn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := newGrpcClient(connID, addr)
 	if err != nil {
 		xlog.GLog.Errorf("OnlineMgr.Add dial %s failed: %v", addr, err)
 		return err
 	}
-	conn := &grpcClientConn{id: connID, conn: clientConn, available: true}
 
 	info := &Online{
-		conn:        conn,
+		client:      conn,
 		groupID:     groupID,
 		serverName:  serverName,
 		serverID:    serverID,
@@ -95,8 +91,8 @@ func (mgr *OnlineMgr) removeInfo(key string, info *Online) {
 	); err != nil {
 		xlog.GLog.Warnf("OnlineMgr.removeInfo RemoveServer key=%s: %v", key, err)
 	}
-	if err := info.conn.Stop(); err != nil {
-		xlog.GLog.Warnf("OnlineMgr.removeInfo Stop conn key=%s: %v", key, err)
+	if err := info.client.Stop(); err != nil {
+		xlog.GLog.Warnf("OnlineMgr.removeInfo Stop client key=%s: %v", key, err)
 	}
 	mgr.m.Del(key)
 }
