@@ -1,38 +1,10 @@
 package main
 
 import (
-	"sync"
-
 	xetcd "github.com/75912001/xlib/etcd"
 	xetcdconstants "github.com/75912001/xlib/etcd/constants"
 	xlog "github.com/75912001/xlib/log"
-	"google.golang.org/grpc"
 )
-
-// grpcClientConn 实现 xgrpcutil.IClientConn，包装一条 gRPC 连接，供各服务 Mgr 使用
-type grpcClientConn struct {
-	id        string
-	conn      *grpc.ClientConn
-	available bool
-	mu        sync.RWMutex
-}
-
-func (c *grpcClientConn) GetClientConn() *grpc.ClientConn { return c.conn }
-func (c *grpcClientConn) GetID() string                   { return c.id }
-func (c *grpcClientConn) Available() bool {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	return c.available
-}
-func (c *grpcClientConn) Disabled() {
-	c.mu.Lock()
-	c.available = false
-	c.mu.Unlock()
-}
-func (c *grpcClientConn) Stop() error {
-	c.Disabled()
-	return c.conn.Close()
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // etcd 回调入口：在 xlib actor 协程中串行执行，无需额外加锁
