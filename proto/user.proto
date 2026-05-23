@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package user;
+option go_package = "server/proto/pb;pb";
+
+// ===================================================================
+// 消息体定义 — 客户端 ↔ Gateway TCP 协议层
+// ===================================================================
+
+//0x000001#client->gateway#登录验证-请求
+message UserVerifyReq
+{
+  uint64 uid   = 1;   // 玩家唯一 ID
+  string token = 2;   // 登录 Token，供 Online 服校验
+}
+
+//0x000002#gateway->client#登录验证-回复
+message UserVerifyRes
+{
+  uint32 code        = 1;   // 0=成功，非 0=失败
+  string msg         = 2;   // 失败时的错误描述
+  int64  server_time = 3;   // 服务器当前时间戳，单位毫秒（用于客户端对时）
+}
+
+//0x000003#client->gateway#主动下线-请求
+message UserOfflineReq
+{
+  uint32 reason = 1;   // 1=用户主动离线，2=网络异常断开
+}
