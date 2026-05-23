@@ -32,6 +32,8 @@ custom:
 
   # 服务-消息映射
   cmdMapping:
+    user: [0x000001, 0x0fffff] # 用户服务命令范围
+    gateway: [0x100000, 0x1fffff] # 网关服务命令范围
     online: [0x200000, 0x2fffff] # 在线服务命令范围
 
 
