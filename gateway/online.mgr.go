@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 
+	gatewaycommon "server/common"
+
 	xetcd "github.com/75912001/xlib/etcd"
 	xgrpcresolve "github.com/75912001/xlib/grpc/resolve"
 	xgrpcutil "github.com/75912001/xlib/grpc/util"
@@ -101,7 +103,7 @@ func (mgr *OnlineMgr) removeInfo(key string, info *Online) {
 
 // GetConn 通过一致性哈希获取一条到 online 的连接
 func (mgr *OnlineMgr) GetConn(shardKey string) (xgrpcutil.IClientConn, error) {
-	return xgrpcresolve.GetClientConnByHashRing(onlinePackageName, onlineServiceName, shardKey)
+	return xgrpcresolve.GetClientConnByHashRing(gatewaycommon.OnlinePackageName, gatewaycommon.OnlineServiceName, shardKey)
 }
 
 // Len 返回当前在线的 online 实例数量
