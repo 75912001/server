@@ -1,73 +1,102 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"sync"
 
 	pb "server/proto/pb"
 
+	xactor "github.com/75912001/xlib/actor"
+	xlog "github.com/75912001/xlib/log"
 	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
 )
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Online：嵌入 *pb.XOnlineService（连接管理 + 生命周期），补充 id 和 streamMu
-// ─────────────────────────────────────────────────────────────────────────────
+const (
+	CmdStreamSend  xactor.CMD = 0 // 向 online stream 发送一帧
+	CmdStreamReset xactor.CMD = 1 // 流断开时清空 stream 指针（由 Post 回调投递）
+)
 
 // Online 是一个 online 服务实例。
-//   - 嵌入 *pb.XOnlineService 获得 GetClientConn/Available/Disabled，
-//     以及带拦截器的 dial 和 receiveLoop 错误处理。
-//   - id 补充 IClientConn.GetID()（XOnlineService 无此字段）。
-//   - streamMu 保护 XOnlineService 内部流字段的并发读写
-//     （读：getStream；写：resetStream via Post 回调）。
 type Online struct {
 	*pb.XOnlineService
-	id string
+	ID string // ${GroupID}.${serverName}.${serverID}
 
-	streamMu sync.RWMutex // 保护 XOnlineService.GetStream/ResetStream 的并发访问
+	actor  *xactor.Actor[string]                     // 序列化 stream.Send 的 actor（每个 Online 独立一个）
+	stream pb.OnlineService_OnlineStreamTunnelClient // 仅 actor goroutine 访问，无需加锁
 
-	groupID     uint32
-	serverName  string
-	serverID    uint32
-	packageName string
-	serviceName string
+	closeOnce sync.Once // 保证 actor Stop 只发送一次
+
+	GroupID     uint32
+	ServerName  string
+	ServerID    uint32
+	PackageName string
+	ServiceName string
 }
 
-// newOnline 建立 gRPC 连接，启动 recvLoop。
-// 流在 NewXOnlineService 内部同步创建，无需等待 Pre 回调。
+// newOnline 建立 gRPC 连接，启动 recvLoop 和 stream actor。
 func newOnline(id, addr string) (*Online, error) {
 	xService, err := pb.NewXOnlineService(addr)
 	if err != nil {
 		return nil, errors.WithMessage(err, xruntime.Location())
 	}
-	o := &Online{id: id, XOnlineService: xService}
+	o := &Online{ID: id, XOnlineService: xService}
 	_ = xService.Start()
+	o.stream = xService.GetStream()
+	o.actor = xactor.NewActor[string](id, nil, o.streamBehavior)
+	o.actor.Start()
 	return o, nil
 }
 
-// GetID 补充 IClientConn 接口（XOnlineService 无此方法）
-func (o *Online) GetID() string { return o.id }
-
-// Stop 标记不可用后关闭底层流和连接
-func (o *Online) Stop() error {
-	o.Disabled()
-	return o.XOnlineService.Stop()
-}
-
-// getStream 返回当前双向流供 Send 使用
-func (o *Online) getStream() (pb.OnlineService_OnlineStreamTunnelClient, error) {
-	o.streamMu.RLock()
-	defer o.streamMu.RUnlock()
-	s := o.GetStream()
-	if s == nil {
-		return nil, fmt.Errorf("online[%s] stream not ready", o.id)
+// streamBehavior 是 actor 的唯一消息处理入口，运行在独立 goroutine 中。
+// stream 字段仅在此函数内读写，无需任何锁。
+func (p *Online) streamBehavior(messages ...any) (xactor.Behavior, any, error) {
+	for _, raw := range messages {
+		msg, ok := raw.(*xactor.Msg)
+		if !ok {
+			continue
+		}
+		switch msg.Cmd {
+		case CmdStreamSend:
+			req, ok := msg.Args[0].(*pb.OnlineStreamTunnelReq)
+			if !ok {
+				continue
+			}
+			if p.stream == nil {
+				xlog.PrintfErr("online[%s] stream not ready, drop msg", p.ID)
+				continue
+			}
+			if err := p.stream.Send(req); err != nil {
+				p.stream = nil
+				xlog.PrintfErr("online[%s] stream send error: %v", p.ID, err)
+			}
+		case CmdStreamReset:
+			incoming, ok := msg.Args[0].(pb.OnlineService_OnlineStreamTunnelClient)
+			if !ok {
+				continue
+			}
+			if p.stream == incoming {
+				p.stream = nil
+			}
+		}
 	}
-	return s, nil
+	return p.streamBehavior, nil, nil
 }
 
-// resetStream 流出错后置空，下次 getStream 返回错误（由 Post 回调或发送失败时调用）
-func (o *Online) resetStream() {
-	o.streamMu.Lock()
-	o.ResetStream()
-	o.streamMu.Unlock()
+// Send 将消息帧异步投递到 actor，由 actor goroutine 串行调用 stream.Send。
+func (p *Online) Send(req *pb.OnlineStreamTunnelReq) error {
+	p.actor.SendMsg(xactor.NewMsg(context.Background(), CmdStreamSend, req))
+	return nil
+}
+
+// GetID 实现 xgrpcutil.IClientConn，返回服务实例唯一标识。
+func (p *Online) GetID() string { return p.ID }
+
+// Stop 标记不可用，停止 actor，关闭底层流和连接。
+func (p *Online) Stop() error {
+	p.Disabled()
+	p.closeOnce.Do(func() {
+		p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
+	})
+	return p.XOnlineService.Stop()
 }
