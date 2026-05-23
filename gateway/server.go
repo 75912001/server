@@ -5,6 +5,8 @@ import (
 
 	xcontrol "github.com/75912001/xlib/control"
 	xetcd "github.com/75912001/xlib/etcd"
+	xgrpcprotoregistry "github.com/75912001/xlib/grpc/proto/registry"
+	xgrpcselector "github.com/75912001/xlib/grpc/selector"
 	xserver "github.com/75912001/xlib/server"
 )
 
@@ -24,6 +26,11 @@ func NewGateway(args []string) *Gateway {
 
 // PreStart 配置 TCPHandler / HeaderStrategy / etcd 回调，再调用 xlib server 完成日志/actor/timer 初始化
 func (g *Gateway) PreStart(ctx context.Context) error {
+	// 初始化 gRPC selector：扫描 protoregistry 中所有服务/方法选项，建立负载均衡策略表
+	// 必须在第一次调用 selector.Sel（即 XOnlineServiceClient.OnlineUserOnline）之前完成
+	xgrpcprotoregistry.Init()
+	xgrpcselector.Init()
+
 	opts := xserver.NewServerOptions().
 		WithTCPHandler(GUserHandlerTCP).
 		WithHeaderStrategy(&DefaultHeaderStrategy{}).
