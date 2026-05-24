@@ -14,14 +14,14 @@ const (
 	GatewayDefaultUserActorCount         int64 = 64
 )
 
-func gatewayVerifyExpireTimeSecond() int64 {
+func cfgVerifyExpireTimeSecond() int64 {
 	return xconfig.GConfigMgr.GetCustomInt64(GatewayCustomKeyVerifyExpireTimeSecond, GatewayDefaultVerifyExpireTimeSecond)
 }
 
-func gatewayHeartBeatExpireSecond() int64 {
+func cfgHeartBeatExpireSecond() int64 {
 	return xconfig.GConfigMgr.GetCustomInt64(GatewayCustomKeyHeartBeatExpireSecond, GatewayDefaultHeartBeatExpireSecond)
 }
 
-func gatewayUserActorCount() int {
+func cfgUserActorCount() int {
 	return int(xconfig.GConfigMgr.GetCustomInt64(GatewayCustomKeyUserActorCount, GatewayDefaultUserActorCount))
 }
