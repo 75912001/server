@@ -53,7 +53,9 @@ func unaryOnlineUserOnline(
 			if oerr != nil {
 				xlog.PrintfErr("OnlineUserOnline lookup online by uid=%d failed: %v", req.GetUid(), oerr)
 			}
-			u.OnVerified(req.GetUid(), online)
+			if verr := u.shard.PostVerified(u, req.GetUid(), online); verr != nil {
+				xlog.PrintfErr("OnlineUserOnline post verified uid=%d failed: %v", req.GetUid(), verr)
+			}
 		}
 	}
 
