@@ -44,8 +44,6 @@ func (g *Gateway) PreStart(ctx context.Context) error {
 		return err
 	}
 
-	// 至此 xtimer.GTimer 和 actor 均已初始化；注入 UserMgr 供 User 定时器投递事件。
-	// 必须在 TCP 服务接受连接前完成（OnConnect → newUser → AddSecond 需要 actor）。
-	GUserMgr.SetActor(g.Server.GetActor())
+	GUserMgr.Init()
 	return nil
 }
