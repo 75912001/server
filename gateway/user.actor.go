@@ -8,6 +8,7 @@ import (
 	xactor "github.com/75912001/xlib/actor"
 	xcontrol "github.com/75912001/xlib/control"
 	xlog "github.com/75912001/xlib/log"
+	xnetcommon "github.com/75912001/xlib/net/common"
 	xpacket "github.com/75912001/xlib/packet"
 )
 
@@ -87,7 +88,7 @@ func (s *UserShard) handleOnlineFrame(frame *pb.OnlineTunnelFrame) {
 	case *pb.OnlineTunnelFrame_KickUserReq:
 		xlog.PrintInfo(fmt.Sprintf("kick uid=%d reason=%d msg=%s",
 			uid, payload.KickUserReq.GetReason(), payload.KickUserReq.GetMsg()))
-		u.remote.Stop()
+		u.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 	case *pb.OnlineTunnelFrame_ClientPacket:
 		pkt := payload.ClientPacket
 		if pkt == nil {
