@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	xpacket "github.com/75912001/xlib/packet"

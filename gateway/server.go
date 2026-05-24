@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"server/common"
 
 	xcontrol "github.com/75912001/xlib/control"
 	xetcd "github.com/75912001/xlib/etcd"
@@ -33,7 +34,7 @@ func (g *Gateway) PreStart(ctx context.Context) error {
 
 	opts := xserver.NewServerOptions().
 		WithTCPHandler(GUserHandlerTCP).
-		WithHeaderStrategy(&DefaultHeaderStrategy{}).
+		WithHeaderStrategy(&common.DefaultHeaderStrategy{}).
 		WithLogCallbackFunc(xcontrol.NewCallBack(func(args ...any) error { return nil })).
 		WithEtcd(xetcd.NewOptions().
 			WithAddCallback(xcontrol.NewCallBack(onEtcdAdd)).
