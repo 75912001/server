@@ -42,6 +42,6 @@ func (s *UserShard) PostHeartbeat(user *User, header *xpacket.Header, body []byt
 }
 
 func (s *UserShard) PostCleanup(user *User) error {
-	_, err := s.actor.SendMsgSync(xactor.NewMsg(context.Background(), CmdUserCleanup, user))
-	return err
+	s.actor.SendMsg(xactor.NewMsg(context.Background(), CmdUserCleanup, user))
+	return nil
 }

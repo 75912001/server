@@ -83,13 +83,12 @@ func (m *UserMgr) Remove(remote xnetcommon.IRemote) *User {
 	if !ok {
 		return nil
 	}
+	u.closed.Store(true)
 	m.byRemote.Del(remote)
-	if err := u.shard.PostCleanup(u); err != nil {
-		return u
-	}
 	if uid := u.uid.Load(); uid != 0 {
 		m.byUID.Del(uid)
 	}
+	_ = u.shard.PostCleanup(u)
 	return u
 }
 
