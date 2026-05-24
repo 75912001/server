@@ -45,11 +45,11 @@ func (mgr *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 		xlog.GLog.Errorf("OnlineMgr.Add dial %s failed: %v", addr, err)
 		return err
 	}
-	online.groupID = groupID
-	online.serverName = serverName
-	online.serverID = serverID
-	online.packageName = packageName
-	online.serviceName = serviceName
+	online.GroupID = groupID
+	online.ServerName = serverName
+	online.ServerID = serverID
+	online.PackageName = packageName
+	online.ServiceName = serviceName
 
 	mgr.m.Add(key, online)
 	// Online 实现 IClientConn，直接注册到 resolve 哈希环
@@ -71,8 +71,8 @@ func (mgr *OnlineMgr) Remove(key string) {
 
 func (mgr *OnlineMgr) removeInfo(key string, online *Online) {
 	if _, err := xgrpcresolve.RemoveServer(
-		online.groupID, online.serverName, online.serverID,
-		online.packageName, online.serviceName,
+		online.GroupID, online.ServerName, online.ServerID,
+		online.PackageName, online.ServiceName,
 	); err != nil {
 		xlog.GLog.Warnf("OnlineMgr.removeInfo RemoveServer key=%s: %v", key, err)
 	}
