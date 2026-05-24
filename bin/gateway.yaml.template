@@ -28,11 +28,11 @@ net:
 
 # 用户自定义配置
 custom:
-  # 用户 verify 过期时间-秒
-  verifyExpireTimeSecond: 864000
+  # 用户 verify 过期时间-秒 默认为 300 秒
+  #verifyExpireTimeSecond: 864000
 
-  # 用户心跳 过期时间-秒
-  heartBeatExpireTimeSecond: 864000
+  # 用户心跳 过期时间-秒 默认为 300 秒
+  #heartBeatExpireTimeSecond: 864000
 
   # 用户数据处理 actor 数量。
   # online 下行的用户消息会按 uid % userActorCount 分配到固定 actor 中处理；
