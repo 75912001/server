@@ -31,8 +31,8 @@ func (mgr *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	}
 	_, groupID, serverName, serverID := xetcd.Parse(key)
 	gs := valueJson.GrpcService
-	packageName := ptrStr(gs.PackageName)
-	serviceName := ptrStr(gs.ServiceName)
+	packageName := *gs.PackageName
+	serviceName := *gs.ServiceName
 	addr := *gs.Addr
 
 	if old, ok := mgr.m.Find(key); ok {

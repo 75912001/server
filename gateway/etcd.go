@@ -44,10 +44,3 @@ func onEtcdDel(args ...any) error {
 	}
 	return nil
 }
-
-func ptrStr(s *string) string {
-	if s == nil {
-		return ""
-	}
-	return *s
-}
