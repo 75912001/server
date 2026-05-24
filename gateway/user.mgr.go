@@ -77,7 +77,7 @@ func (m *UserMgr) PostOnlineFrame(frameUID uint64, frame *pb.OnlineTunnelFrame) 
 	user.shard.PostFrame(frame)
 }
 
-// Remove 摘除并返回用户（TCP OnDisconnect 触发，调用方负责 Cleanup）。
+// Remove 摘除用户索引并投递 Cleanup
 func (m *UserMgr) Remove(remote xnetcommon.IRemote) *User {
 	u, ok := m.byRemote.Find(remote)
 	if !ok {
