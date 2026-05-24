@@ -27,8 +27,8 @@ type User struct {
 	uid     atomic.Uint64      // 玩家唯一 ID，校验成功后填充
 	remote  xnetcommon.IRemote // 客户端 TCP 连接（发包 / 主动断开）
 	ip      string
-	online  *Online     // 校验后绑定的 online 实例（用 selector 的同一份哈希）
-	verifyd atomic.Bool // 校验是否通过
+	online  atomic.Pointer[Online] // 校验后绑定的 online 实例（用 selector 的同一份哈希）
+	verifyd atomic.Bool            // 校验是否通过
 	closed  atomic.Bool
 	shard   *UserShard
 
@@ -47,7 +47,7 @@ func newUser(remote xnetcommon.IRemote, shard *UserShard) *User {
 func (u *User) IsVerified() bool { return u.verifyd.Load() }
 
 // GetOnline 返回校验后绑定的 online 实例（未校验时为 nil）
-func (u *User) GetOnline() *Online { return u.online }
+func (u *User) GetOnline() *Online { return u.online.Load() }
 
 func (u *User) Disconnect(reason xnetcommon.DisconnectReason) {
 	if !u.closed.CompareAndSwap(false, true) {
@@ -76,7 +76,7 @@ func (u *User) OnVerified(uid uint64, online *Online) {
 		return
 	}
 	u.uid.Store(uid)
-	u.online = online
+	u.online.Store(online)
 	u.verifyd.Store(true)
 	GUserMgr.BindUID(uid, u)
 	if u.verifyTimer != nil {
@@ -154,7 +154,7 @@ func (u *User) Cleanup() {
 		u.verifyTimer = nil
 	}
 	u.hb.Stop()
-	u.online = nil
+	u.online.Store(nil)
 }
 
 // genSession 产生一个非零、且不等于 prev 的随机 session
