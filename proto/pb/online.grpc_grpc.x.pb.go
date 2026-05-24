@@ -30,7 +30,7 @@ type XOnlineService struct {
 	conn *grpc.ClientConn
 
 	xOnlineServiceClient                         *XOnlineServiceClient
-	xStreamOnlineServiceOnlineStreamTunnelClient XStreamOnlineServiceOnlineStreamTunnelClient
+	XStreamOnlineServiceOnlineStreamTunnelClient XStreamOnlineServiceOnlineStreamTunnelClient
 }
 
 func NewXOnlineService(target string) (*XOnlineService, error) {
@@ -44,7 +44,7 @@ func NewXOnlineService(target string) (*XOnlineService, error) {
 	}
 	onlineService.xOnlineServiceClient = NewXOnlineServiceClient(onlineService.conn)
 	{
-		onlineService.xStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient, err = onlineService.xOnlineServiceClient.OnlineStreamTunnel(context.Background())
+		onlineService.XStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient, err = onlineService.xOnlineServiceClient.OnlineStreamTunnel(context.Background())
 		if err != nil {
 			_ = onlineService.Stop()
 			return nil, errors.WithMessage(err, runtime.Location())
@@ -66,15 +66,17 @@ func (p *XOnlineService) Available() bool {
 }
 
 func (p *XOnlineService) Start() error {
-	_ = p.xStreamOnlineServiceOnlineStreamTunnelClient.Start()
+	_ = p.XStreamOnlineServiceOnlineStreamTunnelClient.Start()
 	return nil
 }
 
 func (p *XOnlineService) Stop() error {
 	var err error
-	err = p.xStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient.CloseSend()
-	if err != nil {
-		return errors.WithMessage(err, runtime.Location())
+	if p.XStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient != nil {
+		err = p.XStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient.CloseSend()
+		if err != nil {
+			return errors.WithMessage(err, runtime.Location())
+		}
 	}
 	if p.conn != nil {
 		err = p.conn.Close()
