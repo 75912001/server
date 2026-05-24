@@ -94,16 +94,7 @@ func (s *UserShard) handleOnlineFrame(frame *pb.OnlineTunnelFrame) {
 		if pkt == nil {
 			return
 		}
-		if err := u.remote.Send(&xpacket.PacketPassThrough{
-			Header: &xpacket.Header{
-				Length:    xpacket.HeaderSize + uint32(len(pkt.GetBody())),
-				MessageID: pkt.GetMessageId(),
-				SessionID: pkt.GetSessionId(),
-				ResultID:  pkt.GetResultId(),
-				Key:       pkt.GetKey(),
-			},
-			RawData: buildClientPacketRawData(pkt),
-		}); err != nil {
+		if err := u.remote.Send(buildClientPacketPassThrough(pkt)); err != nil {
 			xlog.PrintfErr("user shard[%d]: downstream send failed uid=%d messageID=%d err=%v",
 				s.id, uid, pkt.GetMessageId(), err)
 		}
@@ -112,7 +103,7 @@ func (s *UserShard) handleOnlineFrame(frame *pb.OnlineTunnelFrame) {
 	}
 }
 
-func buildClientPacketRawData(pkt *pb.OnlineClientPacket) []byte {
+func buildClientPacketPassThrough(pkt *pb.OnlineClientPacket) *xpacket.PacketPassThrough {
 	header := &xpacket.Header{
 		Length:    xpacket.HeaderSize + uint32(len(pkt.GetBody())),
 		MessageID: pkt.GetMessageId(),
@@ -122,5 +113,8 @@ func buildClientPacketRawData(pkt *pb.OnlineClientPacket) []byte {
 	}
 	data := header.Pack()
 	copy(data[xpacket.HeaderSize:], pkt.GetBody())
-	return data
+	return &xpacket.PacketPassThrough{
+		Header:  header,
+		RawData: data,
+	}
 }
