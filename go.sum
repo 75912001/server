@@ -1,6 +1,6 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-github.com/75912001/xlib v0.0.0-20260522145605-ba2960b41968 h1:QeTd283kglj1CcYyYdr1J23HWx7s1OwfmYLpXPqL1To=
-github.com/75912001/xlib v0.0.0-20260522145605-ba2960b41968/go.mod h1:0AgcVP4Bqg/XpULE8uF4qi4SWZtBN6eVek8EXq7fAC0=
+github.com/75912001/xlib v0.0.0-20260524151944-16064316484f h1:Xde6lNXEa4LSEo0GmGSOaejrEEpBQaJioeI+SaTFz+s=
+github.com/75912001/xlib v0.0.0-20260524151944-16064316484f/go.mod h1:0AgcVP4Bqg/XpULE8uF4qi4SWZtBN6eVek8EXq7fAC0=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=

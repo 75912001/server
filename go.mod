@@ -3,10 +3,11 @@ module server
 go 1.25.0
 
 require (
-	github.com/75912001/xlib v0.0.0-20260522145605-ba2960b41968
+	github.com/75912001/xlib v0.0.0-20260524151944-16064316484f
 	github.com/pkg/errors v0.9.1
 	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -35,5 +36,4 @@ require (
 	golang.org/x/time v0.14.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260511170946-3700d4141b60 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260519071638-aa98bba5eb94 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

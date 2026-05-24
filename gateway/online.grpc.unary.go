@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	common "server/common"
 	pb "server/proto/pb"
 
 	xconfig "github.com/75912001/xlib/config"
@@ -52,9 +53,12 @@ func unaryOnlineUserOnline(
 			online, oerr := GOnlineMgr.GetByShardKey(fmt.Sprint(req.GetUid()))
 			if oerr != nil {
 				xlog.PrintfErr("OnlineUserOnline lookup online by uid=%d failed: %v", req.GetUid(), oerr)
-			}
-			if verr := u.shard.PostVerified(u, req.GetUid(), online); verr != nil {
+				res.Code = common.ECGatewayOnlineNotFound.Code()
+				res.Msg = common.ECGatewayOnlineNotFound.Error()
+			} else if verr := u.shard.PostSyncVerified(u, req.GetUid(), online); verr != nil {
 				xlog.PrintfErr("OnlineUserOnline post verified uid=%d failed: %v", req.GetUid(), verr)
+				res.Code = common.ECGatewayOnlineNotFound.Code()
+				res.Msg = common.ECGatewayOnlineNotFound.Error()
 			}
 		}
 	}
