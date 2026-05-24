@@ -8,8 +8,10 @@ import (
 )
 
 const (
-	CmdStreamSend  xactor.CMD = 0 // 向 online stream 发送一帧
-	CmdStreamReset xactor.CMD = 1 // 流断开时清空 stream 指针（由 Post 回调投递）
+	// CmdStreamSend 参数：*pb.OnlineStreamTunnelReq；向 online stream 发送一批上行帧。
+	CmdStreamSend xactor.CMD = 0
+	// CmdStreamReset 参数：pb.OnlineService_OnlineStreamTunnelClient；流断开时清空匹配的 stream 指针（由 Post 回调投递）。
+	CmdStreamReset xactor.CMD = 1
 )
 
 // streamBehavior 是 actor 的唯一消息处理入口，运行在独立 goroutine 中。
