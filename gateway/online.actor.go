@@ -15,7 +15,7 @@ const (
 )
 
 // streamBehavior 是 actor 的唯一消息处理入口，运行在独立 goroutine 中。
-// stream 字段仅在此函数内读写，无需任何锁。
+// stream.Send 和 CmdStreamReset 在 actor 中串行处理，避免并发发送同一个 gRPC stream。
 func (p *Online) streamBehavior(messages ...any) (xactor.Behavior, any, error) {
 	for _, raw := range messages {
 		msg, ok := raw.(*xactor.Msg)
