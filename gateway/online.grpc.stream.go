@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"context"
 
 	pb "server/proto/pb"
 
+	xactor "github.com/75912001/xlib/actor"
 	xlog "github.com/75912001/xlib/log"
 )
 
@@ -36,18 +37,11 @@ func (h *onlineStreamHandler) OnlineStreamTunnel(
 ) error {
 	for _, frame := range msg.GetFrames() {
 		uid := frame.GetUid()
-		switch payload := frame.Payload.(type) {
+		switch frame.Payload.(type) {
 		case *pb.OnlineTunnelFrame_KickUserReq:
-			// Online 服要求踢出玩家：找到对应 TCP 连接并主动断开
-			// TODO: remote := UserMgr.Get(uid); remote.Close()
-			xlog.PrintInfo(fmt.Sprintf("kick uid=%d reason=%d msg=%s",
-				uid, payload.KickUserReq.GetReason(), payload.KickUserReq.GetMsg()))
+			GUserMgr.PostOnlineFrame(uid, frame)
 		case *pb.OnlineTunnelFrame_ClientPacket:
-			// 业务下行包：原封不动转发给客户端
-			// TODO: remote := UserMgr.Get(uid); remote.Send(...)
-			pkt := payload.ClientPacket
-			xlog.PrintInfo(fmt.Sprintf("downstream uid=%d messageID=%d len=%d",
-				uid, pkt.GetMessageId(), len(pkt.GetBody())))
+			GUserMgr.PostOnlineFrame(uid, frame)
 		default:
 			xlog.PrintfErr("online stream: unexpected frame payload type for uid=%d", uid)
 		}
@@ -55,16 +49,11 @@ func (h *onlineStreamHandler) OnlineStreamTunnel(
 	return nil
 }
 
-// OnlineStreamTunnelPost 流关闭时触发：遍历 GOnlineMgr 找到持有该 stream 的实例并置空。
+// OnlineStreamTunnelPost 流关闭时触发：向所有 Online 的 actor 投递 CmdStreamReset，
+// 由各 actor 自行判断是否是自己的流，匹配则置 nil。
 func (h *onlineStreamHandler) OnlineStreamTunnelPost(stream pb.OnlineService_OnlineStreamTunnelClient) error {
 	GOnlineMgr.m.Foreach(func(_ string, o *Online) bool {
-		o.streamMu.RLock()
-		match := o.GetStream() == stream
-		o.streamMu.RUnlock()
-		if match {
-			o.resetStream()
-			return false // 找到即停
-		}
+		o.actor.SendMsg(xactor.NewMsg(context.Background(), CmdStreamReset, stream))
 		return true
 	})
 	return nil
