@@ -34,13 +34,6 @@ custom:
   # 用户心跳 过期时间-秒 默认为 300 秒
   #heartBeatExpireTimeSecond: 864000
 
-  # 用户数据处理 actor 数量。
-  # 每个 TCP 连接建立时会轮询绑定到一个固定 UserShard；
-  # 该连接对应用户后续的验证、心跳、online 下行和清理事件都会投递到同一个 actor。
-  # 单个用户的事件顺序可保证；不同用户如果落在同一个 actor 中，会有轻微相互影响。
-  # 可根据在线人数和消息量调大该值，默认建议 64。
-  userActorCount: 64
-
   # 服务-消息映射
   cmdMapping:
     user: [0x000001, 0x0fffff] # 用户服务命令范围

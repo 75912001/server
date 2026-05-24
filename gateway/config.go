@@ -5,13 +5,11 @@ import xconfig "github.com/75912001/xlib/config"
 const (
 	GatewayCustomKeyVerifyExpireTimeSecond = "verifyExpireTimeSecond"
 	GatewayCustomKeyHeartBeatExpireSecond  = "heartBeatExpireTimeSecond"
-	GatewayCustomKeyUserActorCount         = "userActorCount"
 )
 
 const (
 	GatewayDefaultVerifyExpireTimeSecond int64 = 300
 	GatewayDefaultHeartBeatExpireSecond  int64 = 300
-	GatewayDefaultUserActorCount         int64 = 64
 )
 
 func cfgVerifyExpireTimeSecond() int64 {
@@ -20,8 +18,4 @@ func cfgVerifyExpireTimeSecond() int64 {
 
 func cfgHeartBeatExpireSecond() int64 {
 	return xconfig.GConfigMgr.GetCustomInt64(GatewayCustomKeyHeartBeatExpireSecond, GatewayDefaultHeartBeatExpireSecond)
-}
-
-func cfgUserActorCount() int {
-	return int(xconfig.GConfigMgr.GetCustomInt64(GatewayCustomKeyUserActorCount, GatewayDefaultUserActorCount))
 }
