@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"sync"
-
 	pb "server/proto/pb"
 
 	xactor "github.com/75912001/xlib/actor"
@@ -17,8 +15,6 @@ type Online struct {
 	ID string // ${GroupID}.${serverName}.${serverID}
 
 	actor *xactor.Actor[string] // 序列化 stream.Send 的 actor（每个 Online 独立一个）
-
-	closeOnce sync.Once // 保证 actor Stop 只发送一次
 
 	GroupID     uint32
 	ServerName  string
@@ -51,9 +47,6 @@ func (p *Online) GetID() string { return p.ID }
 
 // Stop 标记不可用，停止 actor，关闭底层流和连接。
 func (p *Online) Stop() error {
-	p.Disabled()
-	p.closeOnce.Do(func() {
-		p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
-	})
+	p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
 	return p.XOnlineService.Stop()
 }

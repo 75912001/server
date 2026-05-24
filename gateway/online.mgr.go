@@ -26,7 +26,8 @@ type OnlineMgr struct {
 // Add 上线：建立 gRPC 连接，启动 recvLoop，注册到 resolve，缓存实例。
 // 若 key 已存在（update），先摘除旧实例再建立新实例。
 func (mgr *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
-	if valueJson == nil || valueJson.GrpcService == nil || valueJson.GrpcService.Addr == nil {
+	if valueJson == nil || valueJson.GrpcService == nil || valueJson.GrpcService.Addr == nil ||
+		valueJson.GrpcService.ServiceName == nil || valueJson.GrpcService.PackageName == nil {
 		return nil
 	}
 	_, groupID, serverName, serverID := xetcd.Parse(key)
@@ -35,9 +36,7 @@ func (mgr *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	serviceName := *gs.ServiceName
 	addr := *gs.Addr
 
-	if old, ok := mgr.m.Find(key); ok {
-		mgr.removeInfo(key, old)
-	}
+	mgr.Remove(key)
 
 	connID := fmt.Sprintf("%d.%s.%d", groupID, serverName, serverID)
 	online, err := newOnline(connID, addr)
@@ -65,19 +64,12 @@ func (mgr *OnlineMgr) Remove(key string) {
 	if !ok {
 		return
 	}
-	mgr.removeInfo(key, online)
-	xlog.GLog.Infof("OnlineMgr.Remove key=%s total=%d", key, mgr.m.Len())
-}
 
-func (mgr *OnlineMgr) removeInfo(key string, online *Online) {
 	if _, err := xgrpcresolve.RemoveServer(
 		online.GroupID, online.ServerName, online.ServerID,
 		online.PackageName, online.ServiceName,
 	); err != nil {
 		xlog.GLog.Warnf("OnlineMgr.removeInfo RemoveServer key=%s: %v", key, err)
-	}
-	if err := online.Stop(); err != nil {
-		xlog.GLog.Warnf("OnlineMgr.removeInfo Stop key=%s: %v", key, err)
 	}
 	mgr.m.Del(key)
 }
