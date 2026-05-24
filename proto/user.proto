@@ -17,13 +17,22 @@ message UserVerifyReq
 //0x000002#gateway->client#登录验证-回复
 message UserVerifyRes
 {
-  uint32 code        = 1;   // 0=成功，非 0=失败
-  string msg         = 2;   // 失败时的错误描述
-  int64  server_time = 3;   // 服务器当前时间戳，单位毫秒（用于客户端对时）
+  int64  server_time = 1;   // 服务器当前时间戳，单位毫秒（用于客户端对时）
 }
 
 //0x000003#client->gateway#主动下线-请求
 message UserOfflineReq
 {
   uint32 reason = 1;   // 1=用户主动离线，2=网络异常断开
+}
+
+// 0x00000A#client->gateway#心跳-请求
+message UserHeartbeatReq {
+  uint32 last_session = 1;   // 上次服务端下发的 session，首次心跳填 0
+}
+
+// 0x00000B#gateway->client#心跳-回复
+message UserHeartbeatRes {
+  uint64 server_time  = 1;   // 服务器时间毫秒
+  uint32 next_session = 2;   // 客户端下次心跳必须用这个 session（用于防重放）
 }
