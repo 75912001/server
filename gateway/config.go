@@ -9,8 +9,8 @@ const (
 )
 
 const (
-	GatewayDefaultVerifyExpireTimeSecond int64 = 86400
-	GatewayDefaultHeartBeatExpireSecond  int64 = 60
+	GatewayDefaultVerifyExpireTimeSecond int64 = 300
+	GatewayDefaultHeartBeatExpireSecond  int64 = 300
 	GatewayDefaultUserActorCount         int64 = 64
 )
 
