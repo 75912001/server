@@ -2,6 +2,7 @@
 etcd:
   endpoints: [127.0.0.1:2379]  # ETCD 地址列表 e.g.: 127.0.0.x:2379,127.0.0.y:2379
   ttl: 33000000 # ttl 秒 [default]: xetcd.TtlSecondDefault 秒, e.g.:系统每10秒续约一次,该参数至少为11秒
+
 # 基础配置
 base:
   projectName: project  # 项目名称
@@ -14,21 +15,31 @@ base:
   runMode: 1                        # 运行模式 [0:release, 1:debug]
   availableLoad: 100000            # 可用负载
   processingMode: 1 # 处理-模式 [0:bus, 1:actor]
+
 # 日志
 log:
   level: 7        # 日志级别
+
 # 网络配置
 net:
-  - listenAddr: 127.0.0.1:10101 # TCP 地址 e.g.:127.0.0.x:10101
+  - listenAddr: 0.0.0.0:10101 # TCP 地址 e.g.:127.0.0.x:10101
     externalAddr: 127.0.0.1:10101
     type: tcp
 
+# 用户自定义配置
 custom:
   # 用户 verify 过期时间-秒
   verifyExpireTimeSecond: 864000
 
   # 用户心跳 过期时间-秒
   heartBeatExpireTimeSecond: 864000
+
+  # 用户数据处理 actor 数量。
+  # online 下行的用户消息会按 uid % userActorCount 分配到固定 actor 中处理；
+  # 同一 uid 始终进入同一个 actor，可保证单用户消息顺序。
+  # 不同 uid 可能落在同一个 actor 中，因此同分片用户之间会有轻微相互影响；
+  # 可根据在线人数和下行消息量调大该值，默认建议 64。
+  userActorCount: 64
 
   # 服务-消息映射
   cmdMapping:
