@@ -36,11 +36,11 @@ func (h *onlineStreamHandler) OnlineStreamTunnel(
 	return nil
 }
 
-// OnlineStreamTunnelPost 流关闭时触发：向所有 Online 的 actor 投递 CmdStreamReset，
+// OnlineStreamTunnelPost 流关闭时触发：向所有 Online 的 actor 投递 OnlineActorCmdStreamReset，
 // 由各 actor 自行判断是否是自己的流，匹配则置 nil。
 func (h *onlineStreamHandler) OnlineStreamTunnelPost(stream pb.OnlineService_OnlineStreamTunnelClient) error {
 	GOnlineMgr.m.Foreach(func(_ string, o *Online) bool {
-		o.actor.SendMsg(xactor.NewMsg(context.Background(), CmdStreamReset, stream))
+		o.actor.SendMsg(xactor.NewMsg(context.Background(), OnlineActorCmdStreamReset, stream))
 		return true
 	})
 	return nil
