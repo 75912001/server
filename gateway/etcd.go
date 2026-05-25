@@ -22,7 +22,7 @@ func onEtcdAdd(args ...any) error {
 	switch serverName {
 	case common.OnlineServerName:
 		if err := GOnlineMgr.Add(key, valueJson); err != nil {
-			xlog.GLog.Errorf("onEtcdAdd serverName=%s key=%s: %v", serverName, key, err)
+			xlog.GLog.Errorf("onEtcdAdd key=%s: %v", key, err)
 			return err
 		}
 	}
@@ -41,6 +41,7 @@ func onEtcdDel(args ...any) error {
 	switch serverName {
 	case common.OnlineServerName:
 		GOnlineMgr.Remove(key)
+		xlog.GLog.Infof("onEtcdDel key=%s", key)
 	}
 	return nil
 }
