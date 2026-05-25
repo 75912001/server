@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"server/common"
+	pb "server/proto/pb"
 
 	xcontrol "github.com/75912001/xlib/control"
 	xetcd "github.com/75912001/xlib/etcd"
@@ -43,6 +44,9 @@ func (g *Gateway) PreStart(ctx context.Context) error {
 
 	if err := g.Server.PreStart(ctx, opts); err != nil {
 		return err
+	}
+	if g.Server.GRPCServer != nil {
+		pb.RegisterGatewayServiceServer(g.Server.GRPCServer.GrpcServer, &gatewayGRPCServer{})
 	}
 	return nil
 }
