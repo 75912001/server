@@ -59,8 +59,8 @@ func (m *UserMgr) Remove(remote xnetcommon.IRemote) *User {
 	if !ok {
 		return nil
 	}
-	uid := u.PostSyncCleanup(remote.GetDisconnectReason())
 	m.byRemote.Del(remote)
+	uid := u.PostSyncCleanup(remote.GetDisconnectReason())
 	if uid != 0 {
 		m.byUID.Del(uid)
 	}
