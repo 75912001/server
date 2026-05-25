@@ -55,7 +55,7 @@ func unaryOnlineUserOnline(
 				xlog.PrintfErr("OnlineUserOnline lookup online by uid=%d failed: %v", req.GetUid(), oerr)
 				res.Code = common.ECGatewayOnlineNotFound.Code()
 				res.Msg = common.ECGatewayOnlineNotFound.Error()
-			} else if verr := u.shard.PostSyncVerified(u, req.GetUid(), online); verr != nil {
+			} else if verr := u.PostSyncVerified(req.GetUid(), online); verr != nil {
 				xlog.PrintfErr("OnlineUserOnline post verified uid=%d failed: %v", req.GetUid(), verr)
 				res.Code = common.ECGatewayOnlineNotFound.Code()
 				res.Msg = common.ECGatewayOnlineNotFound.Error()
