@@ -49,17 +49,20 @@ func unaryOnlineUserOnline(
 	// 校验通过：绑定 User 到本次哈希命中的 online 实例（GetByShardKey 与 selector.Sel 同一哈希环，结果一致），
 	// 停止「未校验超时」定时器，启动心跳超时定时器。
 	if res.GetCode() == 0 {
-		if u := GUserMgr.Get(remote); u != nil {
-			online, oerr := GOnlineMgr.GetByShardKey(fmt.Sprint(req.GetUid()))
-			if oerr != nil {
-				xlog.PrintfErr("OnlineUserOnline lookup online by uid=%d failed: %v", req.GetUid(), oerr)
-				res.Code = common.ECGatewayOnlineNotFound.Code()
-				res.Msg = common.ECGatewayOnlineNotFound.Error()
-			} else if verr := u.PostSyncVerified(req.GetUid(), online); verr != nil {
-				xlog.PrintfErr("OnlineUserOnline post verified uid=%d failed: %v", req.GetUid(), verr)
-				res.Code = common.ECGatewayOnlineNotFound.Code()
-				res.Msg = common.ECGatewayOnlineNotFound.Error()
-			}
+		u := GUserMgr.Get(remote)
+		if u == nil || !remote.IsConnect() {
+			xlog.PrintInfo(fmt.Sprintf("OnlineUserOnline uid=%d ignored, client disconnected", req.GetUid()))
+			return nil
+		}
+		online, oerr := GOnlineMgr.GetByShardKey(fmt.Sprint(req.GetUid()))
+		if oerr != nil {
+			xlog.PrintfErr("OnlineUserOnline lookup online by uid=%d failed: %v", req.GetUid(), oerr)
+			res.Code = common.ECGatewayOnlineNotFound.Code()
+			res.Msg = common.ECGatewayOnlineNotFound.Error()
+		} else if verr := u.PostSyncVerified(req.GetUid(), online); verr != nil {
+			xlog.PrintfErr("OnlineUserOnline post verified uid=%d failed: %v", req.GetUid(), verr)
+			res.Code = common.ECGatewayOnlineNotFound.Code()
+			res.Msg = common.ECGatewayOnlineNotFound.Error()
 		}
 	}
 
