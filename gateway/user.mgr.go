@@ -3,8 +3,6 @@ package main
 import (
 	pb "server/proto/pb"
 
-	"sync/atomic"
-
 	xlog "github.com/75912001/xlib/log"
 	xmap "github.com/75912001/xlib/map"
 	xnetcommon "github.com/75912001/xlib/net/common"
@@ -22,35 +20,13 @@ var GUserMgr = &UserMgr{
 type UserMgr struct {
 	byRemote *xmap.MapMutexMgr[xnetcommon.IRemote, *User]
 	byUID    *xmap.MapMutexMgr[uint64, *User]
-	shards   []*UserShard
-	next     atomic.Uint64
-}
-
-// Init 初始化用户分片 actor；必须在任何 newUser 调用之前完成。
-func (m *UserMgr) Init() {
-	if len(m.shards) > 0 {
-		return
-	}
-	count := cfgUserActorCount()
-	if count <= 0 {
-		count = int(GatewayDefaultUserActorCount)
-	}
-	m.shards = make([]*UserShard, 0, count)
-	for i := 0; i < count; i++ {
-		m.shards = append(m.shards, newUserShard(i))
-	}
 }
 
 // Add 创建用户并登记（TCP OnConnect 触发）。
 func (m *UserMgr) Add(remote xnetcommon.IRemote) *User {
-	u := newUser(remote, m.nextShard())
+	u := newUser(remote)
 	m.byRemote.Add(remote, u)
 	return u
-}
-
-func (m *UserMgr) nextShard() *UserShard {
-	idx := m.next.Add(1) - 1
-	return m.shards[int(idx%uint64(len(m.shards)))]
 }
 
 // Get 查找用户（TCP OnPacket 用 remote 反查）。
@@ -74,7 +50,7 @@ func (m *UserMgr) PostOnlineFrame(frameUID uint64, frame *pb.OnlineTunnelFrame) 
 		xlog.PrintfErr("online frame uid=%d not found", frameUID)
 		return
 	}
-	user.shard.PostFrame(frame)
+	user.PostFrame(frame)
 }
 
 // Remove 摘除用户索引并投递 Cleanup
@@ -83,12 +59,11 @@ func (m *UserMgr) Remove(remote xnetcommon.IRemote) *User {
 	if !ok {
 		return nil
 	}
-	u.closed.Store(true)
+	uid := u.PostSyncCleanup(remote.GetDisconnectReason())
 	m.byRemote.Del(remote)
-	if uid := u.uid.Load(); uid != 0 {
+	if uid != 0 {
 		m.byUID.Del(uid)
 	}
-	_ = u.shard.PostCleanup(u)
 	return u
 }
 
