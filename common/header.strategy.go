@@ -16,7 +16,11 @@ func (p *DefaultHeaderStrategy) GetLengthSize() uint32 {
 }
 
 func (p *DefaultHeaderStrategy) UnpackLength(buf []byte) uint32 {
-	return xpacket.GEndian.Uint32(buf[0:4])
+	length := xpacket.GEndian.Uint32(buf[0:4])
+	if length < xpacket.HeaderLengthFieldSize {
+		return 0
+	}
+	return length - xpacket.HeaderLengthFieldSize
 }
 
 func (p *DefaultHeaderStrategy) UnpackMessageID(buf []byte) uint32 {
