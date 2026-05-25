@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	pb "server/proto/pb"
 
 	xactor "github.com/75912001/xlib/actor"
 	xcontrol "github.com/75912001/xlib/control"
+	xlog "github.com/75912001/xlib/log"
 	xnetcommon "github.com/75912001/xlib/net/common"
 	xpacket "github.com/75912001/xlib/packet"
 )
@@ -19,6 +21,30 @@ const (
 	// UserActorCmdUserCleanup 参数：xnetcommon.DisconnectReason；连接断开后清理用户定时器和状态，返回 uid。
 	UserActorCmdUserCleanup xactor.CMD = 103
 )
+
+func (p *User) PostFrame(frame *pb.OnlineTunnelFrame) {
+	p.actor.SendMsg(xactor.NewMsg(context.Background(), UserActorCmdOnlineTunnelFrame, frame))
+}
+
+func (p *User) PostSyncVerified(uid uint64, online *Online) error {
+	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserVerified, uid, online))
+	return err
+}
+
+func (p *User) PostClientPacket(header *xpacket.Header, body []byte) {
+	p.actor.SendMsg(xactor.NewMsg(context.Background(), UserActorCmdUserPacket, header, body))
+}
+
+func (p *User) PostSyncCleanup(reason xnetcommon.DisconnectReason) uint64 {
+	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserCleanup, reason))
+	if err != nil {
+		xlog.PrintfErr("user cleanup sync failed remote=%p err=%v", p.remote, err)
+		return 0
+	}
+	uid, _ := resp.(uint64)
+	p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
+	return uid
+}
 
 func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 	var resp any
