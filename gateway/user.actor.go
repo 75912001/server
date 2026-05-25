@@ -23,11 +23,6 @@ const (
 	UserActorCmdUserCleanup xactor.CMD = 103
 )
 
-type userPacketEvent struct {
-	header *xpacket.Header
-	body   []byte
-}
-
 func (u *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 	var resp any
 	for _, raw := range messages {
