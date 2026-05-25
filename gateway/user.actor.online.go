@@ -10,13 +10,13 @@ import (
 	xpacket "github.com/75912001/xlib/packet"
 )
 
-func (u *User) handleOnlineFrame(frame *pb.OnlineTunnelFrame) {
-	if !u.remote.IsConnect() {
+func (p *User) handleOnlineFrame(frame *pb.OnlineTunnelFrame) {
+	if !p.remote.IsConnect() {
 		return
 	}
 	uid := frame.GetUid()
-	if uid != u.uid {
-		xlog.PrintfErr("user actor uid mismatch: actor uid=%d frame uid=%d", u.uid, uid)
+	if uid != p.uid {
+		xlog.PrintfErr("user actor uid mismatch: actor uid=%d frame uid=%d", p.uid, uid)
 		return
 	}
 
@@ -24,13 +24,13 @@ func (u *User) handleOnlineFrame(frame *pb.OnlineTunnelFrame) {
 	case *pb.OnlineTunnelFrame_KickUserReq:
 		xlog.PrintInfo(fmt.Sprintf("kick uid=%d reason=%d msg=%s",
 			uid, payload.KickUserReq.GetReason(), payload.KickUserReq.GetMsg()))
-		u.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
+		p.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 	case *pb.OnlineTunnelFrame_ClientPacket:
 		pkt := payload.ClientPacket
 		if pkt == nil {
 			return
 		}
-		if err := u.remote.Send(buildClientPacketPassThrough(pkt)); err != nil {
+		if err := p.remote.Send(buildClientPacketPassThrough(pkt)); err != nil {
 			xlog.PrintfErr("user downstream send failed uid=%d messageID=%d err=%v",
 				uid, pkt.GetMessageId(), err)
 		}

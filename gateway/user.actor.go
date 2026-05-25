@@ -20,7 +20,7 @@ const (
 	UserActorCmdUserCleanup xactor.CMD = 103
 )
 
-func (u *User) behavior(messages ...any) (xactor.Behavior, any, error) {
+func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 	var resp any
 	for _, raw := range messages {
 		if event, ok := raw.(*xcontrol.Event); ok {
@@ -37,7 +37,7 @@ func (u *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 		case UserActorCmdOnlineTunnelFrame:
 			frame, ok := msg.Args[0].(*pb.OnlineTunnelFrame)
 			if ok {
-				u.handleOnlineFrame(frame)
+				p.handleOnlineFrame(frame)
 			}
 		case UserActorCmdUserVerified:
 			uid, ok := msg.Args[0].(uint64)
@@ -48,7 +48,7 @@ func (u *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if !ok {
 				continue
 			}
-			u.OnVerified(uid, online)
+			p.OnVerified(uid, online)
 		case UserActorCmdUserPacket:
 			header, ok := msg.Args[0].(*xpacket.Header)
 			if !ok {
@@ -58,13 +58,13 @@ func (u *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if !ok {
 				continue
 			}
-			_ = u.OnClientPacket(header, body)
+			_ = p.OnClientPacket(header, body)
 		case UserActorCmdUserCleanup:
 			reason, ok := msg.Args[0].(xnetcommon.DisconnectReason)
 			if ok {
-				resp = u.Cleanup(reason)
+				resp = p.Cleanup(reason)
 			}
 		}
 	}
-	return u.behavior, resp, nil
+	return p.behavior, resp, nil
 }
