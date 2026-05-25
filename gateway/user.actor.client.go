@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	pb "server/proto/pb"
@@ -22,7 +21,7 @@ func (p *User) OnClientPacket(header *xpacket.Header, body []byte) error {
 		return p.OnHeartbeatReq(header, body)
 	}
 	if p.online == nil {
-		xlog.PrintfErr("packet before verify, remote=%p messageID=%d", p.remote, header.MessageID)
+		xlog.GLog.Warnf("packet before verify, remote=%p messageID=%d", p.remote, header.MessageID)
 		p.Disconnect(xnetcommon.DisconnectReasonClientLogic)
 		return nil
 	}
@@ -44,10 +43,10 @@ func (p *User) OnClientPacket(header *xpacket.Header, body []byte) error {
 		},
 	}
 	if err := p.online.Send(&pb.OnlineStreamTunnelReq{Frames: []*pb.OnlineTunnelFrame{frame}}); err != nil {
-		xlog.PrintfErr("stream send failed for online[%s]: %v", p.online.ID, err)
+		xlog.GLog.Errorf("stream send failed for online[%s]: %v", p.online.ID, err)
 		return err
 	}
-	xlog.PrintInfo(fmt.Sprintf("Message %d forwarded to online[%s]", header.MessageID, p.online.ID))
+	xlog.GLog.Infof("Message %d forwarded to online[%s]", header.MessageID, p.online.ID)
 	return nil
 }
 
@@ -61,21 +60,22 @@ func (p *User) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
 		return nil
 	}
 	if p.online == nil {
-		xlog.PrintfErr("heartbeat before verify, remote=%s", p.ip)
+		xlog.GLog.Warnf("heartbeat before verify, remote=%s", p.ip)
 		p.Disconnect(xnetcommon.DisconnectReasonClientLogic)
 		return nil
 	}
 
 	var req pb.UserHeartbeatReq
 	if err := proto.Unmarshal(body, &req); err != nil {
+		xlog.GLog.Warnf("heartbeat req unmarshal failed err=%v", err)
 		return errors.WithMessage(err, "UserHeartbeatReq unmarshal")
 	}
 
 	if p.hb.WaitID != 0 && req.GetLastSession() != p.hb.WaitID {
-		xlog.PrintfErr("user[uid=%d] heartbeat session mismatch: got=%d expect=%d",
+		xlog.GLog.Warnf("user[uid=%d] heartbeat session mismatch: got=%d expect=%d",
 			p.uid, req.GetLastSession(), p.hb.WaitID)
 		p.Disconnect(xnetcommon.DisconnectReasonClientLogic)
-		return errors.New("heartbeat session mismatch")
+		return nil
 	}
 
 	next := xutil.RandomUint32()
