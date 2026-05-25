@@ -44,7 +44,5 @@ func (g *Gateway) PreStart(ctx context.Context) error {
 	if err := g.Server.PreStart(ctx, opts); err != nil {
 		return err
 	}
-
-	GUserMgr.Init()
 	return nil
 }
