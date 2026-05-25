@@ -54,7 +54,7 @@ func (mgr *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	// Online 实现 IClientConn，直接注册到 resolve 哈希环
 	xgrpcresolve.AddServer(groupID, serverName, serverID, online, packageName, serviceName)
 
-	xlog.GLog.Infof("OnlineMgr.Add key=%s addr=%s total=%d", key, addr, mgr.m.Len())
+	xlog.GLog.Infof("OnlineMgr.Add key:%s addr:%s total:%d", key, addr, mgr.m.Len())
 	return nil
 }
 
@@ -75,6 +75,8 @@ func (mgr *OnlineMgr) Remove(key string) {
 		}
 	}
 	mgr.m.Del(key)
+
+	xlog.GLog.Infof("OnlineMgr.removeInfo RemoveServer key:%s total:%v", key, mgr.m.Len())
 }
 
 // GetByShardKey 通过一致性哈希选取一个 online 实例
