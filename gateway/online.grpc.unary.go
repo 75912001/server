@@ -11,6 +11,7 @@ import (
 	xlog "github.com/75912001/xlib/log"
 	xnetcommon "github.com/75912001/xlib/net/common"
 	xpacket "github.com/75912001/xlib/packet"
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -77,4 +78,13 @@ func unaryOnlineUserOnline(
 			ServerTime: res.GetServerTime(),
 		},
 	})
+}
+
+func unaryOnlineUserOffline(clientConn *grpc.ClientConn, uid uint64, reason xnetcommon.DisconnectReason, msg string) error {
+	_, err := pb.NewOnlineServiceClient(clientConn).OnlineUserOffline(context.Background(), &pb.OnlineUserOfflineReq{
+		Uid:    uid,
+		Reason: uint32(reason),
+		Msg:    msg,
+	})
+	return err
 }
