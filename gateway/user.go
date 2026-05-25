@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	pb "server/proto/pb"
-
 	xactor "github.com/75912001/xlib/actor"
 	xcontrol "github.com/75912001/xlib/control"
 	xheartbeat "github.com/75912001/xlib/heartbeat"
@@ -53,29 +51,7 @@ func (p *User) Disconnect(reason xnetcommon.DisconnectReason) {
 		return
 	}
 	p.remote.SetDisconnectReason(reason)
-	p.remote.Stop()
-}
-
-func (p *User) notifyOffline(reason xnetcommon.DisconnectReason) {
-	if p.uid == 0 {
-		return
-	}
-	if p.online == nil {
-		xlog.PrintfErr("notify offline skipped, online not bound uid=%d reason=%d", p.uid, reason)
-		return
-	}
-	if err := p.online.Send(&pb.OnlineStreamTunnelReq{
-		Frames: []*pb.OnlineTunnelFrame{
-			{
-				Uid: p.uid,
-				Payload: &pb.OnlineTunnelFrame_UserOfflineReq{
-					UserOfflineReq: &pb.OnlineUserOfflineReq{Reason: uint32(reason)},
-				},
-			},
-		},
-	}); err != nil {
-		xlog.PrintfErr("notify offline failed uid=%d reason=%d online=%s err=%v", p.uid, reason, p.online.ID, err)
-	}
+	GUserMgr.Remove(p.remote)
 }
 
 // startVerifyTimer 注册超时回调：到期若仍未校验则断开连接
@@ -124,16 +100,17 @@ func (p *User) startHeartbeatTimer() {
 }
 
 // Cleanup 连接断开后由 user actor 串行清理定时器和在线状态。
-func (p *User) Cleanup(reason xnetcommon.DisconnectReason) uint64 {
-	if p.online != nil {
-		p.notifyOffline(reason)
+func (p *User) Cleanup(reason xnetcommon.DisconnectReason) {
+	if p.uid != 0 && p.online != nil {
+		if err := unaryOnlineUserOffline(p.online.GetClientConn(), p.uid, reason, "gateway user offline"); err != nil {
+			xlog.GLog.Warnf("notify offline failed uid=%d reason=%d online=%s err=%v", p.uid, reason, p.online.ID, err)
+		}
 	}
-	uid := p.uid
+
 	if p.verifyTimer != nil {
 		xtimer.GTimer.DelSecond(p.verifyTimer)
 		p.verifyTimer = nil
 	}
 	p.hb.Stop()
 	p.online = nil
-	return uid
 }
