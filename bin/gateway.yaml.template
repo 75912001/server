@@ -21,7 +21,6 @@ log:
   level: 7        # 日志级别
 
 # gRPC 配置
-# Online 顶号时会调用该服务的 GatewayKickUser unary 接口。
 grpc:
   packageName: gateway
   serviceName: GatewayService
