@@ -83,10 +83,15 @@ func (p *User) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
 
 	p.startHeartbeatTimer()
 
+	return p.sendHeartbeatRes(header, next)
+}
+
+func (p *User) sendHeartbeatRes(header *xpacket.Header, next uint32) error {
 	return p.remote.Send(&xpacket.Packet{
 		Header: &xpacket.Header{
 			MessageID: uint32(pb.MsgIDUser_UserHeartbeatRes_CMD),
 			SessionID: header.SessionID,
+			ResultID:  0,
 			Key:       header.Key,
 		},
 		PBMessage: &pb.UserHeartbeatRes{
