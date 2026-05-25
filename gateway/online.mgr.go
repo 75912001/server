@@ -70,6 +70,9 @@ func (mgr *OnlineMgr) Remove(key string) {
 		online.PackageName, online.ServiceName,
 	); err != nil {
 		xlog.GLog.Warnf("OnlineMgr.removeInfo RemoveServer key=%s: %v", key, err)
+		if stopErr := online.Stop(); stopErr != nil {
+			xlog.GLog.Warnf("OnlineMgr.removeInfo fallback Stop key=%s: %v", key, stopErr)
+		}
 	}
 	mgr.m.Del(key)
 }
