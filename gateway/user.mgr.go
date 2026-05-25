@@ -53,7 +53,7 @@ func (m *UserMgr) PostOnlineFrame(frameUID uint64, frame *pb.OnlineTunnelFrame) 
 	user.PostFrame(frame)
 }
 
-// Remove 摘除用户索引并投递 Cleanup
+// Remove 摘除 remote 对应用户，同步执行 Cleanup，并移除 uid 索引。
 func (m *UserMgr) Remove(remote xnetcommon.IRemote) *User {
 	u, ok := m.byRemote.Find(remote)
 	if !ok {

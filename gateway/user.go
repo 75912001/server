@@ -15,15 +15,14 @@ import (
 )
 
 // User 一个客户端连接的会话上下文。
-//   - online：校验成功后绑定的 online 实例，用于后续业务包透传（stream.Send）。
-//   - online：nil 表示未校验或已清理，非 nil 表示校验通过且已绑定 online。
+//   - online：nil 表示未校验或已清理，非 nil 表示校验通过并绑定的 online 实例。
 //   - verifyTimer / hb：校验超时定时器 + 心跳管理（二选一存在）。
 //   - hb.WaitID：上次下发给客户端的 session（防重放），首次心跳时为 0。
 type User struct {
 	uid    uint64             // 玩家唯一 ID，校验成功后填充
 	remote xnetcommon.IRemote // 客户端 TCP 连接（发包 / 主动断开）
 	ip     string
-	online *Online // 校验后绑定的 online 实例（用 selector 的同一份哈希）
+	online *Online // nil 表示未校验或已清理，非 nil 表示校验通过并绑定的 online 实例
 	actor  *xactor.Actor[string]
 
 	verifyTimer *xtimer.Second       // 校验超时定时器（onVerified 后置 nil）
@@ -124,7 +123,7 @@ func (p *User) startHeartbeatTimer() {
 	p.hb.Start(cb, p.actor)
 }
 
-// Cleanup 连接断开后清理所有定时器（由 OnDisconnect 调用）。
+// Cleanup 连接断开后由 user actor 串行清理定时器和在线状态。
 func (p *User) Cleanup(reason xnetcommon.DisconnectReason) uint64 {
 	if p.online != nil {
 		p.notifyOffline(reason)
