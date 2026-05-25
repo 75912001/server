@@ -7,30 +7,38 @@ import (
 	common "server/common"
 	pb "server/proto/pb"
 
+	xerror "github.com/75912001/xlib/error"
 	xlog "github.com/75912001/xlib/log"
+	xnetcommon "github.com/75912001/xlib/net/common"
 )
 
 type gatewayGRPCServer struct {
 	pb.UnimplementedGatewayServiceServer
 }
 
-func (s *gatewayGRPCServer) GatewayKickUser(_ context.Context, req *pb.GatewayKickUserReq) (*pb.GatewayKickUserRes, error) {
+func (p *gatewayGRPCServer) GatewayUserOffline(_ context.Context, req *pb.GatewayUserOfflineReq) (*pb.GatewayUserOfflineRes, error) {
 	if req.GetUid() == 0 {
-		return &pb.GatewayKickUserRes{
+		xlog.GLog.Error("GatewayUserOffline uid:0")
+		return &pb.GatewayUserOfflineRes{
 			Code: common.ECGatewayInvalidUID.Code(),
 			Msg:  common.ECGatewayInvalidUID.Error(),
 		}, nil
 	}
-	kicked := GUserMgr.KickVerifiedUID(req.GetUid(), req.GetReason(), req.GetMsg())
-	if !kicked {
-		return &pb.GatewayKickUserRes{
-			Code: 0,
-			Msg:  fmt.Sprintf("uid=%d already offline", req.GetUid()),
+
+	user := GUserMgr.GetByUID(req.GetUid())
+	if user == nil {
+		xlog.GLog.Warnf("not found uid:%d", req.GetUid())
+		return &pb.GatewayUserOfflineRes{
+			Code: xerror.Success.Code(),
+			Msg:  common.ECGatewayUIDNotFound.Error(),
 		}, nil
 	}
-	xlog.PrintInfo(fmt.Sprintf("GatewayKickUser uid=%d reason=%d msg=%s", req.GetUid(), req.GetReason(), req.GetMsg()))
-	return &pb.GatewayKickUserRes{
-		Code: 0,
-		Msg:  fmt.Sprintf("uid=%d kicked", req.GetUid()),
+
+	user.Disconnect(xnetcommon.DisconnectReason(req.GetReason()))
+
+	xlog.GLog.Debugf("GatewayUserOffline uid:%d reason:%v msg:%s", req.GetUid(), xnetcommon.DisconnectReason(req.GetReason()), req.GetMsg())
+	return &pb.GatewayUserOfflineRes{
+		Code: xerror.Success.Code(),
+		Msg:  fmt.Sprintf("uid:%d offline", req.GetUid()),
 	}, nil
 }
