@@ -38,7 +38,7 @@ func newOnline(id, addr string) (*Online, error) {
 
 // Send 将消息帧异步投递到 actor，由 actor goroutine 串行调用 stream.Send。
 func (p *Online) Send(req *pb.OnlineStreamTunnelReq) error {
-	p.actor.SendMsg(xactor.NewMsg(context.Background(), CmdStreamSend, req))
+	p.actor.SendMsg(xactor.NewMsg(context.Background(), OnlineActorCmdStreamSend, req))
 	return nil
 }
 
