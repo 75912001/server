@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 
-	"google.golang.org/protobuf/proto"
-
 	pb "server/proto/pb"
 
 	xconfig "github.com/75912001/xlib/config"
@@ -48,10 +46,9 @@ func (h *UserHandlerTCP) OnUnmarshalPacket(remote xnetcommon.IRemote, data []byt
 	_ = remote
 	header := xpacket.NewHeader()
 	header.Unpack(data[:xpacket.HeaderSize])
-	body := data[xpacket.HeaderSize:header.Length]
 	return &xpacket.PacketPassThrough{
 		Header:  header,
-		RawData: body,
+		RawData: data,
 	}, nil
 }
 
@@ -63,7 +60,7 @@ func (h *UserHandlerTCP) OnPacket(remote xnetcommon.IRemote, packet xpacket.IPac
 	}
 
 	header := pt.Header
-	body := pt.RawData
+	body := pt.RawData[xpacket.HeaderSize:header.Length]
 
 	xlog.PrintInfo(fmt.Sprintf("OnPacket MessageID: %d, Length: %d, Key: %d", header.MessageID, header.Length, header.Key))
 
@@ -78,60 +75,7 @@ func (h *UserHandlerTCP) OnPacket(remote xnetcommon.IRemote, packet xpacket.IPac
 		return nil
 	}
 
-	// 心跳：网关本地处理（校验 session + 刷新心跳定时器），不下发到 online
-	if header.MessageID == uint32(pb.MsgIDUser_UserHeartbeatReq_CMD) {
-		u.shard.PostHeartbeat(u, header, body)
-		return nil
-	}
-
-	if !u.IsVerified() {
-		xlog.PrintfErr("packet before verify, remote=%p messageID=%d", remote, header.MessageID)
-		u.Disconnect(xnetcommon.DisconnectReasonClientLogic)
-		return nil
-	}
-
-	uid := u.uid.Load()
-
-	// 其余消息：使用登录时绑定的 online 实例，经双向 StreamTunnel 透传
-	online := u.GetOnline()
-	if online == nil {
-		xlog.PrintfErr("online not bound for uid=%d", uid)
-		u.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
-		return nil
-	}
-
-	frame := &pb.OnlineTunnelFrame{Uid: uid}
-
-	// UserOfflineReq：客户端主动离线信令
-	if header.MessageID == uint32(pb.MsgIDUser_UserOfflineReq_CMD) {
-		var offlineReq pb.UserOfflineReq
-		if err := proto.Unmarshal(body, &offlineReq); err != nil {
-			xlog.PrintfErr("UserOfflineReq unmarshal failed uid=%d: %v", uid, err)
-			return err
-		}
-		frame.Payload = &pb.OnlineTunnelFrame_UserOfflineReq{
-			UserOfflineReq: &pb.OnlineUserOfflineReq{
-				Reason: offlineReq.GetReason(),
-			},
-		}
-	} else {
-		frame.Payload = &pb.OnlineTunnelFrame_ClientPacket{
-			ClientPacket: &pb.OnlineClientPacket{
-				MessageId: header.MessageID,
-				SessionId: header.SessionID,
-				ResultId:  header.ResultID,
-				Key:       uid,
-				Body:      body,
-			},
-		}
-	}
-
-	if err := online.Send(&pb.OnlineStreamTunnelReq{Frames: []*pb.OnlineTunnelFrame{frame}}); err != nil {
-		xlog.PrintfErr("stream send failed for online[%s]: %v", online.ID, err)
-		return err
-	}
-
-	xlog.PrintInfo(fmt.Sprintf("Message %d forwarded to online[%s]", header.MessageID, online.ID))
+	u.PostClientPacket(header, body)
 	return nil
 }
 
