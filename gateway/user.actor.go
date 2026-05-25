@@ -18,7 +18,7 @@ const (
 	UserActorCmdUserVerified xactor.CMD = 101
 	// UserActorCmdUserPacket 参数：header *xpacket.Header, body []byte；处理客户端上行包，包含心跳、主动离线和业务透传。
 	UserActorCmdUserPacket xactor.CMD = 102
-	// UserActorCmdUserCleanup 参数：xnetcommon.DisconnectReason；连接断开后清理用户定时器和状态，返回 uid。
+	// UserActorCmdUserCleanup 参数：xnetcommon.DisconnectReason；连接断开后清理用户定时器和状态。
 	UserActorCmdUserCleanup xactor.CMD = 103
 )
 
@@ -35,15 +35,13 @@ func (p *User) PostClientPacket(header *xpacket.Header, body []byte) {
 	p.actor.SendMsg(xactor.NewMsg(context.Background(), UserActorCmdUserPacket, header, body))
 }
 
-func (p *User) PostSyncCleanup(reason xnetcommon.DisconnectReason) uint64 {
-	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserCleanup, reason))
+func (p *User) PostSyncCleanup(reason xnetcommon.DisconnectReason) {
+	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserCleanup, reason))
 	if err != nil {
-		xlog.PrintfErr("user cleanup sync failed remote=%p err=%v", p.remote, err)
-		return 0
+		xlog.GLog.Errorf("user cleanup sync failed remote=%p err=%v", p.remote, err)
+		return
 	}
-	uid, _ := resp.(uint64)
 	p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
-	return uid
 }
 
 func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
@@ -88,7 +86,7 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 		case UserActorCmdUserCleanup:
 			reason, ok := msg.Args[0].(xnetcommon.DisconnectReason)
 			if ok {
-				resp = p.Cleanup(reason)
+				p.Cleanup(reason)
 			}
 		}
 	}
