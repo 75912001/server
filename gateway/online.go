@@ -45,7 +45,7 @@ func (p *Online) Send(req *pb.OnlineStreamTunnelReq) error {
 // GetID 实现 xgrpcutil.IClientConn，返回服务实例唯一标识。
 func (p *Online) GetID() string { return p.ID }
 
-// Stop 标记不可用，停止 actor，关闭底层流和连接。
+// Stop 停止 actor，关闭底层流和连接。
 func (p *Online) Stop() error {
 	p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
 	return p.XOnlineService.Stop()

@@ -23,7 +23,7 @@ func (h *onlineStreamHandler) OnlineStreamTunnelPre(_ pb.OnlineService_OnlineStr
 }
 
 // OnlineStreamTunnel 处理 online → gateway 下行流。
-// 每条 OnlineStreamTunnelRes 含若干 OnlineTunnelFrame，按 payload 类型分发：
+// 每条 OnlineStreamTunnelRes 含若干 OnlineTunnelFrame，按 uid 投递到对应用户 actor。
 func (h *onlineStreamHandler) OnlineStreamTunnel(
 	_ *pb.XStreamOnlineServiceOnlineStreamTunnelClient,
 	msg *pb.OnlineStreamTunnelRes,
