@@ -42,28 +42,16 @@ func (m *UserMgr) GetByUID(uid uint64) *User {
 
 func (m *UserMgr) BindUID(uid uint64, u *User) {
 	if old := m.GetByUID(uid); old != nil && old != u {
-		xlog.PrintInfo("duplicate uid login, disconnect old user")
+		xlog.GLog.Infof("duplicate uid login, disconnect old user")
 		old.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 	}
 	m.byUID.Add(uid, u)
 }
 
-func (m *UserMgr) KickVerifiedUID(uid uint64, reason uint32, msg string) bool {
-	u := m.GetByUID(uid)
-	if u == nil {
-		return false
-	}
-	xlog.PrintfInfo("kick verified uid=%d reason=%d msg=%s", uid, reason, msg)
-	u.remote.SetDisconnectReason(xnetcommon.DisconnectReasonServerShutdown)
-	m.Remove(u.remote)
-	u.remote.Stop()
-	return true
-}
-
 func (m *UserMgr) PostOnlineFrame(frameUID uint64, frame *pb.OnlineTunnelFrame) {
 	user := m.GetByUID(frameUID)
 	if user == nil {
-		xlog.PrintfErr("online frame uid=%d not found", frameUID)
+		xlog.GLog.Errorf("online frame uid=%d not found", frameUID)
 		return
 	}
 	user.PostFrame(frame)
@@ -76,10 +64,12 @@ func (m *UserMgr) Remove(remote xnetcommon.IRemote) *User {
 		return nil
 	}
 	m.byRemote.Del(remote)
-	uid := u.PostSyncCleanup(remote.GetDisconnectReason())
-	if uid != 0 && m.GetByUID(uid) == u {
-		m.byUID.Del(uid)
-	}
+
+	m.byUID.Del(u.uid)
+
+	u.PostSyncCleanup(remote.GetDisconnectReason())
+
+	u.remote.Stop()
 	return u
 }
 
