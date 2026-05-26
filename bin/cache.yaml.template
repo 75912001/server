@@ -7,7 +7,7 @@ etcd:
 base:
   projectName: project  # 项目名称
   groupID: 1 # 分组ID
-  name: online # 服务名称
+  name: cache # 服务名称
   serverID: 1 # 服务ID
   version: v.0.0.1.2025.03.21.12.21          # 项目版本
   packetLengthMax: 100000        # 数据包最大长度
@@ -22,9 +22,9 @@ log:
 
 # gRPC 配置
 grpc:
-  packageName: online
-  serviceName: OnlineService
-  listenAddr: 0.0.0.0:20201
-  externalAddr: 127.0.0.1:20201
+  packageName: cache
+  serviceName: CacheService
+  listenAddr: 0.0.0.0:20301
+  externalAddr: 127.0.0.1:20301
 
 
