@@ -22,7 +22,7 @@ func (s *cacheGRPCServer) CacheGetUserData(ctx context.Context, req *pb.CacheGet
 		}, nil
 	}
 
-	userRecord, err := GRedis.Get(ctx, RedisKeyUserRecord(uid))
+	userRecord, err := GRedis.GetUserRecord(ctx, uid)
 	if errors.Is(err, redis.Nil) {
 		return &pb.CacheGetUserRecordRes{
 			Code: common.ECCacheKeyNotFound.Code(),
