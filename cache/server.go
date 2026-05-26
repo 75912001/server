@@ -21,6 +21,7 @@ func NewCacheServer(args []string) *CacheServer {
 	if srv == nil {
 		return nil
 	}
+	initCustomConfig()
 	return &CacheServer{Server: srv}
 }
 
