@@ -101,16 +101,20 @@ func (p *User) startHeartbeatTimer() {
 
 // Cleanup 连接断开后由 user actor 串行清理定时器和在线状态。
 func (p *User) Cleanup(reason xnetcommon.DisconnectReason) {
-	if p.uid != 0 && p.online != nil {
-		if err := unaryOnlineUserOffline(p.online, p.uid, reason, "gateway user offline"); err != nil {
-			xlog.GLog.Warnf("notify offline failed uid=%d reason=%d online=%s err=%v", p.uid, reason, p.online.ID, err)
-		}
-	}
-
 	if p.verifyTimer != nil {
 		xtimer.GTimer.DelSecond(p.verifyTimer)
 		p.verifyTimer = nil
 	}
 	p.hb.Stop()
+
+	uid := p.uid
+
+	online := p.online
 	p.online = nil
+
+	if uid != 0 && online != nil {
+		if err := unaryOnlineUserOffline(online, uid, reason, "gateway user offline"); err != nil {
+			xlog.GLog.Warnf("notify offline failed uid=%d reason=%d online=%s err=%v", uid, reason, online.ID, err)
+		}
+	}
 }
