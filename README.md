@@ -17,7 +17,7 @@ go run ./online
 ## Run client
 
 ```bash
-go run ./gateway
+go run ./gateway ./bin/gateway.yaml
 ```
 
 
