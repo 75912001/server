@@ -12,22 +12,22 @@ import (
 	xserver "github.com/75912001/xlib/server"
 )
 
-type Gateway struct {
+type GatewayServer struct {
 	*xserver.Server
 }
 
 // NewGatewayServer 解析配置并创建服务实例
 // args: [0:程序名] [1:配置文件绝对路径]
-func NewGatewayServer(args []string) *Gateway {
+func NewGatewayServer(args []string) *GatewayServer {
 	srv := xserver.NewServer(args)
 	if srv == nil {
 		return nil
 	}
-	return &Gateway{Server: srv}
+	return &GatewayServer{Server: srv}
 }
 
 // PreStart 配置 TCPHandler / HeaderStrategy / etcd 回调，再调用 xlib server 完成日志/actor/timer 初始化
-func (g *Gateway) PreStart(ctx context.Context) error {
+func (g *GatewayServer) PreStart(ctx context.Context) error {
 	// 初始化 gRPC selector：扫描 protoregistry 中所有服务/方法选项，建立负载均衡策略表
 	// 必须在第一次调用 selector.Sel（即 XOnlineServiceClient.OnlineUserOnline）之前完成
 	xgrpcprotoregistry.Init()
@@ -45,6 +45,7 @@ func (g *Gateway) PreStart(ctx context.Context) error {
 	if err := g.Server.PreStart(ctx, opts); err != nil {
 		return err
 	}
+
 	if g.Server.GRPCServer != nil {
 		pb.RegisterGatewayServiceServer(g.Server.GRPCServer.GrpcServer, &gatewayGRPCServer{})
 	}
