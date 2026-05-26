@@ -1,7 +1,10 @@
 # ETCD 配置
 etcd:
-  endpoints: [127.0.0.1:2379]  # ETCD 地址列表 e.g.: 127.0.0.x:2379,127.0.0.y:2379
-  ttl: 33000000 # ttl 秒 [default]: xetcd.TtlSecondDefault 秒, e.g.:系统每10秒续约一次,该参数至少为11秒
+  endpoints: # ETCD 地址列表，例如: 127.0.0.1:2379
+    - 127.0.0.1:2379
+    - 127.0.0.1:22379
+    - 127.0.0.1:32379
+  ttlDuration: 33000000s # ttl [default]: xetcdconstants.TtlSecondDefault, e.g.:系统每10秒续约一次,该参数至少为11秒
 
 # 基础配置
 base:
@@ -35,11 +38,11 @@ net:
 
 # 用户自定义配置
 custom:
-  # 用户 verify 过期时间-秒 默认为 300 秒
-  #verifyExpireTimeSecond: 864000
+  # 用户 verify 过期时间-秒 默认为 300s
+  verifyExpireTimeDuration: 864000s
 
-  # 用户心跳 过期时间-秒 默认为 300 秒
-  #heartBeatExpireTimeSecond: 864000
+  # 用户心跳 过期时间-秒 默认为 300s
+  heartBeatExpireTimeDuration: 864000s
 
   # 服务-消息映射
   cmdMapping:
