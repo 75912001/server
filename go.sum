@@ -1,4 +1,12 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
+github.com/75912001/xlib v0.0.0-20260526130214-1ebca1c24fa0 h1:jv5iATWO7xE2jBM3CjqTi5UxZVnFTXrFwUARiTHy8sU=
+github.com/75912001/xlib v0.0.0-20260526130214-1ebca1c24fa0/go.mod h1:0AgcVP4Bqg/XpULE8uF4qi4SWZtBN6eVek8EXq7fAC0=
+github.com/75912001/xlib v0.0.0-20260526131948-346a1f4bc9da h1:gwy6j5NgDxnfGZAwOzIzfc2jk6ynEbk+B1iKNFnKbkA=
+github.com/75912001/xlib v0.0.0-20260526131948-346a1f4bc9da/go.mod h1:0AgcVP4Bqg/XpULE8uF4qi4SWZtBN6eVek8EXq7fAC0=
+github.com/75912001/xlib v0.0.0-20260526141523-f8800a9a0baf h1:AY3M5Jg5MaHVhE8M0oAJ2D1318OyvWvT3zSCuddh1AA=
+github.com/75912001/xlib v0.0.0-20260526141523-f8800a9a0baf/go.mod h1:0AgcVP4Bqg/XpULE8uF4qi4SWZtBN6eVek8EXq7fAC0=
+github.com/75912001/xlib v0.0.0-20260526150035-f5dc65e01f41 h1:dnGZxtspZcF4PhzbNPoljpJTCEURzJEHXUIP5qi5HIU=
+github.com/75912001/xlib v0.0.0-20260526150035-f5dc65e01f41/go.mod h1:0AgcVP4Bqg/XpULE8uF4qi4SWZtBN6eVek8EXq7fAC0=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
