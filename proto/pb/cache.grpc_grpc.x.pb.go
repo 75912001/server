@@ -104,6 +104,26 @@ func NewXCacheServiceClient(clientConn *grpc.ClientConn) *XCacheServiceClient {
 // //////////////////////////////////////////////////////////////////////////////
 // CacheService 客户端-Stream
 // //////////////////////////////////////////////////////////////////////////////
+func (p *XCacheServiceClient) CacheSetUserRecord(ctx context.Context, in *CacheSetUserRecordReq, opts ...grpc.CallOption) (*CacheSetUserRecordRes, error) {
+	shardKeyValue, err := in.Get_XShardKey()
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	strValue := strconv.FormatUint(shardKeyValue, 10)
+
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheSetUserRecord_FullMethodName, shardKeyValue)
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
+	x := NewCacheServiceClient(grpcConn)
+	return x.CacheSetUserRecord(ctx, in, opts...)
+}
+
+func (x *CacheSetUserRecordReq) Get_XShardKey() (uint64, error) {
+	return x.GetUid(), nil
+}
+
 func (p *XCacheServiceClient) CacheGetUserRecord(ctx context.Context, in *CacheGetUserRecordReq, opts ...grpc.CallOption) (*CacheGetUserRecordRes, error) {
 	shardKeyValue, err := in.Get_XShardKey()
 	if err != nil {
@@ -185,6 +205,7 @@ func SetIStreamCacheServiceServer(streamServer IStreamCacheServiceServer) {
 //
 // //////////////////////////////////////////////////////////////////////////////
 type IUnaryCacheServiceServer interface {
+	CacheSetUserRecord(ctx context.Context, req *CacheSetUserRecordReq) (*CacheSetUserRecordRes, error)
 	CacheGetUserRecord(ctx context.Context, req *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error)
 	CacheVerifyUserToken(ctx context.Context, req *CacheVerifyUserTokenReq) (*CacheVerifyUserTokenRes, error)
 }
@@ -193,6 +214,10 @@ var iUnaryCacheServiceServer IUnaryCacheServiceServer
 
 func SetIUnaryCacheServiceServer(unaryServer IUnaryCacheServiceServer) {
 	iUnaryCacheServiceServer = unaryServer
+}
+
+func (p *XCacheServiceServer) CacheSetUserRecord(ctx context.Context, req *CacheSetUserRecordReq) (*CacheSetUserRecordRes, error) {
+	return iUnaryCacheServiceServer.CacheSetUserRecord(ctx, req)
 }
 
 func (p *XCacheServiceServer) CacheGetUserRecord(ctx context.Context, req *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error) {

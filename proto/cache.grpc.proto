@@ -1,14 +1,22 @@
 syntax = "proto3";
 
-package cache;
+package _;
 option go_package = "server/proto/pb;pb";
 import "options.proto";
+import "user.record.proto";
 
 service CacheService {
   option (proto.serviceOpt) = {
     timeout: "3s"
     loadBalancePolicy: LoadBalancePolicy_RingHash
   };
+
+  rpc CacheSetUserRecord(CacheSetUserRecordReq) returns (CacheSetUserRecordRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
 
   rpc CacheGetUserRecord(CacheGetUserRecordReq) returns (CacheGetUserRecordRes) {
     option (proto.methodOpt) = {
@@ -25,6 +33,16 @@ service CacheService {
   }
 }
 
+message CacheSetUserRecordReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  UserRecord user_record = 2; // 用户数据
+}
+
+message CacheSetUserRecordRes {
+  uint32 code = 1;
+  string msg = 2;
+}
+
 message CacheGetUserRecordReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
 }
@@ -32,7 +50,7 @@ message CacheGetUserRecordReq {
 message CacheGetUserRecordRes {
   uint32 code = 1;
   string msg = 2;
-  string user_record = 3;
+  UserRecord user_record = 3; // 用户数据
 }
 
 message CacheVerifyUserTokenReq {

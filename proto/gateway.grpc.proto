@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package gateway;
+package _;
 option go_package = "server/proto/pb;pb";
 import "options.proto";
 

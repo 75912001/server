@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	OnlineService_OnlineUserOnline_FullMethodName   = "/online.OnlineService/OnlineUserOnline"
-	OnlineService_OnlineUserOffline_FullMethodName  = "/online.OnlineService/OnlineUserOffline"
-	OnlineService_OnlineStreamTunnel_FullMethodName = "/online.OnlineService/OnlineStreamTunnel"
+	OnlineService_OnlineUserOnline_FullMethodName   = "/_.OnlineService/OnlineUserOnline"
+	OnlineService_OnlineUserOffline_FullMethodName  = "/_.OnlineService/OnlineUserOffline"
+	OnlineService_OnlineStreamTunnel_FullMethodName = "/_.OnlineService/OnlineStreamTunnel"
 )
 
 // OnlineServiceClient is the client API for OnlineService service.
@@ -184,7 +184,7 @@ type OnlineService_OnlineStreamTunnelServer = grpc.BidiStreamingServer[OnlineStr
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var OnlineService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "online.OnlineService",
+	ServiceName: "_.OnlineService",
 	HandlerType: (*OnlineServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

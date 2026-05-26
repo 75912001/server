@@ -19,14 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CacheService_CacheGetUserRecord_FullMethodName   = "/cache.CacheService/CacheGetUserRecord"
-	CacheService_CacheVerifyUserToken_FullMethodName = "/cache.CacheService/CacheVerifyUserToken"
+	CacheService_CacheSetUserRecord_FullMethodName   = "/_.CacheService/CacheSetUserRecord"
+	CacheService_CacheGetUserRecord_FullMethodName   = "/_.CacheService/CacheGetUserRecord"
+	CacheService_CacheVerifyUserToken_FullMethodName = "/_.CacheService/CacheVerifyUserToken"
 )
 
 // CacheServiceClient is the client API for CacheService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CacheServiceClient interface {
+	CacheSetUserRecord(ctx context.Context, in *CacheSetUserRecordReq, opts ...grpc.CallOption) (*CacheSetUserRecordRes, error)
 	CacheGetUserRecord(ctx context.Context, in *CacheGetUserRecordReq, opts ...grpc.CallOption) (*CacheGetUserRecordRes, error)
 	CacheVerifyUserToken(ctx context.Context, in *CacheVerifyUserTokenReq, opts ...grpc.CallOption) (*CacheVerifyUserTokenRes, error)
 }
@@ -37,6 +39,16 @@ type cacheServiceClient struct {
 
 func NewCacheServiceClient(cc grpc.ClientConnInterface) CacheServiceClient {
 	return &cacheServiceClient{cc}
+}
+
+func (c *cacheServiceClient) CacheSetUserRecord(ctx context.Context, in *CacheSetUserRecordReq, opts ...grpc.CallOption) (*CacheSetUserRecordRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CacheSetUserRecordRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheSetUserRecord_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *cacheServiceClient) CacheGetUserRecord(ctx context.Context, in *CacheGetUserRecordReq, opts ...grpc.CallOption) (*CacheGetUserRecordRes, error) {
@@ -63,6 +75,7 @@ func (c *cacheServiceClient) CacheVerifyUserToken(ctx context.Context, in *Cache
 // All implementations must embed UnimplementedCacheServiceServer
 // for forward compatibility.
 type CacheServiceServer interface {
+	CacheSetUserRecord(context.Context, *CacheSetUserRecordReq) (*CacheSetUserRecordRes, error)
 	CacheGetUserRecord(context.Context, *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error)
 	CacheVerifyUserToken(context.Context, *CacheVerifyUserTokenReq) (*CacheVerifyUserTokenRes, error)
 	mustEmbedUnimplementedCacheServiceServer()
@@ -75,6 +88,9 @@ type CacheServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCacheServiceServer struct{}
 
+func (UnimplementedCacheServiceServer) CacheSetUserRecord(context.Context, *CacheSetUserRecordReq) (*CacheSetUserRecordRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheSetUserRecord not implemented")
+}
 func (UnimplementedCacheServiceServer) CacheGetUserRecord(context.Context, *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method CacheGetUserRecord not implemented")
 }
@@ -100,6 +116,24 @@ func RegisterCacheServiceServer(s grpc.ServiceRegistrar, srv CacheServiceServer)
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&CacheService_ServiceDesc, srv)
+}
+
+func _CacheService_CacheSetUserRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheSetUserRecordReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CacheServiceServer).CacheSetUserRecord(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CacheService_CacheSetUserRecord_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CacheServiceServer).CacheSetUserRecord(ctx, req.(*CacheSetUserRecordReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _CacheService_CacheGetUserRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -142,9 +176,13 @@ func _CacheService_CacheVerifyUserToken_Handler(srv interface{}, ctx context.Con
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var CacheService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "cache.CacheService",
+	ServiceName: "_.CacheService",
 	HandlerType: (*CacheServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CacheSetUserRecord",
+			Handler:    _CacheService_CacheSetUserRecord_Handler,
+		},
 		{
 			MethodName: "CacheGetUserRecord",
 			Handler:    _CacheService_CacheGetUserRecord_Handler,
