@@ -6,18 +6,20 @@ import (
 )
 
 func main() {
-	app := NewGateway(os.Args)
-	if app == nil {
+	srv := NewGatewayServer(os.Args)
+	if srv == nil {
 		return
 	}
 
 	ctx := context.Background()
 
-	if err := app.PreStart(ctx); err != nil {
+	if err := srv.PreStart(ctx); err != nil {
 		panic(err)
 	}
-	if err := app.Start(ctx); err != nil {
+	if err := srv.Start(ctx); err != nil {
 		panic(err)
 	}
-	_ = app.PostStart()
+	if err := srv.PostStart(); err != nil {
+		panic(err)
+	}
 }

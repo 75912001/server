@@ -16,9 +16,9 @@ type Gateway struct {
 	*xserver.Server
 }
 
-// NewGateway 解析配置并创建服务实例
+// NewGatewayServer 解析配置并创建服务实例
 // args: [0:程序名] [1:配置文件绝对路径]
-func NewGateway(args []string) *Gateway {
+func NewGatewayServer(args []string) *Gateway {
 	srv := xserver.NewServer(args)
 	if srv == nil {
 		return nil
