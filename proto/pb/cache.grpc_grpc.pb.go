@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CacheService_CacheSetUserRecord_FullMethodName   = "/_.CacheService/CacheSetUserRecord"
-	CacheService_CacheGetUserRecord_FullMethodName   = "/_.CacheService/CacheGetUserRecord"
-	CacheService_CacheVerifyUserToken_FullMethodName = "/_.CacheService/CacheVerifyUserToken"
+	CacheService_CacheSetUserRecord_FullMethodName   = "/cache.CacheService/CacheSetUserRecord"
+	CacheService_CacheGetUserRecord_FullMethodName   = "/cache.CacheService/CacheGetUserRecord"
+	CacheService_CacheVerifyUserToken_FullMethodName = "/cache.CacheService/CacheVerifyUserToken"
 )
 
 // CacheServiceClient is the client API for CacheService service.
@@ -176,7 +176,7 @@ func _CacheService_CacheVerifyUserToken_Handler(srv interface{}, ctx context.Con
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var CacheService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "_.CacheService",
+	ServiceName: "cache.CacheService",
 	HandlerType: (*CacheServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

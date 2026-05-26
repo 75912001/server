@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	GatewayService_GatewayUserOffline_FullMethodName = "/_.GatewayService/GatewayUserOffline"
+	GatewayService_GatewayUserOffline_FullMethodName = "/gateway.GatewayService/GatewayUserOffline"
 )
 
 // GatewayServiceClient is the client API for GatewayService service.
@@ -110,7 +110,7 @@ func _GatewayService_GatewayUserOffline_Handler(srv interface{}, ctx context.Con
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var GatewayService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "_.GatewayService",
+	ServiceName: "gateway.GatewayService",
 	HandlerType: (*GatewayServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
