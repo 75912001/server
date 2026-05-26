@@ -23,6 +23,7 @@ func NewGatewayServer(args []string) *GatewayServer {
 	if srv == nil {
 		return nil
 	}
+	initCustomConfig()
 	return &GatewayServer{Server: srv}
 }
 

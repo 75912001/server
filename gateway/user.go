@@ -64,7 +64,7 @@ func (p *User) startVerifyTimer() {
 		p.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 		return nil
 	})
-	p.verifyTimer = xtimer.GTimer.AddSecond(cb, time.Now().Unix()+cfgVerifyExpireTimeSecond(), p.actor)
+	p.verifyTimer = xtimer.GTimer.AddSecond(cb, time.Now().Unix()+int64(GCfgCustomverifyExpireTimeDuration/time.Second), p.actor)
 }
 
 // OnVerified 由登录鉴权成功后调用：绑定 uid + online，停校验定时器，启心跳定时器。
@@ -94,7 +94,7 @@ func (p *User) startHeartbeatTimer() {
 			p.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 			return nil
 		},
-		p, xtimer.GTimer, cfgHeartBeatExpireSecond())
+		p, xtimer.GTimer, int64(GCfgCustomHeartBeatExpireDuration/time.Second))
 	p.hb.Stop()
 	p.hb.Start(cb, p.actor)
 }
