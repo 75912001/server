@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package user;
+option go_package = "server/proto/pb;pb";
+
+message UserRecord {
+  uint64 uid = 1; // 用户唯一 ID
+  string name = 2; // 用户昵称
+  map<uint64, uint64> asset_map = 10; // 资产表 key: AssetID value: 数值
+  map<uint64, RecordPrimary> record_map = 1000; // 记录表 key: 主要ID
+}
+
+// 记录-主要
+message RecordPrimary{
+  uint64 PrimaryID = 1; // 记录-主要ID
+  map<uint64, RecordSecondary> RecordElementMap= 2; // 记录表 key: 记录-次要ID
+}
+
+// 记录-次要
+message RecordSecondary{
+  uint64 SecondaryID = 1; // 记录-副ID
+  int64 Timestamp = 2; // 记录-时间戳
+  repeated uint64 Data = 3; // 数据-根据记录 PrimaryID/SecondaryID 不同-含义不同
+  repeated string StrData = 4; // 记录字符串数据-根据记录 PrimaryID/SecondaryID 不同-含义不同
+}

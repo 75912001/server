@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package user;
 option go_package = "server/proto/pb;pb";
+import "user.record.proto";
 
 // ===================================================================
 // 消息体定义 — 客户端 ↔ Gateway TCP 协议层
@@ -35,4 +36,13 @@ message UserHeartbeatReq {
 message UserHeartbeatRes {
   uint64 server_time  = 1;   // 服务器时间毫秒
   uint32 next_session = 2;   // 客户端下次心跳必须用这个 session（用于防重放）
+}
+
+// 0x00000C#client->gateway#请求用户数据-请求
+message UserRecordReq {
+}
+
+// 0x00000D#gateway->client#请求用户数据-回复
+message UserRecordRes {
+  UserRecord user_record = 1; // 用户数据
 }

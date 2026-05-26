@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package cache;
+option go_package = "server/proto/pb;pb";
+import "options.proto";
+
+service CacheService {
+  option (proto.serviceOpt) = {
+    timeout: "3s"
+    loadBalancePolicy: LoadBalancePolicy_RingHash
+  };
+
+  rpc CacheGetUserData(CacheGetUserDataReq) returns (CacheGetUserDataRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+
+  rpc CacheVerifyUserToken(CacheVerifyUserTokenReq) returns (CacheVerifyUserTokenRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+}
+
+message CacheGetUserDataReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+}
+
+message CacheGetUserDataRes {
+  uint32 code = 1;
+  string msg = 2;
+  string user_data_json = 3;
+}
+
+message CacheVerifyUserTokenReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  string token = 2;
+}
+
+message CacheVerifyUserTokenRes {
+  uint32 code = 1;
+  string msg = 2;
+  bool ok = 3;
+}
