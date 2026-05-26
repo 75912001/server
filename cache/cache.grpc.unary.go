@@ -14,7 +14,7 @@ import (
 )
 
 // todo menglc 当前直接从redis获取数据,后续可以考虑加一层本地缓存,比如sync.Map,减少redis访问压力
-func (s *cacheGRPCServer) CacheGetUserData(ctx context.Context, req *pb.CacheGetUserRecordReq) (*pb.CacheGetUserRecordRes, error) {
+func (s *cacheGRPCServer) CacheGetUserRecord(ctx context.Context, req *pb.CacheGetUserRecordReq) (*pb.CacheGetUserRecordRes, error) {
 	uid := req.GetUid()
 	if uid == 0 {
 		return &pb.CacheGetUserRecordRes{
