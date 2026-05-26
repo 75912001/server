@@ -104,23 +104,23 @@ func NewXCacheServiceClient(clientConn *grpc.ClientConn) *XCacheServiceClient {
 // //////////////////////////////////////////////////////////////////////////////
 // CacheService 客户端-Stream
 // //////////////////////////////////////////////////////////////////////////////
-func (p *XCacheServiceClient) CacheGetUserData(ctx context.Context, in *CacheGetUserDataReq, opts ...grpc.CallOption) (*CacheGetUserDataRes, error) {
+func (p *XCacheServiceClient) CacheGetUserRecord(ctx context.Context, in *CacheGetUserRecordReq, opts ...grpc.CallOption) (*CacheGetUserRecordRes, error) {
 	shardKeyValue, err := in.Get_XShardKey()
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	strValue := strconv.FormatUint(shardKeyValue, 10)
 
-	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheGetUserData_FullMethodName, shardKeyValue)
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheGetUserRecord_FullMethodName, shardKeyValue)
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
 	x := NewCacheServiceClient(grpcConn)
-	return x.CacheGetUserData(ctx, in, opts...)
+	return x.CacheGetUserRecord(ctx, in, opts...)
 }
 
-func (x *CacheGetUserDataReq) Get_XShardKey() (uint64, error) {
+func (x *CacheGetUserRecordReq) Get_XShardKey() (uint64, error) {
 	return x.GetUid(), nil
 }
 
@@ -185,7 +185,7 @@ func SetIStreamCacheServiceServer(streamServer IStreamCacheServiceServer) {
 //
 // //////////////////////////////////////////////////////////////////////////////
 type IUnaryCacheServiceServer interface {
-	CacheGetUserData(ctx context.Context, req *CacheGetUserDataReq) (*CacheGetUserDataRes, error)
+	CacheGetUserRecord(ctx context.Context, req *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error)
 	CacheVerifyUserToken(ctx context.Context, req *CacheVerifyUserTokenReq) (*CacheVerifyUserTokenRes, error)
 }
 
@@ -195,8 +195,8 @@ func SetIUnaryCacheServiceServer(unaryServer IUnaryCacheServiceServer) {
 	iUnaryCacheServiceServer = unaryServer
 }
 
-func (p *XCacheServiceServer) CacheGetUserData(ctx context.Context, req *CacheGetUserDataReq) (*CacheGetUserDataRes, error) {
-	return iUnaryCacheServiceServer.CacheGetUserData(ctx, req)
+func (p *XCacheServiceServer) CacheGetUserRecord(ctx context.Context, req *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error) {
+	return iUnaryCacheServiceServer.CacheGetUserRecord(ctx, req)
 }
 
 func (p *XCacheServiceServer) CacheVerifyUserToken(ctx context.Context, req *CacheVerifyUserTokenReq) (*CacheVerifyUserTokenRes, error) {

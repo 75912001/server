@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CacheService_CacheGetUserData_FullMethodName     = "/cache.CacheService/CacheGetUserData"
+	CacheService_CacheGetUserRecord_FullMethodName   = "/cache.CacheService/CacheGetUserRecord"
 	CacheService_CacheVerifyUserToken_FullMethodName = "/cache.CacheService/CacheVerifyUserToken"
 )
 
@@ -27,7 +27,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CacheServiceClient interface {
-	CacheGetUserData(ctx context.Context, in *CacheGetUserDataReq, opts ...grpc.CallOption) (*CacheGetUserDataRes, error)
+	CacheGetUserRecord(ctx context.Context, in *CacheGetUserRecordReq, opts ...grpc.CallOption) (*CacheGetUserRecordRes, error)
 	CacheVerifyUserToken(ctx context.Context, in *CacheVerifyUserTokenReq, opts ...grpc.CallOption) (*CacheVerifyUserTokenRes, error)
 }
 
@@ -39,10 +39,10 @@ func NewCacheServiceClient(cc grpc.ClientConnInterface) CacheServiceClient {
 	return &cacheServiceClient{cc}
 }
 
-func (c *cacheServiceClient) CacheGetUserData(ctx context.Context, in *CacheGetUserDataReq, opts ...grpc.CallOption) (*CacheGetUserDataRes, error) {
+func (c *cacheServiceClient) CacheGetUserRecord(ctx context.Context, in *CacheGetUserRecordReq, opts ...grpc.CallOption) (*CacheGetUserRecordRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CacheGetUserDataRes)
-	err := c.cc.Invoke(ctx, CacheService_CacheGetUserData_FullMethodName, in, out, cOpts...)
+	out := new(CacheGetUserRecordRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheGetUserRecord_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *cacheServiceClient) CacheVerifyUserToken(ctx context.Context, in *Cache
 // All implementations must embed UnimplementedCacheServiceServer
 // for forward compatibility.
 type CacheServiceServer interface {
-	CacheGetUserData(context.Context, *CacheGetUserDataReq) (*CacheGetUserDataRes, error)
+	CacheGetUserRecord(context.Context, *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error)
 	CacheVerifyUserToken(context.Context, *CacheVerifyUserTokenReq) (*CacheVerifyUserTokenRes, error)
 	mustEmbedUnimplementedCacheServiceServer()
 }
@@ -75,8 +75,8 @@ type CacheServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCacheServiceServer struct{}
 
-func (UnimplementedCacheServiceServer) CacheGetUserData(context.Context, *CacheGetUserDataReq) (*CacheGetUserDataRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method CacheGetUserData not implemented")
+func (UnimplementedCacheServiceServer) CacheGetUserRecord(context.Context, *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheGetUserRecord not implemented")
 }
 func (UnimplementedCacheServiceServer) CacheVerifyUserToken(context.Context, *CacheVerifyUserTokenReq) (*CacheVerifyUserTokenRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method CacheVerifyUserToken not implemented")
@@ -102,20 +102,20 @@ func RegisterCacheServiceServer(s grpc.ServiceRegistrar, srv CacheServiceServer)
 	s.RegisterService(&CacheService_ServiceDesc, srv)
 }
 
-func _CacheService_CacheGetUserData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CacheGetUserDataReq)
+func _CacheService_CacheGetUserRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheGetUserRecordReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).CacheGetUserData(ctx, in)
+		return srv.(CacheServiceServer).CacheGetUserRecord(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CacheService_CacheGetUserData_FullMethodName,
+		FullMethod: CacheService_CacheGetUserRecord_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).CacheGetUserData(ctx, req.(*CacheGetUserDataReq))
+		return srv.(CacheServiceServer).CacheGetUserRecord(ctx, req.(*CacheGetUserRecordReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -146,8 +146,8 @@ var CacheService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CacheServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CacheGetUserData",
-			Handler:    _CacheService_CacheGetUserData_Handler,
+			MethodName: "CacheGetUserRecord",
+			Handler:    _CacheService_CacheGetUserRecord_Handler,
 		},
 		{
 			MethodName: "CacheVerifyUserToken",

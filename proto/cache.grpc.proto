@@ -10,7 +10,7 @@ service CacheService {
     loadBalancePolicy: LoadBalancePolicy_RingHash
   };
 
-  rpc CacheGetUserData(CacheGetUserDataReq) returns (CacheGetUserDataRes) {
+  rpc CacheGetUserRecord(CacheGetUserRecordReq) returns (CacheGetUserRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
       shardKeyFieldType: ShardKeyFieldType_UINT64
@@ -25,14 +25,14 @@ service CacheService {
   }
 }
 
-message CacheGetUserDataReq {
+message CacheGetUserRecordReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
 }
 
-message CacheGetUserDataRes {
+message CacheGetUserRecordRes {
   uint32 code = 1;
   string msg = 2;
-  string user_data_json = 3;
+  string user_record = 3;
 }
 
 message CacheVerifyUserTokenReq {
