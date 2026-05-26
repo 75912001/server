@@ -64,7 +64,7 @@ func (p *User) startVerifyTimer() {
 		p.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 		return nil
 	})
-	p.verifyTimer = xtimer.GTimer.AddSecond(cb, time.Now().Unix()+int64(GCfgCustomverifyExpireTimeDuration/time.Second), p.actor)
+	p.verifyTimer = xtimer.GTimer.AddSecond(cb, time.Now().Unix()+int64(GCfgCustomVerifyExpireTimeDuration/time.Second), p.actor)
 }
 
 // OnVerified 由登录鉴权成功后调用：绑定 uid + online，停校验定时器，启心跳定时器。
