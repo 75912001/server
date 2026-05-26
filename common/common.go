@@ -12,6 +12,10 @@ const (
 	GatewayServerName  = "gateway"
 	GatewayPackageName = "gateway"
 	GatewayServiceName = "GatewayService"
+
+	CacheServerName  = "cache"
+	CachePackageName = "cache"
+	CacheServiceName = "CacheService"
 )
 
 const (
