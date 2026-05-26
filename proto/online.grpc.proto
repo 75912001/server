@@ -13,7 +13,7 @@ service OnlineService {
     timeout: "3s"
     loadBalancePolicy: LoadBalancePolicy_RingHash
   };
-  // 1. 控制面：用户登录鉴权 (Unary RPC)
+  // 控制面：用户登录鉴权 (Unary RPC)
   // 作用：TCP 刚连接时，网关通过此接口验证 Token。
   // 特性：验证成功后，该连接才被允许进入 StreamTunnel 核心隧道。
   rpc OnlineUserOnline(OnlineUserOnlineReq) returns (OnlineUserOnlineRes){
@@ -22,8 +22,15 @@ service OnlineService {
       shardKeyFieldType: ShardKeyFieldType_UINT64
     };
   }
-
-  // 2. 数据面：全互联双向流隧道 (Bidirectional Stream)
+  // 控制面：用户离线 (Unary RPC)
+  // 作用：网关在 TCP 断开、顶号、主动离线等场景下，同步通知 Online 清理用户状态。
+  rpc OnlineUserOffline(OnlineUserOfflineReq) returns (OnlineUserOfflineRes) {
+    option (proto.methodOpt) = {
+      timeout : "60s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+  // 数据面：全互联双向流隧道 (Bidirectional Stream)
   // 作用：承载网关与该 Online 节点之间【所有玩家】的上下行数据。
   // 特性：支持批量打包 (Batching)，极其高效。
   rpc OnlineStreamTunnel (stream OnlineStreamTunnelReq) returns (stream OnlineStreamTunnelRes);
@@ -68,15 +75,9 @@ message OnlineStreamTunnelRes {
 message OnlineTunnelFrame {
   uint64 uid = 1;              // 定位具体的玩家 Actor 或 TCP Socket
 
-  // payload 强互斥：一个 Frame 只能是下面三种类型之一
+  // payload 强互斥：一个 Frame 只能是下面类型之一
   oneof payload {
-    // [类型 1] 系统信令-上行
-    OnlineUserOfflineReq user_offline_req = 2;
-
-    // [类型 2] 系统信令-下行
-    OnlineKickUserReq kick_user_req = 3;
-
-    // [类型 3] 业务数据-上下行：网关不关心内容的纯游戏数据包
+    // [类型 1] 业务数据-上下行：网关不关心内容的纯游戏数据包
     OnlineClientPacket client_packet = 4;
   }
 }
@@ -86,15 +87,16 @@ message OnlineTunnelFrame {
 // 五、 系统信令详情
 // ===================================================================
 
-// 用户离线请求 (Gateway -> Online)，网关在 TCP 连接异常断开时发出，Online 服据此处理玩家下线逻辑。
+// 用户离线请求 (Gateway -> Online)，网关在 TCP 断开、顶号、主动离线等场景下发出。
 message OnlineUserOfflineReq {
-  uint32 reason = 1;           // 1=用户主动离线，2=网络异常断开
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // 离线用户 uid
+  uint32 reason = 2;                                 // 离线原因
+  string msg = 3;                                    // 离线说明
 }
 
-// 踢人请求 (Online -> Gateway)，Online 服在发现玩家异地登录或被 GM 封禁时发出，网关据此断开 TCP 连接。
-message OnlineKickUserReq {
-  uint32 reason = 1;           // 踢人原因码 (如：1=异地登录顶号，2=GM封禁)
-  string msg = 2;              // 踢人提示文案，网关在断开 TCP 前发给客户端展示
+message OnlineUserOfflineRes {
+  uint32 code = 1; // 0 表示成功；用户已离线也视为成功
+  string msg = 2;  // 处理结果说明
 }
 
 // ===================================================================

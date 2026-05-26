@@ -10,8 +10,8 @@ service GatewayService {
     loadBalancePolicy: LoadBalancePolicy_RingHash
   };
 
-  // Online 发现重复登录时调用旧 gateway，按已登录 uid 踢掉旧连接。
-  rpc GatewayKickUser(GatewayKickUserReq) returns (GatewayKickUserRes) {
+  // 用户离线
+  rpc GatewayUserOffline(GatewayUserOfflineReq) returns (GatewayUserOfflineRes) {
     option (proto.methodOpt) = {
       timeout: "60s"
       shardKeyFieldType: ShardKeyFieldType_UINT64
@@ -19,13 +19,13 @@ service GatewayService {
   }
 }
 
-message GatewayKickUserReq {
+message GatewayUserOfflineReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // 已登录用户 uid；gateway 只从登录完成表 byUID 中查找
-  uint32 reason = 2;                                  // 业务顶号原因码，由 online 定义
-  string msg = 3;                                     // 顶号说明，便于日志和后续客户端提示
+  uint32 reason = 2;                                  // 离线原因码
+  string msg = 3;                                     // 离线说明
 }
 
-message GatewayKickUserRes {
+message GatewayUserOfflineRes {
   uint32 code = 1; // 0 表示成功；用户已离线也视为成功
   string msg = 2;  // 处理结果说明
 }
