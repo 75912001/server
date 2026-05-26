@@ -1,7 +1,10 @@
 # ETCD 配置
 etcd:
-  endpoints: [127.0.0.1:2379]  # ETCD 地址列表 e.g.: 127.0.0.x:2379,127.0.0.y:2379
-  ttl: 33000000 # ttl 秒 [default]: xetcd.TtlSecondDefault 秒, e.g.:系统每10秒续约一次,该参数至少为11秒
+  endpoints: # ETCD 地址列表，例如: 127.0.0.1:2379
+    - 127.0.0.1:2379
+    - 127.0.0.1:22379
+    - 127.0.0.1:32379
+  ttlDuration: 33000000s # ttl [default]: xetcdconstants.TtlSecondDefault, e.g.:系统每10秒续约一次,该参数至少为11秒
 
 # 基础配置
 base:
@@ -27,4 +30,21 @@ grpc:
   listenAddr: 0.0.0.0:20301
   externalAddr: 127.0.0.1:20301
 
+# Redis 集群配置
+redis:
+  - name: cache
+    addrs:
+      - 127.0.0.1:7000
+      - 127.0.0.1:7001
+      - 127.0.0.1:7002
+      - 127.0.0.1:7003
+      - 127.0.0.1:7004
+      - 127.0.0.1:7005
+    password: "111111"
+    dialTimeoutDuration: 3s # 连接超时时间
+    readTimeoutDuration: 3s # 读超时时间
+    writeTimeoutDuration: 3s # 写超时时间
 
+custom:
+  redisKeyFormatUserData: "user:%v:data"
+  redisKeyFormatUserToken: "user:%v:token:%v"
