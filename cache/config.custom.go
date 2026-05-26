@@ -14,7 +14,7 @@ func initCustomConfig() {
 	GCfgCustomRedisKeyFormatUserToken = xconfig.GConfigMgr.GetCustomString("redisKeyFormatUserToken")
 }
 
-func RedisKeyUserData(uid uint64) string {
+func RedisKeyUserRecord(uid uint64) string {
 	return fmt.Sprintf(GCfgCustomRedisKeyFormatUserRecord, uid)
 }
 
