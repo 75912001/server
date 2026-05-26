@@ -3,15 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	common "server/common"
 	pb "server/proto/pb"
 
 	xconfig "github.com/75912001/xlib/config"
+	xgrpcproto "github.com/75912001/xlib/grpc/proto"
 	xlog "github.com/75912001/xlib/log"
 	xnetcommon "github.com/75912001/xlib/net/common"
 	xpacket "github.com/75912001/xlib/packet"
-	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -80,8 +81,9 @@ func unaryOnlineUserOnline(
 	})
 }
 
-func unaryOnlineUserOffline(clientConn *grpc.ClientConn, uid uint64, reason xnetcommon.DisconnectReason, msg string) error {
-	_, err := pb.NewOnlineServiceClient(clientConn).OnlineUserOffline(context.Background(), &pb.OnlineUserOfflineReq{
+func unaryOnlineUserOffline(online *Online, uid uint64, reason xnetcommon.DisconnectReason, msg string) error {
+	ctx := xgrpcproto.SetFromOutgoingContext(context.Background(), xgrpcproto.ShardKeyFieldNameDefault, strconv.FormatUint(uid, 10))
+	_, err := pb.NewOnlineServiceClient(online.GetClientConn()).OnlineUserOffline(ctx, &pb.OnlineUserOfflineReq{
 		Uid:    uid,
 		Reason: uint32(reason),
 		Msg:    msg,
