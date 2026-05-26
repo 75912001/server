@@ -46,5 +46,5 @@ redis:
     writeTimeoutDuration: 3s # 写超时时间
 
 custom:
-  redisKeyFormatUserData: "user:%v:data"
+  redisKeyFormatUserRecord: "user:%v:record"
   redisKeyFormatUserToken: "user:%v:token:%v"
