@@ -12,10 +12,6 @@ import (
 	xnetcommon "github.com/75912001/xlib/net/common"
 )
 
-type gatewayGRPCServer struct {
-	pb.UnimplementedGatewayServiceServer
-}
-
 func (p *gatewayGRPCServer) GatewayUserOffline(_ context.Context, req *pb.GatewayUserOfflineReq) (*pb.GatewayUserOfflineRes, error) {
 	if req.GetUid() == 0 {
 		xlog.GLog.Error("GatewayUserOffline uid:0")
