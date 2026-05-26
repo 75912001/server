@@ -209,6 +209,26 @@ func (x *OnlineUserOnlineReq) Get_XShardKey() (uint64, error) {
 	return x.GetUid(), nil
 }
 
+func (p *XOnlineServiceClient) OnlineUserOffline(ctx context.Context, in *OnlineUserOfflineReq, opts ...grpc.CallOption) (*OnlineUserOfflineRes, error) {
+	shardKeyValue, err := in.Get_XShardKey()
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	strValue := strconv.FormatUint(shardKeyValue, 10)
+
+	ctx, grpcConn, err := selector.Sel(ctx, OnlineService_OnlineUserOffline_FullMethodName, shardKeyValue)
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
+	x := NewOnlineServiceClient(grpcConn)
+	return x.OnlineUserOffline(ctx, in, opts...)
+}
+
+func (x *OnlineUserOfflineReq) Get_XShardKey() (uint64, error) {
+	return x.GetUid(), nil
+}
+
 // //////////////////////////////////////////////////////////////////////////////////////////////////
 // OnlineService 服务端
 // //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -291,6 +311,7 @@ func (p *XOnlineServiceServer) OnlineStreamTunnel(stream OnlineService_OnlineStr
 // //////////////////////////////////////////////////////////////////////////////
 type IUnaryOnlineServiceServer interface {
 	OnlineUserOnline(ctx context.Context, req *OnlineUserOnlineReq) (*OnlineUserOnlineRes, error)
+	OnlineUserOffline(ctx context.Context, req *OnlineUserOfflineReq) (*OnlineUserOfflineRes, error)
 }
 
 var iUnaryOnlineServiceServer IUnaryOnlineServiceServer
@@ -301,4 +322,8 @@ func SetIUnaryOnlineServiceServer(unaryServer IUnaryOnlineServiceServer) {
 
 func (p *XOnlineServiceServer) OnlineUserOnline(ctx context.Context, req *OnlineUserOnlineReq) (*OnlineUserOnlineRes, error) {
 	return iUnaryOnlineServiceServer.OnlineUserOnline(ctx, req)
+}
+
+func (p *XOnlineServiceServer) OnlineUserOffline(ctx context.Context, req *OnlineUserOfflineReq) (*OnlineUserOfflineRes, error) {
+	return iUnaryOnlineServiceServer.OnlineUserOffline(ctx, req)
 }

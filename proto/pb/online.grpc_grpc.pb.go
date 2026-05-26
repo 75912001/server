@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	OnlineService_OnlineUserOnline_FullMethodName   = "/online.OnlineService/OnlineUserOnline"
+	OnlineService_OnlineUserOffline_FullMethodName  = "/online.OnlineService/OnlineUserOffline"
 	OnlineService_OnlineStreamTunnel_FullMethodName = "/online.OnlineService/OnlineStreamTunnel"
 )
 
@@ -27,11 +28,14 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OnlineServiceClient interface {
-	// 1. 控制面：用户登录鉴权 (Unary RPC)
+	// 控制面：用户登录鉴权 (Unary RPC)
 	// 作用：TCP 刚连接时，网关通过此接口验证 Token。
 	// 特性：验证成功后，该连接才被允许进入 StreamTunnel 核心隧道。
 	OnlineUserOnline(ctx context.Context, in *OnlineUserOnlineReq, opts ...grpc.CallOption) (*OnlineUserOnlineRes, error)
-	// 2. 数据面：全互联双向流隧道 (Bidirectional Stream)
+	// 控制面：用户离线 (Unary RPC)
+	// 作用：网关在 TCP 断开、顶号、主动离线等场景下，同步通知 Online 清理用户状态。
+	OnlineUserOffline(ctx context.Context, in *OnlineUserOfflineReq, opts ...grpc.CallOption) (*OnlineUserOfflineRes, error)
+	// 数据面：全互联双向流隧道 (Bidirectional Stream)
 	// 作用：承载网关与该 Online 节点之间【所有玩家】的上下行数据。
 	// 特性：支持批量打包 (Batching)，极其高效。
 	OnlineStreamTunnel(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[OnlineStreamTunnelReq, OnlineStreamTunnelRes], error)
@@ -55,6 +59,16 @@ func (c *onlineServiceClient) OnlineUserOnline(ctx context.Context, in *OnlineUs
 	return out, nil
 }
 
+func (c *onlineServiceClient) OnlineUserOffline(ctx context.Context, in *OnlineUserOfflineReq, opts ...grpc.CallOption) (*OnlineUserOfflineRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OnlineUserOfflineRes)
+	err := c.cc.Invoke(ctx, OnlineService_OnlineUserOffline_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *onlineServiceClient) OnlineStreamTunnel(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[OnlineStreamTunnelReq, OnlineStreamTunnelRes], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &OnlineService_ServiceDesc.Streams[0], OnlineService_OnlineStreamTunnel_FullMethodName, cOpts...)
@@ -72,11 +86,14 @@ type OnlineService_OnlineStreamTunnelClient = grpc.BidiStreamingClient[OnlineStr
 // All implementations must embed UnimplementedOnlineServiceServer
 // for forward compatibility.
 type OnlineServiceServer interface {
-	// 1. 控制面：用户登录鉴权 (Unary RPC)
+	// 控制面：用户登录鉴权 (Unary RPC)
 	// 作用：TCP 刚连接时，网关通过此接口验证 Token。
 	// 特性：验证成功后，该连接才被允许进入 StreamTunnel 核心隧道。
 	OnlineUserOnline(context.Context, *OnlineUserOnlineReq) (*OnlineUserOnlineRes, error)
-	// 2. 数据面：全互联双向流隧道 (Bidirectional Stream)
+	// 控制面：用户离线 (Unary RPC)
+	// 作用：网关在 TCP 断开、顶号、主动离线等场景下，同步通知 Online 清理用户状态。
+	OnlineUserOffline(context.Context, *OnlineUserOfflineReq) (*OnlineUserOfflineRes, error)
+	// 数据面：全互联双向流隧道 (Bidirectional Stream)
 	// 作用：承载网关与该 Online 节点之间【所有玩家】的上下行数据。
 	// 特性：支持批量打包 (Batching)，极其高效。
 	OnlineStreamTunnel(grpc.BidiStreamingServer[OnlineStreamTunnelReq, OnlineStreamTunnelRes]) error
@@ -92,6 +109,9 @@ type UnimplementedOnlineServiceServer struct{}
 
 func (UnimplementedOnlineServiceServer) OnlineUserOnline(context.Context, *OnlineUserOnlineReq) (*OnlineUserOnlineRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method OnlineUserOnline not implemented")
+}
+func (UnimplementedOnlineServiceServer) OnlineUserOffline(context.Context, *OnlineUserOfflineReq) (*OnlineUserOfflineRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method OnlineUserOffline not implemented")
 }
 func (UnimplementedOnlineServiceServer) OnlineStreamTunnel(grpc.BidiStreamingServer[OnlineStreamTunnelReq, OnlineStreamTunnelRes]) error {
 	return status.Error(codes.Unimplemented, "method OnlineStreamTunnel not implemented")
@@ -135,6 +155,24 @@ func _OnlineService_OnlineUserOnline_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OnlineService_OnlineUserOffline_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OnlineUserOfflineReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OnlineServiceServer).OnlineUserOffline(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OnlineService_OnlineUserOffline_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OnlineServiceServer).OnlineUserOffline(ctx, req.(*OnlineUserOfflineReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _OnlineService_OnlineStreamTunnel_Handler(srv interface{}, stream grpc.ServerStream) error {
 	return srv.(OnlineServiceServer).OnlineStreamTunnel(&grpc.GenericServerStream[OnlineStreamTunnelReq, OnlineStreamTunnelRes]{ServerStream: stream})
 }
@@ -152,6 +190,10 @@ var OnlineService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "OnlineUserOnline",
 			Handler:    _OnlineService_OnlineUserOnline_Handler,
+		},
+		{
+			MethodName: "OnlineUserOffline",
+			Handler:    _OnlineService_OnlineUserOffline_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
