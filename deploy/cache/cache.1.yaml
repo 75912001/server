@@ -1,0 +1,50 @@
+# ETCD 配置
+etcd:
+  endpoints: # ETCD 地址列表，例如: 127.0.0.1:2379
+    - 192.168.71.123:2379
+    - 192.168.71.123:22379
+    - 192.168.71.123:32379
+  ttlDuration: 33000000s # ttl [default]: xetcdconstants.TtlSecondDefault, e.g.:系统每10秒续约一次,该参数至少为11秒
+
+# 基础配置
+base:
+  projectName: project  # 项目名称
+  groupID: 1 # 分组ID
+  name: cache # 服务名称
+  serverID: 1 # 服务ID
+  version: v.0.0.1.2025.03.21.12.21          # 项目版本
+  packetLengthMax: 100000        # 数据包最大长度
+  sendChannelCapacity: 100000      # 发送通道容量
+  runMode: 1                        # 运行模式 [0:release, 1:debug]
+  availableLoad: 100000            # 可用负载
+  processingMode: 1 # 处理-模式 [0:bus, 1:actor]
+
+# 日志
+log:
+  level: 7        # 日志级别
+
+# gRPC 配置
+grpc:
+  packageName: cache
+  serviceName: CacheService
+  listenAddr: 0.0.0.0:20301
+  externalAddr: 192.168.71.123:20301
+
+# Redis 集群配置
+redis:
+  - name: cache
+    addrs:
+      - 192.168.71.123:7000
+      - 192.168.71.123:7001
+      - 192.168.71.123:7002
+      - 192.168.71.123:7003
+      - 192.168.71.123:7004
+      - 192.168.71.123:7005
+    password: "111111"
+    dialTimeoutDuration: 3s # 连接超时时间
+    readTimeoutDuration: 3s # 读超时时间
+    writeTimeoutDuration: 3s # 写超时时间
+
+custom:
+  redisKeyFormatUserRecord: "user:%v:record"
+  redisKeyFormatUserToken: "user:%v:token:%v"

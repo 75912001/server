@@ -1,0 +1,9 @@
+.git
+.idea
+.cursor
+.gocache
+bin/log
+*.exe
+*.exe~
+__pycache__
+src/client.simulator/bin
