@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CacheService_CacheSetUserRecord_FullMethodName   = "/cache.CacheService/CacheSetUserRecord"
-	CacheService_CacheGetUserRecord_FullMethodName   = "/cache.CacheService/CacheGetUserRecord"
-	CacheService_CacheVerifyUserToken_FullMethodName = "/cache.CacheService/CacheVerifyUserToken"
+	CacheService_CacheSetUserRecord_FullMethodName      = "/cache.CacheService/CacheSetUserRecord"
+	CacheService_CacheGetUserRecord_FullMethodName      = "/cache.CacheService/CacheGetUserRecord"
+	CacheService_CacheSetVerifyUserToken_FullMethodName = "/cache.CacheService/CacheSetVerifyUserToken"
+	CacheService_CacheVerifyUserToken_FullMethodName    = "/cache.CacheService/CacheVerifyUserToken"
 )
 
 // CacheServiceClient is the client API for CacheService service.
@@ -30,6 +31,7 @@ const (
 type CacheServiceClient interface {
 	CacheSetUserRecord(ctx context.Context, in *CacheSetUserRecordReq, opts ...grpc.CallOption) (*CacheSetUserRecordRes, error)
 	CacheGetUserRecord(ctx context.Context, in *CacheGetUserRecordReq, opts ...grpc.CallOption) (*CacheGetUserRecordRes, error)
+	CacheSetVerifyUserToken(ctx context.Context, in *CacheSetVerifyUserTokenReq, opts ...grpc.CallOption) (*CacheSetVerifyUserTokenRes, error)
 	CacheVerifyUserToken(ctx context.Context, in *CacheVerifyUserTokenReq, opts ...grpc.CallOption) (*CacheVerifyUserTokenRes, error)
 }
 
@@ -61,6 +63,16 @@ func (c *cacheServiceClient) CacheGetUserRecord(ctx context.Context, in *CacheGe
 	return out, nil
 }
 
+func (c *cacheServiceClient) CacheSetVerifyUserToken(ctx context.Context, in *CacheSetVerifyUserTokenReq, opts ...grpc.CallOption) (*CacheSetVerifyUserTokenRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CacheSetVerifyUserTokenRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheSetVerifyUserToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *cacheServiceClient) CacheVerifyUserToken(ctx context.Context, in *CacheVerifyUserTokenReq, opts ...grpc.CallOption) (*CacheVerifyUserTokenRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CacheVerifyUserTokenRes)
@@ -77,6 +89,7 @@ func (c *cacheServiceClient) CacheVerifyUserToken(ctx context.Context, in *Cache
 type CacheServiceServer interface {
 	CacheSetUserRecord(context.Context, *CacheSetUserRecordReq) (*CacheSetUserRecordRes, error)
 	CacheGetUserRecord(context.Context, *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error)
+	CacheSetVerifyUserToken(context.Context, *CacheSetVerifyUserTokenReq) (*CacheSetVerifyUserTokenRes, error)
 	CacheVerifyUserToken(context.Context, *CacheVerifyUserTokenReq) (*CacheVerifyUserTokenRes, error)
 	mustEmbedUnimplementedCacheServiceServer()
 }
@@ -93,6 +106,9 @@ func (UnimplementedCacheServiceServer) CacheSetUserRecord(context.Context, *Cach
 }
 func (UnimplementedCacheServiceServer) CacheGetUserRecord(context.Context, *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method CacheGetUserRecord not implemented")
+}
+func (UnimplementedCacheServiceServer) CacheSetVerifyUserToken(context.Context, *CacheSetVerifyUserTokenReq) (*CacheSetVerifyUserTokenRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheSetVerifyUserToken not implemented")
 }
 func (UnimplementedCacheServiceServer) CacheVerifyUserToken(context.Context, *CacheVerifyUserTokenReq) (*CacheVerifyUserTokenRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method CacheVerifyUserToken not implemented")
@@ -154,6 +170,24 @@ func _CacheService_CacheGetUserRecord_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CacheService_CacheSetVerifyUserToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheSetVerifyUserTokenReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CacheServiceServer).CacheSetVerifyUserToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CacheService_CacheSetVerifyUserToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CacheServiceServer).CacheSetVerifyUserToken(ctx, req.(*CacheSetVerifyUserTokenReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CacheService_CacheVerifyUserToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CacheVerifyUserTokenReq)
 	if err := dec(in); err != nil {
@@ -186,6 +220,10 @@ var CacheService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CacheGetUserRecord",
 			Handler:    _CacheService_CacheGetUserRecord_Handler,
+		},
+		{
+			MethodName: "CacheSetVerifyUserToken",
+			Handler:    _CacheService_CacheSetVerifyUserToken_Handler,
 		},
 		{
 			MethodName: "CacheVerifyUserToken",

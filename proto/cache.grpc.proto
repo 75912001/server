@@ -25,6 +25,13 @@ service CacheService {
     };
   }
 
+  rpc CacheSetVerifyUserToken(CacheSetVerifyUserTokenReq) returns (CacheSetVerifyUserTokenRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+
   rpc CacheVerifyUserToken(CacheVerifyUserTokenReq) returns (CacheVerifyUserTokenRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -51,6 +58,18 @@ message CacheGetUserRecordRes {
   uint32 code = 1;
   string msg = 2;
   user.UserRecord user_record = 3; // 用户数据
+}
+
+message CacheSetVerifyUserTokenReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  string token = 2;
+  uint64 expire_second = 3;
+}
+
+message CacheSetVerifyUserTokenRes {
+  uint32 code = 1;
+  string msg = 2;
+  bool ok = 3;
 }
 
 message CacheVerifyUserTokenReq {
