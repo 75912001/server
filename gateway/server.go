@@ -5,11 +5,13 @@ import (
 	"server/common"
 	pb "server/proto/pb"
 
+	xconfig "github.com/75912001/xlib/config"
 	xcontrol "github.com/75912001/xlib/control"
 	xetcd "github.com/75912001/xlib/etcd"
 	xgrpcprotoregistry "github.com/75912001/xlib/grpc/proto/registry"
 	xgrpcselector "github.com/75912001/xlib/grpc/selector"
 	xserver "github.com/75912001/xlib/server"
+	"google.golang.org/grpc/reflection"
 )
 
 type GatewayServer struct {
@@ -49,6 +51,12 @@ func (g *GatewayServer) PreStart(ctx context.Context) error {
 
 	if g.Server.GRPCServer != nil {
 		pb.RegisterGatewayServiceServer(g.Server.GRPCServer.GrpcServer, &gatewayGRPCServer{})
+
+		if *xconfig.GConfigMgr.Base.RunMode == 1 { // debug 开发模式，注册 gRPC 反射服务，方便使用 grpcurl 等工具调试
+			// grpcurl -plaintext ip:port list gateway.GatewayService
+			// grpcurl -plaintext ip:port describe gateway.GatewayService
+			reflection.Register(g.Server.GRPCServer.GrpcServer)
+		}
 	}
 	return nil
 }
