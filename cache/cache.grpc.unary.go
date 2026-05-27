@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"server/common"
+	"time"
 
 	xerror "github.com/75912001/xlib/error"
 	xruntime "github.com/75912001/xlib/runtime"
@@ -41,6 +42,32 @@ func (s *cacheGRPCServer) CacheGetUserRecord(ctx context.Context, req *pb.CacheG
 		Code:       xerror.Success.Code(),
 		Msg:        xerror.Success.Desc(),
 		UserRecord: userRecord,
+	}, nil
+}
+
+func (s *cacheGRPCServer) CacheSetVerifyUserToken(ctx context.Context, req *pb.CacheSetVerifyUserTokenReq) (*pb.CacheSetVerifyUserTokenRes, error) {
+	uid := req.GetUid()
+	token := req.GetToken()
+	expireSecond := req.GetExpireSecond()
+	if uid == 0 || token == "" || expireSecond == 0 {
+		return &pb.CacheSetVerifyUserTokenRes{
+			Code: common.ECCacheInvalidArgument.Code(),
+			Msg:  common.ECCacheInvalidArgument.Desc(),
+			Ok:   false,
+		}, nil
+	}
+	ok, err := GRedis.SetVerifyUserToken(ctx, uid, token, time.Duration(expireSecond)*time.Second)
+	if err != nil {
+		return &pb.CacheSetVerifyUserTokenRes{
+			Code: common.ECCacheRedisError.Code(),
+			Msg:  errors.WithMessagef(err, "%v %v", common.ECCacheRedisError.Desc(), xruntime.Location()).Error(),
+			Ok:   false,
+		}, nil
+	}
+	return &pb.CacheSetVerifyUserTokenRes{
+		Code: xerror.Success.Code(),
+		Msg:  xerror.Success.Desc(),
+		Ok:   ok,
 	}, nil
 }
 
