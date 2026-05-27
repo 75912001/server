@@ -10,6 +10,7 @@ import (
 	xgrpcprotoregistry "github.com/75912001/xlib/grpc/proto/registry"
 	xgrpcselector "github.com/75912001/xlib/grpc/selector"
 	xserver "github.com/75912001/xlib/server"
+	"google.golang.org/grpc/reflection"
 )
 
 type CacheServer struct {
@@ -47,6 +48,12 @@ func (s *CacheServer) PreStart(ctx context.Context) error {
 
 	if s.Server.GRPCServer != nil {
 		pb.RegisterCacheServiceServer(s.Server.GRPCServer.GrpcServer, &cacheGRPCServer{})
+
+		if *xconfig.GConfigMgr.Base.RunMode == 1 { // debug 开发模式，注册 gRPC 反射服务，方便使用 grpcurl 等工具调试
+			// grpcurl -plaintext localhost:20301 list cache.CacheService
+			// grpcurl -plaintext localhost:20301 describe cache.CacheService
+			reflection.Register(s.Server.GRPCServer.GrpcServer)
+		}
 	}
 	return nil
 }
