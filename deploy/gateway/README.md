@@ -13,6 +13,11 @@ docker build -f deploy/gateway/Dockerfile -t server.gateway:dev .
 docker images | grep server.gateway
 ```
 
+## Remove Image
+```bash
+docker rmi server.gateway:dev
+```
+
 # gateway.1
 
 ## Run Container
