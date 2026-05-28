@@ -27,22 +27,22 @@ message UserOfflineReq
   uint32 reason = 1;   // 1=用户主动离线，2=网络异常断开
 }
 
-// 0x00000A#client->gateway#心跳-请求
+//0x00000A#client->gateway#心跳-请求
 message UserHeartbeatReq {
   uint32 last_session = 1;   // 上次服务端下发的 session，首次心跳填 0
 }
 
-// 0x00000B#gateway->client#心跳-回复
+//0x00000B#gateway->client#心跳-回复
 message UserHeartbeatRes {
   uint64 server_time  = 1;   // 服务器时间毫秒
   uint32 next_session = 2;   // 客户端下次心跳必须用这个 session（用于防重放）
 }
 
-// 0x00000C#client->gateway#请求用户数据-请求
+//0x00000C#client->gateway#请求用户数据-请求
 message UserRecordReq {
 }
 
-// 0x00000D#gateway->client#请求用户数据-回复
+//0x00000D#gateway->client#请求用户数据-回复
 message UserRecordRes {
   UserRecord user_record = 1; // 用户数据
 }
