@@ -43,8 +43,10 @@ service OnlineService {
 
 // 上行请求包装器 (Gateway -> Online)
 message OnlineStreamTunnelReq {
+  // gateway_id 用于 stream 建立后向 online 注册 gateway 身份
+  string gateway_id = 1;
   // 将多个玩家的小帧打包在一起发送，避免单包发送带来的 HTTP/2 帧头与系统调用开销
-  repeated OnlineTunnelFrame frames = 1;
+  repeated OnlineTunnelFrame frames = 2;
 }
 
 // 下行响应包装器 (Online -> Gateway)
