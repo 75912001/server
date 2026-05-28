@@ -1,8 +1,6 @@
 package main
 
 import (
-	pb "server/proto/pb"
-
 	xlog "github.com/75912001/xlib/log"
 	xmap "github.com/75912001/xlib/map"
 	xnetcommon "github.com/75912001/xlib/net/common"
@@ -46,15 +44,6 @@ func (p *UserMgr) BindUID(uid uint64, u *User) {
 		old.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 	}
 	p.byUID.Add(uid, u)
-}
-
-func (p *UserMgr) PostOnlineFrame(frameUID uint64, frame *pb.OnlineTunnelFrame) {
-	user := p.GetByUID(frameUID)
-	if user == nil {
-		xlog.GLog.Errorf("online frame uid=%d not found", frameUID)
-		return
-	}
-	user.PostFrame(frame)
 }
 
 // Remove 摘除 remote 对应用户，同步执行 Cleanup，并移除 uid 索引。

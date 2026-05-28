@@ -34,6 +34,7 @@ func (p *Online) streamBehavior(messages ...any) (xactor.Behavior, any, error) {
 				continue
 			}
 			if err := stream.Send(req); err != nil {
+				// todo menglc 这里断开后,没有重连机制, 需要后续添加重连机制
 				p.XStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient = nil
 				xlog.GLog.Errorf("online[%s] stream send req: %v error: %v", p.Key, req, err)
 			}
@@ -44,6 +45,7 @@ func (p *Online) streamBehavior(messages ...any) (xactor.Behavior, any, error) {
 			}
 			if p.XStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient == incoming {
 				xlog.GLog.Fatalf("online[%s] stream reset err:%v", p.Key, msg.Args[0])
+				// todo menglc 这里断开后,没有重连机制, 需要后续添加重连机制
 				p.XStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient = nil
 			}
 		}

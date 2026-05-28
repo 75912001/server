@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	common "server/common"
 	pb "server/proto/pb"
@@ -13,6 +14,9 @@ import (
 	xlog "github.com/75912001/xlib/log"
 	xnetcommon "github.com/75912001/xlib/net/common"
 	xpacket "github.com/75912001/xlib/packet"
+	xruntime "github.com/75912001/xlib/runtime"
+	"github.com/pkg/errors"
+	grpcstatus "google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -25,47 +29,44 @@ func unaryOnlineUserOnline(
 ) error {
 	var verifyReq pb.UserVerifyReq
 	if err := proto.Unmarshal(body, &verifyReq); err != nil {
-		xlog.PrintfErr("UserVerifyReq unmarshal req: %v", err)
-		return err
+		return errors.WithMessagef(err, "unaryOnlineUserOnline unmarshal fail %v", xruntime.Location())
 	}
+	uid := verifyReq.GetUid()
 	req := &pb.OnlineUserOnlineReq{
-		Uid:       verifyReq.GetUid(),
-		Token:     verifyReq.GetToken(),
-		GatewayId: xetcd.GEtcd.GetKey(),
-		ClientIp:  remote.GetIP(),
+		Uid:        uid,
+		Token:      verifyReq.GetToken(),
+		GatewayKey: xetcd.GEtcd.GetKey(),
+		ClientIp:   remote.GetIP(),
 	}
 
-	// 不在此处套 WithTimeout：拨号时已挂 TimeOutClientInterceptor，会按 proto methodOpt.timeout
-	// （online.grpc.proto:21 → 60s）自动给 ctx 加 deadline；外层再 WithTimeout 取最早值会反而覆盖配置。
-	// GXOnlineServiceService 是全局 *XOnlineServiceClient；OnlineUserOnline 内部
-	// 调用 selector.Sel → xgrpcresolve.GetClientConnByHashRing 按 uid 选取连接，
-	// 不使用 receiver 的 Client 字段，因此可直接用空实例。
 	res, err := pb.GXOnlineServiceService.OnlineUserOnline(context.Background(), req)
 	if err != nil {
-		xlog.PrintfErr("OnlineUserOnline rpc error: %v", err)
-		return err
+		status, ok := grpcstatus.FromError(err)
+		if ok {
+			return errors.WithMessagef(err, "OnlineUserOnline rpc error: %v, status code: %v, message: %v %v", err, status.Code(), status.Message(), xruntime.Location())
+		}
+		return errors.WithMessagef(err, "OnlineUserOnline rpc error: %v, %v", err, xruntime.Location())
 	}
-	xlog.PrintInfo(fmt.Sprintf("OnlineUserOnline uid=%d code=%d msg=%s",
-		req.GetUid(), res.GetCode(), res.GetMsg()))
 
-	// 校验通过：绑定 User 到本次哈希命中的 online 实例（GetByShardKey 与 selector.Sel 同一哈希环，结果一致），
+	xlog.GLog.Tracef(fmt.Sprintf("OnlineUserOnline uid:%d", uid))
+
+	// 校验通过：绑定 User 到本次哈希命中的 online 实例
 	// 停止「未校验超时」定时器，启动心跳超时定时器。
-	if res.GetCode() == 0 {
-		u := GUserMgr.Get(remote)
-		if u == nil || !remote.IsConnect() {
-			xlog.PrintInfo(fmt.Sprintf("OnlineUserOnline uid=%d ignored, client disconnected", req.GetUid()))
-			return nil
-		}
-		online, oerr := GOnlineMgr.GetByShardKey(fmt.Sprint(req.GetUid()))
-		if oerr != nil {
-			xlog.PrintfErr("OnlineUserOnline lookup online by uid=%d failed: %v", req.GetUid(), oerr)
-			res.Code = common.ECGatewayOnlineNotFound.Code()
-			res.Msg = common.ECGatewayOnlineNotFound.Error()
-		} else if verr := u.PostSyncVerified(req.GetUid(), online); verr != nil {
-			xlog.PrintfErr("OnlineUserOnline post verified uid=%d failed: %v", req.GetUid(), verr)
-			res.Code = common.ECGatewayOnlineNotFound.Code()
-			res.Msg = common.ECGatewayOnlineNotFound.Error()
-		}
+	u := GUserMgr.Get(remote)
+	if u == nil || !remote.IsConnect() {
+		return errors.WithMessagef(err, "OnlineUserOnline remote not connect uid:%v %v", uid, xruntime.Location())
+	}
+	// 选一个 online 实例，进行后续绑定和心跳管理. 理论上应该能找到与 pb.GXOnlineServiceService.OnlineUserOnline 相同的 online实例，因为它们都基于相同的 selector.Sel 和 uid 哈希算法，
+	// todo menglc 但如果找不到/找到的不一致，说明在线服务实例发生了变更（重启或扩容），需要让用户重新上线以绑定新的实例。
+	online, err := GOnlineMgr.GetByShardKey(fmt.Sprint(req.GetUid()))
+	if err != nil {
+		return errors.WithMessagef(err, "OnlineUserOnline lookup online by uid:%v fail %v", req.GetUid(), xruntime.Location())
+	}
+	if err = u.PostSyncVerified(req.GetUid(), online); err != nil {
+		xlog.PrintfErr("OnlineUserOnline post verified uid=%d failed: %v", req.GetUid(), err)
+		res.Code = common.ECGatewayOnlineNotFound.Code()
+		res.Msg = common.ECGatewayOnlineNotFound.Error()
+		return errors.WithMessagef(err, "OnlineUserOnline post verified uid:%d fail %v", req.GetUid(), xruntime.Location())
 	}
 
 	return remote.Send(&xpacket.Packet{
@@ -76,7 +77,7 @@ func unaryOnlineUserOnline(
 			Key:       header.Key,
 		},
 		PBMessage: &pb.UserVerifyRes{
-			ServerTime: res.GetServerTime(),
+			ServerTime: time.Now().UnixMilli(),
 		},
 	})
 }

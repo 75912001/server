@@ -66,7 +66,11 @@ func (p *UserHandlerTCP) OnPacket(remote xnetcommon.IRemote, packet xpacket.IPac
 
 	// UserVerifyReq：登录鉴权，走 Unary gRPC（selector.Sel 内部按 uid 路由，无需预选 online）
 	if header.MessageID == uint32(pb.MsgIDUser_UserVerifyReq_CMD) {
-		return unaryOnlineUserOnline(remote, header, body)
+		err := unaryOnlineUserOnline(remote, header, body)
+		if err != nil {
+			xlog.GLog.Warnf("unaryOnlineUserOnline error: %v", err)
+		}
+		return err
 	}
 
 	u := GUserMgr.Get(remote)

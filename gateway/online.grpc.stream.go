@@ -7,6 +7,7 @@ import (
 
 	xactor "github.com/75912001/xlib/actor"
 	xetcd "github.com/75912001/xlib/etcd"
+	xlog "github.com/75912001/xlib/log"
 )
 
 // GOnlineStreamHandler 全局流回调，init 时注册到 pb 包。
@@ -32,7 +33,12 @@ func (p *onlineStreamHandler) OnlineStreamTunnel(
 ) error {
 	for _, frame := range msg.GetFrames() {
 		uid := frame.GetUid()
-		GUserMgr.PostOnlineFrame(uid, frame)
+		user := GUserMgr.GetByUID(uid)
+		if user == nil {
+			xlog.GLog.Warnf("online frame uid:%d not found", uid)
+			continue
+		}
+		user.PostFrame(frame)
 	}
 	return nil
 }
