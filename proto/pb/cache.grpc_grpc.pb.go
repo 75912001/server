@@ -29,7 +29,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CacheServiceClient interface {
+	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	CacheSetUserRecord(ctx context.Context, in *CacheSetUserRecordReq, opts ...grpc.CallOption) (*CacheSetUserRecordRes, error)
+	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	CacheGetUserRecord(ctx context.Context, in *CacheGetUserRecordReq, opts ...grpc.CallOption) (*CacheGetUserRecordRes, error)
 	CacheSetVerifyUserToken(ctx context.Context, in *CacheSetVerifyUserTokenReq, opts ...grpc.CallOption) (*CacheSetVerifyUserTokenRes, error)
 	CacheVerifyUserToken(ctx context.Context, in *CacheVerifyUserTokenReq, opts ...grpc.CallOption) (*CacheVerifyUserTokenRes, error)
@@ -87,7 +89,9 @@ func (c *cacheServiceClient) CacheVerifyUserToken(ctx context.Context, in *Cache
 // All implementations must embed UnimplementedCacheServiceServer
 // for forward compatibility.
 type CacheServiceServer interface {
+	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	CacheSetUserRecord(context.Context, *CacheSetUserRecordReq) (*CacheSetUserRecordRes, error)
+	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	CacheGetUserRecord(context.Context, *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error)
 	CacheSetVerifyUserToken(context.Context, *CacheSetVerifyUserTokenReq) (*CacheSetVerifyUserTokenRes, error)
 	CacheVerifyUserToken(context.Context, *CacheVerifyUserTokenReq) (*CacheVerifyUserTokenRes, error)

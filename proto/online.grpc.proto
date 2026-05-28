@@ -3,6 +3,7 @@ syntax = "proto3";
 package online;
 option go_package = "server/proto/pb;pb";
 import "options.proto";
+import "online.grpc.unary.proto";
 
 // ===================================================================
 // 一、 服务接口定义
@@ -37,24 +38,7 @@ service OnlineService {
 }
 
 // ===================================================================
-// 二、 登录请求定义 (控制面)
-// ===================================================================
-
-message OnlineUserOnlineReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // 路由分片键，生成器据此产生 selector.Sel 路由代码
-  string token = 2;            // 登录 Token，供后端 Online 服校验
-  string gateway_id = 3;       // 当前网关的 ID，用于后端记录全局路由 Session
-  string client_ip = 4;        // 客户端真实 IP (防刷、反外挂)
-}
-
-message OnlineUserOnlineRes {
-  uint32 code = 1;             // 0 表示成功，非 0 表示失败
-  string msg = 2;              // 错误信息描述
-  int64 server_time = 3;       // 服务器当前时间戳，单位毫秒 (用于客户端对时)
-}
-
-// ===================================================================
-// 三、 隧道包装器 (实现 Batch 批量吞吐的核心)
+// 隧道包装器 (实现 Batch 批量吞吐的核心)
 // ===================================================================
 
 // 上行请求包装器 (Gateway -> Online)
@@ -69,7 +53,7 @@ message OnlineStreamTunnelRes {
 }
 
 // ===================================================================
-// 四、 核心数据帧 (利用 oneof 区分业务数据与系统信令)
+// 核心数据帧 (利用 oneof 区分业务数据与系统信令)
 // ===================================================================
 
 message OnlineTunnelFrame {
@@ -82,25 +66,8 @@ message OnlineTunnelFrame {
   }
 }
 
-
 // ===================================================================
-// 五、 系统信令详情
-// ===================================================================
-
-// 用户离线请求 (Gateway -> Online)，网关在 TCP 断开、顶号、主动离线等场景下发出。
-message OnlineUserOfflineReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // 离线用户 uid
-  uint32 reason = 2;                                 // 离线原因
-  string msg = 3;                                    // 离线说明
-}
-
-message OnlineUserOfflineRes {
-  uint32 code = 1; // 0 表示成功；用户已离线也视为成功
-  string msg = 2;  // 处理结果说明
-}
-
-// ===================================================================
-// 六、 客户端业务透传包 (适配 TCP Header)
+// 客户端业务透传包 (适配 TCP Header)
 // ===================================================================
 
 message OnlineClientPacket {
