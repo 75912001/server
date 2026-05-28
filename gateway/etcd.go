@@ -6,6 +6,8 @@ import (
 	xetcd "github.com/75912001/xlib/etcd"
 	xetcdconstants "github.com/75912001/xlib/etcd/constants"
 	xlog "github.com/75912001/xlib/log"
+	xruntime "github.com/75912001/xlib/runtime"
+	"github.com/pkg/errors"
 )
 
 // onEtcdAdd 新服务上线
@@ -22,8 +24,7 @@ func onEtcdAdd(args ...any) error {
 	switch serverName {
 	case common.OnlineServerName:
 		if err := GOnlineMgr.Add(key, valueJson); err != nil {
-			xlog.GLog.Fatalf("onEtcdAdd key=%s: %v", key, err)
-			return err
+			return errors.WithMessagef(err, "onEtcdAdd key=%s %v", key, xruntime.Location())
 		}
 		xlog.GLog.Infof("onEtcdAdd key:%s", key)
 	}
