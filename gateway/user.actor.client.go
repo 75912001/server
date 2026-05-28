@@ -1,13 +1,15 @@
 package main
 
 import (
+	"server/common"
 	"time"
 
 	pb "server/proto/pb"
 
-	xlog "github.com/75912001/xlib/log"
+	xerror "github.com/75912001/xlib/error"
 	xnetcommon "github.com/75912001/xlib/net/common"
 	xpacket "github.com/75912001/xlib/packet"
+	xruntime "github.com/75912001/xlib/runtime"
 	xutil "github.com/75912001/xlib/util"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
@@ -15,21 +17,24 @@ import (
 
 func (p *User) OnClientPacket(header *xpacket.Header, body []byte) error {
 	if !p.remote.IsConnect() {
-		return nil
-	}
-	if header.MessageID == uint32(pb.MsgIDUser_UserHeartbeatReq_CMD) {
-		return p.OnHeartbeatReq(header, body)
-	}
-	if p.online == nil {
-		xlog.GLog.Warnf("packet before verify, remote=%p messageID=%d", p.remote, header.MessageID)
-		p.Disconnect(xnetcommon.DisconnectReasonClientLogic)
-		return nil
-	}
-	if header.MessageID == uint32(pb.MsgIDUser_UserOfflineReq_CMD) {
-		p.Disconnect(xnetcommon.DisconnectReasonClientShutdown)
-		return nil
+		return errors.WithMessagef(xerror.Disconnect, "remote not connected: %p", p.remote)
 	}
 
+	if p.online == nil { // 在线实例未找到，可能是未通过验证
+		p.Disconnect(xnetcommon.DisconnectReasonClientLogic)
+		return errors.WithMessagef(common.ECGatewayOnlineNotFound, "online not found for user[uid=%v] remote:%v packet messageID=%d %v",
+			p.uid, p.remote, header.MessageID, xruntime.Location())
+	}
+
+	// 通过验证
+	switch header.MessageID {
+	case uint32(pb.MsgIDUser_UserHeartbeatReq_CMD):
+		return p.OnHeartbeatReq(header, body)
+	case uint32(pb.MsgIDUser_UserOfflineReq_CMD):
+		p.Disconnect(xnetcommon.DisconnectReasonClientShutdown)
+		return nil
+	default:
+	}
 	frame := &pb.OnlineTunnelFrame{
 		Uid: p.uid,
 		Payload: &pb.OnlineTunnelFrame_ClientPacket{
@@ -43,10 +48,8 @@ func (p *User) OnClientPacket(header *xpacket.Header, body []byte) error {
 		},
 	}
 	if err := p.online.Send(&pb.OnlineStreamTunnelReq{Frames: []*pb.OnlineTunnelFrame{frame}}); err != nil {
-		xlog.GLog.Errorf("stream send failed for online[%s]: %v", p.online.Key, err)
-		return err
+		return errors.WithMessagef(err, "stream send failed for online %v %v", p.online.Key, xruntime.Location())
 	}
-	xlog.GLog.Infof("Message %d forwarded to online[%s]", header.MessageID, p.online.Key)
 	return nil
 }
 
@@ -56,32 +59,21 @@ func (p *User) OnClientPacket(header *xpacket.Header, body []byte) error {
 //	若不一致视为重放/篡改，主动断开；
 //	否则生成新 session 并下发，重置心跳超时定时器。
 func (p *User) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
-	if !p.remote.IsConnect() {
-		return nil
-	}
-	if p.online == nil {
-		xlog.GLog.Warnf("heartbeat before verify, remote=%s", p.ip)
-		p.Disconnect(xnetcommon.DisconnectReasonClientLogic)
-		return nil
-	}
-
 	var req pb.UserHeartbeatReq
 	if err := proto.Unmarshal(body, &req); err != nil {
-		xlog.GLog.Warnf("heartbeat req unmarshal failed err=%v", err)
-		return errors.WithMessage(err, "UserHeartbeatReq unmarshal")
+		return errors.WithMessagef(err, "UserHeartbeatReq unmarshal %v", xruntime.Location())
 	}
 
 	if p.hb.WaitID != 0 && req.GetLastSession() != p.hb.WaitID {
-		xlog.GLog.Warnf("user[uid=%d] heartbeat session mismatch: got=%d expect=%d",
-			p.uid, req.GetLastSession(), p.hb.WaitID)
 		p.Disconnect(xnetcommon.DisconnectReasonClientLogic)
-		return nil
+		return errors.WithMessagef(xerror.Mismatch, "heartbeat session mismatch for user[uid=%d] got=%d expect=%d %v",
+			p.uid, req.GetLastSession(), p.hb.WaitID, xruntime.Location())
 	}
 
 	next := xutil.RandomUint32()
 	p.hb.WaitID = next
 
-	p.startHeartbeatTimer()
+	p.restartHeartbeatTimer()
 
 	return p.sendHeartbeatRes(header, next)
 }
@@ -91,11 +83,11 @@ func (p *User) sendHeartbeatRes(header *xpacket.Header, next uint32) error {
 		Header: &xpacket.Header{
 			MessageID: uint32(pb.MsgIDUser_UserHeartbeatRes_CMD),
 			SessionID: header.SessionID,
-			ResultID:  0,
+			ResultID:  xerror.Success.Code(),
 			Key:       header.Key,
 		},
 		PBMessage: &pb.UserHeartbeatRes{
-			ServerTime:  uint64(time.Now().UnixMilli()),
+			ServerTime:  time.Now().UnixMilli(),
 			NextSession: next,
 		},
 	})
