@@ -12,7 +12,7 @@ import (
 // Online 是一个 online 服务实例。
 type Online struct {
 	*pb.XOnlineService
-	ID string // ${GroupID}.${serverName}.${serverID}
+	ID string // xetcd.GenKey 生成的 etcd 服务实例 key
 
 	actor *xactor.Actor[string] // 序列化 stream.Send 的 actor（每个 Online 独立一个）
 
