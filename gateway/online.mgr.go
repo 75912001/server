@@ -5,7 +5,9 @@ import (
 
 	gatewaycommon "server/common"
 
+	xconfig "github.com/75912001/xlib/config"
 	xetcd "github.com/75912001/xlib/etcd"
+	xetcdconstants "github.com/75912001/xlib/etcd/constants"
 	xgrpcresolve "github.com/75912001/xlib/grpc/resolve"
 	xlog "github.com/75912001/xlib/log"
 	xmap "github.com/75912001/xlib/map"
@@ -38,8 +40,8 @@ func (p *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 
 	p.Remove(key)
 
-	connID := fmt.Sprintf("%d.%s.%d", groupID, serverName, serverID)
-	online, err := newOnline(connID, addr)
+	id := xetcd.GenKey(*xconfig.GConfigMgr.Base.ProjectName, xetcdconstants.WatchMsgTypeServer, groupID, serverName, serverID)
+	online, err := newOnline(id, addr)
 	if err != nil {
 		xlog.GLog.Errorf("OnlineMgr.Add dial %s failed: %v", addr, err)
 		return err
