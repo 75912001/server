@@ -23,6 +23,8 @@ func onEtcdAdd(args ...any) error {
 	}
 	switch serverName {
 	case common.OnlineServerName:
+		GOnlineMgr.Remove(key)
+
 		if err := GOnlineMgr.Add(key, valueJson); err != nil {
 			return errors.WithMessagef(err, "onEtcdAdd key=%s %v", key, xruntime.Location())
 		}

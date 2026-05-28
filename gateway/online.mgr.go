@@ -1,30 +1,28 @@
 package main
 
 import (
-	"fmt"
-
 	gatewaycommon "server/common"
 
 	xetcd "github.com/75912001/xlib/etcd"
 	xgrpcresolve "github.com/75912001/xlib/grpc/resolve"
 	xlog "github.com/75912001/xlib/log"
 	xmap "github.com/75912001/xlib/map"
+	xruntime "github.com/75912001/xlib/runtime"
+	"github.com/pkg/errors"
 )
 
 // GOnlineMgr 全局 online 服务管理器
 var GOnlineMgr = &OnlineMgr{
-	m: xmap.NewMapMutexMgr[string, *Online](), // key: etcd key
+	m: xmap.NewMapMutexMgr[string, *Online](),
 }
 
 // OnlineMgr 管理所有 online 服务实例
-// key: etcd key（唯一标识一个实例）
 // 写操作只在 etcd actor 协程中触发（串行），读操作来自 TCP 处理协程（并发）→ MapMutexMgr
 type OnlineMgr struct {
-	m *xmap.MapMutexMgr[string, *Online]
+	m *xmap.MapMutexMgr[string, *Online] // key: etcd key
 }
 
 // Add 上线：建立 gRPC 连接，启动 recvLoop，注册到 resolve，缓存实例。
-// 若 key 已存在（update），先摘除旧实例再建立新实例。
 func (p *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	if valueJson == nil || valueJson.GrpcService == nil || valueJson.GrpcService.Addr == nil ||
 		valueJson.GrpcService.ServiceName == nil || valueJson.GrpcService.PackageName == nil {
@@ -35,8 +33,6 @@ func (p *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	packageName := *gs.PackageName
 	serviceName := *gs.ServiceName
 	addr := *gs.Addr
-
-	p.Remove(key)
 
 	online, err := newOnline(key, addr)
 	if err != nil {
@@ -50,7 +46,7 @@ func (p *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	online.ServiceName = serviceName
 
 	p.m.Add(key, online)
-	// Online 实现 IClientConn，直接注册到 resolve 哈希环
+	// Online 实现 IClientConn，直接注册到 resolve
 	xgrpcresolve.AddServer(groupID, serverName, serverID, online, packageName, serviceName)
 
 	xlog.GLog.Infof("OnlineMgr.Add key:%s addr:%s total:%d", key, addr, p.m.Len())
@@ -64,11 +60,9 @@ func (p *OnlineMgr) Remove(key string) {
 		return
 	}
 
-	if _, err := xgrpcresolve.RemoveServer(
-		online.GroupID, online.ServerName, online.ServerID,
-		online.PackageName, online.ServiceName,
-	); err != nil {
-		xlog.GLog.Warnf("OnlineMgr.removeInfo RemoveServer key=%s: %v", key, err)
+	if _, err := xgrpcresolve.RemoveServer(online.GroupID, online.ServerName, online.ServerID, online.PackageName, online.ServiceName); err != nil {
+		xlog.GLog.Errorf("OnlineMgr.Remove xgrpcresolve.RemoveServer key:%s err:%v", key, err)
+		// 即使从 resolve 摘除失败，也继续关闭连接和删除缓存，避免不一致导致的请求失败
 		if stopErr := online.Stop(); stopErr != nil {
 			xlog.GLog.Warnf("OnlineMgr.removeInfo fallback Stop key=%s: %v", key, stopErr)
 		}
@@ -80,20 +74,13 @@ func (p *OnlineMgr) Remove(key string) {
 
 // GetByShardKey 通过一致性哈希选取一个 online 实例
 func (p *OnlineMgr) GetByShardKey(shardKey string) (*Online, error) {
-	iConn, err := xgrpcresolve.GetClientConnByHashRing(
-		gatewaycommon.OnlinePackageName, gatewaycommon.OnlineServiceName, shardKey,
-	)
+	iConn, err := xgrpcresolve.GetClientConnByHashRing(gatewaycommon.OnlinePackageName, gatewaycommon.OnlineServiceName, shardKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithMessagef(err, "GetByShardKey shardKey:%v failed %v", shardKey, xruntime.Location())
 	}
 	online, ok := iConn.(*Online)
 	if !ok {
-		return nil, fmt.Errorf("unexpected conn type in resolve")
+		return nil, errors.WithMessagef(err, "GetByShardKey shardKey:%v failed %v", shardKey, xruntime.Location())
 	}
 	return online, nil
-}
-
-// Len 返回当前在线的 online 实例数量
-func (p *OnlineMgr) Len() int {
-	return p.m.Len()
 }
