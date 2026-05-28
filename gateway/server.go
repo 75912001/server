@@ -11,6 +11,7 @@ import (
 	xgrpcselector "github.com/75912001/xlib/grpc/selector"
 	xruntime "github.com/75912001/xlib/runtime"
 	xserver "github.com/75912001/xlib/server"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -46,7 +47,7 @@ func (p *GatewayServer) PreStart(ctx context.Context) error {
 			WithDelCallback(xcontrol.NewCallBack(onEtcdDel)))
 
 	if err := p.Server.PreStart(ctx, opts); err != nil {
-		return err
+		return errors.WithMessagef(err, "pre start server failed, %v %v", opts, xruntime.Location())
 	}
 
 	if p.Server.GRPCServer != nil {
