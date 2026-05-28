@@ -2,39 +2,27 @@ package main
 
 import (
 	"context"
-	"fmt"
-
-	common "server/common"
 	pb "server/proto/pb"
 
-	xerror "github.com/75912001/xlib/error"
 	xlog "github.com/75912001/xlib/log"
 	xnetcommon "github.com/75912001/xlib/net/common"
+	grpccodes "google.golang.org/grpc/codes"
+	grpcstatus "google.golang.org/grpc/status"
 )
 
 func (p *gatewayGRPCServer) GatewayUserOffline(_ context.Context, req *pb.GatewayUserOfflineReq) (*pb.GatewayUserOfflineRes, error) {
 	if req.GetUid() == 0 {
-		xlog.GLog.Error("GatewayUserOffline uid:0")
-		return &pb.GatewayUserOfflineRes{
-			Code: common.ECGatewayInvalidUID.Code(),
-			Msg:  common.ECGatewayInvalidUID.Error(),
-		}, nil
+		return &pb.GatewayUserOfflineRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid uid:0")
 	}
 
-	user := GUserMgr.GetByUID(req.GetUid())
+	uid := req.GetUid()
+	user := GUserMgr.GetByUID(uid)
 	if user == nil {
-		xlog.GLog.Warnf("not found uid:%d", req.GetUid())
-		return &pb.GatewayUserOfflineRes{
-			Code: xerror.Success.Code(),
-			Msg:  common.ECGatewayUIDNotFound.Error(),
-		}, nil
+		return &pb.GatewayUserOfflineRes{}, grpcstatus.Errorf(grpccodes.NotFound, "not found uid:%d", req.GetUid())
 	}
 
 	user.Disconnect(xnetcommon.DisconnectReason(req.GetReason()))
 
 	xlog.GLog.Debugf("GatewayUserOffline uid:%d reason:%v msg:%s", req.GetUid(), xnetcommon.DisconnectReason(req.GetReason()), req.GetMsg())
-	return &pb.GatewayUserOfflineRes{
-		Code: xerror.Success.Code(),
-		Msg:  fmt.Sprintf("uid:%d offline", req.GetUid()),
-	}, nil
+	return &pb.GatewayUserOfflineRes{}, nil
 }
