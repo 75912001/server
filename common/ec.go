@@ -8,8 +8,6 @@ import xerror "github.com/75912001/xlib/error"
 var (
 	// gateway
 	ECGatewayOnlineNotFound = xerror.NewError(0x10000).WithName("ECGatewayOnlineNotFound").WithDesc("gateway-online-not-found-gateway未找到online服务")
-	ECGatewayInvalidUID     = xerror.NewError(0x10001).WithName("ECGatewayInvalidUID").WithDesc("gateway-invalid-uid-uid无效")
-	ECGatewayUIDNotFound    = xerror.NewError(0x10002).WithName("ECGatewayUIDNotFound").WithDesc("gateway-uid-not-found-uid未找到")
 
 	// online
 
