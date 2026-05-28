@@ -43,10 +43,10 @@ func (p *User) OnClientPacket(header *xpacket.Header, body []byte) error {
 		},
 	}
 	if err := p.online.Send(&pb.OnlineStreamTunnelReq{Frames: []*pb.OnlineTunnelFrame{frame}}); err != nil {
-		xlog.GLog.Errorf("stream send failed for online[%s]: %v", p.online.ID, err)
+		xlog.GLog.Errorf("stream send failed for online[%s]: %v", p.online.Key, err)
 		return err
 	}
-	xlog.GLog.Infof("Message %d forwarded to online[%s]", header.MessageID, p.online.ID)
+	xlog.GLog.Infof("Message %d forwarded to online[%s]", header.MessageID, p.online.Key)
 	return nil
 }
 

@@ -6,6 +6,7 @@ import (
 	pb "server/proto/pb"
 
 	xactor "github.com/75912001/xlib/actor"
+	xetcd "github.com/75912001/xlib/etcd"
 )
 
 // GOnlineStreamHandler 全局流回调，init 时注册到 pb 包。
@@ -17,9 +18,9 @@ func init() {
 
 type onlineStreamHandler struct{}
 
-// OnlineStreamTunnelPre 流建立时触发（流已在 NewXOnlineService 中创建，此处无需额外处理）
-func (p *onlineStreamHandler) OnlineStreamTunnelPre(_ pb.OnlineService_OnlineStreamTunnelClient) error {
-	return nil
+// OnlineStreamTunnelPre 流建立时发送 gateway_id 注册包，让 online 绑定该 gateway stream。
+func (p *onlineStreamHandler) OnlineStreamTunnelPre(stream pb.OnlineService_OnlineStreamTunnelClient) error {
+	return stream.Send(&pb.OnlineStreamTunnelReq{GatewayId: xetcd.GEtcd.GetKey()})
 }
 
 // OnlineStreamTunnel 处理 online → gateway 下行流。

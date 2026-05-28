@@ -114,7 +114,7 @@ func (p *User) Cleanup(reason xnetcommon.DisconnectReason) {
 
 	if uid != 0 && online != nil {
 		if err := unaryOnlineUserOffline(online, uid, reason, "gateway user offline"); err != nil {
-			xlog.GLog.Warnf("notify offline failed uid=%d reason=%d online=%s err=%v", uid, reason, online.ID, err)
+			xlog.GLog.Warnf("notify offline failed uid:%d reason:%d online:%s err:%v", uid, reason, online.Key, err)
 		}
 	}
 }

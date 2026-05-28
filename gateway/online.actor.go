@@ -30,12 +30,12 @@ func (p *Online) streamBehavior(messages ...any) (xactor.Behavior, any, error) {
 			}
 			stream := p.XStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient
 			if stream == nil {
-				xlog.GLog.Errorf("online[%s] stream not ready, drop msg req:%v", p.ID, req)
+				xlog.GLog.Errorf("online[%s] stream not ready, drop msg req:%v", p.Key, req)
 				continue
 			}
 			if err := stream.Send(req); err != nil {
 				p.XStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient = nil
-				xlog.GLog.Errorf("online[%s] stream send req: %v error: %v", p.ID, req, err)
+				xlog.GLog.Errorf("online[%s] stream send req: %v error: %v", p.Key, req, err)
 			}
 		case OnlineActorCmdStreamReset:
 			incoming, ok := msg.Args[0].(pb.OnlineService_OnlineStreamTunnelClient)
@@ -43,7 +43,7 @@ func (p *Online) streamBehavior(messages ...any) (xactor.Behavior, any, error) {
 				continue
 			}
 			if p.XStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient == incoming {
-				xlog.GLog.Fatalf("online[%s] stream reset err:%v", p.ID, msg.Args[0])
+				xlog.GLog.Fatalf("online[%s] stream reset err:%v", p.Key, msg.Args[0])
 				p.XStreamOnlineServiceOnlineStreamTunnelClient.OnlineService_OnlineStreamTunnelClient = nil
 			}
 		}
