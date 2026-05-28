@@ -8,9 +8,7 @@ import (
 	common "server/common"
 	pb "server/proto/pb"
 
-	xconfig "github.com/75912001/xlib/config"
 	xetcd "github.com/75912001/xlib/etcd"
-	xetcdconstants "github.com/75912001/xlib/etcd/constants"
 	xgrpcproto "github.com/75912001/xlib/grpc/proto"
 	xlog "github.com/75912001/xlib/log"
 	xnetcommon "github.com/75912001/xlib/net/common"
@@ -33,7 +31,7 @@ func unaryOnlineUserOnline(
 	req := &pb.OnlineUserOnlineReq{
 		Uid:       verifyReq.GetUid(),
 		Token:     verifyReq.GetToken(),
-		GatewayId: xetcd.GenKey(*xconfig.GConfigMgr.Base.ProjectName, xetcdconstants.WatchMsgTypeServer, *xconfig.GConfigMgr.Base.GroupID, *xconfig.GConfigMgr.Base.Name, *xconfig.GConfigMgr.Base.ServerID),
+		GatewayId: xetcd.GEtcd.GetKey(),
 		ClientIp:  remote.GetIP(),
 	}
 

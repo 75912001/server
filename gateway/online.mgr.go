@@ -5,9 +5,7 @@ import (
 
 	gatewaycommon "server/common"
 
-	xconfig "github.com/75912001/xlib/config"
 	xetcd "github.com/75912001/xlib/etcd"
-	xetcdconstants "github.com/75912001/xlib/etcd/constants"
 	xgrpcresolve "github.com/75912001/xlib/grpc/resolve"
 	xlog "github.com/75912001/xlib/log"
 	xmap "github.com/75912001/xlib/map"
@@ -15,7 +13,7 @@ import (
 
 // GOnlineMgr 全局 online 服务管理器
 var GOnlineMgr = &OnlineMgr{
-	m: xmap.NewMapMutexMgr[string, *Online](),
+	m: xmap.NewMapMutexMgr[string, *Online](), // key: etcd key
 }
 
 // OnlineMgr 管理所有 online 服务实例
@@ -40,8 +38,7 @@ func (p *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 
 	p.Remove(key)
 
-	id := xetcd.GenKey(*xconfig.GConfigMgr.Base.ProjectName, xetcdconstants.WatchMsgTypeServer, groupID, serverName, serverID)
-	online, err := newOnline(id, addr)
+	online, err := newOnline(key, addr)
 	if err != nil {
 		xlog.GLog.Errorf("OnlineMgr.Add dial %s failed: %v", addr, err)
 		return err
