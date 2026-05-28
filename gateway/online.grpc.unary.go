@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	common "server/common"
 	pb "server/proto/pb"
 
+	xerror "github.com/75912001/xlib/error"
 	xetcd "github.com/75912001/xlib/etcd"
 	xgrpcproto "github.com/75912001/xlib/grpc/proto"
 	xlog "github.com/75912001/xlib/log"
@@ -39,7 +39,7 @@ func unaryOnlineUserOnline(
 		ClientIp:   remote.GetIP(),
 	}
 
-	res, err := pb.GXOnlineServiceService.OnlineUserOnline(context.Background(), req)
+	_, err := pb.GXOnlineServiceService.OnlineUserOnline(context.Background(), req)
 	if err != nil {
 		status, ok := grpcstatus.FromError(err)
 		if ok {
@@ -63,9 +63,6 @@ func unaryOnlineUserOnline(
 		return errors.WithMessagef(err, "OnlineUserOnline lookup online by uid:%v fail %v", req.GetUid(), xruntime.Location())
 	}
 	if err = u.PostSyncVerified(req.GetUid(), online); err != nil {
-		xlog.PrintfErr("OnlineUserOnline post verified uid=%d failed: %v", req.GetUid(), err)
-		res.Code = common.ECGatewayOnlineNotFound.Code()
-		res.Msg = common.ECGatewayOnlineNotFound.Error()
 		return errors.WithMessagef(err, "OnlineUserOnline post verified uid:%d fail %v", req.GetUid(), xruntime.Location())
 	}
 
@@ -73,7 +70,7 @@ func unaryOnlineUserOnline(
 		Header: &xpacket.Header{
 			MessageID: uint32(pb.MsgIDUser_UserVerifyRes_CMD),
 			SessionID: header.SessionID,
-			ResultID:  res.GetCode(),
+			ResultID:  xerror.Success.Code(),
 			Key:       header.Key,
 		},
 		PBMessage: &pb.UserVerifyRes{
@@ -84,10 +81,11 @@ func unaryOnlineUserOnline(
 
 func unaryOnlineUserOffline(online *Online, uid uint64, reason xnetcommon.DisconnectReason, msg string) error {
 	ctx := xgrpcproto.SetFromOutgoingContext(context.Background(), xgrpcproto.ShardKeyFieldNameDefault, strconv.FormatUint(uid, 10))
-	_, err := pb.NewOnlineServiceClient(online.GetClientConn()).OnlineUserOffline(ctx, &pb.OnlineUserOfflineReq{
-		Uid:    uid,
-		Reason: uint32(reason),
-		Msg:    msg,
-	})
+	_, err := pb.NewOnlineServiceClient(online.GetClientConn()).OnlineUserOffline(ctx,
+		&pb.OnlineUserOfflineReq{
+			Uid:    uid,
+			Reason: uint32(reason),
+			Msg:    msg,
+		})
 	return err
 }
