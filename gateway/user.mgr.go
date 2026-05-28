@@ -23,33 +23,33 @@ type UserMgr struct {
 }
 
 // Add 创建用户并登记（TCP OnConnect 触发）。
-func (m *UserMgr) Add(remote xnetcommon.IRemote) *User {
+func (p *UserMgr) Add(remote xnetcommon.IRemote) *User {
 	u := newUser(remote)
-	m.byRemote.Add(remote, u)
+	p.byRemote.Add(remote, u)
 	return u
 }
 
 // Get 查找用户（TCP OnPacket 用 remote 反查）。
-func (m *UserMgr) Get(remote xnetcommon.IRemote) *User {
-	u, _ := m.byRemote.Find(remote)
+func (p *UserMgr) Get(remote xnetcommon.IRemote) *User {
+	u, _ := p.byRemote.Find(remote)
 	return u
 }
 
-func (m *UserMgr) GetByUID(uid uint64) *User {
-	u, _ := m.byUID.Find(uid)
+func (p *UserMgr) GetByUID(uid uint64) *User {
+	u, _ := p.byUID.Find(uid)
 	return u
 }
 
-func (m *UserMgr) BindUID(uid uint64, u *User) {
-	if old := m.GetByUID(uid); old != nil && old != u {
+func (p *UserMgr) BindUID(uid uint64, u *User) {
+	if old := p.GetByUID(uid); old != nil && old != u {
 		xlog.GLog.Infof("duplicate uid login, disconnect old user")
 		old.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 	}
-	m.byUID.Add(uid, u)
+	p.byUID.Add(uid, u)
 }
 
-func (m *UserMgr) PostOnlineFrame(frameUID uint64, frame *pb.OnlineTunnelFrame) {
-	user := m.GetByUID(frameUID)
+func (p *UserMgr) PostOnlineFrame(frameUID uint64, frame *pb.OnlineTunnelFrame) {
+	user := p.GetByUID(frameUID)
 	if user == nil {
 		xlog.GLog.Errorf("online frame uid=%d not found", frameUID)
 		return
@@ -58,14 +58,14 @@ func (m *UserMgr) PostOnlineFrame(frameUID uint64, frame *pb.OnlineTunnelFrame) 
 }
 
 // Remove 摘除 remote 对应用户，同步执行 Cleanup，并移除 uid 索引。
-func (m *UserMgr) Remove(remote xnetcommon.IRemote) *User {
-	u, ok := m.byRemote.Find(remote)
+func (p *UserMgr) Remove(remote xnetcommon.IRemote) *User {
+	u, ok := p.byRemote.Find(remote)
 	if !ok {
 		return nil
 	}
-	m.byRemote.Del(remote)
+	p.byRemote.Del(remote)
 
-	m.byUID.Del(u.uid)
+	p.byUID.Del(u.uid)
 
 	u.PostSyncCleanup(remote.GetDisconnectReason())
 
@@ -74,4 +74,4 @@ func (m *UserMgr) Remove(remote xnetcommon.IRemote) *User {
 }
 
 // Len 当前在线用户数。
-func (m *UserMgr) Len() int { return m.byRemote.Len() }
+func (p *UserMgr) Len() int { return p.byRemote.Len() }

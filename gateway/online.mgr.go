@@ -25,7 +25,7 @@ type OnlineMgr struct {
 
 // Add 上线：建立 gRPC 连接，启动 recvLoop，注册到 resolve，缓存实例。
 // 若 key 已存在（update），先摘除旧实例再建立新实例。
-func (mgr *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
+func (p *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	if valueJson == nil || valueJson.GrpcService == nil || valueJson.GrpcService.Addr == nil ||
 		valueJson.GrpcService.ServiceName == nil || valueJson.GrpcService.PackageName == nil {
 		return nil
@@ -36,7 +36,7 @@ func (mgr *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	serviceName := *gs.ServiceName
 	addr := *gs.Addr
 
-	mgr.Remove(key)
+	p.Remove(key)
 
 	connID := fmt.Sprintf("%d.%s.%d", groupID, serverName, serverID)
 	online, err := newOnline(connID, addr)
@@ -50,17 +50,17 @@ func (mgr *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	online.PackageName = packageName
 	online.ServiceName = serviceName
 
-	mgr.m.Add(key, online)
+	p.m.Add(key, online)
 	// Online 实现 IClientConn，直接注册到 resolve 哈希环
 	xgrpcresolve.AddServer(groupID, serverName, serverID, online, packageName, serviceName)
 
-	xlog.GLog.Infof("OnlineMgr.Add key:%s addr:%s total:%d", key, addr, mgr.m.Len())
+	xlog.GLog.Infof("OnlineMgr.Add key:%s addr:%s total:%d", key, addr, p.m.Len())
 	return nil
 }
 
 // Remove 下线：从 resolve 摘除，关闭流和连接。
-func (mgr *OnlineMgr) Remove(key string) {
-	online, ok := mgr.m.Find(key)
+func (p *OnlineMgr) Remove(key string) {
+	online, ok := p.m.Find(key)
 	if !ok {
 		return
 	}
@@ -74,13 +74,13 @@ func (mgr *OnlineMgr) Remove(key string) {
 			xlog.GLog.Warnf("OnlineMgr.removeInfo fallback Stop key=%s: %v", key, stopErr)
 		}
 	}
-	mgr.m.Del(key)
+	p.m.Del(key)
 
-	xlog.GLog.Infof("OnlineMgr.removeInfo RemoveServer key:%s total:%v", key, mgr.m.Len())
+	xlog.GLog.Infof("OnlineMgr.removeInfo RemoveServer key:%s total:%v", key, p.m.Len())
 }
 
 // GetByShardKey 通过一致性哈希选取一个 online 实例
-func (mgr *OnlineMgr) GetByShardKey(shardKey string) (*Online, error) {
+func (p *OnlineMgr) GetByShardKey(shardKey string) (*Online, error) {
 	iConn, err := xgrpcresolve.GetClientConnByHashRing(
 		gatewaycommon.OnlinePackageName, gatewaycommon.OnlineServiceName, shardKey,
 	)
@@ -95,6 +95,6 @@ func (mgr *OnlineMgr) GetByShardKey(shardKey string) (*Online, error) {
 }
 
 // Len 返回当前在线的 online 实例数量
-func (mgr *OnlineMgr) Len() int {
-	return mgr.m.Len()
+func (p *OnlineMgr) Len() int {
+	return p.m.Len()
 }
