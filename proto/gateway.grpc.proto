@@ -26,6 +26,4 @@ message GatewayUserOfflineReq {
 }
 
 message GatewayUserOfflineRes {
-  uint32 code = 1; // 0 表示成功；用户已离线也视为成功
-  string msg = 2;  // 处理结果说明
 }

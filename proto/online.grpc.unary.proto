@@ -5,16 +5,13 @@ option go_package = "server/proto/pb;pb";
 import "options.proto";
 
 message OnlineUserOnlineReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // 路由分片键，生成器据此产生 selector.Sel 路由代码
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // 路由分片键
   string token = 2;            // 登录 Token，供后端 Online 服校验
-  string gateway_id = 3;       // 当前网关的 ID，用于后端记录全局路由 Session
+  string gateway_key = 3;       // 当前网关的 key，
   string client_ip = 4;        // 客户端真实 IP (防刷、反外挂)
 }
 
 message OnlineUserOnlineRes {
-  uint32 code = 1;             // 0 表示成功，非 0 表示失败
-  string msg = 2;              // 错误信息描述
-  int64 server_time = 3;       // 服务器当前时间戳，单位毫秒 (用于客户端对时)
 }
 
 // 用户离线请求 (Gateway -> Online)，网关在 TCP 断开、顶号、主动离线等场景下发出。

@@ -34,7 +34,7 @@ message UserHeartbeatReq {
 
 //0x00000B#gateway->client#心跳-回复
 message UserHeartbeatRes {
-  uint64 server_time  = 1;   // 服务器时间毫秒
+  int64 server_time  = 1;   // 服务器时间毫秒
   uint32 next_session = 2;   // 客户端下次心跳必须用这个 session（用于防重放）
 }
 
