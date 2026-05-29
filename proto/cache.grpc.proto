@@ -40,6 +40,40 @@ service CacheService {
       shardKeyFieldType: ShardKeyFieldType_UINT64
     };
   }
+
+  rpc CacheSetUserSessionRecord(CacheSetUserSessionRecordReq) returns (CacheSetUserSessionRecordRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+
+  rpc CacheSetUserSessionExpire(CacheSetUserSessionExpireReq) returns (CacheSetUserSessionExpireRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+
+  rpc CacheGetUserSessionRecord(CacheGetUserSessionRecordReq) returns (CacheGetUserSessionRecordRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+}
+
+enum CacheUserSessionField {
+  CacheUserSessionField_Unspecified = 0;
+  CacheUserSessionField_GatewayKey = 1;
+  CacheUserSessionField_OnlineKey = 2;
+  CacheUserSessionField_Session = 3;
+  CacheUserSessionField_LoginTime = 4;
+}
+
+message CacheUserSessionRecord {
+  CacheUserSessionField field = 1;
+  string value = 2;
 }
 
 message CacheSetUserRecordReq {
@@ -83,4 +117,29 @@ message CacheVerifyUserTokenRes {
   uint32 code = 1;
   string msg = 2;
   bool ok = 3;
+}
+
+message CacheSetUserSessionRecordReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  repeated CacheUserSessionRecord records = 2;
+}
+
+message CacheSetUserSessionRecordRes {
+}
+
+message CacheSetUserSessionExpireReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  uint64 expire_second = 2;
+}
+
+message CacheSetUserSessionExpireRes {
+}
+
+message CacheGetUserSessionRecordReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  repeated CacheUserSessionField fields = 2;
+}
+
+message CacheGetUserSessionRecordRes {
+  repeated CacheUserSessionRecord records = 1;
 }
