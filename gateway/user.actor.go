@@ -6,34 +6,41 @@ import (
 
 	xactor "github.com/75912001/xlib/actor"
 	xcontrol "github.com/75912001/xlib/control"
+	xerror "github.com/75912001/xlib/error"
 	xlog "github.com/75912001/xlib/log"
 	xnetcommon "github.com/75912001/xlib/net/common"
 	xpacket "github.com/75912001/xlib/packet"
+	xruntime "github.com/75912001/xlib/runtime"
+	"github.com/pkg/errors"
 )
 
-const (
-	// UserActorCmdOnlineTunnelFrame 参数：*pb.OnlineTunnelFrame；online 下行给当前用户的业务包。
-	UserActorCmdOnlineTunnelFrame xactor.CMD = 100
-	// UserActorCmdUserVerified 参数：uid uint64, online *Online；登录成功后绑定 uid、online，并启动心跳定时器。
-	UserActorCmdUserVerified xactor.CMD = 101
-	// UserActorCmdUserPacket 参数：header *xpacket.Header, body []byte；处理客户端上行包，包含心跳、主动离线和业务透传。
-	UserActorCmdUserPacket xactor.CMD = 102
-	// UserActorCmdUserCleanup 参数：xnetcommon.DisconnectReason；连接断开后清理用户定时器和状态。
-	UserActorCmdUserCleanup xactor.CMD = 103
-)
+// UserActorCmdOnlineTunnelFrame online 下行给当前用户的业务包
+const UserActorCmdOnlineTunnelFrame xactor.CMD = 100
 
 func (p *User) PostFrame(frame *pb.OnlineTunnelFrame) {
 	p.actor.SendMsg(xactor.NewMsg(context.Background(), UserActorCmdOnlineTunnelFrame, frame))
 }
 
+// UserActorCmdUserVerified 登录验证成功后操作, 绑定 uid、online，并启动心跳定时器
+const UserActorCmdUserVerified xactor.CMD = 101
+
 func (p *User) PostSyncVerified(uid uint64, online *Online) error {
 	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserVerified, uid, online))
-	return err
+	if err != nil {
+		return errors.WithMessagef(err, "user verified sync failed uid:%v online:%v %v", uid, online, xruntime.Location())
+	}
+	return nil
 }
+
+// UserActorCmdUserPacket 客户端上行包client->gateway，包含心跳、主动离线和业务透传
+const UserActorCmdUserPacket xactor.CMD = 102
 
 func (p *User) PostClientPacket(header *xpacket.Header, body []byte) {
 	p.actor.SendMsg(xactor.NewMsg(context.Background(), UserActorCmdUserPacket, header, body))
 }
+
+// UserActorCmdUserCleanup 清理用户
+const UserActorCmdUserCleanup xactor.CMD = 103
 
 func (p *User) PostSyncCleanup(reason xnetcommon.DisconnectReason) {
 	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserCleanup, reason))
@@ -46,10 +53,12 @@ func (p *User) PostSyncCleanup(reason xnetcommon.DisconnectReason) {
 
 func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 	var resp any
+	var err error
 	for _, raw := range messages {
 		if event, ok := raw.(*xcontrol.Event); ok {
 			if event.ISwitch.IsOn() {
-				_ = event.ICallBack.Execute()
+				errTmp := event.ICallBack.Execute()
+				err = xerror.AppendError(err, errors.WithMessagef(errTmp, "user event callback error %v", xruntime.Location()))
 			}
 			continue
 		}
@@ -72,7 +81,9 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if !ok {
 				continue
 			}
-			p.OnVerified(uid, online)
+			if err := p.OnVerified(uid, online); err != nil {
+				return p.behavior, resp, errors.WithMessagef(err, "user verified failed uid:%v online:%v %v", uid, online, xruntime.Location())
+			}
 		case UserActorCmdUserPacket:
 			header, ok := msg.Args[0].(*xpacket.Header)
 			if !ok {
@@ -82,7 +93,8 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if !ok {
 				continue
 			}
-			_ = p.OnClientPacket(header, body)
+			errTmp := p.OnClientPacket(header, body)
+			err = xerror.AppendError(err, errors.WithMessagef(errTmp, "user packet error %v", xruntime.Location()))
 		case UserActorCmdUserCleanup:
 			reason, ok := msg.Args[0].(xnetcommon.DisconnectReason)
 			if ok {
@@ -90,5 +102,5 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			}
 		}
 	}
-	return p.behavior, resp, nil
+	return p.behavior, resp, err
 }
