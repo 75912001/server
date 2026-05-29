@@ -16,8 +16,8 @@ import (
 )
 
 func (p *User) OnClientPacket(header *xpacket.Header, body []byte) error {
-	if !p.remote.IsConnect() {
-		return errors.WithMessagef(xerror.Disconnect, "remote not connected: %p", p.remote)
+	if p.IsClosed() {
+		return errors.WithMessagef(xerror.Disconnect, "remote not connected: %p %v", p.remote, xruntime.Location())
 	}
 
 	if p.online == nil { // 在线实例未找到，可能是未通过验证
