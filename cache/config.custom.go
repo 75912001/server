@@ -8,10 +8,12 @@ import (
 
 var GCfgCustomRedisKeyFormatUserRecord string
 var GCfgCustomRedisKeyFormatUserToken string
+var GCfgCustomRedisKeyFormatUserSession string
 
 func initCustomConfig() {
 	GCfgCustomRedisKeyFormatUserRecord = xconfig.GConfigMgr.GetCustomString("redisKeyFormatUserRecord")
 	GCfgCustomRedisKeyFormatUserToken = xconfig.GConfigMgr.GetCustomString("redisKeyFormatUserToken")
+	GCfgCustomRedisKeyFormatUserSession = xconfig.GConfigMgr.GetCustomString("redisKeyFormatUserSession")
 }
 
 func RedisKeyUserRecord(uid uint64) string {
@@ -20,4 +22,8 @@ func RedisKeyUserRecord(uid uint64) string {
 
 func RedisKeyUserToken(uid uint64, token string) string {
 	return fmt.Sprintf(GCfgCustomRedisKeyFormatUserToken, uid, token)
+}
+
+func RedisKeyUserSession(uid uint64) string {
+	return fmt.Sprintf(GCfgCustomRedisKeyFormatUserSession, uid)
 }
