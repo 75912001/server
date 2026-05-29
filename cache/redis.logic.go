@@ -53,3 +53,38 @@ func (p *Redis) GetUserRecord(ctx context.Context, uid uint64) (record *pb.UserR
 	}
 	return record, nil
 }
+
+// 用户 Session 记录
+
+func (p *Redis) SetUserSessionRecord(ctx context.Context, uid uint64, records map[string]string) error {
+	key := RedisKeyUserSession(uid)
+	if err := p.client.HSet(ctx, key, records).Err(); err != nil {
+		return errors.WithMessagef(err, "set user session record to redis failed, uid: %d, records: %v %v", uid, records, xruntime.Location())
+	}
+	return nil
+}
+
+func (p *Redis) SetUserSessionExpire(ctx context.Context, uid uint64, expire time.Duration) (bool, error) {
+	key := RedisKeyUserSession(uid)
+	ok, err := p.client.Expire(ctx, key, expire).Result()
+	if err != nil {
+		return false, errors.WithMessagef(err, "set user session expire to redis failed, uid: %d %v", uid, xruntime.Location())
+	}
+	return ok, nil
+}
+
+func (p *Redis) GetUserSessionRecord(ctx context.Context, uid uint64, fields []string) (map[string]string, error) {
+	key := RedisKeyUserSession(uid)
+	values, err := p.client.HMGet(ctx, key, fields...).Result()
+	if err != nil {
+		return nil, errors.WithMessagef(err, "get user session record from redis failed, uid: %d, fields: %v %v", uid, fields, xruntime.Location())
+	}
+	records := make(map[string]string, len(values))
+	for i, value := range values {
+		if value == nil {
+			continue
+		}
+		records[fields[i]] = value.(string)
+	}
+	return records, nil
+}
