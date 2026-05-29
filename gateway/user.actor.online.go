@@ -9,11 +9,12 @@ import (
 
 func (p *User) handleOnlineFrame(frame *pb.OnlineTunnelFrame) {
 	if !p.remote.IsConnect() {
+		xlog.GLog.Warnf("remote is not connect %v", p.remote)
 		return
 	}
 	uid := frame.GetUid()
 	if uid != p.uid {
-		xlog.GLog.Fatalf("user actor uid mismatch: actor uid=%d frame uid=%d", p.uid, uid)
+		xlog.GLog.Warnf("user actor uid mismatch: actor uid:%d frame uid:%d", p.uid, uid)
 		return
 	}
 
@@ -24,11 +25,11 @@ func (p *User) handleOnlineFrame(frame *pb.OnlineTunnelFrame) {
 			return
 		}
 		if err := p.remote.Send(buildClientPacketPassThrough(pkt)); err != nil {
-			xlog.GLog.Errorf("user downstream send failed uid=%d messageID=%d err=%v",
+			xlog.GLog.Errorf("user downstream send failed uid:%d messageID:%d err:%v",
 				uid, pkt.GetMessageId(), err)
 		}
 	default:
-		xlog.GLog.Errorf("unexpected frame payload type for uid=%d", uid)
+		xlog.GLog.Errorf("unexpected frame payload type for uid:%d", uid)
 	}
 }
 
