@@ -11,6 +11,7 @@ import (
 	xgrpcselector "github.com/75912001/xlib/grpc/selector"
 	xruntime "github.com/75912001/xlib/runtime"
 	xserver "github.com/75912001/xlib/server"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -27,33 +28,34 @@ func NewCacheServer(args []string) *CacheServer {
 	return &CacheServer{Server: srv}
 }
 
-func (s *CacheServer) PreStart(ctx context.Context) error {
+func (p *CacheServer) PreStart(ctx context.Context) error {
 	xgrpcprotoregistry.Init()
 	xgrpcselector.Init()
 
+	{ // 初始化 Redis 客户端
+		var err error
+		GRedis, err = newRedis(xconfig.GConfigMgr.Redis)
+		if err != nil {
+			return errors.WithMessagef(err, "newRedis err %v", xruntime.Location())
+		}
+		if err = GRedis.Ping(ctx); err != nil {
+			return errors.WithMessagef(err, "redis ping err %v", xruntime.Location())
+		}
+	}
+
 	opts := xserver.NewServerOptions().
 		WithLogCallbackFunc(xcontrol.NewCallBack(func(args ...any) error { return nil }))
-	if err := s.Server.PreStart(ctx, opts); err != nil {
-		return err
+	if err := p.Server.PreStart(ctx, opts); err != nil {
+		return errors.WithMessagef(err, "pre start server failed, %v %v", opts, xruntime.Location())
 	}
 
-	// 初始化 Redis 客户端
-	var err error
-	GRedis, err = newRedis(xconfig.GConfigMgr.Redis)
-	if err != nil {
-		return err
-	}
-	if err := GRedis.Ping(ctx); err != nil {
-		return err
-	}
-
-	if s.Server.GRPCServer != nil {
-		pb.RegisterCacheServiceServer(s.Server.GRPCServer.GrpcServer, &cacheGRPCServer{})
+	if p.Server.GRPCServer != nil {
+		pb.RegisterCacheServiceServer(p.Server.GRPCServer.GrpcServer, &cacheGRPCServer{})
 
 		if xruntime.IsDebug() {
 			// grpcurl -plaintext localhost:20301 list cache.CacheService
 			// grpcurl -plaintext localhost:20301 describe cache.CacheService
-			reflection.Register(s.Server.GRPCServer.GrpcServer)
+			reflection.Register(p.Server.GRPCServer.GrpcServer)
 		}
 	}
 	return nil
