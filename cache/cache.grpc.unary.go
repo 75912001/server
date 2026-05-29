@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
-	"server/common"
 	"time"
 
-	xerror "github.com/75912001/xlib/error"
-	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
+	grpccodes "google.golang.org/grpc/codes"
+	grpcstatus "google.golang.org/grpc/status"
 
 	pb "server/proto/pb"
 
@@ -18,29 +17,18 @@ import (
 func (s *cacheGRPCServer) CacheGetUserRecord(ctx context.Context, req *pb.CacheGetUserRecordReq) (*pb.CacheGetUserRecordRes, error) {
 	uid := req.GetUid()
 	if uid == 0 {
-		return &pb.CacheGetUserRecordRes{
-			Code: common.ECCacheInvalidArgument.Code(),
-			Msg:  common.ECCacheInvalidArgument.Desc(),
-		}, nil
+		return &pb.CacheGetUserRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid uid:0")
 	}
 
 	userRecord, err := GRedis.GetUserRecord(ctx, uid)
 	if errors.Is(err, redis.Nil) {
-		return &pb.CacheGetUserRecordRes{
-			Code: common.ECCacheKeyNotFound.Code(),
-			Msg:  common.ECCacheKeyNotFound.Desc(),
-		}, nil
+		return &pb.CacheGetUserRecordRes{}, grpcstatus.Error(grpccodes.NotFound, err.Error())
 	}
 	if err != nil {
-		return &pb.CacheGetUserRecordRes{
-			Code: common.ECCacheRedisError.Code(),
-			Msg:  errors.WithMessagef(err, "%v %v", common.ECCacheRedisError.Desc(), xruntime.Location()).Error(),
-		}, nil
+		return &pb.CacheGetUserRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 
 	return &pb.CacheGetUserRecordRes{
-		Code:       xerror.Success.Code(),
-		Msg:        xerror.Success.Desc(),
 		UserRecord: userRecord,
 	}, nil
 }
@@ -50,55 +38,28 @@ func (s *cacheGRPCServer) CacheSetVerifyUserToken(ctx context.Context, req *pb.C
 	token := req.GetToken()
 	expireSecond := req.GetExpireSecond()
 	if uid == 0 || token == "" || expireSecond == 0 {
-		return &pb.CacheSetVerifyUserTokenRes{
-			Code: common.ECCacheInvalidArgument.Code(),
-			Msg:  common.ECCacheInvalidArgument.Desc(),
-			Ok:   false,
-		}, nil
+		return &pb.CacheSetVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
 	}
-	ok, err := GRedis.SetVerifyUserToken(ctx, uid, token, time.Duration(expireSecond)*time.Second)
+	_, err := GRedis.SetVerifyUserToken(ctx, uid, token, time.Duration(expireSecond)*time.Second)
 	if err != nil {
-		return &pb.CacheSetVerifyUserTokenRes{
-			Code: common.ECCacheRedisError.Code(),
-			Msg:  errors.WithMessagef(err, "%v %v", common.ECCacheRedisError.Desc(), xruntime.Location()).Error(),
-			Ok:   false,
-		}, nil
+		return &pb.CacheSetVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
-	return &pb.CacheSetVerifyUserTokenRes{
-		Code: xerror.Success.Code(),
-		Msg:  xerror.Success.Desc(),
-		Ok:   ok,
-	}, nil
+	return &pb.CacheSetVerifyUserTokenRes{}, nil
 }
 
 func (s *cacheGRPCServer) CacheVerifyUserToken(ctx context.Context, req *pb.CacheVerifyUserTokenReq) (*pb.CacheVerifyUserTokenRes, error) {
 	uid := req.GetUid()
 	token := req.GetToken()
 	if uid == 0 || token == "" {
-		return &pb.CacheVerifyUserTokenRes{
-			Code: common.ECCacheInvalidArgument.Code(),
-			Msg:  common.ECCacheInvalidArgument.Desc(),
-		}, nil
+		return &pb.CacheVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
 	}
 	ok, err := GRedis.VerifyUserToken(ctx, uid, token)
 	if err != nil {
-		return &pb.CacheVerifyUserTokenRes{
-			Code: common.ECCacheRedisError.Code(),
-			Msg:  errors.WithMessagef(err, "%v %v", common.ECCacheRedisError.Desc(), xruntime.Location()).Error(),
-			Ok:   false,
-		}, nil
+		return &pb.CacheVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	if !ok {
-		return &pb.CacheVerifyUserTokenRes{
-			Code: common.ECCacheKeyNotFound.Code(),
-			Msg:  common.ECCacheKeyNotFound.Desc(),
-			Ok:   false,
-		}, nil
+		return &pb.CacheVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.NotFound, "token not found or expired")
 	}
 
-	return &pb.CacheVerifyUserTokenRes{
-		Code: xerror.Success.Code(),
-		Msg:  xerror.Success.Desc(),
-		Ok:   true,
-	}, nil
+	return &pb.CacheVerifyUserTokenRes{}, nil
 }
