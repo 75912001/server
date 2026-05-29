@@ -12,10 +12,10 @@ import (
 	xtimer "github.com/75912001/xlib/timer"
 )
 
-// User 一个客户端连接的会话上下文。
-//   - online：nil 表示未校验或已清理，非 nil 表示校验通过并绑定的 online 实例。
-//   - verifyTimer / hb：校验超时定时器 + 心跳管理（二选一存在）。
-//   - hb.WaitID：上次下发给客户端的 session（防重放），首次心跳时为 0。
+// User 一个客户端连接的会话上下文
+//   - online:nil 表示未校验或已清理,非 nil 表示校验通过并绑定的 online 实例
+//   - verifyTimer / hb:校验超时定时器 + 心跳管理（二选一存在）
+//   - hb.WaitID:上次下发给客户端的 session（防重放）,首次心跳时为 0
 type User struct {
 	uid    uint64             // 玩家唯一 ID，校验成功后填充
 	remote xnetcommon.IRemote // 客户端 TCP 连接（发包 / 主动断开）
@@ -57,7 +57,7 @@ func (p *User) Disconnect(reason xnetcommon.DisconnectReason) {
 // startVerifyTimer 注册超时回调：到期若仍未校验则断开连接
 func (p *User) startVerifyTimer() {
 	cb := xcontrol.NewCallBack(func(args ...any) error {
-		if !p.remote.IsConnect() || p.online != nil {
+		if p.IsClosed() || p.online != nil {
 			return nil
 		}
 		xlog.PrintInfo(fmt.Sprintf("user[%s] verify timeout, disconnect", p.ip))
@@ -68,9 +68,15 @@ func (p *User) startVerifyTimer() {
 }
 
 // OnVerified 由登录鉴权成功后调用：绑定 uid + online，停校验定时器，启心跳定时器。
-func (p *User) OnVerified(uid uint64, online *Online) {
-	if !p.remote.IsConnect() {
-		return
+func (p *User) OnVerified(uid uint64, online *Online) error {
+	if p.IsClosed() {
+		return fmt.Errorf("remote disconnected")
+	}
+	if uid == 0 {
+		return fmt.Errorf("uid is empty")
+	}
+	if online == nil {
+		return fmt.Errorf("online is nil")
 	}
 	p.uid = uid
 	p.online = online
@@ -79,15 +85,15 @@ func (p *User) OnVerified(uid uint64, online *Online) {
 		xtimer.GTimer.DelSecond(p.verifyTimer)
 		p.verifyTimer = nil
 	}
-	p.startHeartbeatTimer()
+	p.restartHeartbeatTimer()
+	return nil
 }
 
-// startHeartbeatTimer 启动 / 重置心跳超时定时器（由用户 actor 串行调用）
-func (p *User) startHeartbeatTimer() {
+// restartHeartbeatTimer 启动 / 重置心跳超时定时器（由用户 actor 串行调用）
+func (p *User) restartHeartbeatTimer() {
 	cb := xcontrol.NewCallBack(
-
 		func(args ...any) error {
-			if !p.remote.IsConnect() {
+			if p.IsClosed() {
 				return nil
 			}
 			xlog.PrintInfo(fmt.Sprintf("user[uid=%d] heartbeat timeout, disconnect", p.uid))
