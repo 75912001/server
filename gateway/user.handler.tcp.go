@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	pb "server/proto/pb"
 
 	xconfig "github.com/75912001/xlib/config"
@@ -22,7 +20,7 @@ type UserHandlerTCP struct{}
 
 // OnConnect 当客户端 TCP 建立成功：登记 User 并启动「未校验超时」定时器。
 func (p *UserHandlerTCP) OnConnect(remote xnetcommon.IRemote) error {
-	xlog.PrintInfo(fmt.Sprintf("Client connected from: %p %s", remote, remote.GetIP()))
+	xlog.GLog.Infof("Client connected from: %p %s", remote, remote.GetIP())
 	GUserMgr.Add(remote)
 	return nil
 }
@@ -62,10 +60,9 @@ func (p *UserHandlerTCP) OnPacket(remote xnetcommon.IRemote, packet xpacket.IPac
 	header := pt.Header
 	body := pt.RawData[xpacket.HeaderSize:header.Length]
 
-	xlog.PrintInfo(fmt.Sprintf("OnPacket MessageID: %d, Length: %d, Key: %d", header.MessageID, header.Length, header.Key))
+	xlog.GLog.Infof("OnPacket MessageID: %d, Length: %d, Key: %d", header.MessageID, header.Length, header.Key)
 
-	// UserVerifyReq：登录鉴权，走 Unary gRPC（selector.Sel 内部按 uid 路由，无需预选 online）
-	if header.MessageID == uint32(pb.MsgIDUser_UserVerifyReq_CMD) {
+	if header.MessageID == uint32(pb.MsgIDUser_UserVerifyReq_CMD) { // 登录鉴权
 		err := unaryOnlineUserOnline(remote, header, body)
 		if err != nil {
 			xlog.GLog.Warnf("unaryOnlineUserOnline error: %v", err)
@@ -75,7 +72,7 @@ func (p *UserHandlerTCP) OnPacket(remote xnetcommon.IRemote, packet xpacket.IPac
 
 	u := GUserMgr.Get(remote)
 	if u == nil {
-		xlog.PrintfErr("packet from unknown remote=%p messageID=%d", remote, header.MessageID)
+		xlog.GLog.Errorf("packet from unknown remote=%p messageID=%d", remote, header.MessageID)
 		return nil
 	}
 
@@ -87,9 +84,9 @@ func (p *UserHandlerTCP) OnPacket(remote xnetcommon.IRemote, packet xpacket.IPac
 func (p *UserHandlerTCP) OnDisconnect(remote xnetcommon.IRemote) error {
 	u := GUserMgr.Remove(remote)
 	if u == nil {
-		xlog.PrintInfo(fmt.Sprintf("Client disconnected: %p reason=%d", remote, remote.GetDisconnectReason()))
+		xlog.GLog.Infof("Client disconnected: %p reason=%d", remote, remote.GetDisconnectReason())
 		return nil
 	}
-	xlog.PrintInfo(fmt.Sprintf("Client disconnected: %p %s reason=%d", remote, u.ip, remote.GetDisconnectReason()))
+	xlog.GLog.Infof("Client disconnected: %p %s reason=%d", remote, u.ip, remote.GetDisconnectReason())
 	return nil
 }
