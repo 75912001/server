@@ -23,10 +23,3 @@ func (p *UserMgr) Login(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, e
 	}
 	return user.PostLogin(req)
 }
-
-func (p *UserMgr) Remove(uid uint64, user *User) {
-	current, ok := p.users.Find(uid)
-	if ok && current == user {
-		p.users.Del(uid)
-	}
-}
