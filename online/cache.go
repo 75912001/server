@@ -27,12 +27,12 @@ func newCache(key, addr string) (*Cache, error) {
 	return &Cache{Key: key, XCacheService: xService}, nil
 }
 
-func (c *Cache) Client() pb.CacheServiceClient {
-	return pb.NewCacheServiceClient(c.GetClientConn())
+func (p *Cache) Client() pb.CacheServiceClient {
+	return pb.NewCacheServiceClient(p.GetClientConn())
 }
 
-func (c *Cache) GetID() string { return c.Key }
+func (p *Cache) GetID() string { return p.Key }
 
-func (c *Cache) GetClientConn() *grpc.ClientConn {
-	return c.XCacheService.GetClientConn()
+func (p *Cache) GetClientConn() *grpc.ClientConn {
+	return p.XCacheService.GetClientConn()
 }
