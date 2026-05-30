@@ -27,6 +27,7 @@ func onEtcdAdd(args ...any) error {
 		}
 		xlog.GLog.Infof("onEtcdAdd key:%s", key)
 	case common.CacheServerName:
+		GCacheMgr.Remove(key)
 		if err := GCacheMgr.Add(key, valueJson); err != nil {
 			xlog.GLog.Fatalf("onEtcdAdd key=%s: %v", key, err)
 			return err
