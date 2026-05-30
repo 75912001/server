@@ -21,7 +21,7 @@ func onEtcdAdd(args ...any) error {
 	}
 	switch serverName {
 	case common.GatewayServerName:
-		if err := GGatewayMgr.Add(key, valueJson); err != nil {
+		if err := GGatewayMgr.AddByEtcd(key, valueJson); err != nil {
 			xlog.GLog.Fatalf("onEtcdAdd key=%s: %v", key, err)
 			return err
 		}
