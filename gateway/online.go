@@ -42,5 +42,9 @@ func (p *Online) GetID() string { return p.Key }
 // Stop 停止 actor，关闭底层流和连接。
 func (p *Online) Stop() error {
 	p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
-	return p.XOnlineService.Stop()
+	err := p.XOnlineService.Stop()
+	if err != nil {
+		return errors.WithMessagef(err, "stop XOnlineService error. %v", xruntime.Location())
+	}
+	return nil
 }
