@@ -82,8 +82,6 @@ message CacheSetUserRecordReq {
 }
 
 message CacheSetUserRecordRes {
-  uint32 code = 1;
-  string msg = 2;
 }
 
 message CacheGetUserRecordReq {
@@ -91,9 +89,7 @@ message CacheGetUserRecordReq {
 }
 
 message CacheGetUserRecordRes {
-  uint32 code = 1;
-  string msg = 2;
-  user.UserRecord user_record = 3; // 用户数据
+  user.UserRecord user_record = 1; // 用户数据
 }
 
 message CacheSetVerifyUserTokenReq {
@@ -103,9 +99,6 @@ message CacheSetVerifyUserTokenReq {
 }
 
 message CacheSetVerifyUserTokenRes {
-  uint32 code = 1;
-  string msg = 2;
-  bool ok = 3;
 }
 
 message CacheVerifyUserTokenReq {
@@ -114,9 +107,6 @@ message CacheVerifyUserTokenReq {
 }
 
 message CacheVerifyUserTokenRes {
-  uint32 code = 1;
-  string msg = 2;
-  bool ok = 3;
 }
 
 message CacheSetUserSessionRecordReq {
