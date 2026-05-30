@@ -20,7 +20,7 @@ func (p *onlineGRPCServer) OnlineUserOffline(_ context.Context, req *pb.OnlineUs
 	if req.GetUid() == 0 {
 		return &pb.OnlineUserOfflineRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "uid is empty")
 	}
-	user, ok := GUserMgr.Get(req.GetUid())
+	user, ok := GUserMgr.users.Find(req.GetUid())
 	if !ok {
 		return &pb.OnlineUserOfflineRes{}, grpcstatus.Error(grpccodes.NotFound, "user not found")
 	}
