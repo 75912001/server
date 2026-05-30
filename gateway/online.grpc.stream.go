@@ -1,11 +1,8 @@
 package main
 
 import (
-	"context"
-
 	pb "server/proto/pb"
 
-	xactor "github.com/75912001/xlib/actor"
 	xetcd "github.com/75912001/xlib/etcd"
 	xlog "github.com/75912001/xlib/log"
 )
@@ -47,7 +44,7 @@ func (p *onlineStreamHandler) OnlineStreamTunnel(
 // 由各 actor 自行判断是否是自己的流，匹配则置 nil。
 func (p *onlineStreamHandler) OnlineStreamTunnelPost(stream pb.OnlineService_OnlineStreamTunnelClient) error {
 	GOnlineMgr.m.Foreach(func(_ string, o *Online) bool {
-		o.actor.SendMsg(xactor.NewMsg(context.Background(), OnlineActorCmdStreamReset, stream))
+		o.ResetStream(stream)
 		return true
 	})
 	return nil

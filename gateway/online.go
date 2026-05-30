@@ -36,12 +36,6 @@ func newOnline(key, addr string) (*Online, error) {
 	return o, nil
 }
 
-// Send 将消息帧异步投递到 actor，由 actor goroutine 串行调用 stream.Send。
-func (p *Online) Send(req *pb.OnlineStreamTunnelReq) error {
-	p.actor.SendMsg(xactor.NewMsg(context.Background(), OnlineActorCmdStreamSend, req))
-	return nil
-}
-
 // GetID 实现 xgrpcutil.IClientConn，返回服务实例唯一标识。
 func (p *Online) GetID() string { return p.Key }
 
