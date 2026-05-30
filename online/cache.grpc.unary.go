@@ -4,6 +4,9 @@ import (
 	"context"
 
 	pb "server/proto/pb"
+
+	"github.com/pkg/errors"
+	grpcstatus "google.golang.org/grpc/status"
 )
 
 func unaryCacheVerifyUserToken(uid uint64, token string) (*pb.CacheVerifyUserTokenRes, error) {
@@ -12,7 +15,11 @@ func unaryCacheVerifyUserToken(uid uint64, token string) (*pb.CacheVerifyUserTok
 		Token: token,
 	})
 	if err != nil {
-		return nil, err
+		s, ok := grpcstatus.FromError(err)
+		if ok {
+			return nil, errors.WithMessagef(err, "CacheVerifyUserToken uid:%d token:%s, code:%v, message:%s", uid, token, s.Code(), s.Message())
+		}
+		return nil, errors.WithMessagef(err, "CacheVerifyUserToken uid:%d token:%s", uid, token)
 	}
 	return res, nil
 }
@@ -22,7 +29,11 @@ func unaryCacheGetUserRecord(uid uint64) (*pb.CacheGetUserRecordRes, error) {
 		Uid: uid,
 	})
 	if err != nil {
-		return nil, err
+		s, ok := grpcstatus.FromError(err)
+		if ok {
+			return nil, errors.WithMessagef(err, "CacheGetUserRecord uid:%d, code:%v, message:%s", uid, s.Code(), s.Message())
+		}
+		return nil, errors.WithMessagef(err, "CacheGetUserRecord uid:%d", uid)
 	}
 	return res, nil
 }
