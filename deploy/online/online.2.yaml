@@ -1,0 +1,31 @@
+# ETCD 配置
+etcd:
+  endpoints:
+    - 192.168.71.123:2379
+    - 192.168.71.123:22379
+    - 192.168.71.123:32379
+  ttlDuration: 33000000s
+
+# 基础配置
+base:
+  projectName: project
+  groupID: 1
+  name: online
+  serverID: 2
+  version: v.0.0.1.2025.03.21.12.21
+  packetLengthMax: 100000
+  sendChannelCapacity: 100000
+  runMode: 1
+  availableLoad: 100000
+  processingMode: 1
+
+# 日志
+log:
+  level: 7
+
+# gRPC 配置
+grpc:
+  packageName: online
+  serviceName: OnlineService
+  listenAddr: 0.0.0.0:20202
+  externalAddr: 192.168.71.123:20202
