@@ -2,18 +2,12 @@ package main
 
 import (
 	"context"
-	"server/common"
 	"time"
 
-	xerror "github.com/75912001/xlib/error"
-	xruntime "github.com/75912001/xlib/runtime"
-	"github.com/pkg/errors"
 	grpccodes "google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 
 	pb "server/proto/pb"
-
-	"github.com/redis/go-redis/v9"
 )
 
 func cacheUserSessionFieldName(field pb.CacheUserSessionField) string {
@@ -55,53 +49,35 @@ func (s *cacheGRPCServer) CacheSetUserSessionExpire(ctx context.Context, req *pb
 	uid := req.GetUid()
 	expireSecond := req.GetExpireSecond()
 	if uid == 0 || expireSecond == 0 {
-		return &pb.CacheSetUserSessionExpireRes{
-			Code: common.ECCacheInvalidArgument.Code(),
-			Msg:  common.ECCacheInvalidArgument.Desc(),
-			Ok:   false,
-		}, nil
+		return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 	ok, err := GRedis.SetUserSessionExpire(ctx, uid, time.Duration(expireSecond)*time.Second)
 	if err != nil {
-		return &pb.CacheSetUserSessionExpireRes{
-			Code: common.ECCacheRedisError.Code(),
-			Msg:  errors.WithMessagef(err, "%v %v", common.ECCacheRedisError.Desc(), xruntime.Location()).Error(),
-			Ok:   false,
-		}, nil
+		return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
-	return &pb.CacheSetUserSessionExpireRes{
-		Code: xerror.Success.Code(),
-		Msg:  xerror.Success.Desc(),
-		Ok:   ok,
-	}, nil
+	if !ok {
+		return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.NotFound, "user session not exist")
+	}
+	return &pb.CacheSetUserSessionExpireRes{}, nil
 }
 
 func (s *cacheGRPCServer) CacheGetUserSessionRecord(ctx context.Context, req *pb.CacheGetUserSessionRecordReq) (*pb.CacheGetUserSessionRecordRes, error) {
 	uid := req.GetUid()
 	reqFields := req.GetFields()
 	if uid == 0 || len(reqFields) == 0 {
-		return &pb.CacheGetUserSessionRecordRes{
-			Code: common.ECCacheInvalidArgument.Code(),
-			Msg:  common.ECCacheInvalidArgument.Desc(),
-		}, nil
+		return &pb.CacheGetUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 	fields := make([]string, 0, len(reqFields))
 	for _, reqField := range reqFields {
 		field := cacheUserSessionFieldName(reqField)
 		if field == "" {
-			return &pb.CacheGetUserSessionRecordRes{
-				Code: common.ECCacheInvalidArgument.Code(),
-				Msg:  common.ECCacheInvalidArgument.Desc(),
-			}, nil
+			return &pb.CacheGetUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 		}
 		fields = append(fields, field)
 	}
 	values, err := GRedis.GetUserSessionRecord(ctx, uid, fields)
 	if err != nil {
-		return &pb.CacheGetUserSessionRecordRes{
-			Code: common.ECCacheRedisError.Code(),
-			Msg:  errors.WithMessagef(err, "%v %v", common.ECCacheRedisError.Desc(), xruntime.Location()).Error(),
-		}, nil
+		return &pb.CacheGetUserSessionRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	records := make([]*pb.CacheUserSessionRecord, 0, len(reqFields))
 	for i, field := range fields {
@@ -115,14 +91,9 @@ func (s *cacheGRPCServer) CacheGetUserSessionRecord(ctx context.Context, req *pb
 		})
 	}
 	if len(records) == 0 {
-		return &pb.CacheGetUserSessionRecordRes{
-			Code: common.ECCacheKeyNotFound.Code(),
-			Msg:  common.ECCacheKeyNotFound.Desc(),
-		}, nil
+		return &pb.CacheGetUserSessionRecordRes{}, grpcstatus.Error(grpccodes.NotFound, "user session record not exist")
 	}
 	return &pb.CacheGetUserSessionRecordRes{
-		Code:    xerror.Success.Code(),
-		Msg:     xerror.Success.Desc(),
 		Records: records,
 	}, nil
 }
