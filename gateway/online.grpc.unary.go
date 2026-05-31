@@ -16,6 +16,7 @@ import (
 	xpacket "github.com/75912001/xlib/packet"
 	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 )
@@ -29,6 +30,14 @@ func unaryOnlineUserOnline(
 ) error {
 	var verifyReq pb.UserVerifyReq
 	if err := proto.Unmarshal(body, &verifyReq); err != nil {
+		_ = sendClientRes(
+			remote,
+			uint32(pb.MsgIDUser_UserVerifyRes_CMD),
+			header.SessionID,
+			xerror.Unmarshal.Code(),
+			header.Key,
+			nil,
+		)
 		return errors.WithMessagef(err, "unaryOnlineUserOnline unmarshal fail %v", xruntime.Location())
 	}
 	uid := verifyReq.GetUid()
@@ -41,6 +50,14 @@ func unaryOnlineUserOnline(
 
 	_, err := pb.GXOnlineServiceService.OnlineUserOnline(context.Background(), req)
 	if err != nil {
+		_ = sendClientRes(
+			remote,
+			uint32(pb.MsgIDUser_UserVerifyRes_CMD),
+			header.SessionID,
+			grpcErrorToResultCode(err),
+			header.Key,
+			nil,
+		)
 		status, ok := grpcstatus.FromError(err)
 		if ok {
 			return errors.WithMessagef(err, "OnlineUserOnline rpc error: %v, status code: %v, message: %v %v", err, status.Code(), status.Message(), xruntime.Location())
@@ -54,29 +71,97 @@ func unaryOnlineUserOnline(
 	// 停止「未校验超时」定时器，启动心跳超时定时器。
 	u := GUserMgr.Get(remote)
 	if u == nil || !remote.IsConnect() {
+		_ = sendClientRes(
+			remote,
+			uint32(pb.MsgIDUser_UserVerifyRes_CMD),
+			header.SessionID,
+			xerror.Disconnect.Code(),
+			header.Key,
+			nil,
+		)
 		return errors.WithMessagef(err, "OnlineUserOnline remote not connect uid:%v %v", uid, xruntime.Location())
 	}
 	// 选一个 online 实例，进行后续绑定和心跳管理. 理论上应该能找到与 pb.GXOnlineServiceService.OnlineUserOnline 相同的 online实例，因为它们都基于相同的 selector.Sel 和 uid 哈希算法，
 	// todo menglc 但如果找不到/找到的不一致，说明在线服务实例发生了变更（重启或扩容），需要让用户重新上线以绑定新的实例。
 	online, err := GOnlineMgr.GetByShardKey(fmt.Sprint(req.GetUid()))
 	if err != nil {
+		_ = sendClientRes(
+			remote,
+			uint32(pb.MsgIDUser_UserVerifyRes_CMD),
+			header.SessionID,
+			xerror.Unavailable.Code(),
+			header.Key,
+			nil,
+		)
 		return errors.WithMessagef(err, "OnlineUserOnline lookup online by uid:%v fail %v", req.GetUid(), xruntime.Location())
 	}
 	if err = u.PostSyncVerified(req.GetUid(), online); err != nil {
+		_ = sendClientRes(
+			remote,
+			uint32(pb.MsgIDUser_UserVerifyRes_CMD),
+			header.SessionID,
+			xerror.Fail.Code(),
+			header.Key,
+			nil,
+		)
 		return errors.WithMessagef(err, "OnlineUserOnline post verified uid:%d fail %v", req.GetUid(), xruntime.Location())
 	}
 
-	return remote.Send(&xpacket.Packet{
-		Header: &xpacket.Header{
-			MessageID: uint32(pb.MsgIDUser_UserVerifyRes_CMD),
-			SessionID: header.SessionID,
-			ResultID:  xerror.Success.Code(),
-			Key:       header.Key,
-		},
-		PBMessage: &pb.UserVerifyRes{
+	return sendClientRes(remote,
+		uint32(pb.MsgIDUser_UserVerifyRes_CMD),
+		header.SessionID,
+		xerror.Success.Code(),
+		header.Key,
+		&pb.UserVerifyRes{
 			ServerTime: time.Now().UnixMilli(),
 		},
-	})
+	)
+}
+
+// todo menglc 目前 grpc 错误码与网关内部错误码的映射关系比较粗糙，可以根据实际业务需求细化
+func grpcErrorToResultCode(err error) uint32 {
+	status, ok := grpcstatus.FromError(err)
+	if !ok {
+		return xerror.Fail.Code()
+	}
+	switch status.Code() {
+	case codes.OK:
+		return xerror.Success.Code()
+	case codes.Canceled:
+		return xerror.Cancelled.Code()
+	case codes.Unknown:
+		return xerror.Unknown.Code()
+	case codes.InvalidArgument:
+		return xerror.InvalidArgument.Code()
+	case codes.DeadlineExceeded:
+		return xerror.DeadlineExceeded.Code()
+	case codes.NotFound:
+		return xerror.NotFound.Code()
+	case codes.AlreadyExists:
+		return xerror.AlreadyExists.Code()
+	case codes.PermissionDenied:
+		return xerror.PermissionDenied.Code()
+	case codes.ResourceExhausted:
+		return xerror.ResourceExhausted.Code()
+	case codes.FailedPrecondition:
+		return xerror.FailedPrecondition.Code()
+	case codes.Aborted:
+		return xerror.Aborted.Code()
+	case codes.OutOfRange:
+		return xerror.OutOfRange.Code()
+	case codes.Unimplemented:
+		return xerror.Unimplemented.Code()
+	case codes.Internal:
+		return xerror.Internal.Code()
+	case codes.Unavailable:
+		return xerror.Unavailable.Code()
+	case codes.DataLoss:
+		return xerror.DataLoss.Code()
+	case codes.Unauthenticated:
+		return xerror.Unauthenticated.Code()
+	default:
+		return xerror.Fail.Code()
+	}
 }
 
 func unaryOnlineUserOffline(online *Online, uid uint64, reason xnetcommon.DisconnectReason, msg string) error {

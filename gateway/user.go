@@ -9,7 +9,9 @@ import (
 	xheartbeat "github.com/75912001/xlib/heartbeat"
 	xlog "github.com/75912001/xlib/log"
 	xnetcommon "github.com/75912001/xlib/net/common"
+	xpacket "github.com/75912001/xlib/packet"
 	xtimer "github.com/75912001/xlib/timer"
+	"google.golang.org/protobuf/proto"
 )
 
 // User 一个客户端连接的会话上下文
@@ -34,6 +36,21 @@ func newUser(remote xnetcommon.IRemote) *User {
 	u.actor.Start()
 	u.startVerifyTimer()
 	return u
+}
+
+func sendClientRes(remote xnetcommon.IRemote, messageID uint32, sessionID uint32, resultID uint32, key uint64, message proto.Message) error {
+	if remote == nil || !remote.IsConnect() {
+		return nil
+	}
+	return remote.Send(&xpacket.Packet{
+		Header: &xpacket.Header{
+			MessageID: messageID,
+			SessionID: sessionID,
+			ResultID:  resultID,
+			Key:       key,
+		},
+		PBMessage: message,
+	})
 }
 
 // 是否校验成功
