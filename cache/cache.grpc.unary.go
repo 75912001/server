@@ -33,6 +33,22 @@ func (s *cacheGRPCServer) CacheGetUserRecord(ctx context.Context, req *pb.CacheG
 	}, nil
 }
 
+func (s *cacheGRPCServer) CacheSetUserRecord(ctx context.Context, req *pb.CacheSetUserRecordReq) (*pb.CacheSetUserRecordRes, error) {
+	uid := req.GetUid()
+	userRecord := req.GetUserRecord()
+	if uid == 0 || userRecord == nil {
+		return &pb.CacheSetUserRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
+	}
+	if userRecord.GetUid() != 0 && userRecord.GetUid() != uid {
+		return &pb.CacheSetUserRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "uid mismatch")
+	}
+
+	if err := GRedis.SetUserRecord(ctx, uid, userRecord); err != nil {
+		return &pb.CacheSetUserRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
+	}
+	return &pb.CacheSetUserRecordRes{}, nil
+}
+
 func (s *cacheGRPCServer) CacheSetVerifyUserToken(ctx context.Context, req *pb.CacheSetVerifyUserTokenReq) (*pb.CacheSetVerifyUserTokenRes, error) {
 	uid := req.GetUid()
 	token := req.GetToken()
