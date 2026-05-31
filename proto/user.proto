@@ -24,7 +24,7 @@ message UserVerifyRes
 //0x000003#client->gateway#主动下线-请求
 message UserOfflineReq
 {
-  uint32 reason = 1;   // 1=用户主动离线，2=网络异常断开
+  uint32 reason = 1;   // 1=用户主动离线
 }
 
 //0x00000A#client->gateway#心跳-请求
