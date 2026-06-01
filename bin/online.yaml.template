@@ -1,9 +1,9 @@
 # ETCD 配置
 etcd:
-  endpoints: # ETCD 地址列表，例如: 127.0.0.1:2379
-    - 127.0.0.1:2379
-    - 127.0.0.1:22379
-    - 127.0.0.1:32379
+  endpoints: # ETCD 地址列表，例如: 192.168.71.123:2379
+    - 192.168.71.123:2379
+    - 192.168.71.123:22379
+    - 192.168.71.123:32379
   ttlDuration: 33000000s # ttl [default]: xetcdconstants.TtlSecondDefault, e.g.:系统每10秒续约一次,该参数至少为11秒
 
 # 基础配置
@@ -28,6 +28,6 @@ grpc:
   packageName: online
   serviceName: OnlineService
   listenAddr: 0.0.0.0:20201
-  externalAddr: 127.0.0.1:20201
+  externalAddr: 192.168.71.123:20201
 
 
