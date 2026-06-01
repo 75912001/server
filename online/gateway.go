@@ -56,7 +56,7 @@ func (p *Gateway) UpdateService(addr string, groupID uint32, serverName string, 
 
 func (p *Gateway) Client() (pb.GatewayServiceClient, error) {
 	if p.XGatewayService == nil {
-		return nil, errors.WithMessagef(xerror.NotExist, "Gateway %v %v", p.Key, xruntime.Location())
+		return nil, errors.WithMessagef(xerror.NotFound, "Gateway %v %v", p.Key, xruntime.Location())
 	}
 	return pb.NewGatewayServiceClient(p.GetClientConn()), nil
 }
