@@ -41,6 +41,13 @@ jobs:
       - name: Download Go modules
         run: go mod download
 
+      - name: Make grpc-x plugin executable
+        run: |
+          XLIB_DIR="$(go list -m -f '{{.Dir}}' github.com/75912001/xlib)"
+          ls -l "$XLIB_DIR/grpc/proto/bin"
+          chmod +x "$XLIB_DIR/grpc/proto/bin/protoc-gen-go-grpc-x-linux"
+          ls -l "$XLIB_DIR/grpc/proto/bin/protoc-gen-go-grpc-x-linux"
+
       - name: Generate proto code
         run: python gen.py
 
