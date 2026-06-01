@@ -130,7 +130,7 @@ type UserOfflineReq struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Reason uint32 `protobuf:"varint,1,opt,name=reason,proto3" json:"reason,omitempty"` // 1=用户主动离线，2=网络异常断开
+	Reason uint32 `protobuf:"varint,1,opt,name=reason,proto3" json:"reason,omitempty"` // 1=用户主动离线
 }
 
 func (x *UserOfflineReq) Reset() {
