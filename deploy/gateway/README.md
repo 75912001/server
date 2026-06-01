@@ -1,10 +1,15 @@
 # Gateway Container
 
-Run commands from the project root:
+Run commands from this README directory; the first command enters the project root:
 The image uses `Asia/Shanghai` as its timezone so file logs match the host's local time.
 
 ```bash
-cd /d/src/github.com/server
+cd ../..
+```
+
+# 删除日志
+```bash
+rm -rf deploy/gateway/log/*
 ```
 
 ## Build Image
@@ -22,13 +27,14 @@ docker rmi server.gateway:dev
 
 ## Run Container
 ```bash
-mkdir -p /d/src/github.com/server/deploy/gateway/log
+mkdir -p deploy/gateway/log
+PROJECT_ROOT="$(pwd -W)"
 
 MSYS_NO_PATHCONV=1 docker run -d --name server.gateway.1 \
   -p 10101:10101 \
   -p 20101:20101 \
-  -v "D:/src/github.com/server/deploy/gateway/gateway.1.yaml:/app/config/gateway.yaml" \
-  -v "D:/src/github.com/server/deploy/gateway/log:/app/log" \
+  -v "$PROJECT_ROOT/deploy/gateway/gateway.1.yaml:/app/config/gateway.yaml" \
+  -v "$PROJECT_ROOT/deploy/gateway/log:/app/log" \
   server.gateway:dev
 ```
 
@@ -57,13 +63,14 @@ grpcurl -plaintext 192.168.71.123:20101 describe gateway.GatewayService
 
 ## Run Container
 ```bash
-mkdir -p /d/src/github.com/server/deploy/gateway/log
+mkdir -p deploy/gateway/log
+PROJECT_ROOT="$(pwd -W)"
 
 MSYS_NO_PATHCONV=1 docker run -d --name server.gateway.2 \
   -p 10102:10102 \
   -p 20102:20102 \
-  -v "D:/src/github.com/server/deploy/gateway/gateway.2.yaml:/app/config/gateway.yaml" \
-  -v "D:/src/github.com/server/deploy/gateway/log:/app/log" \
+  -v "$PROJECT_ROOT/deploy/gateway/gateway.2.yaml:/app/config/gateway.yaml" \
+  -v "$PROJECT_ROOT/deploy/gateway/log:/app/log" \
   server.gateway:dev
 ```
 

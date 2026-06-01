@@ -1,10 +1,15 @@
 # Cache Container
 
-Run commands from the project root:
+Run commands from this README directory; the first command enters the project root:
 The image uses `Asia/Shanghai` as its timezone so file logs match the host's local time.
 
 ```bash
-cd /d/src/github.com/server
+cd ../..
+```
+
+# 删除日志
+```bash
+rm -rf deploy/cache/log/*
 ```
 
 ## Build Image
@@ -13,16 +18,22 @@ docker build -f deploy/cache/Dockerfile -t server.cache:dev .
 docker images | grep server.cache
 ```
 
+## Remove Image
+```bash
+docker rmi server.cache:dev
+```
+
 # cache.1
 
 ## Run Container
 ```bash
-mkdir -p /d/src/github.com/server/deploy/cache/log
+mkdir -p deploy/cache/log
+PROJECT_ROOT="$(pwd -W)"
 
 MSYS_NO_PATHCONV=1 docker run -d --name server.cache.1 \
   -p 20301:20301 \
-  -v "D:/src/github.com/server/deploy/cache/cache.1.yaml:/app/config/cache.yaml" \
-  -v "D:/src/github.com/server/deploy/cache/log:/app/log" \
+  -v "$PROJECT_ROOT/deploy/cache/cache.1.yaml:/app/config/cache.yaml" \
+  -v "$PROJECT_ROOT/deploy/cache/log:/app/log" \
   server.cache:dev
 ```
 
@@ -51,12 +62,13 @@ grpcurl -plaintext 192.168.71.123:20301 describe cache.CacheService
 
 ## Run Container
 ```bash
-mkdir -p /d/src/github.com/server/deploy/cache/log
+mkdir -p deploy/cache/log
+PROJECT_ROOT="$(pwd -W)"
 
 MSYS_NO_PATHCONV=1 docker run -d --name server.cache.2 \
   -p 20302:20302 \
-  -v "D:/src/github.com/server/deploy/cache/cache.2.yaml:/app/config/cache.yaml" \
-  -v "D:/src/github.com/server/deploy/cache/log:/app/log" \
+  -v "$PROJECT_ROOT/deploy/cache/cache.2.yaml:/app/config/cache.yaml" \
+  -v "$PROJECT_ROOT/deploy/cache/log:/app/log" \
   server.cache:dev
 ```
 
