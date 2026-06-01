@@ -1,0 +1,71 @@
+name: Cache Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/75912001/server/cache
+
+jobs:
+  build-and-push:
+    name: Build and push cache image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+          cache: true
+
+      - name: Install protoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+
+      - name: Install protoc Go plugins
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+      - name: Download Go modules
+        run: go mod download
+
+      - name: Make grpc-x plugin executable
+        run: |
+          XLIB_DIR="$(go list -m -f '{{.Dir}}' github.com/75912001/xlib)"
+          ls -l "$XLIB_DIR/grpc/proto/bin"
+          chmod +x "$XLIB_DIR/grpc/proto/bin/protoc-gen-go-grpc-x-linux"
+          ls -l "$XLIB_DIR/grpc/proto/bin/protoc-gen-go-grpc-x-linux"
+
+      - name: Generate proto code
+        run: python gen.py
+
+      - name: Test cache packages
+        run: go test ./cache ./common ./proto/pb
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build cache image
+        run: |
+          docker build \
+            -f deploy/cache/Dockerfile \
+            -t $IMAGE_NAME:main \
+            -t $IMAGE_NAME:${{ github.sha }} \
+            .
+
+      - name: Push cache image
+        run: |
+          docker push $IMAGE_NAME:main
+          docker push $IMAGE_NAME:${{ github.sha }}
