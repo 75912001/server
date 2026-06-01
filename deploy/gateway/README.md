@@ -1,19 +1,21 @@
 # Gateway Container
 
-Run commands from this README directory; the first command enters the project root:
+Run commands from anywhere inside this Git repository; the first command enters the project root:
 The image uses `Asia/Shanghai` as its timezone so file logs match the host's local time.
 
 ```bash
-cd ../..
+cd "$(git rev-parse --show-toplevel)"
 ```
 
 # 删除日志
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 rm -rf deploy/gateway/log/*
 ```
 
 ## Build Image
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 docker build -f deploy/gateway/Dockerfile -t server.gateway:dev .
 docker images | grep server.gateway
 ```
@@ -27,6 +29,7 @@ docker rmi server.gateway:dev
 
 ## Run Container
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 mkdir -p deploy/gateway/log
 PROJECT_ROOT="$(pwd -W)"
 
@@ -36,6 +39,20 @@ MSYS_NO_PATHCONV=1 docker run -d --name server.gateway.1 \
   -v "$PROJECT_ROOT/deploy/gateway/gateway.1.yaml:/app/config/gateway.yaml" \
   -v "$PROJECT_ROOT/deploy/gateway/log:/app/log" \
   server.gateway:dev
+```
+
+## Run Container - ghcr.io/75912001/server/gateway:main
+```bash
+cd "$(git rev-parse --show-toplevel)"
+mkdir -p deploy/gateway/log
+PROJECT_ROOT="$(pwd -W)"
+
+MSYS_NO_PATHCONV=1 docker run -d --name server.gateway.1 \
+  -p 10101:10101 \
+  -p 20101:20101 \
+  -v "$PROJECT_ROOT/deploy/gateway/gateway.1.yaml:/app/config/gateway.yaml" \
+  -v "$PROJECT_ROOT/deploy/gateway/log:/app/log" \
+  ghcr.io/75912001/server/gateway:main
 ```
 
 ## Stop Container
@@ -63,6 +80,7 @@ grpcurl -plaintext 192.168.71.123:20101 describe gateway.GatewayService
 
 ## Run Container
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 mkdir -p deploy/gateway/log
 PROJECT_ROOT="$(pwd -W)"
 
@@ -72,6 +90,20 @@ MSYS_NO_PATHCONV=1 docker run -d --name server.gateway.2 \
   -v "$PROJECT_ROOT/deploy/gateway/gateway.2.yaml:/app/config/gateway.yaml" \
   -v "$PROJECT_ROOT/deploy/gateway/log:/app/log" \
   server.gateway:dev
+```
+
+## Run Container - ghcr.io/75912001/server/gateway:main
+```bash
+cd "$(git rev-parse --show-toplevel)"
+mkdir -p deploy/gateway/log
+PROJECT_ROOT="$(pwd -W)"
+
+MSYS_NO_PATHCONV=1 docker run -d --name server.gateway.2 \
+  -p 10102:10102 \
+  -p 20102:20102 \
+  -v "$PROJECT_ROOT/deploy/gateway/gateway.2.yaml:/app/config/gateway.yaml" \
+  -v "$PROJECT_ROOT/deploy/gateway/log:/app/log" \
+  ghcr.io/75912001/server/gateway:main
 ```
 
 ## Stop Container

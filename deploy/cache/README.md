@@ -4,16 +4,18 @@ Run commands from this README directory; the first command enters the project ro
 The image uses `Asia/Shanghai` as its timezone so file logs match the host's local time.
 
 ```bash
-cd ../..
+cd "$(git rev-parse --show-toplevel)"
 ```
 
 # 删除日志
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 rm -rf deploy/cache/log/*
 ```
 
 ## Build Image
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 docker build -f deploy/cache/Dockerfile -t server.cache:dev .
 docker images | grep server.cache
 ```
@@ -27,6 +29,7 @@ docker rmi server.cache:dev
 
 ## Run Container
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 mkdir -p deploy/cache/log
 PROJECT_ROOT="$(pwd -W)"
 
@@ -62,6 +65,7 @@ grpcurl -plaintext 192.168.71.123:20301 describe cache.CacheService
 
 ## Run Container
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 mkdir -p deploy/cache/log
 PROJECT_ROOT="$(pwd -W)"
 

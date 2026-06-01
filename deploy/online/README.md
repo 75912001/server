@@ -4,16 +4,18 @@ Run commands from this README directory; the first command enters the project ro
 The image uses `Asia/Shanghai` as its timezone so file logs match the host's local time.
 
 ```bash
-cd ../..
+cd "$(git rev-parse --show-toplevel)"
 ```
 
 # 删除日志
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 rm -rf deploy/online/log/*
 ```
 
 ## Build Image
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 docker build -f deploy/online/Dockerfile -t server.online:dev .
 docker images | grep server.online
 ```
@@ -27,6 +29,7 @@ docker rmi server.online:dev
 
 ## Run Container
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 mkdir -p deploy/online/log
 PROJECT_ROOT="$(pwd -W)"
 
@@ -62,6 +65,7 @@ grpcurl -plaintext 192.168.71.123:20201 describe online.OnlineService
 
 ## Run Container
 ```bash
+cd "$(git rev-parse --show-toplevel)"
 mkdir -p deploy/online/log
 PROJECT_ROOT="$(pwd -W)"
 
