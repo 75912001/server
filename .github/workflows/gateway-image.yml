@@ -1,0 +1,61 @@
+name: Gateway Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/75912001/server/gateway
+
+jobs:
+  build-and-push:
+    name: Build and push gateway image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+          cache: true
+
+      - name: Install protoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+
+      - name: Install protoc Go plugins
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+      - name: Generate proto code
+        run: python gen.py
+
+      - name: Test gateway packages
+        run: go test ./gateway ./common ./proto/pb
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build gateway image
+        run: |
+          docker build \
+            -f deploy/gateway/Dockerfile \
+            -t $IMAGE_NAME:main \
+            -t $IMAGE_NAME:${{ github.sha }} \
+            .
+
+      - name: Push gateway image
+        run: |
+          docker push $IMAGE_NAME:main
+          docker push $IMAGE_NAME:${{ github.sha }}
