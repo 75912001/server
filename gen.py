@@ -4,32 +4,64 @@ import shutil
 import subprocess
 import sys
 
+XLIB_MODULE = "github.com/75912001/xlib"
+COLOR_GREEN = "\033[32m"
+COLOR_RED = "\033[31m"
+COLOR_RESET = "\033[0m"
+
+
+def print_ok(message):
+    print(f"{COLOR_GREEN}{message}{COLOR_RESET}")
+
+
+def print_error(message):
+    print(f"{COLOR_RED}{message}{COLOR_RESET}", file=sys.stderr)
+
 
 def run_cmd(cmd, cwd=None):
     print(f"Executing: {cmd}")
     res = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=cwd)
     if res.returncode != 0:
-        print(f"Error: {res.stderr}")
+        print_error(f"Error: {res.stderr}")
         sys.exit(res.returncode)
     return res.stdout
 
 
 def check_tool(name):
     if shutil.which(name) is None:
-        print(f"Error: '{name}' not found in PATH. Please install it first.")
+        print_error(f"Error: '{name}' not found in PATH. Please install it first.")
         sys.exit(1)
 
 
 def check_dir(path, desc):
     if not os.path.isdir(path):
-        print(f"Error: {desc} not found: {path}")
+        print_error(f"Error: {desc} not found: {path}")
         sys.exit(1)
 
 
 def check_file(path, desc):
     if not os.path.isfile(path):
-        print(f"Error: {desc} not found: {path}")
+        print_error(f"Error: {desc} not found: {path}")
         sys.exit(1)
+
+
+def get_go_module_dir(module, cwd):
+    out = run_cmd(f'go list -m -f "{{{{.Dir}}}}" {module}', cwd=cwd).strip()
+    if not out:
+        print_error(f"Error: go module dir is empty: {module}")
+        sys.exit(1)
+    return out
+
+
+def get_grpc_x_plugin_path(xlib_dir):
+    if sys.platform.startswith("win"):
+        name = "protoc-gen-go-grpc-x"
+    elif sys.platform == "darwin":
+        name = "protoc-gen-go-grpc-x-mac"
+    else:
+        name = "protoc-gen-go-grpc-x-linux"
+
+    return os.path.join(xlib_dir, "grpc", "proto", "bin", name)
 
 
 def discover_protos(proto_dir):
@@ -124,7 +156,7 @@ def gen_cmd_protos(proto_dir):
                 f.write(f"  {msg_name}_CMD = {hex_val}; {comment}\n")
             f.write("}\n")
 
-        print(f"生成 {base}.cmd.proto  ({len(entries)} 条 CMD)")
+        print_ok(f"生成 {base}.cmd.proto  ({len(entries)} 条 CMD)")
 
 
 # ─── 主流程 ───────────────────────────────────────────────────────────────────
@@ -133,24 +165,21 @@ def main():
     # 当前 server 仓库根目录
     server_dir = os.path.dirname(os.path.abspath(__file__))
     # xlib 仓库与 server 同级
-    xlib_dir = os.path.join(os.path.dirname(server_dir), "xlib")
+    xlib_dir = get_go_module_dir(XLIB_MODULE, server_dir)
 
     # --- 前置校验 ---
     check_tool("go")
     check_tool("protoc")
     check_dir(xlib_dir,                                              "xlib 仓库目录")
-    check_dir(os.path.join(xlib_dir, "grpc", "proto", "gen"),       "xlib/grpc/proto/gen (插件源码)")
     check_dir(os.path.join(xlib_dir, "grpc", "proto"),              "xlib/grpc/proto (options.proto)")
+    check_file(os.path.join(xlib_dir, "grpc", "proto", "options.proto"), "xlib/grpc/proto/options.proto")
     check_dir(os.path.join(xlib_dir, "thirdparty"),                 "xlib/thirdparty")
 
     proto_dir = os.path.join(server_dir, "proto")
     check_dir(proto_dir, "proto 目录")
 
-    plugin_exe = os.path.join(xlib_dir, "protoc-gen-go-grpc-x.exe")
-
-    # 1. 编译自研 protoc 插件
-    run_cmd("go build -o protoc-gen-go-grpc-x.exe ./grpc/proto/gen/", cwd=xlib_dir)
-    check_file(plugin_exe, "编译后的 protoc-gen-go-grpc-x.exe")
+    plugin_exe = get_grpc_x_plugin_path(xlib_dir)
+    check_file(plugin_exe, "protoc-gen-go-grpc-x plugin")
 
     # 2. 根据源 proto 的 //0xHEX#... 注释生成 *.cmd.proto 枚举文件
     gen_cmd_protos(proto_dir)
@@ -158,7 +187,7 @@ def main():
     # 3. 扫描 proto 文件，分组（gen_cmd_protos 已将生成文件写入 proto_dir，会被发现）
     all_protos, grpc_protos = discover_protos(proto_dir)
     if not all_protos:
-        print("Error: proto 目录中没有找到任何 .proto 文件")
+        print_error("Error: proto 目录中没有找到任何 .proto 文件")
         sys.exit(1)
     print(f"发现 proto 文件: {all_protos}")
     print(f"gRPC proto 文件: {grpc_protos}")
@@ -180,7 +209,7 @@ def main():
         f" {' '.join(all_protos)}"
     )
     run_cmd(cmd_go, cwd=server_dir)
-    print(f"[go_out] 生成完毕: {all_protos}")
+    print_ok(f"[go_out] 生成完毕: {all_protos}")
 
     # 4b. *.grpc.proto → --go-grpc_out + --go-grpc-x_out（服务桩代码）
     if grpc_protos:
@@ -193,13 +222,9 @@ def main():
             f" {' '.join(grpc_protos)}"
         )
         run_cmd(cmd_grpc, cwd=server_dir)
-        print(f"[go-grpc_out / go-grpc-x_out] 生成完毕: {grpc_protos}")
+        print_ok(f"[go-grpc_out / go-grpc-x_out] 生成完毕: {grpc_protos}")
 
-    # 5. 清理插件编译产物
-    if os.path.exists(plugin_exe):
-        os.remove(plugin_exe)
-
-    print("Done. 文件已输出至 proto/pb/")
+    print_ok("Done. 文件已输出至 proto/pb/")
 
 
 if __name__ == "__main__":
