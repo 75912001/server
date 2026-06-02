@@ -22,13 +22,20 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 	if err != nil {
 		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
-	hasOldSession := oldSession.gatewayKey != "" || oldSession.onlineKey != ""
-	if !hasOldSession && p.gatewayID != "" {
-		oldSession.gatewayKey = p.gatewayID
-		oldSession.onlineKey = currentOnlineKey
-		hasOldSession = true
+	if cacheUserSessionIsEmpty(oldSession) && p.gatewayID != "" {
+		oldSession = cloneCacheUserSession(p.sessionMgr.session)
+		if oldSession.gatewayKey == "" {
+			oldSession.gatewayKey = p.gatewayID
+		}
+		if oldSession.onlineKey == "" {
+			oldSession.onlineKey = currentOnlineKey
+		}
 	}
-	if hasOldSession && oldSession.gatewayKey != "" {
+	userRecord, err := unaryCacheGetUserRecord(req.GetUid())
+	if err != nil {
+		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
+	}
+	if !cacheUserSessionIsEmpty(oldSession) && oldSession.gatewayKey != "" {
 		removed := false
 		if currentUser, ok := GUserMgr.users.Find(uid); ok && currentUser == p {
 			GUserMgr.users.Del(uid)
@@ -41,18 +48,13 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 			return nil, grpcstatus.Error(grpccodes.FailedPrecondition, fmt.Sprintf("kick old gateway failed: %v", err))
 		}
 	}
-	sessionCommitted := false
-	if err := unaryCacheReplaceUserSession(uid, oldSession, newSession); err != nil {
+	expectedSession, err := expectedCacheUserSessionAfterKick(uid, oldSession)
+	if err != nil {
+		return nil, err
+	}
+	if err := unaryCacheReplaceUserSession(uid, expectedSession, newSession); err != nil {
 		if s, ok := grpcstatus.FromError(err); ok && s.Code() == grpccodes.Aborted {
 			return nil, grpcstatus.Error(grpccodes.Aborted, err.Error())
-		}
-		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
-	}
-	sessionCommitted = true
-	userRecord, err := unaryCacheGetUserRecord(req.GetUid())
-	if err != nil {
-		if cleanupErr := p.cleanupCommittedUserSession(uid, sessionCommitted, newSession); cleanupErr != nil {
-			return nil, grpcstatus.Error(grpccodes.Internal, fmt.Sprintf("%v; cleanup user session failed: %v", err, cleanupErr))
 		}
 		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
@@ -64,11 +66,41 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 	return &pb.OnlineUserOnlineRes{}, nil
 }
 
-func (p *User) cleanupCommittedUserSession(uid uint64, sessionCommitted bool, session *cacheUserSession) error {
-	if !sessionCommitted {
-		return nil
+func cloneCacheUserSession(session *cacheUserSession) *cacheUserSession {
+	if session == nil {
+		return &cacheUserSession{}
 	}
-	return unaryCacheDelUserSession(uid, session)
+	return &cacheUserSession{
+		gatewayKey: session.gatewayKey,
+		onlineKey:  session.onlineKey,
+		session:    session.session,
+		loginTime:  session.loginTime,
+	}
+}
+
+func cacheUserSessionIsEmpty(session *cacheUserSession) bool {
+	return session == nil || (session.gatewayKey == "" && session.onlineKey == "" && session.session == "")
+}
+
+func cacheUserSessionMatch(a *cacheUserSession, b *cacheUserSession) bool {
+	if a == nil || b == nil {
+		return cacheUserSessionIsEmpty(a) && cacheUserSessionIsEmpty(b)
+	}
+	return a.gatewayKey == b.gatewayKey && a.onlineKey == b.onlineKey && a.session == b.session
+}
+
+func expectedCacheUserSessionAfterKick(uid uint64, oldSession *cacheUserSession) (*cacheUserSession, error) {
+	currentSession, err := unaryCacheGetUserSession(uid)
+	if err != nil {
+		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
+	}
+	if cacheUserSessionIsEmpty(currentSession) {
+		return &cacheUserSession{}, nil
+	}
+	if cacheUserSessionMatch(currentSession, oldSession) {
+		return oldSession, nil
+	}
+	return nil, grpcstatus.Error(grpccodes.Aborted, fmt.Sprintf("user session changed uid:%d", uid))
 }
 
 func (p *User) kickGateway(gatewayKey string) error {
