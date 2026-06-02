@@ -15,18 +15,30 @@ import (
 
 // SetVerifyUserToken 设置用户令牌
 func (p *Redis) SetVerifyUserToken(ctx context.Context, uid uint64, token string, expire time.Duration) (bool, error) {
-	key := RedisKeyUserToken(uid, token)
-	return p.client.SetNX(ctx, key, "1", expire).Result()
+	key := RedisKeyUserToken(uid)
+	return p.client.SetNX(ctx, key, token, expire).Result()
 }
+
+const verifyUserTokenScript = `
+local current = redis.call("GET", KEYS[1])
+if current == false then
+	return 0
+end
+if current ~= ARGV[1] then
+	return 0
+end
+redis.call("DEL", KEYS[1])
+return 1
+`
 
 // VerifyUserToken 验证用户令牌
 func (p *Redis) VerifyUserToken(ctx context.Context, uid uint64, token string) (bool, error) {
-	key := RedisKeyUserToken(uid, token)
-	res, err := p.client.Del(ctx, key).Result()
+	key := RedisKeyUserToken(uid)
+	result, err := p.client.Eval(ctx, verifyUserTokenScript, []string{key}, token).Result()
 	if err != nil {
-		return false, errors.WithMessagef(err, "delete user token from redis failed, uid: %d, token: %s %v", uid, token, xruntime.Location())
+		return false, errors.WithMessagef(err, "verify user token from redis failed, uid: %d, token: %s %v", uid, token, xruntime.Location())
 	}
-	return res == 1, nil
+	return redisScriptResultIsOK(result), nil
 }
 
 // UserRecord 用户记录
@@ -152,19 +164,16 @@ func (p *Redis) ReplaceUserSessionRecord(ctx context.Context, uid uint64, expect
 
 func (p *Redis) DelUserSessionRecord(ctx context.Context, uid uint64, expected map[string]string) error {
 	key := RedisKeyUserSession(uid)
-	if len(expected) != 0 {
-		args := make([]any, 0, 1+len(expected)*2)
-		args = append(args, strconv.Itoa(len(expected)))
-		for field, value := range expected {
-			args = append(args, field, value)
-		}
-		if _, err := p.client.Eval(ctx, delUserSessionRecordScript, []string{key}, args...).Result(); err != nil {
-			return errors.WithMessagef(err, "delete user session record from redis failed, uid: %d, expected: %v %v", uid, expected, xruntime.Location())
-		}
-		return nil
+	if len(expected) == 0 {
+		return errors.Errorf("delete user session record expected is empty, uid: %d %v", uid, xruntime.Location())
 	}
-	if err := p.client.Del(ctx, key).Err(); err != nil {
-		return errors.WithMessagef(err, "delete user session record from redis failed, uid: %d %v", uid, xruntime.Location())
+	args := make([]any, 0, 1+len(expected)*2)
+	args = append(args, strconv.Itoa(len(expected)))
+	for field, value := range expected {
+		args = append(args, field, value)
+	}
+	if _, err := p.client.Eval(ctx, delUserSessionRecordScript, []string{key}, args...).Result(); err != nil {
+		return errors.WithMessagef(err, "delete user session record from redis failed, uid: %d, expected: %v %v", uid, expected, xruntime.Location())
 	}
 	return nil
 }
