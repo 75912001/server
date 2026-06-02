@@ -805,7 +805,8 @@ type CacheDelUserSessionRecordReq struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Uid             uint64                    `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	ExpectedRecords []*CacheUserSessionRecord `protobuf:"bytes,2,rep,name=expected_records,json=expectedRecords,proto3" json:"expected_records,omitempty"`
 }
 
 func (x *CacheDelUserSessionRecordReq) Reset() {
@@ -847,6 +848,13 @@ func (x *CacheDelUserSessionRecordReq) GetUid() uint64 {
 	return 0
 }
 
+func (x *CacheDelUserSessionRecordReq) GetExpectedRecords() []*CacheUserSessionRecord {
+	if x != nil {
+		return x.ExpectedRecords
+	}
+	return nil
+}
+
 type CacheDelUserSessionRecordRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -883,6 +891,107 @@ func (x *CacheDelUserSessionRecordRes) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CacheDelUserSessionRecordRes.ProtoReflect.Descriptor instead.
 func (*CacheDelUserSessionRecordRes) Descriptor() ([]byte, []int) {
 	return file_cache_grpc_proto_rawDescGZIP(), []int{16}
+}
+
+type CacheReplaceUserSessionRecordReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Uid             uint64                    `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	ExpectedRecords []*CacheUserSessionRecord `protobuf:"bytes,2,rep,name=expected_records,json=expectedRecords,proto3" json:"expected_records,omitempty"`
+	Records         []*CacheUserSessionRecord `protobuf:"bytes,3,rep,name=records,proto3" json:"records,omitempty"`
+}
+
+func (x *CacheReplaceUserSessionRecordReq) Reset() {
+	*x = CacheReplaceUserSessionRecordReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cache_grpc_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CacheReplaceUserSessionRecordReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CacheReplaceUserSessionRecordReq) ProtoMessage() {}
+
+func (x *CacheReplaceUserSessionRecordReq) ProtoReflect() protoreflect.Message {
+	mi := &file_cache_grpc_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CacheReplaceUserSessionRecordReq.ProtoReflect.Descriptor instead.
+func (*CacheReplaceUserSessionRecordReq) Descriptor() ([]byte, []int) {
+	return file_cache_grpc_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *CacheReplaceUserSessionRecordReq) GetUid() uint64 {
+	if x != nil {
+		return x.Uid
+	}
+	return 0
+}
+
+func (x *CacheReplaceUserSessionRecordReq) GetExpectedRecords() []*CacheUserSessionRecord {
+	if x != nil {
+		return x.ExpectedRecords
+	}
+	return nil
+}
+
+func (x *CacheReplaceUserSessionRecordReq) GetRecords() []*CacheUserSessionRecord {
+	if x != nil {
+		return x.Records
+	}
+	return nil
+}
+
+type CacheReplaceUserSessionRecordRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *CacheReplaceUserSessionRecordRes) Reset() {
+	*x = CacheReplaceUserSessionRecordRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cache_grpc_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CacheReplaceUserSessionRecordRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CacheReplaceUserSessionRecordRes) ProtoMessage() {}
+
+func (x *CacheReplaceUserSessionRecordRes) ProtoReflect() protoreflect.Message {
+	mi := &file_cache_grpc_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CacheReplaceUserSessionRecordRes.ProtoReflect.Descriptor instead.
+func (*CacheReplaceUserSessionRecordRes) Descriptor() ([]byte, []int) {
+	return file_cache_grpc_proto_rawDescGZIP(), []int{18}
 }
 
 var File_cache_grpc_proto protoreflect.FileDescriptor
@@ -958,11 +1067,30 @@ var file_cache_grpc_proto_rawDesc = []byte{
 	0x37, 0x0a, 0x07, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b,
 	0x32, 0x1d, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x55, 0x73,
 	0x65, 0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52,
-	0x07, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x73, 0x22, 0x37, 0x0a, 0x1c, 0x43, 0x61, 0x63, 0x68,
-	0x65, 0x44, 0x65, 0x6c, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52,
-	0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x12, 0x17, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x04, 0x42, 0x05, 0xc2, 0x3e, 0x02, 0x50, 0x01, 0x52, 0x03, 0x75, 0x69,
-	0x64, 0x22, 0x1e, 0x0a, 0x1c, 0x43, 0x61, 0x63, 0x68, 0x65, 0x44, 0x65, 0x6c, 0x55, 0x73, 0x65,
+	0x07, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x73, 0x22, 0x81, 0x01, 0x0a, 0x1c, 0x43, 0x61, 0x63,
+	0x68, 0x65, 0x44, 0x65, 0x6c, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e,
+	0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x12, 0x17, 0x0a, 0x03, 0x75, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x42, 0x05, 0xc2, 0x3e, 0x02, 0x50, 0x01, 0x52, 0x03, 0x75,
+	0x69, 0x64, 0x12, 0x48, 0x0a, 0x10, 0x65, 0x78, 0x70, 0x65, 0x63, 0x74, 0x65, 0x64, 0x5f, 0x72,
+	0x65, 0x63, 0x6f, 0x72, 0x64, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x63,
+	0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x0f, 0x65, 0x78, 0x70,
+	0x65, 0x63, 0x74, 0x65, 0x64, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x73, 0x22, 0x1e, 0x0a, 0x1c,
+	0x43, 0x61, 0x63, 0x68, 0x65, 0x44, 0x65, 0x6c, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x73, 0x73,
+	0x69, 0x6f, 0x6e, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x73, 0x22, 0xbe, 0x01, 0x0a,
+	0x20, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x65, 0x70, 0x6c, 0x61, 0x63, 0x65, 0x55, 0x73, 0x65,
+	0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x65,
+	0x71, 0x12, 0x17, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x42, 0x05,
+	0xc2, 0x3e, 0x02, 0x50, 0x01, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12, 0x48, 0x0a, 0x10, 0x65, 0x78,
+	0x70, 0x65, 0x63, 0x74, 0x65, 0x64, 0x5f, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x73, 0x18, 0x02,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63,
+	0x68, 0x65, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x63,
+	0x6f, 0x72, 0x64, 0x52, 0x0f, 0x65, 0x78, 0x70, 0x65, 0x63, 0x74, 0x65, 0x64, 0x52, 0x65, 0x63,
+	0x6f, 0x72, 0x64, 0x73, 0x12, 0x37, 0x0a, 0x07, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x73, 0x18,
+	0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61,
+	0x63, 0x68, 0x65, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65,
+	0x63, 0x6f, 0x72, 0x64, 0x52, 0x07, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x73, 0x22, 0x22, 0x0a,
+	0x20, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x65, 0x70, 0x6c, 0x61, 0x63, 0x65, 0x55, 0x73, 0x65,
 	0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x65,
 	0x73, 0x2a, 0xd1, 0x01, 0x0a, 0x15, 0x43, 0x61, 0x63, 0x68, 0x65, 0x55, 0x73, 0x65, 0x72, 0x53,
 	0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x12, 0x25, 0x0a, 0x21, 0x43,
@@ -977,7 +1105,7 @@ var file_cache_grpc_proto_rawDesc = []byte{
 	0x6e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x10, 0x03,
 	0x12, 0x23, 0x0a, 0x1f, 0x43, 0x61, 0x63, 0x68, 0x65, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x73,
 	0x73, 0x69, 0x6f, 0x6e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x54,
-	0x69, 0x6d, 0x65, 0x10, 0x04, 0x32, 0xf3, 0x06, 0x0a, 0x0c, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53,
+	0x69, 0x6d, 0x65, 0x10, 0x04, 0x32, 0xf2, 0x07, 0x0a, 0x0c, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53,
 	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x5c, 0x0a, 0x12, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53,
 	0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x12, 0x1c, 0x2e, 0x63,
 	0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53, 0x65, 0x74, 0x55, 0x73, 0x65,
@@ -1031,10 +1159,18 @@ var file_cache_grpc_proto_rawDesc = []byte{
 	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x1a, 0x23,
 	0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x44, 0x65, 0x6c, 0x55,
 	0x73, 0x65, 0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64,
-	0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0, 0x01, 0x05, 0x1a,
-	0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xa0, 0x01, 0x05, 0x42, 0x14, 0x5a, 0x12, 0x73,
-	0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70,
-	0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0, 0x01, 0x05, 0x12,
+	0x7d, 0x0a, 0x1d, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x65, 0x70, 0x6c, 0x61, 0x63, 0x65, 0x55,
+	0x73, 0x65, 0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64,
+	0x12, 0x27, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x65,
+	0x70, 0x6c, 0x61, 0x63, 0x65, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e,
+	0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x1a, 0x27, 0x2e, 0x63, 0x61, 0x63, 0x68,
+	0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x65, 0x70, 0x6c, 0x61, 0x63, 0x65, 0x55, 0x73,
+	0x65, 0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52,
+	0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0, 0x01, 0x05, 0x1a, 0x0a,
+	0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xa0, 0x01, 0x05, 0x42, 0x14, 0x5a, 0x12, 0x73, 0x65,
+	0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1050,56 +1186,63 @@ func file_cache_grpc_proto_rawDescGZIP() []byte {
 }
 
 var file_cache_grpc_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_cache_grpc_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_cache_grpc_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_cache_grpc_proto_goTypes = []any{
-	(CacheUserSessionField)(0),           // 0: cache.CacheUserSessionField
-	(*CacheUserSessionRecord)(nil),       // 1: cache.CacheUserSessionRecord
-	(*CacheSetUserRecordReq)(nil),        // 2: cache.CacheSetUserRecordReq
-	(*CacheSetUserRecordRes)(nil),        // 3: cache.CacheSetUserRecordRes
-	(*CacheGetUserRecordReq)(nil),        // 4: cache.CacheGetUserRecordReq
-	(*CacheGetUserRecordRes)(nil),        // 5: cache.CacheGetUserRecordRes
-	(*CacheSetVerifyUserTokenReq)(nil),   // 6: cache.CacheSetVerifyUserTokenReq
-	(*CacheSetVerifyUserTokenRes)(nil),   // 7: cache.CacheSetVerifyUserTokenRes
-	(*CacheVerifyUserTokenReq)(nil),      // 8: cache.CacheVerifyUserTokenReq
-	(*CacheVerifyUserTokenRes)(nil),      // 9: cache.CacheVerifyUserTokenRes
-	(*CacheSetUserSessionRecordReq)(nil), // 10: cache.CacheSetUserSessionRecordReq
-	(*CacheSetUserSessionRecordRes)(nil), // 11: cache.CacheSetUserSessionRecordRes
-	(*CacheSetUserSessionExpireReq)(nil), // 12: cache.CacheSetUserSessionExpireReq
-	(*CacheSetUserSessionExpireRes)(nil), // 13: cache.CacheSetUserSessionExpireRes
-	(*CacheGetUserSessionRecordReq)(nil), // 14: cache.CacheGetUserSessionRecordReq
-	(*CacheGetUserSessionRecordRes)(nil), // 15: cache.CacheGetUserSessionRecordRes
-	(*CacheDelUserSessionRecordReq)(nil), // 16: cache.CacheDelUserSessionRecordReq
-	(*CacheDelUserSessionRecordRes)(nil), // 17: cache.CacheDelUserSessionRecordRes
-	(*UserRecord)(nil),                   // 18: user.UserRecord
+	(CacheUserSessionField)(0),               // 0: cache.CacheUserSessionField
+	(*CacheUserSessionRecord)(nil),           // 1: cache.CacheUserSessionRecord
+	(*CacheSetUserRecordReq)(nil),            // 2: cache.CacheSetUserRecordReq
+	(*CacheSetUserRecordRes)(nil),            // 3: cache.CacheSetUserRecordRes
+	(*CacheGetUserRecordReq)(nil),            // 4: cache.CacheGetUserRecordReq
+	(*CacheGetUserRecordRes)(nil),            // 5: cache.CacheGetUserRecordRes
+	(*CacheSetVerifyUserTokenReq)(nil),       // 6: cache.CacheSetVerifyUserTokenReq
+	(*CacheSetVerifyUserTokenRes)(nil),       // 7: cache.CacheSetVerifyUserTokenRes
+	(*CacheVerifyUserTokenReq)(nil),          // 8: cache.CacheVerifyUserTokenReq
+	(*CacheVerifyUserTokenRes)(nil),          // 9: cache.CacheVerifyUserTokenRes
+	(*CacheSetUserSessionRecordReq)(nil),     // 10: cache.CacheSetUserSessionRecordReq
+	(*CacheSetUserSessionRecordRes)(nil),     // 11: cache.CacheSetUserSessionRecordRes
+	(*CacheSetUserSessionExpireReq)(nil),     // 12: cache.CacheSetUserSessionExpireReq
+	(*CacheSetUserSessionExpireRes)(nil),     // 13: cache.CacheSetUserSessionExpireRes
+	(*CacheGetUserSessionRecordReq)(nil),     // 14: cache.CacheGetUserSessionRecordReq
+	(*CacheGetUserSessionRecordRes)(nil),     // 15: cache.CacheGetUserSessionRecordRes
+	(*CacheDelUserSessionRecordReq)(nil),     // 16: cache.CacheDelUserSessionRecordReq
+	(*CacheDelUserSessionRecordRes)(nil),     // 17: cache.CacheDelUserSessionRecordRes
+	(*CacheReplaceUserSessionRecordReq)(nil), // 18: cache.CacheReplaceUserSessionRecordReq
+	(*CacheReplaceUserSessionRecordRes)(nil), // 19: cache.CacheReplaceUserSessionRecordRes
+	(*UserRecord)(nil),                       // 20: user.UserRecord
 }
 var file_cache_grpc_proto_depIdxs = []int32{
 	0,  // 0: cache.CacheUserSessionRecord.field:type_name -> cache.CacheUserSessionField
-	18, // 1: cache.CacheSetUserRecordReq.user_record:type_name -> user.UserRecord
-	18, // 2: cache.CacheGetUserRecordRes.user_record:type_name -> user.UserRecord
+	20, // 1: cache.CacheSetUserRecordReq.user_record:type_name -> user.UserRecord
+	20, // 2: cache.CacheGetUserRecordRes.user_record:type_name -> user.UserRecord
 	1,  // 3: cache.CacheSetUserSessionRecordReq.records:type_name -> cache.CacheUserSessionRecord
 	0,  // 4: cache.CacheGetUserSessionRecordReq.fields:type_name -> cache.CacheUserSessionField
 	1,  // 5: cache.CacheGetUserSessionRecordRes.records:type_name -> cache.CacheUserSessionRecord
-	2,  // 6: cache.CacheService.CacheSetUserRecord:input_type -> cache.CacheSetUserRecordReq
-	4,  // 7: cache.CacheService.CacheGetUserRecord:input_type -> cache.CacheGetUserRecordReq
-	6,  // 8: cache.CacheService.CacheSetVerifyUserToken:input_type -> cache.CacheSetVerifyUserTokenReq
-	8,  // 9: cache.CacheService.CacheVerifyUserToken:input_type -> cache.CacheVerifyUserTokenReq
-	10, // 10: cache.CacheService.CacheSetUserSessionRecord:input_type -> cache.CacheSetUserSessionRecordReq
-	12, // 11: cache.CacheService.CacheSetUserSessionExpire:input_type -> cache.CacheSetUserSessionExpireReq
-	14, // 12: cache.CacheService.CacheGetUserSessionRecord:input_type -> cache.CacheGetUserSessionRecordReq
-	16, // 13: cache.CacheService.CacheDelUserSessionRecord:input_type -> cache.CacheDelUserSessionRecordReq
-	3,  // 14: cache.CacheService.CacheSetUserRecord:output_type -> cache.CacheSetUserRecordRes
-	5,  // 15: cache.CacheService.CacheGetUserRecord:output_type -> cache.CacheGetUserRecordRes
-	7,  // 16: cache.CacheService.CacheSetVerifyUserToken:output_type -> cache.CacheSetVerifyUserTokenRes
-	9,  // 17: cache.CacheService.CacheVerifyUserToken:output_type -> cache.CacheVerifyUserTokenRes
-	11, // 18: cache.CacheService.CacheSetUserSessionRecord:output_type -> cache.CacheSetUserSessionRecordRes
-	13, // 19: cache.CacheService.CacheSetUserSessionExpire:output_type -> cache.CacheSetUserSessionExpireRes
-	15, // 20: cache.CacheService.CacheGetUserSessionRecord:output_type -> cache.CacheGetUserSessionRecordRes
-	17, // 21: cache.CacheService.CacheDelUserSessionRecord:output_type -> cache.CacheDelUserSessionRecordRes
-	14, // [14:22] is the sub-list for method output_type
-	6,  // [6:14] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	1,  // 6: cache.CacheDelUserSessionRecordReq.expected_records:type_name -> cache.CacheUserSessionRecord
+	1,  // 7: cache.CacheReplaceUserSessionRecordReq.expected_records:type_name -> cache.CacheUserSessionRecord
+	1,  // 8: cache.CacheReplaceUserSessionRecordReq.records:type_name -> cache.CacheUserSessionRecord
+	2,  // 9: cache.CacheService.CacheSetUserRecord:input_type -> cache.CacheSetUserRecordReq
+	4,  // 10: cache.CacheService.CacheGetUserRecord:input_type -> cache.CacheGetUserRecordReq
+	6,  // 11: cache.CacheService.CacheSetVerifyUserToken:input_type -> cache.CacheSetVerifyUserTokenReq
+	8,  // 12: cache.CacheService.CacheVerifyUserToken:input_type -> cache.CacheVerifyUserTokenReq
+	10, // 13: cache.CacheService.CacheSetUserSessionRecord:input_type -> cache.CacheSetUserSessionRecordReq
+	12, // 14: cache.CacheService.CacheSetUserSessionExpire:input_type -> cache.CacheSetUserSessionExpireReq
+	14, // 15: cache.CacheService.CacheGetUserSessionRecord:input_type -> cache.CacheGetUserSessionRecordReq
+	16, // 16: cache.CacheService.CacheDelUserSessionRecord:input_type -> cache.CacheDelUserSessionRecordReq
+	18, // 17: cache.CacheService.CacheReplaceUserSessionRecord:input_type -> cache.CacheReplaceUserSessionRecordReq
+	3,  // 18: cache.CacheService.CacheSetUserRecord:output_type -> cache.CacheSetUserRecordRes
+	5,  // 19: cache.CacheService.CacheGetUserRecord:output_type -> cache.CacheGetUserRecordRes
+	7,  // 20: cache.CacheService.CacheSetVerifyUserToken:output_type -> cache.CacheSetVerifyUserTokenRes
+	9,  // 21: cache.CacheService.CacheVerifyUserToken:output_type -> cache.CacheVerifyUserTokenRes
+	11, // 22: cache.CacheService.CacheSetUserSessionRecord:output_type -> cache.CacheSetUserSessionRecordRes
+	13, // 23: cache.CacheService.CacheSetUserSessionExpire:output_type -> cache.CacheSetUserSessionExpireRes
+	15, // 24: cache.CacheService.CacheGetUserSessionRecord:output_type -> cache.CacheGetUserSessionRecordRes
+	17, // 25: cache.CacheService.CacheDelUserSessionRecord:output_type -> cache.CacheDelUserSessionRecordRes
+	19, // 26: cache.CacheService.CacheReplaceUserSessionRecord:output_type -> cache.CacheReplaceUserSessionRecordRes
+	18, // [18:27] is the sub-list for method output_type
+	9,  // [9:18] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_cache_grpc_proto_init() }
@@ -1313,6 +1456,30 @@ func file_cache_grpc_proto_init() {
 				return nil
 			}
 		}
+		file_cache_grpc_proto_msgTypes[17].Exporter = func(v any, i int) any {
+			switch v := v.(*CacheReplaceUserSessionRecordReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cache_grpc_proto_msgTypes[18].Exporter = func(v any, i int) any {
+			switch v := v.(*CacheReplaceUserSessionRecordRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1320,7 +1487,7 @@ func file_cache_grpc_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_cache_grpc_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   17,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

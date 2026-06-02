@@ -19,14 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CacheService_CacheSetUserRecord_FullMethodName        = "/cache.CacheService/CacheSetUserRecord"
-	CacheService_CacheGetUserRecord_FullMethodName        = "/cache.CacheService/CacheGetUserRecord"
-	CacheService_CacheSetVerifyUserToken_FullMethodName   = "/cache.CacheService/CacheSetVerifyUserToken"
-	CacheService_CacheVerifyUserToken_FullMethodName      = "/cache.CacheService/CacheVerifyUserToken"
-	CacheService_CacheSetUserSessionRecord_FullMethodName = "/cache.CacheService/CacheSetUserSessionRecord"
-	CacheService_CacheSetUserSessionExpire_FullMethodName = "/cache.CacheService/CacheSetUserSessionExpire"
-	CacheService_CacheGetUserSessionRecord_FullMethodName = "/cache.CacheService/CacheGetUserSessionRecord"
-	CacheService_CacheDelUserSessionRecord_FullMethodName = "/cache.CacheService/CacheDelUserSessionRecord"
+	CacheService_CacheSetUserRecord_FullMethodName            = "/cache.CacheService/CacheSetUserRecord"
+	CacheService_CacheGetUserRecord_FullMethodName            = "/cache.CacheService/CacheGetUserRecord"
+	CacheService_CacheSetVerifyUserToken_FullMethodName       = "/cache.CacheService/CacheSetVerifyUserToken"
+	CacheService_CacheVerifyUserToken_FullMethodName          = "/cache.CacheService/CacheVerifyUserToken"
+	CacheService_CacheSetUserSessionRecord_FullMethodName     = "/cache.CacheService/CacheSetUserSessionRecord"
+	CacheService_CacheSetUserSessionExpire_FullMethodName     = "/cache.CacheService/CacheSetUserSessionExpire"
+	CacheService_CacheGetUserSessionRecord_FullMethodName     = "/cache.CacheService/CacheGetUserSessionRecord"
+	CacheService_CacheDelUserSessionRecord_FullMethodName     = "/cache.CacheService/CacheDelUserSessionRecord"
+	CacheService_CacheReplaceUserSessionRecord_FullMethodName = "/cache.CacheService/CacheReplaceUserSessionRecord"
 )
 
 // CacheServiceClient is the client API for CacheService service.
@@ -43,6 +44,7 @@ type CacheServiceClient interface {
 	CacheSetUserSessionExpire(ctx context.Context, in *CacheSetUserSessionExpireReq, opts ...grpc.CallOption) (*CacheSetUserSessionExpireRes, error)
 	CacheGetUserSessionRecord(ctx context.Context, in *CacheGetUserSessionRecordReq, opts ...grpc.CallOption) (*CacheGetUserSessionRecordRes, error)
 	CacheDelUserSessionRecord(ctx context.Context, in *CacheDelUserSessionRecordReq, opts ...grpc.CallOption) (*CacheDelUserSessionRecordRes, error)
+	CacheReplaceUserSessionRecord(ctx context.Context, in *CacheReplaceUserSessionRecordReq, opts ...grpc.CallOption) (*CacheReplaceUserSessionRecordRes, error)
 }
 
 type cacheServiceClient struct {
@@ -133,6 +135,16 @@ func (c *cacheServiceClient) CacheDelUserSessionRecord(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *cacheServiceClient) CacheReplaceUserSessionRecord(ctx context.Context, in *CacheReplaceUserSessionRecordReq, opts ...grpc.CallOption) (*CacheReplaceUserSessionRecordRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CacheReplaceUserSessionRecordRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheReplaceUserSessionRecord_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CacheServiceServer is the server API for CacheService service.
 // All implementations must embed UnimplementedCacheServiceServer
 // for forward compatibility.
@@ -147,6 +159,7 @@ type CacheServiceServer interface {
 	CacheSetUserSessionExpire(context.Context, *CacheSetUserSessionExpireReq) (*CacheSetUserSessionExpireRes, error)
 	CacheGetUserSessionRecord(context.Context, *CacheGetUserSessionRecordReq) (*CacheGetUserSessionRecordRes, error)
 	CacheDelUserSessionRecord(context.Context, *CacheDelUserSessionRecordReq) (*CacheDelUserSessionRecordRes, error)
+	CacheReplaceUserSessionRecord(context.Context, *CacheReplaceUserSessionRecordReq) (*CacheReplaceUserSessionRecordRes, error)
 	mustEmbedUnimplementedCacheServiceServer()
 }
 
@@ -180,6 +193,9 @@ func (UnimplementedCacheServiceServer) CacheGetUserSessionRecord(context.Context
 }
 func (UnimplementedCacheServiceServer) CacheDelUserSessionRecord(context.Context, *CacheDelUserSessionRecordReq) (*CacheDelUserSessionRecordRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method CacheDelUserSessionRecord not implemented")
+}
+func (UnimplementedCacheServiceServer) CacheReplaceUserSessionRecord(context.Context, *CacheReplaceUserSessionRecordReq) (*CacheReplaceUserSessionRecordRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheReplaceUserSessionRecord not implemented")
 }
 func (UnimplementedCacheServiceServer) mustEmbedUnimplementedCacheServiceServer() {}
 func (UnimplementedCacheServiceServer) testEmbeddedByValue()                      {}
@@ -346,6 +362,24 @@ func _CacheService_CacheDelUserSessionRecord_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CacheService_CacheReplaceUserSessionRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheReplaceUserSessionRecordReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CacheServiceServer).CacheReplaceUserSessionRecord(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CacheService_CacheReplaceUserSessionRecord_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CacheServiceServer).CacheReplaceUserSessionRecord(ctx, req.(*CacheReplaceUserSessionRecordReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CacheService_ServiceDesc is the grpc.ServiceDesc for CacheService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -384,6 +418,10 @@ var CacheService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CacheDelUserSessionRecord",
 			Handler:    _CacheService_CacheDelUserSessionRecord_Handler,
+		},
+		{
+			MethodName: "CacheReplaceUserSessionRecord",
+			Handler:    _CacheService_CacheReplaceUserSessionRecord_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
