@@ -6,7 +6,7 @@ etcd:
   ttlDuration: 3000000000s
   projectName: project
 
-cacheTokenExpireSecond: 120
+cacheTokenExpireSecond: 10
 
 # proto 路径，用于记录协议来源。
 protoPath: ../../../proto
@@ -18,6 +18,10 @@ ignoreMsgID:
 
 # 登录验证成功后自动心跳间隔。
 heartbeatInterval: 10s
+
+controlPanel:
+  enable: true
+  addr: 127.0.0.1:18080
 
 robot:
   count: 1
@@ -35,5 +39,5 @@ robot:
     - name: UserRecordReq
       weight: 20
   logging:
-    summaryInterval: 5s
+    summaryInterval: 10s
     detailFailures: true
