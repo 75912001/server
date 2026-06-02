@@ -20,8 +20,8 @@ func RedisKeyUserRecord(uid uint64) string {
 	return fmt.Sprintf(GCfgCustomRedisKeyFormatUserRecord, uid)
 }
 
-func RedisKeyUserToken(uid uint64, token string) string {
-	return fmt.Sprintf(GCfgCustomRedisKeyFormatUserToken, uid, token)
+func RedisKeyUserToken(uid uint64) string {
+	return fmt.Sprintf(GCfgCustomRedisKeyFormatUserToken, uid)
 }
 
 func RedisKeyUserSession(uid uint64) string {
