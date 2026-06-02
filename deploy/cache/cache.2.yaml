@@ -47,5 +47,5 @@ redis:
 
 custom:
   redisKeyFormatUserRecord: "user:{%v}:record"
-  redisKeyFormatUserToken: "user:{%v}:token:%v"
+  redisKeyFormatUserToken: "user:{%v}:token"
   redisKeyFormatUserSession: "user:{%v}:session"
