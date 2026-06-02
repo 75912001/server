@@ -6,28 +6,58 @@ import (
 
 	pb "server/proto/pb"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	xetcd "github.com/75912001/xlib/etcd"
+	grpccodes "google.golang.org/grpc/codes"
+	grpcstatus "google.golang.org/grpc/status"
 )
 
 func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, error) {
+	uid := req.GetUid()
+	currentOnlineKey := xetcd.GEtcd.GetKey()
+	oldSession, err := unaryCacheGetUserSession(uid)
+	if err != nil {
+		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
+	}
+	hasOldSession := oldSession.gatewayKey != "" || oldSession.onlineKey != ""
+	if !hasOldSession && p.gatewayID != "" {
+		oldSession.gatewayKey = p.gatewayID
+		oldSession.onlineKey = currentOnlineKey
+		hasOldSession = true
+	}
+	if hasOldSession && oldSession.gatewayKey != "" {
+		removed := false
+		if currentUser, ok := GUserMgr.users.Find(uid); ok && currentUser == p {
+			GUserMgr.users.Del(uid)
+			removed = true
+		}
+		if err := p.kickGateway(oldSession.gatewayKey); err != nil {
+			if removed {
+				GUserMgr.users.Add(uid, p)
+			}
+			return nil, grpcstatus.Error(grpccodes.FailedPrecondition, fmt.Sprintf("kick old gateway failed: %v", err))
+		}
+	}
+	if err := unaryCacheSetUserSession(uid, req.GetGatewayKey(), currentOnlineKey); err != nil {
+		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
+	}
 	userRecord, err := unaryCacheGetUserRecord(req.GetUid())
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	if userRecord.GetUserRecord() == nil {
-		return nil, status.Error(codes.Internal, "user record is nil")
+		return nil, grpcstatus.Error(grpccodes.Internal, "user record is nil")
 	}
 	p.gatewayID = req.GetGatewayKey()
 	p.clientIP = req.GetClientIp()
 	p.userRecord = userRecord.GetUserRecord()
+	GUserMgr.users.Add(uid, p)
 	return &pb.OnlineUserOnlineRes{}, nil
 }
 
-func (p *User) kickOldGateway() error {
-	gateway := GGatewayMgr.Get(p.gatewayID)
+func (p *User) kickGateway(gatewayKey string) error {
+	gateway := GGatewayMgr.Get(gatewayKey)
 	if gateway == nil {
-		return fmt.Errorf("old gateway %s not found", p.gatewayID)
+		return nil
 	}
 	client, err := gateway.Client()
 	if err != nil {
@@ -39,6 +69,11 @@ func (p *User) kickOldGateway() error {
 		Msg:    "duplicate login",
 	})
 	if err != nil {
+		if s, ok := grpcstatus.FromError(err); ok {
+			if s.Code() == grpccodes.NotFound {
+				return nil
+			}
+		}
 		return err
 	}
 	return nil
