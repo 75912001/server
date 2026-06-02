@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -8,43 +9,42 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type Config struct {
-	Addr              string        `yaml:"addr"`              // Gateway TCP 地址。
-	APIPath           string        `yaml:"apiPath"`           // api.yaml 路径；支持绝对路径，也支持相对 config.yaml 所在目录。
-	ProtoPath         string        `yaml:"protoPath"`         // proto 目录路径；用于记录协议来源，支持绝对路径和相对 config.yaml 所在目录。
-	IgnoreMsgID       []uint32      `yaml:"ignoreMsgID"`       // 收包打印时忽略的消息号列表。
-	ClientCount       int           `yaml:"clientCount"`       // 并发模拟的客户端数量。
-	UIDStart          uint64        `yaml:"uidStart"`          // 起始 uid，第 N 个客户端 uid = UIDStart + N。
-	TokenPrefix       string        `yaml:"tokenPrefix"`       // 默认 token 前缀，最终 token = TokenPrefix + uid。
-	HeartbeatInterval time.Duration `yaml:"heartbeatInterval"` // 默认心跳间隔。
+var GConfigYaml *ConfigYaml
+
+type ConfigYaml struct {
+	Addr              string        `yaml:"addr"`
+	ProtoPath         string        `yaml:"protoPath"`
+	IgnoreMsgID       []uint32      `yaml:"ignoreMsgID"`
+	HeartbeatInterval time.Duration `yaml:"heartbeatInterval"`
 }
 
-type APIData struct {
-	ID  string         `yaml:"id"`  // 消息号，支持 0x 前缀。
-	Msg map[string]any `yaml:"msg"` // Protobuf 消息字段，按 protojson 字段名填写。
+type ApiData struct {
+	ID  string         `yaml:"id"`
+	Msg map[string]any `yaml:"msg"`
 }
 
-func loadConfig(path string) (Config, error) {
-	cfg := Config{}
+func parseConfigYaml(path string) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return cfg, err
+		fmt.Printf("read config yaml failed: %v\n", err)
+		return err
 	}
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return cfg, err
+	GConfigYaml = &ConfigYaml{}
+	if err := yaml.Unmarshal(data, GConfigYaml); err != nil {
+		fmt.Printf("parse config yaml failed: %v\n", err)
+		return err
 	}
-	if !filepath.IsAbs(cfg.APIPath) {
-		cfg.APIPath = filepath.Join(filepath.Dir(path), cfg.APIPath)
+	if GConfigYaml.HeartbeatInterval <= 0 {
+		GConfigYaml.HeartbeatInterval = 10 * time.Second
 	}
-	if cfg.ProtoPath != "" && !filepath.IsAbs(cfg.ProtoPath) {
-		cfg.ProtoPath = filepath.Join(filepath.Dir(path), cfg.ProtoPath)
+	if GConfigYaml.ProtoPath != "" && !filepath.IsAbs(GConfigYaml.ProtoPath) {
+		GConfigYaml.ProtoPath = filepath.Join(filepath.Dir(path), GConfigYaml.ProtoPath)
 	}
-	return cfg, nil
+	return nil
 }
 
-// loadAPI 读取 api.yaml，返回命令名到消息定义的映射。
-func loadAPI(path string) (map[string]APIData, error) {
-	data := map[string]APIData{}
+func loadAPI(path string) (map[string]ApiData, error) {
+	data := map[string]ApiData{}
 	file, err := os.Open(path)
 	if err != nil {
 		return data, err
@@ -54,4 +54,12 @@ func loadAPI(path string) (map[string]APIData, error) {
 		return data, err
 	}
 	return data, nil
+}
+
+func buildIgnoreMsgID(ids []uint32) map[uint32]struct{} {
+	m := make(map[uint32]struct{}, len(ids))
+	for _, id := range ids {
+		m[id] = struct{}{}
+	}
+	return m
 }
