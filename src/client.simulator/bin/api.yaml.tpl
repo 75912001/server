@@ -23,3 +23,9 @@ UserOfflineReq:
   id: 0x000003
   msg:
     reason: 1
+
+#0x00000E#client->gateway#创建用户-请求
+UserCreateReq:
+  id: 0x00000E
+  msg:
+    reason: 1

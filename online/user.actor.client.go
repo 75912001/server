@@ -23,7 +23,7 @@ func (p *User) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		p.onUserCreateReq(gateway, pkt)
 	default:
 		if p.userRecord == nil || p.userRecord.GetUid() == 0 {
-			p.sendClientRes(gateway, pkt, uint32(msgID), common.ECOnlineUserNotCreated.Code(), nil)
+			p.sendClientErr(gateway, pkt, uint32(msgID), common.ECOnlineUserNotCreated.Code())
 		}
 		// xlog.GLog.Warnf("unknown client packet uid:%d messageID:%d", p.uid, pkt.GetMessageId())
 	}
@@ -36,19 +36,17 @@ func (p *User) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 func (p *User) onUserCreateReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	var req pb.UserCreateReq
 	if err := proto.Unmarshal(pkt.GetBody(), &req); err != nil {
-		p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.InvalidArgument.Code(), &pb.UserCreateRes{})
+		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
 	if p.userRecord != nil && p.userRecord.GetUid() != 0 {
-		p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.AlreadyExists.Code(), &pb.UserCreateRes{
-			UserRecord: p.userRecord,
-		})
+		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.AlreadyExists.Code())
 		return
 	}
 	userRecord := &pb.UserRecord{Uid: p.uid}
 	if err := unaryCacheSetUserRecord(p.uid, userRecord); err != nil {
 		xlog.GLog.Errorf("set user record failed uid:%d err:%v", p.uid, err)
-		p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.Internal.Code(), &pb.UserCreateRes{})
+		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.Internal.Code())
 		return
 	}
 	p.userRecord = userRecord
@@ -72,6 +70,21 @@ func (p *User) sendClientRes(gateway *Gateway, pkt *pb.OnlineClientPacket, messa
 				ResultId:  resultID,
 				Key:       p.uid,
 				Body:      body,
+			},
+		},
+	})
+}
+
+func (p *User) sendClientErr(gateway *Gateway, pkt *pb.OnlineClientPacket, messageID uint32, resultID uint32) {
+	gateway.Send(&pb.OnlineTunnelFrame{
+		Uid: p.uid,
+		Payload: &pb.OnlineTunnelFrame_ClientPacket{
+			ClientPacket: &pb.OnlineClientPacket{
+				MessageId: messageID,
+				SessionId: pkt.GetSessionId(),
+				ResultId:  resultID,
+				Key:       p.uid,
+				Body:      nil,
 			},
 		},
 	})
