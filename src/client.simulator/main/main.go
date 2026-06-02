@@ -7,15 +7,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
-
-	common "server/common"
 
 	xconfig "github.com/75912001/xlib/config"
 	xconfigconstants "github.com/75912001/xlib/config/constants"
 	xcontrol "github.com/75912001/xlib/control"
 	xlog "github.com/75912001/xlib/log"
-	xnettcp "github.com/75912001/xlib/net/tcp"
 	xpacket "github.com/75912001/xlib/packet"
 	xruntime "github.com/75912001/xlib/runtime"
 	xruntimeconstants "github.com/75912001/xlib/runtime/constants"
@@ -51,42 +47,35 @@ func main() {
 	if err = parseConfigYaml(filepath.Join(executablePath, "config.yaml")); err != nil {
 		panic(err)
 	}
-	GetClient().ignoreMsgID = buildIgnoreMsgID(GConfigYaml.IgnoreMsgID)
-	GetClient().iEventMgr.Start()
+	appCtx, cancel := context.WithCancel(context.Background())
+	GRobotManager = NewRobotManager()
+	GRobotManager.StartEventLoop()
+	xtimer.GTimer = xtimer.NewTimer()
+	if err = xtimer.GTimer.Start(appCtx); err != nil {
+		panic("timer start err")
+	}
+	panel, err := StartControlPanel(appCtx, GRobotManager)
+	if err != nil {
+		ColorPrintf(Red, "start control panel failed: %v\n", err)
+		log.Errorf("start control panel failed: %v", err)
+	}
 	defer func() {
+		cancel()
+		if panel != nil {
+			panel.Stop()
+		}
+		GRobotManager.Stop()
 		if err = stopServiceDiscovery(); err != nil {
 			panic(err)
 		}
+		xtimer.GTimer.Stop()
 	}()
-	if err = startServiceDiscovery(context.Background()); err != nil {
+	if err = startServiceDiscovery(appCtx); err != nil {
 		panic(err)
 	}
-	gatewayAddr, err := waitGatewayAddr(5 * time.Second)
-	if err != nil {
+	if err = GRobotManager.Start(appCtx); err != nil {
 		panic(err)
 	}
-	GetClient().gatewayAddr = gatewayAddr
-	xtimer.GTimer = xtimer.NewTimer()
-	if err = xtimer.GTimer.Start(context.Background()); err != nil {
-		panic("timer start err")
-	}
-	defer xtimer.GTimer.Stop()
-
-	GetClient().TCP = xnettcp.NewClient(GetClient())
-	opts := xnettcp.NewConnectOptions().
-		WithAddress(gatewayAddr).
-		WithSendChanCapacity(1000).
-		WithHeaderStrategy(&common.DefaultHeaderStrategy{}).
-		WithIOut(GetClient().iEventMgr)
-	if err = GetClient().TCP.Connect(context.Background(), opts); err != nil {
-		ColorPrintf(Red, "connect fail: %v\n", err)
-		panic(err)
-	}
-	GetClient().Remote = GetClient().TCP.IRemote
-	GetClient().iEventMgr.Send(&xcontrol.Event{
-		ISwitch:   xcontrol.NewSwitchButton(true),
-		ICallBack: xcontrol.NewCallBack(func(args ...any) error { return GetClient().OnConnect(GetClient().Remote) }),
-	})
 
 	reader := bufio.NewReader(os.Stdin)
 	for {
@@ -96,17 +85,12 @@ func main() {
 			continue
 		}
 		command = strings.TrimSpace(command)
-		switch command {
-		case "":
-			continue
-		case "quit", "exit":
-			GetClient().Close()
-			return
-		case "list":
-			printAPIList()
+		if command == "" {
 			continue
 		}
-		GetClient().iEventMgr.Send(&EventCommand{Command: command})
+		if GRobotManager.ExecuteCommand(command) {
+			return
+		}
 	}
 }
 

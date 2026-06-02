@@ -12,11 +12,13 @@ import (
 var GConfigYaml *ConfigYaml
 
 type ConfigYaml struct {
-	Etcd              EtcdConfig    `yaml:"etcd"`
-	ProtoPath         string        `yaml:"protoPath"`
-	IgnoreMsgID       []uint32      `yaml:"ignoreMsgID"`
-	HeartbeatInterval time.Duration `yaml:"heartbeatInterval"`
-	CacheTokenExpire  uint64        `yaml:"cacheTokenExpireSecond"`
+	Etcd              EtcdConfig         `yaml:"etcd"`
+	ProtoPath         string             `yaml:"protoPath"`
+	IgnoreMsgID       []uint32           `yaml:"ignoreMsgID"`
+	HeartbeatInterval time.Duration      `yaml:"heartbeatInterval"`
+	CacheTokenExpire  uint64             `yaml:"cacheTokenExpireSecond"`
+	Robot             RobotConfig        `yaml:"robot"`
+	ControlPanel      ControlPanelConfig `yaml:"controlPanel"`
 }
 
 type EtcdConfig struct {
@@ -53,6 +55,8 @@ func parseConfigYaml(path string) error {
 	if GConfigYaml.Etcd.ProjectName == "" {
 		GConfigYaml.Etcd.ProjectName = "project"
 	}
+	normalizeRobotConfig(GConfigYaml)
+	normalizeControlPanelConfig(GConfigYaml)
 	if GConfigYaml.ProtoPath != "" && !filepath.IsAbs(GConfigYaml.ProtoPath) {
 		GConfigYaml.ProtoPath = filepath.Join(filepath.Dir(path), GConfigYaml.ProtoPath)
 	}

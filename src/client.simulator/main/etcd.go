@@ -54,13 +54,16 @@ func startServiceDiscovery(ctx context.Context) error {
 	if len(GConfigYaml.Etcd.Endpoints) == 0 {
 		return errors.WithMessage(xerror.Config, "etcd endpoints is empty")
 	}
+	if GRobotManager == nil || GRobotManager.iEventMgr == nil {
+		return errors.WithMessage(xerror.Config, "robot manager is nil")
+	}
 	xgrpcprotoregistry.Init()
 	xgrpcselector.Init()
 	xetcd.GEtcd = xetcd.NewEtcd(xetcd.NewOptions().
 		WithEndpoints(GConfigYaml.Etcd.Endpoints).
 		WithTTL(GConfigYaml.Etcd.TTLDuration).
 		WithWatchKeyPrefix(xetcd.GenPrefixKey(GConfigYaml.Etcd.ProjectName)).
-		WithIOut(GetClient().iEventMgr).
+		WithIOut(GRobotManager.iEventMgr).
 		WithAddCallback(xcontrol.NewCallBack(onServiceEtcdAdd)).
 		WithUpdateCallback(xcontrol.NewCallBack(onServiceEtcdUpdate)).
 		WithDelCallback(xcontrol.NewCallBack(onServiceEtcdDel)))
@@ -183,12 +186,8 @@ func selectDiscoveredGatewayAddrLocked() string {
 	if xruntime.IsDebug() {
 		target := rand.Intn(len(discoveredGatewayMap))
 		index := 0
-		for key, addr := range discoveredGatewayMap {
+		for _, addr := range discoveredGatewayMap {
 			if index == target {
-				ColorPrintf(Yellow, "todo menglc debug random select gateway key=%s addr=%s\n", key, addr)
-				if log != nil {
-					log.Warnf("todo menglc debug random select gateway key=%s addr=%s", key, addr)
-				}
 				return addr
 			}
 			index++

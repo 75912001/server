@@ -19,13 +19,15 @@ func init() {
 func registerMessages() {
 	registerMessage(uint32(pb.MsgIDUser_UserVerifyReq_CMD), func() proto.Message { return &pb.UserVerifyReq{} })
 	registerMessage(uint32(pb.MsgIDUser_UserVerifyRes_CMD), func() proto.Message { return &pb.UserVerifyRes{} })
-	registerMessage(uint32(pb.MsgIDUser_UserCreateReq_CMD), func() proto.Message { return &pb.UserCreateReq{} })
-	registerMessage(uint32(pb.MsgIDUser_UserCreateRes_CMD), func() proto.Message { return &pb.UserCreateRes{} })
 	registerMessage(uint32(pb.MsgIDUser_UserOfflineReq_CMD), func() proto.Message { return &pb.UserOfflineReq{} })
 	registerMessage(uint32(pb.MsgIDUser_UserHeartbeatReq_CMD), func() proto.Message { return &pb.UserHeartbeatReq{} })
 	registerMessage(uint32(pb.MsgIDUser_UserHeartbeatRes_CMD), func() proto.Message { return &pb.UserHeartbeatRes{} })
 	registerMessage(uint32(pb.MsgIDUser_UserRecordReq_CMD), func() proto.Message { return &pb.UserRecordReq{} })
 	registerMessage(uint32(pb.MsgIDUser_UserRecordRes_CMD), func() proto.Message { return &pb.UserRecordRes{} })
+	registerMessage(uint32(pb.MsgIDUser_UserCreateReq_CMD), func() proto.Message { return &pb.UserCreateReq{} })
+	registerMessage(uint32(pb.MsgIDUser_UserCreateRes_CMD), func() proto.Message { return &pb.UserCreateRes{} })
+	registerMessage(uint32(pb.MsgIDUser_RobotPingReq_CMD), func() proto.Message { return &pb.RobotPingReq{} })
+	registerMessage(uint32(pb.MsgIDUser_RobotPingRes_CMD), func() proto.Message { return &pb.RobotPingRes{} })
 }
 
 func registerMessage(messageID uint32, newProtoMessage func() proto.Message) {

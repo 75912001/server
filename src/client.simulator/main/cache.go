@@ -4,18 +4,18 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	pb "server/proto/pb"
 
 	xerror "github.com/75912001/xlib/error"
 	xgrpcproto "github.com/75912001/xlib/grpc/proto"
 	"github.com/pkg/errors"
-	grpccodes "google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 )
 
 func cacheVerifyToken(uid uint64) string {
-	return fmt.Sprintf("token.%d", uid)
+	return fmt.Sprintf("robot.%d.%d", uid, time.Now().UnixNano())
 }
 
 func cacheSetVerifyUserToken(uid uint64) (string, error) {
@@ -32,9 +32,6 @@ func cacheSetVerifyUserToken(uid uint64) (string, error) {
 	if err != nil {
 		s, ok := grpcstatus.FromError(err)
 		if ok {
-			if s.Code() == grpccodes.AlreadyExists {
-				return "", grpcstatus.Error(s.Code(), s.Message())
-			}
 			return "", errors.WithMessagef(err, "CacheSetVerifyUserToken uid:%d token:%s code:%v message:%s", uid, token, s.Code(), s.Message())
 		}
 		return "", errors.WithMessagef(err, "CacheSetVerifyUserToken uid:%d token:%s", uid, token)
