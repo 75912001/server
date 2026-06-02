@@ -16,10 +16,23 @@ type UserMgr struct {
 
 func (p *UserMgr) Login(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, error) {
 	uid := req.GetUid()
-	user, ok := p.users.Find(uid)
-	if !ok {
+	user, existed := p.users.Find(uid)
+	if !existed {
 		user = newUser(uid)
 		p.users.Add(uid, user)
 	}
-	return user.PostLogin(req)
+	res, err := user.PostLogin(req)
+	if err != nil {
+		current, ok := p.users.Find(uid)
+		if !existed {
+			if !ok || current == user {
+				p.users.Del(uid)
+			}
+			user.Stop()
+		} else if !ok {
+			user.Stop()
+		}
+		return nil, err
+	}
+	return res, nil
 }
