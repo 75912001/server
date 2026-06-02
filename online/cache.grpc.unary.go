@@ -63,6 +63,21 @@ func unaryCacheGetUserRecord(uid uint64) (*pb.CacheGetUserRecordRes, error) {
 	return res, nil
 }
 
+func unaryCacheSetUserRecord(uid uint64, userRecord *pb.UserRecord) error {
+	_, err := pb.GXCacheServiceService.CacheSetUserRecord(context.Background(), &pb.CacheSetUserRecordReq{
+		Uid:        uid,
+		UserRecord: userRecord,
+	})
+	if err != nil {
+		s, ok := grpcstatus.FromError(err)
+		if ok {
+			return errors.WithMessagef(err, "CacheSetUserRecord uid:%d, code:%v, message:%s", uid, s.Code(), s.Message())
+		}
+		return errors.WithMessagef(err, "CacheSetUserRecord uid:%d", uid)
+	}
+	return nil
+}
+
 type cacheUserSession struct {
 	gatewayKey string
 	onlineKey  string
