@@ -46,3 +46,14 @@ message UserRecordReq {
 message UserRecordRes {
   UserRecord user_record = 1; // 用户数据
 }
+
+//0x00000E#client->gateway#创建用户-请求
+message UserCreateReq
+{
+}
+
+//0x00000F#gateway->client#创建用户-回复
+message UserCreateRes
+{
+  UserRecord user_record = 1;
+}

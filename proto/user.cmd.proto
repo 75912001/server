@@ -13,4 +13,6 @@ enum MsgIDUser {
   UserHeartbeatRes_CMD = 0x00000B; //0x00000B#gateway->client#心跳-回复
   UserRecordReq_CMD = 0x00000C; //0x00000C#client->gateway#请求用户数据-请求
   UserRecordRes_CMD = 0x00000D; //0x00000D#gateway->client#请求用户数据-回复
+  UserCreateReq_CMD = 0x00000E; //0x00000E#client->gateway#创建用户-请求
+  UserCreateRes_CMD = 0x00000F; //0x00000F#gateway->client#创建用户-回复
 }
