@@ -20,8 +20,10 @@ func (p *User) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_UserRecordRes_CMD), xerror.Success.Code(), &pb.UserRecordRes{
 			UserRecord: p.userRecord,
 		})
+		return
 	case pb.MsgIDUser_UserCreateReq_CMD:
 		p.onUserCreateReq(gateway, pkt)
+		return
 	default:
 		if p.userRecord == nil || p.userRecord.GetUid() == 0 {
 			p.sendClientErr(gateway, pkt, uint32(msgID), common.ECOnlineUserNotCreated.Code())
@@ -32,8 +34,10 @@ func (p *User) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	switch msgID {
 	case pb.MsgIDUser_RobotPingReq_CMD:
 		p.onRobotPingReq(gateway, pkt)
+		return
 	default:
 		xlog.GLog.Warnf("unknown client packet uid:%d messageID:%d", p.uid, pkt.GetMessageId())
+		return
 	}
 }
 
