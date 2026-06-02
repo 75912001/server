@@ -103,3 +103,17 @@ func unaryCacheSetUserSession(uid uint64, gatewayKey string, onlineKey string) e
 	}
 	return nil
 }
+
+func unaryCacheDelUserSession(uid uint64) error {
+	_, err := pb.GXCacheServiceService.CacheDelUserSessionRecord(context.Background(), &pb.CacheDelUserSessionRecordReq{
+		Uid: uid,
+	})
+	if err != nil {
+		s, ok := grpcstatus.FromError(err)
+		if ok {
+			return errors.WithMessagef(err, "CacheDelUserSessionRecord uid:%d, code:%v, message:%s", uid, s.Code(), s.Message())
+		}
+		return errors.WithMessagef(err, "CacheDelUserSessionRecord uid:%d", uid)
+	}
+	return nil
+}
