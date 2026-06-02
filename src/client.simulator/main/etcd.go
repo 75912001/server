@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 	xgrpcselector "github.com/75912001/xlib/grpc/selector"
 	xmap "github.com/75912001/xlib/map"
 	xnetcommon "github.com/75912001/xlib/net/common"
+	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
 )
 
@@ -153,7 +155,7 @@ func clearDiscoveredGateway(key string) {
 
 func waitGatewayAddr(timeout time.Duration) (string, error) {
 	discoveredGatewayMu.Lock()
-	addr := discoveredGatewayAddr
+	addr := selectDiscoveredGatewayAddrLocked()
 	discoveredGatewayMu.Unlock()
 	if addr != "" {
 		return addr, nil
@@ -161,7 +163,10 @@ func waitGatewayAddr(timeout time.Duration) (string, error) {
 	timer := time.NewTimer(timeout)
 	defer timer.Stop()
 	select {
-	case addr = <-discoveredGatewayChan:
+	case <-discoveredGatewayChan:
+		discoveredGatewayMu.Lock()
+		addr = selectDiscoveredGatewayAddrLocked()
+		discoveredGatewayMu.Unlock()
 		if addr == "" {
 			return "", errors.WithMessage(xerror.NotFound, "gateway addr is empty")
 		}
@@ -169,6 +174,33 @@ func waitGatewayAddr(timeout time.Duration) (string, error) {
 	case <-timer.C:
 		return "", errors.WithMessage(xerror.Timeout, "wait gateway addr timeout")
 	}
+}
+
+func selectDiscoveredGatewayAddrLocked() string {
+	if len(discoveredGatewayMap) == 0 {
+		return ""
+	}
+	if xruntime.IsDebug() {
+		target := rand.Intn(len(discoveredGatewayMap))
+		index := 0
+		for key, addr := range discoveredGatewayMap {
+			if index == target {
+				ColorPrintf(Yellow, "todo menglc debug random select gateway key=%s addr=%s\n", key, addr)
+				if log != nil {
+					log.Warnf("todo menglc debug random select gateway key=%s addr=%s", key, addr)
+				}
+				return addr
+			}
+			index++
+		}
+	}
+	if discoveredGatewayAddr != "" {
+		return discoveredGatewayAddr
+	}
+	for _, addr := range discoveredGatewayMap {
+		return addr
+	}
+	return ""
 }
 
 func gatewayTCPAddr(valueJson *xetcd.ValueJson) string {

@@ -67,6 +67,7 @@ func (p *Client) OnPacket(remote xnetcommon.IRemote, packet xpacket.IPacket) err
 }
 
 func (p *Client) handleProtoPacket(packet *xpacket.Packet) error {
+	p.applyPacketState(packet)
 	if _, ok := p.ignoreMsgID[packet.Header.MessageID]; ok {
 		return nil
 	}
@@ -96,6 +97,10 @@ func (p *Client) handleProtoPacket(packet *xpacket.Packet) error {
 		log.Infof("\n======recv message======\n%s\nHeader: %s\nMessage: %s", msgName, headerJson, body)
 	}
 
+	return nil
+}
+
+func (p *Client) applyPacketState(packet *xpacket.Packet) {
 	switch msg := packet.PBMessage.(type) {
 	case *pb.UserVerifyRes:
 		if packet.Header.ResultID == 0 {
@@ -103,9 +108,10 @@ func (p *Client) handleProtoPacket(packet *xpacket.Packet) error {
 			p.SendHeartBeat()
 		}
 	case *pb.UserHeartbeatRes:
-		p.nextSession = msg.GetNextSession()
+		if packet.Header.ResultID == 0 {
+			p.nextSession = msg.GetNextSession()
+		}
 	}
-	return nil
 }
 
 func (p *Client) OnDisconnect(remote xnetcommon.IRemote) error {

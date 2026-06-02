@@ -13,6 +13,7 @@ protoPath: ../../../proto
 
 # 收包打印时忽略的消息号列表。
 ignoreMsgID:
+  - 0xb
   #- 0x10000
   #- 0x20000
 

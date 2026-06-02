@@ -1,8 +1,10 @@
 package main
 
 import (
-	gatewaycommon "server/common"
+	"math/rand"
 	"sync/atomic"
+
+	gatewaycommon "server/common"
 
 	xerror "github.com/75912001/xlib/error"
 	xetcd "github.com/75912001/xlib/etcd"
@@ -108,6 +110,33 @@ func (p *OnlineMgr) GetByAvailableLoad() (*Online, error) {
 		return nil, errors.WithMessagef(xerror.Unavailable, "online available load not found %v", xruntime.Location())
 	}
 	return selected, nil
+}
+
+func (p *OnlineMgr) GetByRandom() (*Online, error) {
+	var candidates []*Online
+	p.m.Foreach(func(_ string, online *Online) bool {
+		if online == nil || online.XOnlineService == nil || online.GetClientConn() == nil {
+			return true
+		}
+		if atomic.LoadUint32(&online.AvailableLoad) == 0 {
+			return true
+		}
+		candidates = append(candidates, online)
+		return true
+	})
+	if len(candidates) == 0 {
+		return nil, errors.WithMessagef(xerror.Unavailable, "online available load not found %v", xruntime.Location())
+	}
+	online := candidates[rand.Intn(len(candidates))]
+	xlog.GLog.Warnf("todo menglc debug random select online key:%s availableLoad:%d", online.Key, atomic.LoadUint32(&online.AvailableLoad))
+	return online, nil
+}
+
+func (p *OnlineMgr) GetForLogin() (*Online, error) {
+	if xruntime.IsDebug() {
+		return p.GetByRandom()
+	}
+	return p.GetByAvailableLoad()
 }
 
 // GetByShardKey 通过一致性哈希选取一个 online 实例

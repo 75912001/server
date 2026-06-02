@@ -19,6 +19,8 @@ func init() {
 func registerMessages() {
 	registerMessage(uint32(pb.MsgIDUser_UserVerifyReq_CMD), func() proto.Message { return &pb.UserVerifyReq{} })
 	registerMessage(uint32(pb.MsgIDUser_UserVerifyRes_CMD), func() proto.Message { return &pb.UserVerifyRes{} })
+	registerMessage(uint32(pb.MsgIDUser_UserCreateReq_CMD), func() proto.Message { return &pb.UserCreateReq{} })
+	registerMessage(uint32(pb.MsgIDUser_UserCreateRes_CMD), func() proto.Message { return &pb.UserCreateRes{} })
 	registerMessage(uint32(pb.MsgIDUser_UserOfflineReq_CMD), func() proto.Message { return &pb.UserOfflineReq{} })
 	registerMessage(uint32(pb.MsgIDUser_UserHeartbeatReq_CMD), func() proto.Message { return &pb.UserHeartbeatReq{} })
 	registerMessage(uint32(pb.MsgIDUser_UserHeartbeatRes_CMD), func() proto.Message { return &pb.UserHeartbeatRes{} })

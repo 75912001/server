@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	pb "server/proto/pb"
 
 	xetcd "github.com/75912001/xlib/etcd"
+	xgrpcproto "github.com/75912001/xlib/grpc/proto"
 	grpccodes "google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 )
@@ -117,7 +119,8 @@ func (p *User) kickGateway(gatewayKey string) error {
 	if err != nil {
 		return err
 	}
-	_, err = client.GatewayUserOffline(context.Background(), &pb.GatewayUserOfflineReq{
+	ctx := xgrpcproto.SetFromOutgoingContext(context.Background(), xgrpcproto.ShardKeyFieldNameDefault, strconv.FormatUint(p.uid, 10))
+	_, err = client.GatewayUserOffline(ctx, &pb.GatewayUserOfflineReq{
 		Uid:    p.uid,
 		Reason: 1,
 		Msg:    "duplicate login",
