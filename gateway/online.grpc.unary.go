@@ -22,7 +22,6 @@ import (
 )
 
 // unaryOnlineUserOnline 处理控制面 Unary RPC：OnlineUserOnline
-// selector.Sel 内部按 uid 哈希自动选取目标 online 实例，无需调用方预先选连接
 func unaryOnlineUserOnline(
 	remote xnetcommon.IRemote,
 	header *xpacket.Header,
@@ -80,7 +79,7 @@ func unaryOnlineUserOnline(
 
 	xlog.GLog.Tracef(fmt.Sprintf("OnlineUserOnline uid:%d", uid))
 
-	// 校验通过：绑定 User 到本次哈希命中的 online 实例
+	// 校验通过：绑定 User 到 online 实例
 	// 停止「未校验超时」定时器，启动心跳超时定时器。
 	u := GUserMgr.Get(remote)
 	if u == nil || !remote.IsConnect() {
