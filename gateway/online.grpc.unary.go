@@ -60,7 +60,8 @@ func unaryOnlineUserOnline(
 		return errors.WithMessagef(err, "OnlineUserOnline select online by available load uid:%v fail %v", req.GetUid(), xruntime.Location())
 	}
 
-	onlineRes, err := pb.NewOnlineServiceClient(online.GetClientConn()).OnlineUserOnline(context.Background(), req)
+	ctx := xgrpcproto.SetFromOutgoingContext(context.Background(), xgrpcproto.ShardKeyFieldNameDefault, strconv.FormatUint(uid, 10))
+	onlineRes, err := pb.NewOnlineServiceClient(online.GetClientConn()).OnlineUserOnline(ctx, req)
 	if err != nil {
 		_ = sendClientRes(
 			remote,
