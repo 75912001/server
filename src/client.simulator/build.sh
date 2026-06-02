@@ -1,24 +1,20 @@
 #!/bin/bash
 
-# 获取当前脚本文件所在路径的绝对路径
-currentPath=$(realpath "$(dirname "$0")")
-echo "currentPath:${currentPath}"
+scriptDir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+serverPath=$(cd "${scriptDir}/../.." && pwd)
+simulatorPath="src/client.simulator"
 
-# 模拟器目录
-simulatorPath="${currentPath}"
-echo "simulatorPath:${simulatorPath}"
-
-# server 仓库根目录
-serverPath=$(dirname "$(dirname "${simulatorPath}")")
 echo "serverPath:${serverPath}"
+echo "simulatorPath:${serverPath}/${simulatorPath}"
 
 cd "${serverPath}" || exit 1
+export GOCACHE="${GOCACHE:-${serverPath}/.gocache}"
 
-# 编译客户端模拟器
-go build -o "${simulatorPath}/bin/client.simulator.exe" ./src/client.simulator/main
+go build -buildvcs=false -o "${simulatorPath}/bin/client.simulator.exe" ./${simulatorPath}/main
 if [ $? -ne 0 ]; then
     echo -e "\e[91m build client.simulator failed.\e[0m"
     exit 1
 fi
 
-echo -e "\e[92m build client.simulator successfully: ${simulatorPath}/bin/client.simulator.exe\e[0m"
+echo -e "\e[92m build client.simulator successfully.\e[0m"
+exit 0
