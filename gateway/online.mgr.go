@@ -2,7 +2,9 @@ package main
 
 import (
 	gatewaycommon "server/common"
+	"sync/atomic"
 
+	xerror "github.com/75912001/xlib/error"
 	xetcd "github.com/75912001/xlib/etcd"
 	xgrpcresolve "github.com/75912001/xlib/grpc/resolve"
 	xlog "github.com/75912001/xlib/log"
@@ -44,6 +46,7 @@ func (p *OnlineMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	online.ServerID = serverID
 	online.PackageName = packageName
 	online.ServiceName = serviceName
+	online.AvailableLoad = valueJson.AvailableLoad
 
 	p.m.Add(key, online)
 	// Online 实现 IClientConn，直接注册到 resolve
@@ -70,6 +73,41 @@ func (p *OnlineMgr) Remove(key string) {
 	p.m.Del(key)
 
 	xlog.GLog.Infof("OnlineMgr.removeInfo RemoveServer key:%s total:%v", key, p.m.Len())
+}
+
+func (p *OnlineMgr) UpdateAvailableLoad(key string, valueJson *xetcd.ValueJson) {
+	if valueJson == nil {
+		return
+	}
+	online, ok := p.m.Find(key)
+	if !ok || online == nil {
+		return
+	}
+	atomic.StoreUint32(&online.AvailableLoad, valueJson.AvailableLoad)
+	xlog.GLog.Infof("OnlineMgr.UpdateAvailableLoad key:%s availableLoad:%d", key, valueJson.AvailableLoad)
+}
+
+func (p *OnlineMgr) GetByAvailableLoad() (*Online, error) {
+	var selected *Online
+	var selectedLoad uint32
+	p.m.Foreach(func(key string, online *Online) bool {
+		if online == nil || online.XOnlineService == nil || online.GetClientConn() == nil {
+			return true
+		}
+		availableLoad := atomic.LoadUint32(&online.AvailableLoad)
+		if availableLoad == 0 {
+			return true
+		}
+		if selected == nil || availableLoad > selectedLoad || (availableLoad == selectedLoad && key < selected.Key) {
+			selected = online
+			selectedLoad = availableLoad
+		}
+		return true
+	})
+	if selected == nil {
+		return nil, errors.WithMessagef(xerror.Unavailable, "online available load not found %v", xruntime.Location())
+	}
+	return selected, nil
 }
 
 // GetByShardKey 通过一致性哈希选取一个 online 实例

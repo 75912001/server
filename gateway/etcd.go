@@ -35,6 +35,20 @@ func onEtcdAdd(args ...any) error {
 
 // onEtcdUpdate 服务信息更新
 func onEtcdUpdate(args ...any) error {
+	key := args[0].(string)
+	valueJson := args[1].(*xetcd.ValueJson)
+	if valueJson == nil {
+		return nil
+	}
+	msgType, _, serverName, _ := xetcd.Parse(key)
+	if msgType != xetcdconstants.WatchMsgTypeServer {
+		return nil
+	}
+	switch serverName {
+	case common.OnlineServerName:
+		GOnlineMgr.UpdateAvailableLoad(key, valueJson)
+		xlog.GLog.Infof("onEtcdUpdate key:%s availableLoad:%d", key, valueJson.AvailableLoad)
+	}
 	return nil
 }
 
