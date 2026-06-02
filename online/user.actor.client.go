@@ -3,6 +3,7 @@ package main
 import (
 	"server/common"
 	pb "server/proto/pb"
+	"time"
 
 	xerror "github.com/75912001/xlib/error"
 	xlog "github.com/75912001/xlib/log"
@@ -24,13 +25,30 @@ func (p *User) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	default:
 		if p.userRecord == nil || p.userRecord.GetUid() == 0 {
 			p.sendClientErr(gateway, pkt, uint32(msgID), common.ECOnlineUserNotCreated.Code())
+			return
 		}
 		// xlog.GLog.Warnf("unknown client packet uid:%d messageID:%d", p.uid, pkt.GetMessageId())
 	}
 	switch msgID {
-
+	case pb.MsgIDUser_RobotPingReq_CMD:
+		p.onRobotPingReq(gateway, pkt)
+	default:
+		xlog.GLog.Warnf("unknown client packet uid:%d messageID:%d", p.uid, pkt.GetMessageId())
 	}
+}
 
+func (p *User) onRobotPingReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
+	var req pb.RobotPingReq
+	if err := proto.Unmarshal(pkt.GetBody(), &req); err != nil {
+		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_RobotPingRes_CMD), xerror.InvalidArgument.Code())
+		return
+	}
+	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_RobotPingRes_CMD), xerror.Success.Code(), &pb.RobotPingRes{
+		Seq:        req.GetSeq(),
+		ClientTime: req.GetClientTime(),
+		ServerTime: time.Now().UnixMilli(),
+		Payload:    req.GetPayload(),
+	})
 }
 
 func (p *User) onUserCreateReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
