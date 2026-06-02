@@ -86,7 +86,30 @@ for i = 1, recordCount do
 	redis.call("HSET", KEYS[1], ARGV[index], ARGV[index + 1])
 	index = index + 2
 end
+local expireSecond = tonumber(ARGV[index])
+if expireSecond > 0 then
+	redis.call("EXPIRE", KEYS[1], expireSecond)
+end
 return 1
+`
+
+const expireUserSessionRecordScript = `
+local expectedCount = tonumber(ARGV[1])
+local index = 2
+for i = 1, expectedCount do
+	local field = ARGV[index]
+	local expected = ARGV[index + 1]
+	index = index + 2
+	local current = redis.call("HGET", KEYS[1], field)
+	if current == false then
+		current = ""
+	end
+	if current ~= expected then
+		return 0
+	end
+end
+local expireSecond = tonumber(ARGV[index])
+return redis.call("EXPIRE", KEYS[1], expireSecond)
 `
 
 const delUserSessionRecordScript = `
@@ -108,9 +131,9 @@ redis.call("DEL", KEYS[1])
 return 1
 `
 
-func (p *Redis) ReplaceUserSessionRecord(ctx context.Context, uid uint64, expected map[string]string, records map[string]string) (bool, error) {
+func (p *Redis) ReplaceUserSessionRecord(ctx context.Context, uid uint64, expected map[string]string, records map[string]string, expireSecond uint64) (bool, error) {
 	key := RedisKeyUserSession(uid)
-	args := make([]any, 0, 2+len(expected)*2+len(records)*2)
+	args := make([]any, 0, 3+len(expected)*2+len(records)*2)
 	args = append(args, strconv.Itoa(len(expected)))
 	for field, value := range expected {
 		args = append(args, field, value)
@@ -119,6 +142,7 @@ func (p *Redis) ReplaceUserSessionRecord(ctx context.Context, uid uint64, expect
 	for field, value := range records {
 		args = append(args, field, value)
 	}
+	args = append(args, strconv.FormatUint(expireSecond, 10))
 	result, err := p.client.Eval(ctx, replaceUserSessionRecordScript, []string{key}, args...).Result()
 	if err != nil {
 		return false, errors.WithMessagef(err, "replace user session record in redis failed, uid: %d, expected: %v, records: %v %v", uid, expected, records, xruntime.Location())
@@ -158,8 +182,21 @@ func redisScriptResultIsOK(result any) bool {
 	}
 }
 
-func (p *Redis) SetUserSessionExpire(ctx context.Context, uid uint64, expire time.Duration) (bool, error) {
+func (p *Redis) SetUserSessionExpire(ctx context.Context, uid uint64, expire time.Duration, expected map[string]string) (bool, error) {
 	key := RedisKeyUserSession(uid)
+	if len(expected) != 0 {
+		args := make([]any, 0, 2+len(expected)*2)
+		args = append(args, strconv.Itoa(len(expected)))
+		for field, value := range expected {
+			args = append(args, field, value)
+		}
+		args = append(args, strconv.FormatInt(int64(expire/time.Second), 10))
+		result, err := p.client.Eval(ctx, expireUserSessionRecordScript, []string{key}, args...).Result()
+		if err != nil {
+			return false, errors.WithMessagef(err, "set user session expire to redis failed, uid: %d, expected: %v %v", uid, expected, xruntime.Location())
+		}
+		return redisScriptResultIsOK(result), nil
+	}
 	ok, err := p.client.Expire(ctx, key, expire).Result()
 	if err != nil {
 		return false, errors.WithMessagef(err, "set user session expire to redis failed, uid: %d %v", uid, xruntime.Location())

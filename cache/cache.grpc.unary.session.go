@@ -95,7 +95,7 @@ func (s *cacheGRPCServer) CacheReplaceUserSessionRecord(ctx context.Context, req
 	if !ok || !cacheUserSessionRecordsHas(records, "gatewayKey", "onlineKey", "session", "loginTime") {
 		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	replaced, err := GRedis.ReplaceUserSessionRecord(ctx, uid, expected, records)
+	replaced, err := GRedis.ReplaceUserSessionRecord(ctx, uid, expected, records, req.GetExpireSecond())
 	if err != nil {
 		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
@@ -111,11 +111,23 @@ func (s *cacheGRPCServer) CacheSetUserSessionExpire(ctx context.Context, req *pb
 	if uid == 0 || expireSecond == 0 {
 		return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	ok, err := GRedis.SetUserSessionExpire(ctx, uid, time.Duration(expireSecond)*time.Second)
+	expectedRecords := req.GetExpectedRecords()
+	var expected map[string]string
+	if len(expectedRecords) != 0 {
+		var valid bool
+		expected, valid = cacheUserSessionRecords(expectedRecords)
+		if !valid || !cacheUserSessionRecordsHas(expected, "gatewayKey", "onlineKey", "session") {
+			return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
+		}
+	}
+	ok, err := GRedis.SetUserSessionExpire(ctx, uid, time.Duration(expireSecond)*time.Second, expected)
 	if err != nil {
 		return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	if !ok {
+		if len(expected) != 0 {
+			return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.Aborted, "user session changed")
+		}
 		return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.NotFound, "user session not exist")
 	}
 	return &pb.CacheSetUserSessionExpireRes{}, nil
