@@ -18,6 +18,10 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 	if err != nil {
 		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
+	newSession, err := newCacheUserSession(req.GetGatewayKey(), currentOnlineKey)
+	if err != nil {
+		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
+	}
 	hasOldSession := oldSession.gatewayKey != "" || oldSession.onlineKey != ""
 	if !hasOldSession && p.gatewayID != "" {
 		oldSession.gatewayKey = p.gatewayID
@@ -38,13 +42,16 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 		}
 	}
 	sessionCommitted := false
-	if err := unaryCacheSetUserSession(uid, req.GetGatewayKey(), currentOnlineKey); err != nil {
+	if err := unaryCacheReplaceUserSession(uid, oldSession, newSession); err != nil {
+		if s, ok := grpcstatus.FromError(err); ok && s.Code() == grpccodes.Aborted {
+			return nil, grpcstatus.Error(grpccodes.Aborted, err.Error())
+		}
 		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	sessionCommitted = true
 	userRecord, err := unaryCacheGetUserRecord(req.GetUid())
 	if err != nil {
-		if cleanupErr := p.cleanupCommittedUserSession(uid, sessionCommitted); cleanupErr != nil {
+		if cleanupErr := p.cleanupCommittedUserSession(uid, sessionCommitted, newSession); cleanupErr != nil {
 			return nil, grpcstatus.Error(grpccodes.Internal, fmt.Sprintf("%v; cleanup user session failed: %v", err, cleanupErr))
 		}
 		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
@@ -56,11 +63,11 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 	return &pb.OnlineUserOnlineRes{}, nil
 }
 
-func (p *User) cleanupCommittedUserSession(uid uint64, sessionCommitted bool) error {
+func (p *User) cleanupCommittedUserSession(uid uint64, sessionCommitted bool, session *cacheUserSession) error {
 	if !sessionCommitted {
 		return nil
 	}
-	return unaryCacheDelUserSession(uid)
+	return unaryCacheDelUserSession(uid, session)
 }
 
 func (p *User) kickGateway(gatewayKey string) error {

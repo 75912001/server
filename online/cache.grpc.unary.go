@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"strconv"
 	"time"
 
@@ -44,6 +46,8 @@ func unaryCacheGetUserRecord(uid uint64) (*pb.CacheGetUserRecordRes, error) {
 type cacheUserSession struct {
 	gatewayKey string
 	onlineKey  string
+	session    string
+	loginTime  string
 }
 
 func unaryCacheGetUserSession(uid uint64) (*cacheUserSession, error) {
@@ -52,6 +56,7 @@ func unaryCacheGetUserSession(uid uint64) (*cacheUserSession, error) {
 		Fields: []pb.CacheUserSessionField{
 			pb.CacheUserSessionField_CacheUserSessionField_GatewayKey,
 			pb.CacheUserSessionField_CacheUserSessionField_OnlineKey,
+			pb.CacheUserSessionField_CacheUserSessionField_Session,
 		},
 	})
 	if err != nil {
@@ -71,42 +76,79 @@ func unaryCacheGetUserSession(uid uint64) (*cacheUserSession, error) {
 			session.gatewayKey = record.GetValue()
 		case pb.CacheUserSessionField_CacheUserSessionField_OnlineKey:
 			session.onlineKey = record.GetValue()
+		case pb.CacheUserSessionField_CacheUserSessionField_Session:
+			session.session = record.GetValue()
 		}
 	}
 	return session, nil
 }
 
-func unaryCacheSetUserSession(uid uint64, gatewayKey string, onlineKey string) error {
-	_, err := pb.GXCacheServiceService.CacheSetUserSessionRecord(context.Background(), &pb.CacheSetUserSessionRecordReq{
-		Uid: uid,
-		Records: []*pb.CacheUserSessionRecord{
-			{
-				Field: pb.CacheUserSessionField_CacheUserSessionField_GatewayKey,
-				Value: gatewayKey,
-			},
-			{
-				Field: pb.CacheUserSessionField_CacheUserSessionField_OnlineKey,
-				Value: onlineKey,
-			},
-			{
-				Field: pb.CacheUserSessionField_CacheUserSessionField_LoginTime,
-				Value: strconv.FormatInt(time.Now().UnixMilli(), 10),
-			},
+func newCacheUserSession(gatewayKey string, onlineKey string) (*cacheUserSession, error) {
+	buf := make([]byte, 16)
+	if _, err := rand.Read(buf); err != nil {
+		return nil, errors.WithMessagef(err, "generate login session failed")
+	}
+	return &cacheUserSession{
+		gatewayKey: gatewayKey,
+		onlineKey:  onlineKey,
+		session:    hex.EncodeToString(buf),
+		loginTime:  strconv.FormatInt(time.Now().UnixMilli(), 10),
+	}, nil
+}
+
+func cacheUserSessionExpectedRecords(session *cacheUserSession) []*pb.CacheUserSessionRecord {
+	return []*pb.CacheUserSessionRecord{
+		{
+			Field: pb.CacheUserSessionField_CacheUserSessionField_GatewayKey,
+			Value: session.gatewayKey,
 		},
+		{
+			Field: pb.CacheUserSessionField_CacheUserSessionField_OnlineKey,
+			Value: session.onlineKey,
+		},
+		{
+			Field: pb.CacheUserSessionField_CacheUserSessionField_Session,
+			Value: session.session,
+		},
+	}
+}
+
+func cacheUserSessionRecords(session *cacheUserSession) []*pb.CacheUserSessionRecord {
+	records := cacheUserSessionExpectedRecords(session)
+	records = append(records, &pb.CacheUserSessionRecord{
+		Field: pb.CacheUserSessionField_CacheUserSessionField_LoginTime,
+		Value: session.loginTime,
+	})
+	return records
+}
+
+func unaryCacheReplaceUserSession(uid uint64, expected *cacheUserSession, session *cacheUserSession) error {
+	_, err := pb.GXCacheServiceService.CacheReplaceUserSessionRecord(context.Background(), &pb.CacheReplaceUserSessionRecordReq{
+		Uid:             uid,
+		ExpectedRecords: cacheUserSessionExpectedRecords(expected),
+		Records:         cacheUserSessionRecords(session),
 	})
 	if err != nil {
 		s, ok := grpcstatus.FromError(err)
 		if ok {
-			return errors.WithMessagef(err, "CacheSetUserSessionRecord uid:%d, code:%v, message:%s", uid, s.Code(), s.Message())
+			if s.Code() == grpccodes.Aborted {
+				return grpcstatus.Error(grpccodes.Aborted, s.Message())
+			}
+			return errors.WithMessagef(err, "CacheReplaceUserSessionRecord uid:%d, code:%v, message:%s", uid, s.Code(), s.Message())
 		}
-		return errors.WithMessagef(err, "CacheSetUserSessionRecord uid:%d", uid)
+		return errors.WithMessagef(err, "CacheReplaceUserSessionRecord uid:%d", uid)
 	}
 	return nil
 }
 
-func unaryCacheDelUserSession(uid uint64) error {
+func unaryCacheDelUserSession(uid uint64, expected *cacheUserSession) error {
+	var expectedRecords []*pb.CacheUserSessionRecord
+	if expected != nil {
+		expectedRecords = cacheUserSessionExpectedRecords(expected)
+	}
 	_, err := pb.GXCacheServiceService.CacheDelUserSessionRecord(context.Background(), &pb.CacheDelUserSessionRecordReq{
-		Uid: uid,
+		Uid:             uid,
+		ExpectedRecords: expectedRecords,
 	})
 	if err != nil {
 		s, ok := grpcstatus.FromError(err)
