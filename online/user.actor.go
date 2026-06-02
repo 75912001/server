@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	OnlineUserActorCmdLogin   xactor.CMD = 101
-	OnlineUserActorCmdOffline xactor.CMD = 102
+	OnlineUserActorCmdLogin        xactor.CMD = 101
+	OnlineUserActorCmdOffline      xactor.CMD = 102
+	OnlineUserActorCmdClientPacket xactor.CMD = 103
 )
 
 func (p *User) PostLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, error) {
@@ -34,6 +35,10 @@ func (p *User) PostOffline(gatewayKey string, session string) {
 	if stopped {
 		p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
 	}
+}
+
+func (p *User) PostClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
+	p.actor.SendMsg(xactor.NewMsg(context.Background(), OnlineUserActorCmdClientPacket, gateway, pkt))
 }
 
 func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
@@ -82,6 +87,16 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 				GUserMgr.users.Del(p.uid)
 			}
 			resp = true
+		case OnlineUserActorCmdClientPacket:
+			gateway, ok := msg.Args[0].(*Gateway)
+			if !ok {
+				continue
+			}
+			pkt, ok := msg.Args[1].(*pb.OnlineClientPacket)
+			if !ok {
+				continue
+			}
+			p.onClientPacket(gateway, pkt)
 		}
 	}
 	return p.behavior, resp, nil

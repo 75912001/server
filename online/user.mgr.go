@@ -14,6 +14,14 @@ type UserMgr struct {
 	users *xmap.MapMutexMgr[uint64, *User]
 }
 
+func (p *UserMgr) GetByUID(uid uint64) *User {
+	user, ok := p.users.Find(uid)
+	if !ok {
+		return nil
+	}
+	return user
+}
+
 func (p *UserMgr) Login(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, error) {
 	uid := req.GetUid()
 	user, existed := p.users.Find(uid)

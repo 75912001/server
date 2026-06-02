@@ -46,7 +46,12 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 	}
 	userRecord, err := unaryCacheGetUserRecord(req.GetUid())
 	if err != nil {
-		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
+		s, ok := grpcstatus.FromError(err)
+		if ok && s.Code() == grpccodes.NotFound {
+			userRecord = &pb.CacheGetUserRecordRes{UserRecord: &pb.UserRecord{}}
+		} else {
+			return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
+		}
 	}
 	expectedSession, err := expectedCacheUserSessionAfterKick(uid, oldSession)
 	if err != nil {
