@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"server/proto/pb"
+	"strconv"
 	"time"
 
 	xruntime "github.com/75912001/xlib/runtime"
@@ -64,12 +65,97 @@ func (p *Redis) SetUserSessionRecord(ctx context.Context, uid uint64, records ma
 	return nil
 }
 
-func (p *Redis) DelUserSessionRecord(ctx context.Context, uid uint64) error {
+const replaceUserSessionRecordScript = `
+local expectedCount = tonumber(ARGV[1])
+local index = 2
+for i = 1, expectedCount do
+	local field = ARGV[index]
+	local expected = ARGV[index + 1]
+	index = index + 2
+	local current = redis.call("HGET", KEYS[1], field)
+	if current == false then
+		current = ""
+	end
+	if current ~= expected then
+		return 0
+	end
+end
+local recordCount = tonumber(ARGV[index])
+index = index + 1
+for i = 1, recordCount do
+	redis.call("HSET", KEYS[1], ARGV[index], ARGV[index + 1])
+	index = index + 2
+end
+return 1
+`
+
+const delUserSessionRecordScript = `
+local expectedCount = tonumber(ARGV[1])
+local index = 2
+for i = 1, expectedCount do
+	local field = ARGV[index]
+	local expected = ARGV[index + 1]
+	index = index + 2
+	local current = redis.call("HGET", KEYS[1], field)
+	if current == false then
+		current = ""
+	end
+	if current ~= expected then
+		return 0
+	end
+end
+redis.call("DEL", KEYS[1])
+return 1
+`
+
+func (p *Redis) ReplaceUserSessionRecord(ctx context.Context, uid uint64, expected map[string]string, records map[string]string) (bool, error) {
 	key := RedisKeyUserSession(uid)
+	args := make([]any, 0, 2+len(expected)*2+len(records)*2)
+	args = append(args, strconv.Itoa(len(expected)))
+	for field, value := range expected {
+		args = append(args, field, value)
+	}
+	args = append(args, strconv.Itoa(len(records)))
+	for field, value := range records {
+		args = append(args, field, value)
+	}
+	result, err := p.client.Eval(ctx, replaceUserSessionRecordScript, []string{key}, args...).Result()
+	if err != nil {
+		return false, errors.WithMessagef(err, "replace user session record in redis failed, uid: %d, expected: %v, records: %v %v", uid, expected, records, xruntime.Location())
+	}
+	return redisScriptResultIsOK(result), nil
+}
+
+func (p *Redis) DelUserSessionRecord(ctx context.Context, uid uint64, expected map[string]string) error {
+	key := RedisKeyUserSession(uid)
+	if len(expected) != 0 {
+		args := make([]any, 0, 1+len(expected)*2)
+		args = append(args, strconv.Itoa(len(expected)))
+		for field, value := range expected {
+			args = append(args, field, value)
+		}
+		if _, err := p.client.Eval(ctx, delUserSessionRecordScript, []string{key}, args...).Result(); err != nil {
+			return errors.WithMessagef(err, "delete user session record from redis failed, uid: %d, expected: %v %v", uid, expected, xruntime.Location())
+		}
+		return nil
+	}
 	if err := p.client.Del(ctx, key).Err(); err != nil {
 		return errors.WithMessagef(err, "delete user session record from redis failed, uid: %d %v", uid, xruntime.Location())
 	}
 	return nil
+}
+
+func redisScriptResultIsOK(result any) bool {
+	switch v := result.(type) {
+	case int64:
+		return v == 1
+	case int:
+		return v == 1
+	case string:
+		return v == "1"
+	default:
+		return false
+	}
 }
 
 func (p *Redis) SetUserSessionExpire(ctx context.Context, uid uint64, expire time.Duration) (bool, error) {

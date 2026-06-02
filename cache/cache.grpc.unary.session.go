@@ -25,19 +25,36 @@ func cacheUserSessionFieldName(field pb.CacheUserSessionField) string {
 	}
 }
 
+func cacheUserSessionRecords(reqRecords []*pb.CacheUserSessionRecord) (map[string]string, bool) {
+	records := make(map[string]string, len(reqRecords))
+	for _, record := range reqRecords {
+		field := cacheUserSessionFieldName(record.GetField())
+		if field == "" {
+			return nil, false
+		}
+		records[field] = record.GetValue()
+	}
+	return records, true
+}
+
+func cacheUserSessionRecordsHas(records map[string]string, fields ...string) bool {
+	for _, field := range fields {
+		if _, ok := records[field]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
 func (s *cacheGRPCServer) CacheSetUserSessionRecord(ctx context.Context, req *pb.CacheSetUserSessionRecordReq) (*pb.CacheSetUserSessionRecordRes, error) {
 	uid := req.GetUid()
 	reqRecords := req.GetRecords()
 	if uid == 0 || len(reqRecords) == 0 {
 		return &pb.CacheSetUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	records := make(map[string]string, len(reqRecords))
-	for _, record := range reqRecords {
-		field := cacheUserSessionFieldName(record.GetField())
-		if field == "" {
-			return &pb.CacheSetUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
-		}
-		records[field] = record.GetValue()
+	records, ok := cacheUserSessionRecords(reqRecords)
+	if !ok {
+		return &pb.CacheSetUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 	if err := GRedis.SetUserSessionRecord(ctx, uid, records); err != nil {
 		return &pb.CacheSetUserSessionRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
@@ -50,10 +67,42 @@ func (s *cacheGRPCServer) CacheDelUserSessionRecord(ctx context.Context, req *pb
 	if uid == 0 {
 		return &pb.CacheDelUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	if err := GRedis.DelUserSessionRecord(ctx, uid); err != nil {
+	expectedRecords := req.GetExpectedRecords()
+	var expected map[string]string
+	if len(expectedRecords) != 0 {
+		var ok bool
+		expected, ok = cacheUserSessionRecords(expectedRecords)
+		if !ok || !cacheUserSessionRecordsHas(expected, "gatewayKey", "onlineKey", "session") {
+			return &pb.CacheDelUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
+		}
+	}
+	if err := GRedis.DelUserSessionRecord(ctx, uid, expected); err != nil {
 		return &pb.CacheDelUserSessionRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	return &pb.CacheDelUserSessionRecordRes{}, nil
+}
+
+func (s *cacheGRPCServer) CacheReplaceUserSessionRecord(ctx context.Context, req *pb.CacheReplaceUserSessionRecordReq) (*pb.CacheReplaceUserSessionRecordRes, error) {
+	uid := req.GetUid()
+	if uid == 0 || len(req.GetExpectedRecords()) == 0 || len(req.GetRecords()) == 0 {
+		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
+	}
+	expected, ok := cacheUserSessionRecords(req.GetExpectedRecords())
+	if !ok || !cacheUserSessionRecordsHas(expected, "gatewayKey", "onlineKey", "session") {
+		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
+	}
+	records, ok := cacheUserSessionRecords(req.GetRecords())
+	if !ok || !cacheUserSessionRecordsHas(records, "gatewayKey", "onlineKey", "session", "loginTime") {
+		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
+	}
+	replaced, err := GRedis.ReplaceUserSessionRecord(ctx, uid, expected, records)
+	if err != nil {
+		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
+	}
+	if !replaced {
+		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.Aborted, "user session changed")
+	}
+	return &pb.CacheReplaceUserSessionRecordRes{}, nil
 }
 
 func (s *cacheGRPCServer) CacheSetUserSessionExpire(ctx context.Context, req *pb.CacheSetUserSessionExpireReq) (*pb.CacheSetUserSessionExpireRes, error) {
