@@ -16,11 +16,12 @@ type Online struct {
 
 	actor *xactor.Actor[string] // 序列化 stream.Send 的 actor（每个 Online 独立一个）
 
-	GroupID     uint32
-	ServerName  string
-	ServerID    uint32
-	PackageName string
-	ServiceName string
+	GroupID       uint32
+	ServerName    string
+	ServerID      uint32
+	PackageName   string
+	ServiceName   string
+	AvailableLoad uint32
 }
 
 // newOnline 建立 gRPC 连接，启动 recvLoop 和 stream actor。
