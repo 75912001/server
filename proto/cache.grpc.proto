@@ -61,6 +61,13 @@ service CacheService {
       shardKeyFieldType: ShardKeyFieldType_UINT64
     };
   }
+
+  rpc CacheDelUserSessionRecord(CacheDelUserSessionRecordReq) returns (CacheDelUserSessionRecordRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
 }
 
 enum CacheUserSessionField {
@@ -132,4 +139,11 @@ message CacheGetUserSessionRecordReq {
 
 message CacheGetUserSessionRecordRes {
   repeated CacheUserSessionRecord records = 1;
+}
+
+message CacheDelUserSessionRecordReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+}
+
+message CacheDelUserSessionRecordRes {
 }

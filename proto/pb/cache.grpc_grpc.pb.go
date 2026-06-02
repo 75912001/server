@@ -26,6 +26,7 @@ const (
 	CacheService_CacheSetUserSessionRecord_FullMethodName = "/cache.CacheService/CacheSetUserSessionRecord"
 	CacheService_CacheSetUserSessionExpire_FullMethodName = "/cache.CacheService/CacheSetUserSessionExpire"
 	CacheService_CacheGetUserSessionRecord_FullMethodName = "/cache.CacheService/CacheGetUserSessionRecord"
+	CacheService_CacheDelUserSessionRecord_FullMethodName = "/cache.CacheService/CacheDelUserSessionRecord"
 )
 
 // CacheServiceClient is the client API for CacheService service.
@@ -41,6 +42,7 @@ type CacheServiceClient interface {
 	CacheSetUserSessionRecord(ctx context.Context, in *CacheSetUserSessionRecordReq, opts ...grpc.CallOption) (*CacheSetUserSessionRecordRes, error)
 	CacheSetUserSessionExpire(ctx context.Context, in *CacheSetUserSessionExpireReq, opts ...grpc.CallOption) (*CacheSetUserSessionExpireRes, error)
 	CacheGetUserSessionRecord(ctx context.Context, in *CacheGetUserSessionRecordReq, opts ...grpc.CallOption) (*CacheGetUserSessionRecordRes, error)
+	CacheDelUserSessionRecord(ctx context.Context, in *CacheDelUserSessionRecordReq, opts ...grpc.CallOption) (*CacheDelUserSessionRecordRes, error)
 }
 
 type cacheServiceClient struct {
@@ -121,6 +123,16 @@ func (c *cacheServiceClient) CacheGetUserSessionRecord(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *cacheServiceClient) CacheDelUserSessionRecord(ctx context.Context, in *CacheDelUserSessionRecordReq, opts ...grpc.CallOption) (*CacheDelUserSessionRecordRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CacheDelUserSessionRecordRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheDelUserSessionRecord_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CacheServiceServer is the server API for CacheService service.
 // All implementations must embed UnimplementedCacheServiceServer
 // for forward compatibility.
@@ -134,6 +146,7 @@ type CacheServiceServer interface {
 	CacheSetUserSessionRecord(context.Context, *CacheSetUserSessionRecordReq) (*CacheSetUserSessionRecordRes, error)
 	CacheSetUserSessionExpire(context.Context, *CacheSetUserSessionExpireReq) (*CacheSetUserSessionExpireRes, error)
 	CacheGetUserSessionRecord(context.Context, *CacheGetUserSessionRecordReq) (*CacheGetUserSessionRecordRes, error)
+	CacheDelUserSessionRecord(context.Context, *CacheDelUserSessionRecordReq) (*CacheDelUserSessionRecordRes, error)
 	mustEmbedUnimplementedCacheServiceServer()
 }
 
@@ -164,6 +177,9 @@ func (UnimplementedCacheServiceServer) CacheSetUserSessionExpire(context.Context
 }
 func (UnimplementedCacheServiceServer) CacheGetUserSessionRecord(context.Context, *CacheGetUserSessionRecordReq) (*CacheGetUserSessionRecordRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method CacheGetUserSessionRecord not implemented")
+}
+func (UnimplementedCacheServiceServer) CacheDelUserSessionRecord(context.Context, *CacheDelUserSessionRecordReq) (*CacheDelUserSessionRecordRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheDelUserSessionRecord not implemented")
 }
 func (UnimplementedCacheServiceServer) mustEmbedUnimplementedCacheServiceServer() {}
 func (UnimplementedCacheServiceServer) testEmbeddedByValue()                      {}
@@ -312,6 +328,24 @@ func _CacheService_CacheGetUserSessionRecord_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CacheService_CacheDelUserSessionRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheDelUserSessionRecordReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CacheServiceServer).CacheDelUserSessionRecord(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CacheService_CacheDelUserSessionRecord_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CacheServiceServer).CacheDelUserSessionRecord(ctx, req.(*CacheDelUserSessionRecordReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CacheService_ServiceDesc is the grpc.ServiceDesc for CacheService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -346,6 +380,10 @@ var CacheService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CacheGetUserSessionRecord",
 			Handler:    _CacheService_CacheGetUserSessionRecord_Handler,
+		},
+		{
+			MethodName: "CacheDelUserSessionRecord",
+			Handler:    _CacheService_CacheDelUserSessionRecord_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

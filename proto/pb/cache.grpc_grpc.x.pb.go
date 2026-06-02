@@ -244,6 +244,26 @@ func (x *CacheGetUserSessionRecordReq) Get_XShardKey() (uint64, error) {
 	return x.GetUid(), nil
 }
 
+func (p *XCacheServiceClient) CacheDelUserSessionRecord(ctx context.Context, in *CacheDelUserSessionRecordReq, opts ...grpc.CallOption) (*CacheDelUserSessionRecordRes, error) {
+	shardKeyValue, err := in.Get_XShardKey()
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	strValue := strconv.FormatUint(shardKeyValue, 10)
+
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheDelUserSessionRecord_FullMethodName, shardKeyValue)
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
+	x := NewCacheServiceClient(grpcConn)
+	return x.CacheDelUserSessionRecord(ctx, in, opts...)
+}
+
+func (x *CacheDelUserSessionRecordReq) Get_XShardKey() (uint64, error) {
+	return x.GetUid(), nil
+}
+
 // //////////////////////////////////////////////////////////////////////////////////////////////////
 // CacheService 服务端
 // //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -292,6 +312,7 @@ type IUnaryCacheServiceServer interface {
 	CacheSetUserSessionRecord(ctx context.Context, req *CacheSetUserSessionRecordReq) (*CacheSetUserSessionRecordRes, error)
 	CacheSetUserSessionExpire(ctx context.Context, req *CacheSetUserSessionExpireReq) (*CacheSetUserSessionExpireRes, error)
 	CacheGetUserSessionRecord(ctx context.Context, req *CacheGetUserSessionRecordReq) (*CacheGetUserSessionRecordRes, error)
+	CacheDelUserSessionRecord(ctx context.Context, req *CacheDelUserSessionRecordReq) (*CacheDelUserSessionRecordRes, error)
 }
 
 var iUnaryCacheServiceServer IUnaryCacheServiceServer
@@ -326,4 +347,8 @@ func (p *XCacheServiceServer) CacheSetUserSessionExpire(ctx context.Context, req
 
 func (p *XCacheServiceServer) CacheGetUserSessionRecord(ctx context.Context, req *CacheGetUserSessionRecordReq) (*CacheGetUserSessionRecordRes, error) {
 	return iUnaryCacheServiceServer.CacheGetUserSessionRecord(ctx, req)
+}
+
+func (p *XCacheServiceServer) CacheDelUserSessionRecord(ctx context.Context, req *CacheDelUserSessionRecordReq) (*CacheDelUserSessionRecordRes, error) {
+	return iUnaryCacheServiceServer.CacheDelUserSessionRecord(ctx, req)
 }
