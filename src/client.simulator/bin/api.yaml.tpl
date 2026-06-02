@@ -28,4 +28,11 @@ UserOfflineReq:
 UserCreateReq:
   id: 0x00000E
   msg:
-    reason: 1
+
+#0x000010#client->gateway#机器人压测-请求
+RobotPingReq:
+  id: 0x000010
+  msg:
+    seq: 0
+    clientTime: 0
+    payload: "robot-ping"
