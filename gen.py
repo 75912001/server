@@ -19,8 +19,8 @@ def print_error(message):
 
 
 def run_cmd(cmd, cwd=None):
-    print(f"Executing: {cmd}")
-    res = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=cwd)
+    print(f"Executing: {subprocess.list2cmdline(cmd)}")
+    res = subprocess.run(cmd, capture_output=True, text=True, cwd=cwd)
     if res.returncode != 0:
         print_error(f"Error: {res.stderr}")
         sys.exit(res.returncode)
@@ -46,7 +46,7 @@ def check_file(path, desc):
 
 
 def get_go_module_dir(module, cwd):
-    out = run_cmd(f'go list -m -f "{{{{.Dir}}}}" {module}', cwd=cwd).strip()
+    out = run_cmd(["go", "list", "-m", "-f", "{{.Dir}}", module], cwd=cwd).strip()
     if not out:
         print_error(f"Error: go module dir is empty: {module}")
         sys.exit(1)
@@ -193,34 +193,36 @@ def main():
     print(f"gRPC proto 文件: {grpc_protos}")
 
     out_dir = server_dir
-    proto_path_args = (
-        f" --proto_path={proto_dir}"
-        f" --proto_path={os.path.join(xlib_dir, 'grpc', 'proto')}"
-        f" --proto_path={os.path.join(xlib_dir, 'thirdparty')}"
-    )
+    proto_path_args = [
+        f"--proto_path={proto_dir}",
+        f"--proto_path={os.path.join(xlib_dir, 'grpc', 'proto')}",
+        f"--proto_path={os.path.join(xlib_dir, 'thirdparty')}",
+    ]
     m_options = "Moptions.proto=github.com/75912001/xlib/grpc/proto"
 
     # 4a. 所有 proto → --go_out（普通消息、枚举）
-    cmd_go = (
-        f"protoc"
-        f"{proto_path_args}"
-        f" --go_out={out_dir}"
-        f" --go_opt=module=server,{m_options}"
-        f" {' '.join(all_protos)}"
-    )
+    cmd_go = [
+        "protoc",
+        *proto_path_args,
+        f"--go_out={out_dir}",
+        f"--go_opt=module=server,{m_options}",
+        *all_protos,
+    ]
     run_cmd(cmd_go, cwd=server_dir)
     print_ok(f"[go_out] 生成完毕: {all_protos}")
 
     # 4b. *.grpc.proto → --go-grpc_out + --go-grpc-x_out（服务桩代码）
     if grpc_protos:
-        cmd_grpc = (
-            f"protoc"
-            f"{proto_path_args}"
-            f" --plugin=protoc-gen-go-grpc-x={plugin_exe}"
-            f" --go-grpc_out={out_dir}   --go-grpc_opt=module=server,{m_options}"
-            f" --go-grpc-x_out={out_dir} --go-grpc-x_opt=module=server"
-            f" {' '.join(grpc_protos)}"
-        )
+        cmd_grpc = [
+            "protoc",
+            *proto_path_args,
+            f"--plugin=protoc-gen-go-grpc-x={plugin_exe}",
+            f"--go-grpc_out={out_dir}",
+            f"--go-grpc_opt=module=server,{m_options}",
+            f"--go-grpc-x_out={out_dir}",
+            "--go-grpc-x_opt=module=server",
+            *grpc_protos,
+        ]
         run_cmd(cmd_grpc, cwd=server_dir)
         print_ok(f"[go-grpc_out / go-grpc-x_out] 生成完毕: {grpc_protos}")
 
