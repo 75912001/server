@@ -45,6 +45,17 @@ func (s *cacheGRPCServer) CacheSetUserSessionRecord(ctx context.Context, req *pb
 	return &pb.CacheSetUserSessionRecordRes{}, nil
 }
 
+func (s *cacheGRPCServer) CacheDelUserSessionRecord(ctx context.Context, req *pb.CacheDelUserSessionRecordReq) (*pb.CacheDelUserSessionRecordRes, error) {
+	uid := req.GetUid()
+	if uid == 0 {
+		return &pb.CacheDelUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
+	}
+	if err := GRedis.DelUserSessionRecord(ctx, uid); err != nil {
+		return &pb.CacheDelUserSessionRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
+	}
+	return &pb.CacheDelUserSessionRecordRes{}, nil
+}
+
 func (s *cacheGRPCServer) CacheSetUserSessionExpire(ctx context.Context, req *pb.CacheSetUserSessionExpireReq) (*pb.CacheSetUserSessionExpireRes, error) {
 	uid := req.GetUid()
 	expireSecond := req.GetExpireSecond()

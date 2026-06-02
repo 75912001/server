@@ -64,6 +64,14 @@ func (p *Redis) SetUserSessionRecord(ctx context.Context, uid uint64, records ma
 	return nil
 }
 
+func (p *Redis) DelUserSessionRecord(ctx context.Context, uid uint64) error {
+	key := RedisKeyUserSession(uid)
+	if err := p.client.Del(ctx, key).Err(); err != nil {
+		return errors.WithMessagef(err, "delete user session record from redis failed, uid: %d %v", uid, xruntime.Location())
+	}
+	return nil
+}
+
 func (p *Redis) SetUserSessionExpire(ctx context.Context, uid uint64, expire time.Duration) (bool, error) {
 	key := RedisKeyUserSession(uid)
 	ok, err := p.client.Expire(ctx, key, expire).Result()
