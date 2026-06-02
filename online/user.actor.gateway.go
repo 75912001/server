@@ -37,21 +37,30 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 			return nil, grpcstatus.Error(grpccodes.FailedPrecondition, fmt.Sprintf("kick old gateway failed: %v", err))
 		}
 	}
+	sessionCommitted := false
 	if err := unaryCacheSetUserSession(uid, req.GetGatewayKey(), currentOnlineKey); err != nil {
 		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
+	sessionCommitted = true
 	userRecord, err := unaryCacheGetUserRecord(req.GetUid())
 	if err != nil {
+		if cleanupErr := p.cleanupCommittedUserSession(uid, sessionCommitted); cleanupErr != nil {
+			return nil, grpcstatus.Error(grpccodes.Internal, fmt.Sprintf("%v; cleanup user session failed: %v", err, cleanupErr))
+		}
 		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
-	}
-	if userRecord.GetUserRecord() == nil {
-		return nil, grpcstatus.Error(grpccodes.Internal, "user record is nil")
 	}
 	p.gatewayID = req.GetGatewayKey()
 	p.clientIP = req.GetClientIp()
 	p.userRecord = userRecord.GetUserRecord()
 	GUserMgr.users.Add(uid, p)
 	return &pb.OnlineUserOnlineRes{}, nil
+}
+
+func (p *User) cleanupCommittedUserSession(uid uint64, sessionCommitted bool) error {
+	if !sessionCommitted {
+		return nil
+	}
+	return unaryCacheDelUserSession(uid)
 }
 
 func (p *User) kickGateway(gatewayKey string) error {
