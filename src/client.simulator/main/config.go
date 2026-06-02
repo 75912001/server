@@ -12,10 +12,17 @@ import (
 var GConfigYaml *ConfigYaml
 
 type ConfigYaml struct {
-	Addr              string        `yaml:"addr"`
+	Etcd              EtcdConfig    `yaml:"etcd"`
 	ProtoPath         string        `yaml:"protoPath"`
 	IgnoreMsgID       []uint32      `yaml:"ignoreMsgID"`
 	HeartbeatInterval time.Duration `yaml:"heartbeatInterval"`
+	CacheTokenExpire  uint64        `yaml:"cacheTokenExpireSecond"`
+}
+
+type EtcdConfig struct {
+	Endpoints   []string      `yaml:"endpoints"`
+	TTLDuration time.Duration `yaml:"ttlDuration"`
+	ProjectName string        `yaml:"projectName"`
 }
 
 type ApiData struct {
@@ -36,6 +43,15 @@ func parseConfigYaml(path string) error {
 	}
 	if GConfigYaml.HeartbeatInterval <= 0 {
 		GConfigYaml.HeartbeatInterval = 10 * time.Second
+	}
+	if GConfigYaml.CacheTokenExpire == 0 {
+		GConfigYaml.CacheTokenExpire = 10
+	}
+	if GConfigYaml.Etcd.TTLDuration <= 0 {
+		GConfigYaml.Etcd.TTLDuration = 30 * time.Second
+	}
+	if GConfigYaml.Etcd.ProjectName == "" {
+		GConfigYaml.Etcd.ProjectName = "project"
 	}
 	if GConfigYaml.ProtoPath != "" && !filepath.IsAbs(GConfigYaml.ProtoPath) {
 		GConfigYaml.ProtoPath = filepath.Join(filepath.Dir(path), GConfigYaml.ProtoPath)

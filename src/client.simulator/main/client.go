@@ -17,6 +17,7 @@ type Client struct {
 
 	uid            uint64
 	token          string
+	gatewayAddr    string
 	nextSession    uint32
 	verified       bool
 	heartbeatTimer *xtimer.Millisecond

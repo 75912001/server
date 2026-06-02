@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	common "server/common"
 
@@ -51,6 +52,20 @@ func main() {
 		panic(err)
 	}
 	GetClient().ignoreMsgID = buildIgnoreMsgID(GConfigYaml.IgnoreMsgID)
+	GetClient().iEventMgr.Start()
+	defer func() {
+		if err = stopServiceDiscovery(); err != nil {
+			panic(err)
+		}
+	}()
+	if err = startServiceDiscovery(context.Background()); err != nil {
+		panic(err)
+	}
+	gatewayAddr, err := waitGatewayAddr(5 * time.Second)
+	if err != nil {
+		panic(err)
+	}
+	GetClient().gatewayAddr = gatewayAddr
 	xtimer.GTimer = xtimer.NewTimer()
 	if err = xtimer.GTimer.Start(context.Background()); err != nil {
 		panic("timer start err")
@@ -59,7 +74,7 @@ func main() {
 
 	GetClient().TCP = xnettcp.NewClient(GetClient())
 	opts := xnettcp.NewConnectOptions().
-		WithAddress(GConfigYaml.Addr).
+		WithAddress(gatewayAddr).
 		WithSendChanCapacity(1000).
 		WithHeaderStrategy(&common.DefaultHeaderStrategy{}).
 		WithIOut(GetClient().iEventMgr)
@@ -68,7 +83,6 @@ func main() {
 		panic(err)
 	}
 	GetClient().Remote = GetClient().TCP.IRemote
-	GetClient().iEventMgr.Start()
 	GetClient().iEventMgr.Send(&xcontrol.Event{
 		ISwitch:   xcontrol.NewSwitchButton(true),
 		ICallBack: xcontrol.NewCallBack(func(args ...any) error { return GetClient().OnConnect(GetClient().Remote) }),

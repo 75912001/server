@@ -5,7 +5,7 @@ UserVerifyReq:
   id: 0x000001
   msg:
     uid: 10001
-    token: "token-10001"
+    token: "token.10001"
 
 #0x00000A#client->gateway#心跳-请求
 UserHeartbeatReq:

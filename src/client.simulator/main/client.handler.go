@@ -13,7 +13,7 @@ import (
 )
 
 func (p *Client) OnConnect(remote xnetcommon.IRemote) error {
-	ColorPrintf(Green, "connected addr=%s\n", GConfigYaml.Addr)
+	ColorPrintf(Green, "connected addr=%s\n", GetClient().gatewayAddr)
 	return nil
 }
 
@@ -57,6 +57,9 @@ func (p *Client) OnPacket(remote xnetcommon.IRemote, packet xpacket.IPacket) err
 		return p.handleProtoPacket(pkt)
 	case *xpacket.PacketPassThrough:
 		ColorPrintf(Red, "recv unknown messageID=0x%x resultID=%d len=%d\n", pkt.Header.MessageID, pkt.Header.ResultID, len(pkt.RawData))
+		if pkt.Header.ResultID != 0 {
+			ColorPrintf(Yellow, "ResultError: %s\n", formatResultError(pkt.Header.ResultID))
+		}
 		return nil
 	default:
 		return xerror.Mismatch
@@ -80,9 +83,18 @@ func (p *Client) handleProtoPacket(packet *xpacket.Packet) error {
 		return err
 	}
 	ColorPrintf(color, "Header: %s\n", headerJson)
+	resultError := ""
+	if packet.Header.ResultID != 0 {
+		resultError = formatResultError(packet.Header.ResultID)
+		ColorPrintf(color, "ResultError: %s\n", resultError)
+	}
 	body := marshalJSON(packet.PBMessage)
 	ColorPrintf(color, "Message: %s\n", body)
-	log.Infof("\n======recv message======\n%s\nHeader: %s\nMessage: %s", msgName, headerJson, body)
+	if resultError != "" {
+		log.Infof("\n======recv message======\n%s\nHeader: %s\nResultError: %s\nMessage: %s", msgName, headerJson, resultError, body)
+	} else {
+		log.Infof("\n======recv message======\n%s\nHeader: %s\nMessage: %s", msgName, headerJson, body)
+	}
 
 	switch msg := packet.PBMessage.(type) {
 	case *pb.UserVerifyRes:

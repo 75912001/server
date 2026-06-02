@@ -1,5 +1,12 @@
-# Gateway TCP 地址。
-addr: 192.168.71.123:10101
+etcd:
+  endpoints:
+    - 192.168.71.123:2379
+    - 192.168.71.123:22379
+    - 192.168.71.123:32379
+  ttlDuration: 3000000000s
+  projectName: project
+
+cacheTokenExpireSecond: 10
 
 # proto 路径，用于记录协议来源。
 protoPath: ../../../proto

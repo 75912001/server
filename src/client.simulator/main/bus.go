@@ -80,6 +80,12 @@ func sendCommand(command string) error {
 	fillDynamicFields(GetClient(), protoMsg)
 
 	if verifyReq, ok := protoMsg.(*pb.UserVerifyReq); ok {
+		token, err := cacheSetVerifyUserToken(verifyReq.GetUid())
+		if err != nil {
+			ColorPrintf(Red, "set verify token failed: %v\n", err)
+			return err
+		}
+		verifyReq.Token = token
 		GetClient().uid = verifyReq.GetUid()
 		GetClient().token = verifyReq.GetToken()
 	}
