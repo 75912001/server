@@ -56,9 +56,12 @@ func (s *cacheGRPCServer) CacheSetVerifyUserToken(ctx context.Context, req *pb.C
 	if uid == 0 || token == "" || expireSecond == 0 {
 		return &pb.CacheSetVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
 	}
-	_, err := GRedis.SetVerifyUserToken(ctx, uid, token, time.Duration(expireSecond)*time.Second)
+	ok, err := GRedis.SetVerifyUserToken(ctx, uid, token, time.Duration(expireSecond)*time.Second)
 	if err != nil {
 		return &pb.CacheSetVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
+	}
+	if !ok {
+		return &pb.CacheSetVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.AlreadyExists, "token already exists")
 	}
 	return &pb.CacheSetVerifyUserTokenRes{}, nil
 }
