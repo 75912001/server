@@ -43,12 +43,14 @@ func (p *User) PostClientPacket(header *xpacket.Header, body []byte) {
 const UserActorCmdUserCleanup xactor.CMD = 103
 
 func (p *User) PostSyncCleanup(reason xnetcommon.DisconnectReason) {
+	defer func() {
+		p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
+	}()
 	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserCleanup, reason))
 	if err != nil {
 		xlog.GLog.Errorf("user cleanup sync failed remote=%p err=%v", p.remote, err)
 		return
 	}
-	p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
 }
 
 func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
