@@ -69,12 +69,13 @@ func (s *cacheGRPCServer) CacheDelUserSessionRecord(ctx context.Context, req *pb
 	}
 	expectedRecords := req.GetExpectedRecords()
 	var expected map[string]string
-	if len(expectedRecords) != 0 {
-		var ok bool
-		expected, ok = cacheUserSessionRecords(expectedRecords)
-		if !ok || !cacheUserSessionRecordsHas(expected, "gatewayKey", "onlineKey", "session") {
-			return &pb.CacheDelUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
-		}
+	if len(expectedRecords) == 0 {
+		return &pb.CacheDelUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
+	}
+	var ok bool
+	expected, ok = cacheUserSessionRecords(expectedRecords)
+	if !ok || !cacheUserSessionRecordsHas(expected, "gatewayKey", "onlineKey", "session") {
+		return &pb.CacheDelUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 	if err := GRedis.DelUserSessionRecord(ctx, uid, expected); err != nil {
 		return &pb.CacheDelUserSessionRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
