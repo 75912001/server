@@ -134,6 +134,7 @@ message CacheSetUserSessionRecordRes {
 message CacheSetUserSessionExpireReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
   uint64 expire_second = 2;
+  repeated CacheUserSessionRecord expected_records = 3;
 }
 
 message CacheSetUserSessionExpireRes {
@@ -160,6 +161,7 @@ message CacheReplaceUserSessionRecordReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
   repeated CacheUserSessionRecord expected_records = 2;
   repeated CacheUserSessionRecord records = 3;
+  uint64 expire_second = 4;
 }
 
 message CacheReplaceUserSessionRecordRes {
