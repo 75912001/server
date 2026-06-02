@@ -12,6 +12,7 @@ message OnlineUserOnlineReq {
 }
 
 message OnlineUserOnlineRes {
+  string session = 1;
 }
 
 // 用户离线请求 (Gateway -> Online)，网关在 TCP 断开、顶号、主动离线等场景下发出。
@@ -19,6 +20,8 @@ message OnlineUserOfflineReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // 离线用户 uid
   uint32 reason = 2;                                 // 离线原因
   string msg = 3;                                    // 离线说明
+  string gateway_key = 4;
+  string session = 5;
 }
 
 message OnlineUserOfflineRes {

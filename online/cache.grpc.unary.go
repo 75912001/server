@@ -19,19 +19,34 @@ const (
 	userSessionRefreshSecond uint64 = 4 * 60
 )
 
-func unaryCacheVerifyUserToken(uid uint64, token string) (*pb.CacheVerifyUserTokenRes, error) {
-	res, err := pb.GXCacheServiceService.CacheVerifyUserToken(context.Background(), &pb.CacheVerifyUserTokenReq{
+func unaryCacheVerifyUserToken(uid uint64, token string) error {
+	_, err := pb.GXCacheServiceService.CacheVerifyUserToken(context.Background(), &pb.CacheVerifyUserTokenReq{
 		Uid:   uid,
 		Token: token,
 	})
 	if err != nil {
 		s, ok := grpcstatus.FromError(err)
 		if ok {
-			return nil, errors.WithMessagef(err, "CacheVerifyUserToken uid:%d token:%s, code:%v, message:%s", uid, token, s.Code(), s.Message())
+			return errors.WithMessagef(err, "CacheVerifyUserToken uid:%d token:%s, code:%v, message:%s", uid, token, s.Code(), s.Message())
 		}
-		return nil, errors.WithMessagef(err, "CacheVerifyUserToken uid:%d token:%s", uid, token)
+		return errors.WithMessagef(err, "CacheVerifyUserToken uid:%d token:%s", uid, token)
 	}
-	return res, nil
+	return nil
+}
+
+func unaryCacheUseVerifyUserToken(uid uint64, token string) error {
+	_, err := pb.GXCacheServiceService.CacheUseVerifyUserToken(context.Background(), &pb.CacheUseVerifyUserTokenReq{
+		Uid:   uid,
+		Token: token,
+	})
+	if err != nil {
+		s, ok := grpcstatus.FromError(err)
+		if ok {
+			return errors.WithMessagef(err, "CacheUseVerifyUserToken uid:%d token:%s, code:%v, message:%s", uid, token, s.Code(), s.Message())
+		}
+		return errors.WithMessagef(err, "CacheUseVerifyUserToken uid:%d token:%s", uid, token)
+	}
+	return nil
 }
 
 func unaryCacheGetUserRecord(uid uint64) (*pb.CacheGetUserRecordRes, error) {

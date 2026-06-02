@@ -41,6 +41,13 @@ service CacheService {
     };
   }
 
+  rpc CacheUseVerifyUserToken(CacheUseVerifyUserTokenReq) returns (CacheUseVerifyUserTokenRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+
   rpc CacheSetUserSessionRecord(CacheSetUserSessionRecordReq) returns (CacheSetUserSessionRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -121,6 +128,14 @@ message CacheVerifyUserTokenReq {
 }
 
 message CacheVerifyUserTokenRes {
+}
+
+message CacheUseVerifyUserTokenReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  string token = 2;
+}
+
+message CacheUseVerifyUserTokenRes {
 }
 
 message CacheSetUserSessionRecordReq {

@@ -82,3 +82,19 @@ func (s *cacheGRPCServer) CacheVerifyUserToken(ctx context.Context, req *pb.Cach
 
 	return &pb.CacheVerifyUserTokenRes{}, nil
 }
+
+func (s *cacheGRPCServer) CacheUseVerifyUserToken(ctx context.Context, req *pb.CacheUseVerifyUserTokenReq) (*pb.CacheUseVerifyUserTokenRes, error) {
+	uid := req.GetUid()
+	token := req.GetToken()
+	if uid == 0 || token == "" {
+		return &pb.CacheUseVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
+	}
+	ok, err := GRedis.UseVerifyUserToken(ctx, uid, token)
+	if err != nil {
+		return &pb.CacheUseVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
+	}
+	if !ok {
+		return &pb.CacheUseVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.NotFound, "token not found or used")
+	}
+	return &pb.CacheUseVerifyUserTokenRes{}, nil
+}

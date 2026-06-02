@@ -27,9 +27,31 @@ end
 if current ~= ARGV[1] then
 	return 0
 end
-redis.call("DEL", KEYS[1])
 return 1
 `
+
+const useVerifyUserTokenScript = `
+local current = redis.call("GET", KEYS[1])
+if current == false then
+	return 0
+end
+if current ~= ARGV[1] then
+	return 0
+end
+local ttl = redis.call("PTTL", KEYS[1])
+if ttl > 0 then
+	redis.call("SET", KEYS[1], ARGV[2], "PX", ttl)
+elseif ttl == -1 then
+	redis.call("SET", KEYS[1], ARGV[2])
+else
+	return 0
+end
+return 1
+`
+
+func verifyUserTokenUsedValue(token string) string {
+	return "used:" + token
+}
 
 // VerifyUserToken 验证用户令牌
 func (p *Redis) VerifyUserToken(ctx context.Context, uid uint64, token string) (bool, error) {
@@ -37,6 +59,16 @@ func (p *Redis) VerifyUserToken(ctx context.Context, uid uint64, token string) (
 	result, err := p.client.Eval(ctx, verifyUserTokenScript, []string{key}, token).Result()
 	if err != nil {
 		return false, errors.WithMessagef(err, "verify user token from redis failed, uid: %d, token: %s %v", uid, token, xruntime.Location())
+	}
+	return redisScriptResultIsOK(result), nil
+}
+
+func (p *Redis) UseVerifyUserToken(ctx context.Context, uid uint64, token string) (bool, error) {
+	key := RedisKeyUserToken(uid)
+	usedValue := verifyUserTokenUsedValue(token)
+	result, err := p.client.Eval(ctx, useVerifyUserTokenScript, []string{key}, token, usedValue).Result()
+	if err != nil {
+		return false, errors.WithMessagef(err, "use verify user token from redis failed, uid: %d, token: %s %v", uid, token, xruntime.Location())
 	}
 	return redisScriptResultIsOK(result), nil
 }

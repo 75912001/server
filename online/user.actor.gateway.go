@@ -31,10 +31,6 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 			oldSession.onlineKey = currentOnlineKey
 		}
 	}
-	userRecord, err := unaryCacheGetUserRecord(req.GetUid())
-	if err != nil {
-		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
-	}
 	if !cacheUserSessionIsEmpty(oldSession) && oldSession.gatewayKey != "" {
 		removed := false
 		if currentUser, ok := GUserMgr.users.Find(uid); ok && currentUser == p {
@@ -47,6 +43,10 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 			}
 			return nil, grpcstatus.Error(grpccodes.FailedPrecondition, fmt.Sprintf("kick old gateway failed: %v", err))
 		}
+	}
+	userRecord, err := unaryCacheGetUserRecord(req.GetUid())
+	if err != nil {
+		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	expectedSession, err := expectedCacheUserSessionAfterKick(uid, oldSession)
 	if err != nil {
@@ -63,7 +63,7 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 	p.sessionMgr.Bind(newSession)
 	p.userRecord = userRecord.GetUserRecord()
 	GUserMgr.users.Add(uid, p)
-	return &pb.OnlineUserOnlineRes{}, nil
+	return &pb.OnlineUserOnlineRes{Session: newSession.session}, nil
 }
 
 func cloneCacheUserSession(session *cacheUserSession) *cacheUserSession {

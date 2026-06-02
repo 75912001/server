@@ -60,7 +60,7 @@ func unaryOnlineUserOnline(
 		return errors.WithMessagef(err, "OnlineUserOnline select online by available load uid:%v fail %v", req.GetUid(), xruntime.Location())
 	}
 
-	_, err = pb.NewOnlineServiceClient(online.GetClientConn()).OnlineUserOnline(context.Background(), req)
+	onlineRes, err := pb.NewOnlineServiceClient(online.GetClientConn()).OnlineUserOnline(context.Background(), req)
 	if err != nil {
 		_ = sendClientRes(
 			remote,
@@ -78,11 +78,16 @@ func unaryOnlineUserOnline(
 	}
 
 	xlog.GLog.Tracef(fmt.Sprintf("OnlineUserOnline uid:%d", uid))
+	onlineSession := ""
+	if onlineRes != nil {
+		onlineSession = onlineRes.GetSession()
+	}
 
 	// 校验通过：绑定 User 到 online 实例
 	// 停止「未校验超时」定时器，启动心跳超时定时器。
 	u := GUserMgr.Get(remote)
 	if u == nil || !remote.IsConnect() {
+		cleanupOnlineLoginSession(online, req.GetUid(), req.GetGatewayKey(), onlineSession, "gateway remote not connected after online login")
 		_ = sendClientRes(
 			remote,
 			uint32(pb.MsgIDUser_UserVerifyRes_CMD),
@@ -94,7 +99,21 @@ func unaryOnlineUserOnline(
 		return errors.WithMessagef(err, "OnlineUserOnline remote not connect uid:%v %v", uid, xruntime.Location())
 	}
 
-	if err = u.PostSyncVerified(req.GetUid(), online); err != nil {
+	if onlineSession == "" {
+		cleanupOnlineLoginSession(online, req.GetUid(), req.GetGatewayKey(), onlineSession, "gateway online login response invalid")
+		_ = sendClientRes(
+			remote,
+			uint32(pb.MsgIDUser_UserVerifyRes_CMD),
+			header.SessionID,
+			xerror.Fail.Code(),
+			header.Key,
+			nil,
+		)
+		return errors.WithMessagef(xerror.Fail, "OnlineUserOnline empty session uid:%d %v", req.GetUid(), xruntime.Location())
+	}
+
+	if err = u.PostSyncVerified(req.GetUid(), online, onlineSession); err != nil {
+		cleanupOnlineLoginSession(online, req.GetUid(), req.GetGatewayKey(), onlineSession, "gateway bind failed after online login")
 		_ = sendClientRes(
 			remote,
 			uint32(pb.MsgIDUser_UserVerifyRes_CMD),
@@ -115,6 +134,15 @@ func unaryOnlineUserOnline(
 			ServerTime: time.Now().UnixMilli(),
 		},
 	)
+}
+
+func cleanupOnlineLoginSession(online *Online, uid uint64, gatewayKey string, session string, msg string) {
+	if online == nil || uid == 0 || gatewayKey == "" || session == "" {
+		return
+	}
+	if err := unaryOnlineUserOffline(online, uid, gatewayKey, session, xnetcommon.DisconnectReasonServerShutdown, msg); err != nil {
+		xlog.GLog.Warnf("cleanup online login session failed uid:%d online:%s err:%v", uid, online.Key, err)
+	}
 }
 
 // todo menglc 目前 grpc 错误码与网关内部错误码的映射关系比较粗糙，可以根据实际业务需求细化
@@ -163,13 +191,15 @@ func grpcErrorToResultCode(err error) uint32 {
 	}
 }
 
-func unaryOnlineUserOffline(online *Online, uid uint64, reason xnetcommon.DisconnectReason, msg string) error {
+func unaryOnlineUserOffline(online *Online, uid uint64, gatewayKey string, session string, reason xnetcommon.DisconnectReason, msg string) error {
 	ctx := xgrpcproto.SetFromOutgoingContext(context.Background(), xgrpcproto.ShardKeyFieldNameDefault, strconv.FormatUint(uid, 10))
 	_, err := pb.NewOnlineServiceClient(online.GetClientConn()).OnlineUserOffline(ctx,
 		&pb.OnlineUserOfflineReq{
-			Uid:    uid,
-			Reason: uint32(reason),
-			Msg:    msg,
+			Uid:        uid,
+			Reason:     uint32(reason),
+			Msg:        msg,
+			GatewayKey: gatewayKey,
+			Session:    session,
 		})
 	return err
 }

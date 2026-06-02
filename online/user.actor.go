@@ -24,12 +24,16 @@ func (p *User) PostLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, 
 	return res, nil
 }
 
-func (p *User) PostOffline() {
-	if _, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineUserActorCmdOffline)); err != nil {
+func (p *User) PostOffline(gatewayKey string, session string) {
+	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineUserActorCmdOffline, gatewayKey, session))
+	if err != nil {
 		xlog.GLog.Errorf("user offline sync failed uid=%d err=%v", p.uid, err)
 		return
 	}
-	p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
+	stopped, _ := resp.(bool)
+	if stopped {
+		p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
+	}
 }
 
 func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
@@ -59,11 +63,33 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 				return p.behavior, resp, err
 			}
 		case OnlineUserActorCmdOffline:
+			gatewayKey, ok := msg.Args[0].(string)
+			if !ok {
+				continue
+			}
+			session, ok := msg.Args[1].(string)
+			if !ok {
+				continue
+			}
+			if !p.offlineSessionMatch(gatewayKey, session) {
+				resp = false
+				continue
+			}
 			if err := p.sessionMgr.CleanupOffline(); err != nil {
 				xlog.GLog.Warnf("cleanup offline user session failed uid=%d err=%v", p.uid, err)
 			}
-			GUserMgr.users.Del(p.uid)
+			if currentUser, ok := GUserMgr.users.Find(p.uid); ok && currentUser == p {
+				GUserMgr.users.Del(p.uid)
+			}
+			resp = true
 		}
 	}
 	return p.behavior, resp, nil
+}
+
+func (p *User) offlineSessionMatch(gatewayKey string, session string) bool {
+	if gatewayKey == "" || session == "" || p.gatewayID != gatewayKey || p.sessionMgr.session == nil {
+		return false
+	}
+	return p.sessionMgr.session.session == session
 }

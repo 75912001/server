@@ -6,6 +6,7 @@ import (
 
 	xactor "github.com/75912001/xlib/actor"
 	xcontrol "github.com/75912001/xlib/control"
+	xetcd "github.com/75912001/xlib/etcd"
 	xheartbeat "github.com/75912001/xlib/heartbeat"
 	xlog "github.com/75912001/xlib/log"
 	xnetcommon "github.com/75912001/xlib/net/common"
@@ -24,6 +25,8 @@ type User struct {
 	ip     string
 	online *Online // nil 表示未校验或已清理，非 nil 表示校验通过并绑定的 online 实例
 	actor  *xactor.Actor[string]
+
+	session string
 
 	verifyTimer *xtimer.Second       // 校验超时定时器（onVerified 后置 nil）
 	hb          xheartbeat.HeartBeat // 心跳管理（WaitID=lastSession，Stop/Start 封装定时器）
@@ -85,7 +88,7 @@ func (p *User) startVerifyTimer() {
 }
 
 // OnVerified 由登录鉴权成功后调用：绑定 uid + online，停校验定时器，启心跳定时器。
-func (p *User) OnVerified(uid uint64, online *Online) error {
+func (p *User) OnVerified(uid uint64, online *Online, session string) error {
 	if p.IsClosed() {
 		return fmt.Errorf("remote disconnected")
 	}
@@ -95,8 +98,12 @@ func (p *User) OnVerified(uid uint64, online *Online) error {
 	if online == nil {
 		return fmt.Errorf("online is nil")
 	}
+	if session == "" {
+		return fmt.Errorf("session is empty")
+	}
 	p.uid = uid
 	p.online = online
+	p.session = session
 	GUserMgr.BindUID(uid, p)
 	if p.verifyTimer != nil {
 		xtimer.GTimer.DelSecond(p.verifyTimer)
@@ -133,10 +140,12 @@ func (p *User) Cleanup(reason xnetcommon.DisconnectReason) {
 	uid := p.uid
 
 	online := p.online
+	session := p.session
 	p.online = nil
+	p.session = ""
 
-	if uid != 0 && online != nil {
-		if err := unaryOnlineUserOffline(online, uid, reason, "gateway user offline"); err != nil {
+	if uid != 0 && online != nil && session != "" {
+		if err := unaryOnlineUserOffline(online, uid, xetcd.GEtcd.GetKey(), session, reason, "gateway user offline"); err != nil {
 			xlog.GLog.Warnf("notify offline failed uid:%d reason:%d online:%s err:%v", uid, reason, online.Key, err)
 		}
 	}
