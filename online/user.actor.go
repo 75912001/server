@@ -6,6 +6,7 @@ import (
 	pb "server/proto/pb"
 
 	xactor "github.com/75912001/xlib/actor"
+	xcontrol "github.com/75912001/xlib/control"
 	xlog "github.com/75912001/xlib/log"
 )
 
@@ -35,6 +36,14 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 	var resp any
 	var err error
 	for _, raw := range messages {
+		if event, ok := raw.(*xcontrol.Event); ok {
+			if event.ISwitch.IsOn() {
+				if errTmp := event.ICallBack.Execute(); errTmp != nil {
+					xlog.GLog.Warnf("user event callback failed uid=%d err=%v", p.uid, errTmp)
+				}
+			}
+			continue
+		}
 		msg, ok := raw.(*xactor.Msg)
 		if !ok {
 			continue
@@ -50,19 +59,11 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 				return p.behavior, resp, err
 			}
 		case OnlineUserActorCmdOffline:
-			if err := p.cleanupOfflineUserSession(); err != nil {
+			if err := p.sessionMgr.CleanupOffline(); err != nil {
 				xlog.GLog.Warnf("cleanup offline user session failed uid=%d err=%v", p.uid, err)
 			}
 			GUserMgr.users.Del(p.uid)
-			p.session = nil
 		}
 	}
 	return p.behavior, resp, nil
-}
-
-func (p *User) cleanupOfflineUserSession() error {
-	if p.session == nil {
-		return nil
-	}
-	return unaryCacheDelUserSession(p.uid, p.session)
 }

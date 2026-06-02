@@ -14,6 +14,11 @@ import (
 	grpcstatus "google.golang.org/grpc/status"
 )
 
+const (
+	userSessionExpireSecond  uint64 = 5 * 60
+	userSessionRefreshSecond uint64 = 4 * 60
+)
+
 func unaryCacheVerifyUserToken(uid uint64, token string) (*pb.CacheVerifyUserTokenRes, error) {
 	res, err := pb.GXCacheServiceService.CacheVerifyUserToken(context.Background(), &pb.CacheVerifyUserTokenReq{
 		Uid:   uid,
@@ -127,6 +132,7 @@ func unaryCacheReplaceUserSession(uid uint64, expected *cacheUserSession, sessio
 		Uid:             uid,
 		ExpectedRecords: cacheUserSessionExpectedRecords(expected),
 		Records:         cacheUserSessionRecords(session),
+		ExpireSecond:    userSessionExpireSecond,
 	})
 	if err != nil {
 		s, ok := grpcstatus.FromError(err)
@@ -137,6 +143,25 @@ func unaryCacheReplaceUserSession(uid uint64, expected *cacheUserSession, sessio
 			return errors.WithMessagef(err, "CacheReplaceUserSessionRecord uid:%d, code:%v, message:%s", uid, s.Code(), s.Message())
 		}
 		return errors.WithMessagef(err, "CacheReplaceUserSessionRecord uid:%d", uid)
+	}
+	return nil
+}
+
+func unaryCacheSetUserSessionExpire(uid uint64, expected *cacheUserSession) error {
+	_, err := pb.GXCacheServiceService.CacheSetUserSessionExpire(context.Background(), &pb.CacheSetUserSessionExpireReq{
+		Uid:             uid,
+		ExpireSecond:    userSessionExpireSecond,
+		ExpectedRecords: cacheUserSessionExpectedRecords(expected),
+	})
+	if err != nil {
+		s, ok := grpcstatus.FromError(err)
+		if ok {
+			if s.Code() == grpccodes.Aborted || s.Code() == grpccodes.NotFound {
+				return grpcstatus.Error(s.Code(), s.Message())
+			}
+			return errors.WithMessagef(err, "CacheSetUserSessionExpire uid:%d, code:%v, message:%s", uid, s.Code(), s.Message())
+		}
+		return errors.WithMessagef(err, "CacheSetUserSessionExpire uid:%d", uid)
 	}
 	return nil
 }
