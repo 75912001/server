@@ -50,8 +50,19 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 				return p.behavior, resp, err
 			}
 		case OnlineUserActorCmdOffline:
+			if err := p.cleanupOfflineUserSession(); err != nil {
+				xlog.GLog.Warnf("cleanup offline user session failed uid=%d err=%v", p.uid, err)
+			}
 			GUserMgr.users.Del(p.uid)
+			p.session = nil
 		}
 	}
 	return p.behavior, resp, nil
+}
+
+func (p *User) cleanupOfflineUserSession() error {
+	if p.session == nil {
+		return nil
+	}
+	return unaryCacheDelUserSession(p.uid, p.session)
 }

@@ -11,6 +11,7 @@ type User struct {
 	uid        uint64
 	gatewayID  string
 	clientIP   string
+	session    *cacheUserSession
 	userRecord *pb.UserRecord
 	actor      *xactor.Actor[uint64]
 }

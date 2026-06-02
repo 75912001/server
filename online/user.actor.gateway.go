@@ -58,6 +58,7 @@ func (p *User) onLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, er
 	}
 	p.gatewayID = req.GetGatewayKey()
 	p.clientIP = req.GetClientIp()
+	p.session = newSession
 	p.userRecord = userRecord.GetUserRecord()
 	GUserMgr.users.Add(uid, p)
 	return &pb.OnlineUserOnlineRes{}, nil
