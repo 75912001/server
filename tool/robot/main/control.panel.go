@@ -209,7 +209,7 @@ const controlPanelHTML = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>client.simulator 控制面板</title>
+<title>robot 控制面板</title>
 <style>
 :root{color-scheme:light;--bg:#f6f7f9;--panel:#fff;--line:#d8dde6;--text:#172033;--muted:#687386;--accent:#0f766e;--warn:#b45309;--bad:#b91c1c}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 "Segoe UI",Arial,"Microsoft YaHei",sans-serif}
@@ -227,7 +227,7 @@ th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white
 </style>
 </head>
 <body>
-<header><h1>client.simulator 控制面板</h1><div id="clock"></div></header>
+<header><h1>robot 控制面板</h1><div id="clock"></div></header>
 <main>
   <section class="grid">
     <div class="tile"><span>总数</span><strong id="total">0</strong></div>

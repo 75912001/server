@@ -4,7 +4,7 @@
 
 scriptDir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 serverPath=$(cd "${scriptDir}/../.." && pwd)
-simulatorPath="src/client.simulator"
+simulatorPath="tool/robot"
 protoPath="${1:-proto}"
 inputProto="${protoPath}/user.cmd.proto"
 outputGo="${simulatorPath}/main/register.message.go"

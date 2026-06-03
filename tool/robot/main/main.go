@@ -26,7 +26,7 @@ func main() {
 
 	log, err = xlog.NewMgr(xlog.NewOptions().
 		WithAbsPath(filepath.Join(xruntime.ExecutablePath, "log")).
-		WithNamePrefix("client.simulator").
+		WithNamePrefix("robot").
 		WithLevel(xlog.LevelOn).
 		WithLevelCallBack(xcontrol.NewCallBack(logCallBackFunc), xlog.LevelFatal, xlog.LevelError, xlog.LevelWarn))
 	if err != nil {
