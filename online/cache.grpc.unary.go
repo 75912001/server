@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"strconv"
 	"time"
 
@@ -18,36 +16,6 @@ const (
 	userSessionExpireSecond  uint64 = 5 * 60
 	userSessionRefreshSecond uint64 = 4 * 60
 )
-
-func unaryCacheVerifyUserToken(uid uint64, token string) error {
-	_, err := pb.GXCacheServiceService.CacheVerifyUserToken(context.Background(), &pb.CacheVerifyUserTokenReq{
-		Uid:   uid,
-		Token: token,
-	})
-	if err != nil {
-		s, ok := grpcstatus.FromError(err)
-		if ok {
-			return errors.WithMessagef(err, "CacheVerifyUserToken uid:%d token:%s, code:%v, message:%s", uid, token, s.Code(), s.Message())
-		}
-		return errors.WithMessagef(err, "CacheVerifyUserToken uid:%d token:%s", uid, token)
-	}
-	return nil
-}
-
-func unaryCacheUseVerifyUserToken(uid uint64, token string) error {
-	_, err := pb.GXCacheServiceService.CacheUseVerifyUserToken(context.Background(), &pb.CacheUseVerifyUserTokenReq{
-		Uid:   uid,
-		Token: token,
-	})
-	if err != nil {
-		s, ok := grpcstatus.FromError(err)
-		if ok {
-			return errors.WithMessagef(err, "CacheUseVerifyUserToken uid:%d token:%s, code:%v, message:%s", uid, token, s.Code(), s.Message())
-		}
-		return errors.WithMessagef(err, "CacheUseVerifyUserToken uid:%d token:%s", uid, token)
-	}
-	return nil
-}
 
 func unaryCacheGetUserRecord(uid uint64) (*pb.CacheGetUserRecordRes, error) {
 	res, err := pb.GXCacheServiceService.CacheGetUserRecord(context.Background(), &pb.CacheGetUserRecordReq{
@@ -79,10 +47,10 @@ func unaryCacheSetUserRecord(uid uint64, userRecord *pb.UserRecord) error {
 }
 
 type cacheUserSession struct {
-	gatewayKey string
-	onlineKey  string
-	session    string
-	loginTime  string
+	gatewayKey     string
+	onlineKey      string
+	gatewaySession string
+	loginTime      string
 }
 
 func unaryCacheGetUserSession(uid uint64) (*cacheUserSession, error) {
@@ -91,7 +59,7 @@ func unaryCacheGetUserSession(uid uint64) (*cacheUserSession, error) {
 		Fields: []pb.CacheUserSessionField{
 			pb.CacheUserSessionField_CacheUserSessionField_GatewayKey,
 			pb.CacheUserSessionField_CacheUserSessionField_OnlineKey,
-			pb.CacheUserSessionField_CacheUserSessionField_Session,
+			pb.CacheUserSessionField_CacheUserSessionField_GatewaySession,
 		},
 	})
 	if err != nil {
@@ -111,23 +79,19 @@ func unaryCacheGetUserSession(uid uint64) (*cacheUserSession, error) {
 			session.gatewayKey = record.GetValue()
 		case pb.CacheUserSessionField_CacheUserSessionField_OnlineKey:
 			session.onlineKey = record.GetValue()
-		case pb.CacheUserSessionField_CacheUserSessionField_Session:
-			session.session = record.GetValue()
+		case pb.CacheUserSessionField_CacheUserSessionField_GatewaySession:
+			session.gatewaySession = record.GetValue()
 		}
 	}
 	return session, nil
 }
 
-func newCacheUserSession(gatewayKey string, onlineKey string) (*cacheUserSession, error) {
-	buf := make([]byte, 16)
-	if _, err := rand.Read(buf); err != nil {
-		return nil, errors.WithMessagef(err, "generate login session failed")
-	}
+func newCacheUserSession(gatewayKey string, onlineKey string, gatewaySession string) (*cacheUserSession, error) {
 	return &cacheUserSession{
-		gatewayKey: gatewayKey,
-		onlineKey:  onlineKey,
-		session:    hex.EncodeToString(buf),
-		loginTime:  strconv.FormatInt(time.Now().UnixMilli(), 10),
+		gatewayKey:     gatewayKey,
+		onlineKey:      onlineKey,
+		gatewaySession: gatewaySession,
+		loginTime:      strconv.FormatInt(time.Now().UnixMilli(), 10),
 	}, nil
 }
 
@@ -142,8 +106,8 @@ func cacheUserSessionExpectedRecords(session *cacheUserSession) []*pb.CacheUserS
 			Value: session.onlineKey,
 		},
 		{
-			Field: pb.CacheUserSessionField_CacheUserSessionField_Session,
-			Value: session.session,
+			Field: pb.CacheUserSessionField_CacheUserSessionField_GatewaySession,
+			Value: session.gatewaySession,
 		},
 	}
 }
