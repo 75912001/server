@@ -12,7 +12,7 @@ import "online.grpc.unary.proto";
 service OnlineService {
   option (proto.serviceOpt) = {
     timeout: "3s"
-    loadBalancePolicy: LoadBalancePolicy_RingHash
+    loadBalancePolicy: LoadBalancePolicy_Direct
   };
   // 控制面：用户上线 (Unary RPC)
   // 作用：Gateway 校验 uid/gatewaySession 后，通过此接口通知 Online 建立在线状态。

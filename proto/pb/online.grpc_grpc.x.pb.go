@@ -187,15 +187,13 @@ func (p *XOnlineServiceClient) OnlineStreamTunnel(ctx context.Context, opts ...g
 }
 
 func (p *XOnlineServiceClient) OnlineUserOnline(ctx context.Context, in *OnlineUserOnlineReq, opts ...grpc.CallOption) (*OnlineUserOnlineRes, error) {
-	return nil, errors.WithMessage(nil, runtime.Location())
+	return p.Client.OnlineUserOnline(ctx, in, opts...)
 }
-
 func (p *XOnlineServiceClient) OnlineUserUpdateGatewaySession(ctx context.Context, in *OnlineUserUpdateGatewaySessionReq, opts ...grpc.CallOption) (*OnlineUserUpdateGatewaySessionRes, error) {
-	return nil, errors.WithMessage(nil, runtime.Location())
+	return p.Client.OnlineUserUpdateGatewaySession(ctx, in, opts...)
 }
-
 func (p *XOnlineServiceClient) OnlineUserOffline(ctx context.Context, in *OnlineUserOfflineReq, opts ...grpc.CallOption) (*OnlineUserOfflineRes, error) {
-	return nil, errors.WithMessage(nil, runtime.Location())
+	return p.Client.OnlineUserOffline(ctx, in, opts...)
 }
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////
