@@ -11,8 +11,8 @@ import "user.record.proto";
 //0x000001#client->gateway#登录验证-请求
 message UserVerifyReq
 {
-  uint64 uid   = 1;   // 玩家唯一 ID
-  string token = 2;   // 登录 Token，供 Online 服校验
+  uint64 uid = 1; // 用户唯一 ID，由 login 服务下发，客户端登录 gateway 时携带
+  string session = 2; // gateway 登录 session，由 login 服务下发，gateway 校验通过后消费
 }
 
 //0x000002#gateway->client#登录验证-回复
@@ -55,22 +55,22 @@ message UserCreateReq
 //0x00000F#gateway->client#创建用户-回复
 message UserCreateRes
 {
-  UserRecord user_record = 1;
+  UserRecord user_record = 1; // 创建成功后的用户数据
 }
 
 //0x000010#client->gateway#机器人压测-请求
 message RobotPingReq
 {
-  uint64 seq = 1;
-  int64 client_time = 2;
-  string payload = 3;
+  uint64 seq = 1; // 客户端递增序号
+  int64 client_time = 2; // 客户端发送时间戳，单位毫秒
+  string payload = 3; // 压测透传数据
 }
 
 //0x000011#gateway->client#机器人压测-回复
 message RobotPingRes
 {
-  uint64 seq = 1;
-  int64 client_time = 2;
-  int64 server_time = 3;
-  string payload = 4;
+  uint64 seq = 1; // 对应请求中的客户端递增序号
+  int64 client_time = 2; // 对应请求中的客户端发送时间戳，单位毫秒
+  int64 server_time = 3; // 服务端回复时间戳，单位毫秒
+  string payload = 4; // 对应请求中的压测透传数据
 }

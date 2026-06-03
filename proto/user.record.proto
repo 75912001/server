@@ -6,6 +6,9 @@ option go_package = "server/proto/pb;pb";
 message UserRecord {
   uint64 uid = 1; // 用户唯一 ID
   string name = 2; // 用户昵称
+  string account = 3; // 登录账号，去除首尾空格后保存，大小写敏感
+  int64 account_create_time = 4; // 账号创建时间戳，单位毫秒
+  int64 user_create_time = 5; // 用户创建时间戳，单位毫秒；0 表示账号已创建但用户未创建
   map<uint64, uint64> asset_map = 10; // 资产表 key: AssetID value: 数值
   map<uint64, RecordPrimary> record_map = 1000; // 记录表 key: 主要ID
 }
