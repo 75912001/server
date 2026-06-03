@@ -12,6 +12,8 @@ service CacheService {
   };
 
   // todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
+  // 写入用户档案。
+  // 以 uid 做 RingHash 分片，用户创建和用户资料更新都会走这个接口。
   rpc CacheSetUserRecord(CacheSetUserRecordReq) returns (CacheSetUserRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -20,6 +22,8 @@ service CacheService {
   }
 
   // todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
+  // 读取用户档案。
+  // 以 uid 做 RingHash 分片，返回当前 uid 对应的 UserRecord。
   rpc CacheGetUserRecord(CacheGetUserRecordReq) returns (CacheGetUserRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -27,27 +31,26 @@ service CacheService {
     };
   }
 
-  rpc CacheSetVerifyUserToken(CacheSetVerifyUserTokenReq) returns (CacheSetVerifyUserTokenRes) {
+  // 写入账号级登录 token。
+  // 以 account 做 RingHash 分片，token 使用一次性 SETNX 语义，未消费前不覆盖。
+  rpc CacheSetAccountVerifyToken(CacheSetAccountVerifyTokenReq) returns (CacheSetAccountVerifyTokenRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
-      shardKeyFieldType: ShardKeyFieldType_UINT64
+      shardKeyFieldType: ShardKeyFieldType_STRING
     };
   }
 
-  rpc CacheVerifyUserToken(CacheVerifyUserTokenReq) returns (CacheVerifyUserTokenRes) {
+  // 验证并消费账号级登录 token。
+  // 以 account 做 RingHash 分片，消费成功后确保账号存在并返回可信 uid。
+  rpc CacheUseAccountVerifyToken(CacheUseAccountVerifyTokenReq) returns (CacheUseAccountVerifyTokenRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
-      shardKeyFieldType: ShardKeyFieldType_UINT64
+      shardKeyFieldType: ShardKeyFieldType_STRING
     };
   }
 
-  rpc CacheUseVerifyUserToken(CacheUseVerifyUserTokenReq) returns (CacheUseVerifyUserTokenRes) {
-    option (proto.methodOpt) = {
-      timeout : "3s"
-      shardKeyFieldType: ShardKeyFieldType_UINT64
-    };
-  }
-
+  // 写入用户在线 session 数据。
+  // 以 uid 做 RingHash 分片，用于 online 建立在线态后写入 gateway/online/session 等字段。
   rpc CacheSetUserSessionRecord(CacheSetUserSessionRecordReq) returns (CacheSetUserSessionRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -55,6 +58,8 @@ service CacheService {
     };
   }
 
+  // 刷新用户在线 session 过期时间。
+  // 以 uid 做 RingHash 分片，仅在 expected_records 匹配当前在线态时刷新 TTL。
   rpc CacheSetUserSessionExpire(CacheSetUserSessionExpireReq) returns (CacheSetUserSessionExpireRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -62,6 +67,8 @@ service CacheService {
     };
   }
 
+  // 读取用户在线 session 数据。
+  // 以 uid 做 RingHash 分片，可按 fields 读取当前在线态中的指定字段。
   rpc CacheGetUserSessionRecord(CacheGetUserSessionRecordReq) returns (CacheGetUserSessionRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -69,6 +76,8 @@ service CacheService {
     };
   }
 
+  // 删除用户在线 session 数据。
+  // 以 uid 做 RingHash 分片，仅在 expected_records 匹配当前在线态时删除。
   rpc CacheDelUserSessionRecord(CacheDelUserSessionRecordReq) returns (CacheDelUserSessionRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -76,6 +85,8 @@ service CacheService {
     };
   }
 
+  // 原子替换用户在线 session 数据。
+  // 以 uid 做 RingHash 分片，仅在 expected_records 匹配时替换 records 并刷新 TTL。
   rpc CacheReplaceUserSessionRecord(CacheReplaceUserSessionRecordReq) returns (CacheReplaceUserSessionRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -88,7 +99,7 @@ enum CacheUserSessionField {
   CacheUserSessionField_Unspecified = 0;
   CacheUserSessionField_GatewayKey = 1;
   CacheUserSessionField_OnlineKey = 2;
-  CacheUserSessionField_Session = 3;
+  CacheUserSessionField_GatewaySession = 3;
   CacheUserSessionField_LoginTime = 4;
 }
 
@@ -113,29 +124,22 @@ message CacheGetUserRecordRes {
   user.UserRecord user_record = 1; // 用户数据
 }
 
-message CacheSetVerifyUserTokenReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+message CacheSetAccountVerifyTokenReq {
+  string account = 1 [(proto.fieldOpt).shardKey = true];
   string token = 2;
   uint64 expire_second = 3;
 }
 
-message CacheSetVerifyUserTokenRes {
+message CacheSetAccountVerifyTokenRes {
 }
 
-message CacheVerifyUserTokenReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+message CacheUseAccountVerifyTokenReq {
+  string account = 1 [(proto.fieldOpt).shardKey = true];
   string token = 2;
 }
 
-message CacheVerifyUserTokenRes {
-}
-
-message CacheUseVerifyUserTokenReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
-  string token = 2;
-}
-
-message CacheUseVerifyUserTokenRes {
+message CacheUseAccountVerifyTokenRes {
+  uint64 uid = 1;
 }
 
 message CacheSetUserSessionRecordReq {
