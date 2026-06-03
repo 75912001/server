@@ -10,7 +10,6 @@ import (
 	xnetcommon "github.com/75912001/xlib/net/common"
 	xpacket "github.com/75912001/xlib/packet"
 	xruntime "github.com/75912001/xlib/runtime"
-	xutil "github.com/75912001/xlib/util"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 )
@@ -55,23 +54,31 @@ func (p *User) OnClientPacket(header *xpacket.Header, body []byte) error {
 
 // OnHeartbeatReq 处理客户端心跳请求。
 //
-//	验证 last_session 与上一次下发的 session 是否一致（首次允许 0）；
+//	验证 last_gateway_session 与 gateway 本地 gatewaySession 是否一致；
 //	若不一致视为重放/篡改，主动断开；
-//	否则生成新 session 并下发，重置心跳超时定时器。
+//	否则生成新 gatewaySession，同步 online/cache 后下发，并重置心跳超时定时器。
 func (p *User) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
 	var req pb.UserHeartbeatReq
 	if err := proto.Unmarshal(body, &req); err != nil {
 		return errors.WithMessagef(err, "UserHeartbeatReq unmarshal %v", xruntime.Location())
 	}
 
-	if p.hb.WaitID != 0 && req.GetLastSession() != p.hb.WaitID {
+	lastGatewaySession := req.GetLastGatewaySession()
+	if lastGatewaySession == "" || lastGatewaySession != p.gatewaySession {
 		p.Disconnect(xnetcommon.DisconnectReasonClientLogic)
-		return errors.WithMessagef(xerror.Mismatch, "heartbeat session mismatch for user[uid=%d] got=%d expect=%d %v",
-			p.uid, req.GetLastSession(), p.hb.WaitID, xruntime.Location())
+		return errors.WithMessagef(xerror.Mismatch, "heartbeat gatewaySession mismatch for user[uid=%d] got=%s expect=%s %v",
+			p.uid, lastGatewaySession, p.gatewaySession, xruntime.Location())
 	}
 
-	next := xutil.RandomUint32()
-	p.hb.WaitID = next
+	nextGatewaySession, err := common.NewRandomGatewaySession()
+	if err != nil {
+		p.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
+		return errors.WithMessagef(err, "new random gatewaySession for user[uid=%d] %v", p.uid, xruntime.Location())
+	}
+
+	if err := p.UpdateGatewaySession(nextGatewaySession); err != nil {
+		return errors.WithMessagef(err, "update gatewaySession for user[uid=%d] %v", p.uid, xruntime.Location())
+	}
 
 	p.restartHeartbeatTimer()
 
@@ -81,8 +88,8 @@ func (p *User) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
 		xerror.Success.Code(),
 		header.Key,
 		&pb.UserHeartbeatRes{
-			ServerTime:  time.Now().UnixMilli(),
-			NextSession: next,
+			ServerTime:         time.Now().UnixMilli(),
+			NextGatewaySession: nextGatewaySession,
 		},
 	)
 }

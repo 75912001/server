@@ -133,9 +133,6 @@ func (p *OnlineMgr) GetByRandom() (*Online, error) {
 }
 
 func (p *OnlineMgr) GetForLogin() (*Online, error) {
-	if xruntime.IsDebug() {
-		return p.GetByRandom()
-	}
 	return p.GetByAvailableLoad()
 }
 

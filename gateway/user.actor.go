@@ -24,8 +24,8 @@ func (p *User) PostFrame(frame *pb.OnlineTunnelFrame) {
 // UserActorCmdUserVerified 登录验证成功后操作, 绑定 uid、online，并启动心跳定时器
 const UserActorCmdUserVerified xactor.CMD = 101
 
-func (p *User) PostSyncVerified(uid uint64, online *Online, session string) error {
-	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserVerified, uid, online, session))
+func (p *User) PostSyncVerified(uid uint64, account string, online *Online, gatewaySession string) error {
+	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserVerified, uid, account, online, gatewaySession))
 	if err != nil {
 		return errors.WithMessagef(err, "user verified sync failed uid:%v online:%v %v", uid, online, xruntime.Location())
 	}
@@ -79,15 +79,19 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if !ok {
 				continue
 			}
-			online, ok := msg.Args[1].(*Online)
+			account, ok := msg.Args[1].(string)
 			if !ok {
 				continue
 			}
-			session, ok := msg.Args[2].(string)
+			online, ok := msg.Args[2].(*Online)
 			if !ok {
 				continue
 			}
-			if err := p.OnVerified(uid, online, session); err != nil {
+			gatewaySession, ok := msg.Args[3].(string)
+			if !ok {
+				continue
+			}
+			if err := p.OnVerified(uid, account, online, gatewaySession); err != nil {
 				return p.behavior, resp, errors.WithMessagef(err, "user verified failed uid:%v online:%v %v", uid, online, xruntime.Location())
 			}
 		case UserActorCmdUserPacket:

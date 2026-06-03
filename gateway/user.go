@@ -15,24 +15,22 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// User 一个客户端连接的会话上下文
-//   - online:nil 表示未校验或已清理,非 nil 表示校验通过并绑定的 online 实例
-//   - verifyTimer / hb:校验超时定时器 + 心跳管理（二选一存在）
-//   - hb.WaitID:上次下发给客户端的 session（防重放）,首次心跳时为 0
+// User 表示一个客户端连接的会话上下文。
 type User struct {
-	uid    uint64             // 玩家唯一 ID，校验成功后填充
-	remote xnetcommon.IRemote // 客户端 TCP 连接（发包 / 主动断开）
-	ip     string
-	online *Online // nil 表示未校验或已清理，非 nil 表示校验通过并绑定的 online 实例
-	actor  *xactor.Actor[string]
+	uid     uint64
+	account string
+	remote  xnetcommon.IRemote
+	ip      string
+	online  *Online
+	actor   *xactor.Actor[string]
 
-	session string
+	gatewaySession string
 
-	verifyTimer *xtimer.Second       // 校验超时定时器（onVerified 后置 nil）
-	hb          xheartbeat.HeartBeat // 心跳管理（WaitID=lastSession，Stop/Start 封装定时器）
+	verifyTimer *xtimer.Second
+	hb          xheartbeat.HeartBeat
 }
 
-// newUser 创建用户 actor，并启动「未校验超时」定时器。
+// newUser 创建用户 actor，并启动未验证超时定时器。
 func newUser(remote xnetcommon.IRemote) *User {
 	u := &User{remote: remote, ip: remote.GetIP()}
 	u.actor = xactor.NewActor[string](fmt.Sprintf("%p", remote), nil, u.behavior)
@@ -56,12 +54,10 @@ func sendClientRes(remote xnetcommon.IRemote, messageID uint32, sessionID uint32
 	})
 }
 
-// 是否校验成功
 func (p *User) IsVerified() bool {
 	return p.online != nil || p.uid != 0 || p.verifyTimer == nil
 }
 
-// 是否连接已断开
 func (p *User) IsClosed() bool {
 	return !p.remote.IsConnect()
 }
@@ -74,7 +70,7 @@ func (p *User) Disconnect(reason xnetcommon.DisconnectReason) {
 	GUserMgr.Remove(p.remote)
 }
 
-// startVerifyTimer 注册超时回调：到期若仍未校验则断开连接
+// startVerifyTimer 注册验证超时回调，未验证完成则断开连接。
 func (p *User) startVerifyTimer() {
 	cb := xcontrol.NewCallBack(func(args ...any) error {
 		if p.IsClosed() || p.online != nil {
@@ -87,23 +83,27 @@ func (p *User) startVerifyTimer() {
 	p.verifyTimer = xtimer.GTimer.AddSecond(cb, time.Now().Unix()+int64(GCfgCustomVerifyExpireTimeDuration/time.Second), p.actor)
 }
 
-// OnVerified 由登录鉴权成功后调用：绑定 uid + online，停校验定时器，启心跳定时器。
-func (p *User) OnVerified(uid uint64, online *Online, session string) error {
+// OnVerified 在登录验证成功后绑定 uid、account、online 和 gatewaySession。
+func (p *User) OnVerified(uid uint64, account string, online *Online, gatewaySession string) error {
 	if p.IsClosed() {
 		return fmt.Errorf("remote disconnected")
 	}
 	if uid == 0 {
 		return fmt.Errorf("uid is empty")
 	}
+	if account == "" {
+		return fmt.Errorf("account is empty")
+	}
 	if online == nil {
 		return fmt.Errorf("online is nil")
 	}
-	if session == "" {
-		return fmt.Errorf("session is empty")
+	if gatewaySession == "" {
+		return fmt.Errorf("gatewaySession is empty")
 	}
 	p.uid = uid
+	p.account = account
 	p.online = online
-	p.session = session
+	p.gatewaySession = gatewaySession
 	GUserMgr.BindUID(uid, p)
 	if p.verifyTimer != nil {
 		xtimer.GTimer.DelSecond(p.verifyTimer)
@@ -113,7 +113,35 @@ func (p *User) OnVerified(uid uint64, online *Online, session string) error {
 	return nil
 }
 
-// restartHeartbeatTimer 启动 / 重置心跳超时定时器（由用户 actor 串行调用）
+func (p *User) UpdateGatewaySession(newGatewaySession string) error {
+	if p.IsClosed() {
+		return fmt.Errorf("remote disconnected")
+	}
+	if p.uid == 0 {
+		return fmt.Errorf("uid is empty")
+	}
+	if p.online == nil {
+		return fmt.Errorf("online is nil")
+	}
+	if p.gatewaySession == "" {
+		return fmt.Errorf("gatewaySession is empty")
+	}
+	if newGatewaySession == "" {
+		return fmt.Errorf("new gatewaySession is empty")
+	}
+	if p.gatewaySession == newGatewaySession {
+		return nil
+	}
+	oldGatewaySession := p.gatewaySession
+	if err := unaryOnlineUserUpdateGatewaySession(p.online, p.uid, xetcd.GEtcd.GetKey(), oldGatewaySession, newGatewaySession); err != nil {
+		p.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
+		return err
+	}
+	p.gatewaySession = newGatewaySession
+	return nil
+}
+
+// restartHeartbeatTimer 启动或重置心跳超时定时器。
 func (p *User) restartHeartbeatTimer() {
 	cb := xcontrol.NewCallBack(
 		func(args ...any) error {
@@ -129,7 +157,7 @@ func (p *User) restartHeartbeatTimer() {
 	p.hb.Start(cb, p.actor)
 }
 
-// Cleanup 连接断开后由 user actor 串行清理定时器和在线状态。
+// Cleanup 在连接断开后清理定时器，并通知 online 清理当前 gatewaySession。
 func (p *User) Cleanup(reason xnetcommon.DisconnectReason) {
 	if p.verifyTimer != nil {
 		xtimer.GTimer.DelSecond(p.verifyTimer)
@@ -138,14 +166,14 @@ func (p *User) Cleanup(reason xnetcommon.DisconnectReason) {
 	p.hb.Stop()
 
 	uid := p.uid
-
 	online := p.online
-	session := p.session
+	gatewaySession := p.gatewaySession
 	p.online = nil
-	p.session = ""
+	p.gatewaySession = ""
+	p.account = ""
 
-	if uid != 0 && online != nil && session != "" {
-		if err := unaryOnlineUserOffline(online, uid, xetcd.GEtcd.GetKey(), session, reason, "gateway user offline"); err != nil {
+	if uid != 0 && online != nil && gatewaySession != "" {
+		if err := unaryOnlineUserOffline(online, uid, xetcd.GEtcd.GetKey(), gatewaySession, reason, "gateway user offline"); err != nil {
 			xlog.GLog.Warnf("notify offline failed uid:%d reason:%d online:%s err:%v", uid, reason, online.Key, err)
 		}
 	}
