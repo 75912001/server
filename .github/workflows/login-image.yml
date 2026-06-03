@@ -1,4 +1,4 @@
-name: Online Image
+name: Login Image
 
 on:
   push:
@@ -11,11 +11,11 @@ permissions:
   packages: write
 
 env:
-  IMAGE_NAME: ghcr.io/75912001/server/online
+  IMAGE_NAME: ghcr.io/75912001/server/login
 
 jobs:
   build-and-push:
-    name: Build and push online image
+    name: Build and push login image
     runs-on: ubuntu-latest
 
     steps:
@@ -49,21 +49,21 @@ jobs:
       - name: Generate proto code
         run: python gen.py
 
-      - name: Test online packages
-        run: go test ./online ./common ./proto/pb
+      - name: Test login packages
+        run: go test ./login ./common ./proto/pb
 
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build online image
+      - name: Build login image
         run: |
           docker build \
-            -f deploy/online/Dockerfile \
+            -f deploy/login/Dockerfile \
             -t $IMAGE_NAME:main \
             -t $IMAGE_NAME:${{ github.sha }} \
             .
 
-      - name: Push online image
+      - name: Push login image
         run: |
           docker push $IMAGE_NAME:main
           docker push $IMAGE_NAME:${{ github.sha }}
