@@ -7,3 +7,7 @@ To generate all files in `./proto/pb` (including `*.pb.go`, `*_grpc.pb.go`, and 
 ```bash
 python ./gen.py
 ```
+
+```bash
+go get github.com/75912001/xlib@latest
+```
