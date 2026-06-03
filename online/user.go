@@ -9,6 +9,7 @@ import (
 
 type User struct {
 	uid        uint64
+	account    string
 	gatewayID  string
 	clientIP   string
 	sessionMgr *userSessionMgr
