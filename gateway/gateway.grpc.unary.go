@@ -37,17 +37,11 @@ func (p *gatewayGRPCServer) GatewayPrepareLogin(_ context.Context, req *pb.Gatew
 	gatewayNonce := req.GetGatewayNonce()
 	gatewaySession := req.GetGatewaySession()
 	expireSecond := req.GetExpireSecond()
-	if uid == 0 || account == "" || gatewayNonce == "" || gatewaySession == "" {
+	if uid == 0 || account == "" || gatewayNonce == "" || gatewaySession == "" || expireSecond == 0 {
 		return &pb.GatewayPrepareLoginRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 	if common.NewGatewaySession(uid, xetcd.GEtcd.GetKey(), gatewayNonce) != gatewaySession {
 		return &pb.GatewayPrepareLoginRes{}, grpcstatus.Error(grpccodes.Unauthenticated, "invalid gateway session")
-	}
-	if expireSecond == 0 {
-		expireSecond = uint64(GCfgCustomLoginSessionPendingTTL / time.Second)
-	}
-	if expireSecond == 0 {
-		expireSecond = 30
 	}
 	GLoginSessionMgr.Add(uid, account, gatewayNonce, gatewaySession, time.Duration(expireSecond)*time.Second)
 	xlog.GLog.Debugf("GatewayPrepareLogin uid:%d account:%s expireSecond:%d", uid, account, expireSecond)
