@@ -166,7 +166,15 @@ docker logs server.login.2
 ## 请求 login.1 token
 
 ```bash
-curl -X POST http://127.0.0.1:10401/api/login/token \
+curl -X POST http://192.168.71.123:30401/api/login/token \
+  -H 'Content-Type: application/json' \
+  -d '{"account":"test-account","token":"test-token"}'
+```
+
+## 请求 login.1 session
+
+```bash
+curl -X POST http://192.168.71.123:30401/api/login/session \
   -H 'Content-Type: application/json' \
   -d '{"account":"test-account","token":"test-token"}'
 ```
@@ -174,7 +182,15 @@ curl -X POST http://127.0.0.1:10401/api/login/token \
 ## 请求 login.2 token
 
 ```bash
-curl -X POST http://127.0.0.1:10402/api/login/token \
+curl -X POST http://192.168.71.123:30402/api/login/token \
+  -H 'Content-Type: application/json' \
+  -d '{"account":"test-account","token":"test-token"}'
+```
+
+## 请求 login.2 session
+
+```bash
+curl -X POST http://192.168.71.123:30402/api/login/session \
   -H 'Content-Type: application/json' \
   -d '{"account":"test-account","token":"test-token"}'
 ```

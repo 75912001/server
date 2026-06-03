@@ -26,12 +26,17 @@ log:
 custom:
   httpAddr: 0.0.0.0:30402
   tokenPath: /api/login/token
+  sessionPath: /api/login/session
   tokenExpireSecond: 10s
+  # gateway pending 登录 session 的有效时间
+  sessionExpireSecond: 30s
   # HTTP 服务读取请求头的超时时间
   readHeaderTimeout: 5s
   # 服务退出时 HTTP 优雅关闭最多等待时间
   shutdownTimeout: 10s
   # 调用 Cache gRPC 接口的超时时间
   cacheRPCTimeout: 3s
+  # 调用 Gateway gRPC 接口的超时时间
+  gatewayRPCTimeout: 3s
   # HTTP 请求体最大字节数
   maxBodyBytes: 4096
