@@ -25,6 +25,7 @@ log:
 
 custom:
   httpAddr: 0.0.0.0:30401
+  tokenPath: /api/login/token
   tokenExpireSecond: 10s
   # HTTP 服务读取请求头的超时时间
   readHeaderTimeout: 5s
