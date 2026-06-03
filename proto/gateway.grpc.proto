@@ -43,6 +43,7 @@ message GatewayPrepareLoginReq {
   string account = 2;
   string gateway_session = 3;
   uint64 expire_second = 4;
+  string gateway_nonce = 5;
 }
 
 message GatewayPrepareLoginRes {

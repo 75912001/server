@@ -13,6 +13,7 @@ message UserVerifyReq
 {
   uint64 uid = 1; // 用户唯一 ID，由 login 服务下发，客户端登录 gateway 时携带
   string gateway_session = 2; // gatewaySession，由 login 服务下发，客户端登录 gateway 时携带
+  string gateway_nonce = 3; // gatewayNonce，由 login 服务下发，参与 gatewaySession 校验
 }
 
 //0x000002#gateway->client#登录验证-回复
