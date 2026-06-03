@@ -25,7 +25,7 @@ func (p *User) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		p.onUserCreateReq(gateway, pkt)
 		return
 	default:
-		if p.userRecord == nil || p.userRecord.GetUid() == 0 {
+		if p.userRecord == nil || p.userRecord.GetUserCreateTime() == 0 {
 			p.sendClientErr(gateway, pkt, uint32(msgID), common.ECOnlineUserNotCreated.Code())
 			return
 		}
@@ -61,11 +61,23 @@ func (p *User) onUserCreateReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
-	if p.userRecord != nil && p.userRecord.GetUid() != 0 {
+	if p.userRecord != nil && p.userRecord.GetUserCreateTime() != 0 {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.AlreadyExists.Code())
 		return
 	}
-	userRecord := &pb.UserRecord{Uid: p.uid}
+	now := time.Now().UnixMilli()
+	userRecord := p.userRecord
+	if userRecord == nil {
+		userRecord = &pb.UserRecord{Uid: p.uid, Account: p.account, AccountCreateTime: now}
+	}
+	userRecord.Uid = p.uid
+	if userRecord.GetAccount() == "" {
+		userRecord.Account = p.account
+	}
+	if userRecord.GetAccountCreateTime() == 0 {
+		userRecord.AccountCreateTime = now
+	}
+	userRecord.UserCreateTime = now
 	if err := unaryCacheSetUserRecord(p.uid, userRecord); err != nil {
 		xlog.GLog.Errorf("set user record failed uid:%d err:%v", p.uid, err)
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.Internal.Code())
