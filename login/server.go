@@ -74,6 +74,7 @@ func (p *LoginServer) PreStop() error {
 
 func (p *LoginServer) Stop() error {
 	GCacheMgr.StopAll()
+	GGatewayMgr.StopAll()
 	if err := p.Server.Stop(); err != nil {
 		return err
 	}

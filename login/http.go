@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"server/common"
 	pb "server/proto/pb"
 
 	xlog "github.com/75912001/xlib/log"
@@ -20,12 +21,19 @@ type tokenReq struct {
 }
 
 type tokenRes struct {
+	Account      string `json:"account"`
+	Token        string `json:"token"`
+	ExpireSecond uint64 `json:"expireSecond"`
+}
+
+type sessionRes struct {
 	Account        string `json:"account"`
-	Token          string `json:"token"`
+	Uid            uint64 `json:"uid"`
+	GatewayNonce   string `json:"gatewayNonce"`
+	GatewaySession string `json:"gatewaySession"`
 	GatewayKey     string `json:"gatewayKey"`
 	GatewayAddr    string `json:"gatewayAddr"`
-	ExpireSecond   uint64 `json:"expireSecond"`
-	AccountCreated bool   `json:"accountCreated"`
+	ExpireSecond   uint64 `json:"sessionExpireSecond"`
 }
 
 type errorRes struct {
@@ -35,6 +43,7 @@ type errorRes struct {
 func newHTTPServer() *http.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc(GCfgCustomTokenPath, handleLoginToken)
+	mux.HandleFunc(GCfgCustomSessionPath, handleLoginSession)
 	return &http.Server{
 		Addr:              GCfgCustomHTTPAddr,
 		Handler:           mux,
@@ -53,16 +62,10 @@ func handleLoginToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gateway, ok := GGatewayMgr.GetByAvailableLoad()
-	if !ok {
-		writeError(w, http.StatusServiceUnavailable, "gateway not available")
-		return
-	}
-
 	ctx, cancel := context.WithTimeout(r.Context(), GCfgCustomCacheRPCTimeout)
 	defer cancel()
 
-	cacheRes, err := pb.GXCacheServiceService.CacheSetAccountVerifyToken(ctx, &pb.CacheSetAccountVerifyTokenReq{
+	_, err := pb.GXCacheServiceService.CacheSetAccountVerifyToken(ctx, &pb.CacheSetAccountVerifyTokenReq{
 		Account:      req.Account,
 		Token:        req.Token,
 		ExpireSecond: GCfgCustomTokenExpireSecond,
@@ -74,12 +77,71 @@ func handleLoginToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, &tokenRes{
+		Account:      req.Account,
+		Token:        req.Token,
+		ExpireSecond: GCfgCustomTokenExpireSecond,
+	})
+}
+
+func handleLoginSession(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+
+	req, ok := decodeTokenReq(w, r)
+	if !ok {
+		return
+	}
+
+	cacheCtx, cacheCancel := context.WithTimeout(r.Context(), GCfgCustomCacheRPCTimeout)
+	defer cacheCancel()
+
+	cacheRes, err := pb.GXCacheServiceService.CacheUseAccountVerifyToken(cacheCtx, &pb.CacheUseAccountVerifyTokenReq{
+		Account: req.Account,
+		Token:   req.Token,
+	})
+	if err != nil {
+		statusCode, message := cacheErrorToHTTP(err)
+		writeError(w, statusCode, message)
+		return
+	}
+	uid := cacheRes.GetUid()
+	if uid == 0 {
+		writeError(w, http.StatusBadGateway, "cache account uid is empty")
+		return
+	}
+
+	gateway, ok := GGatewayMgr.GetByAvailableLoad()
+	if !ok {
+		writeError(w, http.StatusServiceUnavailable, "gateway not available")
+		return
+	}
+
+	gatewayNonce, err := common.NewGatewayNonce()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "new gateway nonce failed")
+		return
+	}
+	gatewaySession := common.NewGatewaySession(uid, gateway.Key, gatewayNonce)
+	gatewayCtx, gatewayCancel := context.WithTimeout(r.Context(), GCfgCustomGatewayRPCTimeout)
+	defer gatewayCancel()
+
+	err = prepareGatewayLogin(gatewayCtx, gateway, uid, req.Account, gatewayNonce, gatewaySession)
+	if err != nil {
+		statusCode, message := gatewayErrorToHTTP(err)
+		writeError(w, statusCode, message)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, &sessionRes{
 		Account:        req.Account,
-		Token:          req.Token,
+		Uid:            uid,
+		GatewayNonce:   gatewayNonce,
+		GatewaySession: gatewaySession,
 		GatewayKey:     gateway.Key,
 		GatewayAddr:    gateway.Addr,
-		ExpireSecond:   GCfgCustomTokenExpireSecond,
-		AccountCreated: cacheRes.GetAccountCreated(),
+		ExpireSecond:   GCfgCustomSessionExpireSecond,
 	})
 }
 
@@ -117,6 +179,25 @@ func cacheErrorToHTTP(err error) (int, string) {
 		return http.StatusBadRequest, status.Message()
 	case codes.AlreadyExists:
 		return http.StatusConflict, status.Message()
+	case codes.NotFound, codes.Unauthenticated:
+		return http.StatusUnauthorized, status.Message()
+	case codes.Unavailable:
+		return http.StatusServiceUnavailable, status.Message()
+	case codes.DeadlineExceeded:
+		return http.StatusGatewayTimeout, status.Message()
+	default:
+		return http.StatusBadGateway, status.Message()
+	}
+}
+
+func gatewayErrorToHTTP(err error) (int, string) {
+	status, ok := grpcstatus.FromError(err)
+	if !ok {
+		return http.StatusServiceUnavailable, "gateway not available"
+	}
+	switch status.Code() {
+	case codes.InvalidArgument:
+		return http.StatusBadRequest, status.Message()
 	case codes.Unavailable:
 		return http.StatusServiceUnavailable, status.Message()
 	case codes.DeadlineExceeded:
