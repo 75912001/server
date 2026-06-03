@@ -16,8 +16,8 @@ func cacheUserSessionFieldName(field pb.CacheUserSessionField) string {
 		return "gatewayKey"
 	case pb.CacheUserSessionField_CacheUserSessionField_OnlineKey:
 		return "onlineKey"
-	case pb.CacheUserSessionField_CacheUserSessionField_Session:
-		return "session"
+	case pb.CacheUserSessionField_CacheUserSessionField_GatewaySession:
+		return "gatewaySession"
 	case pb.CacheUserSessionField_CacheUserSessionField_LoginTime:
 		return "loginTime"
 	default:
@@ -74,7 +74,7 @@ func (s *cacheGRPCServer) CacheDelUserSessionRecord(ctx context.Context, req *pb
 	}
 	var ok bool
 	expected, ok = cacheUserSessionRecords(expectedRecords)
-	if !ok || !cacheUserSessionRecordsHas(expected, "gatewayKey", "onlineKey", "session") {
+	if !ok || !cacheUserSessionRecordsHas(expected, "gatewayKey", "onlineKey", "gatewaySession") {
 		return &pb.CacheDelUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 	if err := GRedis.DelUserSessionRecord(ctx, uid, expected); err != nil {
@@ -89,11 +89,11 @@ func (s *cacheGRPCServer) CacheReplaceUserSessionRecord(ctx context.Context, req
 		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 	expected, ok := cacheUserSessionRecords(req.GetExpectedRecords())
-	if !ok || !cacheUserSessionRecordsHas(expected, "gatewayKey", "onlineKey", "session") {
+	if !ok || !cacheUserSessionRecordsHas(expected, "gatewayKey", "onlineKey", "gatewaySession") {
 		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 	records, ok := cacheUserSessionRecords(req.GetRecords())
-	if !ok || !cacheUserSessionRecordsHas(records, "gatewayKey", "onlineKey", "session", "loginTime") {
+	if !ok || !cacheUserSessionRecordsHas(records, "gatewayKey", "onlineKey", "gatewaySession", "loginTime") {
 		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 	replaced, err := GRedis.ReplaceUserSessionRecord(ctx, uid, expected, records, req.GetExpireSecond())
@@ -101,7 +101,7 @@ func (s *cacheGRPCServer) CacheReplaceUserSessionRecord(ctx context.Context, req
 		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	if !replaced {
-		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.Aborted, "user session changed")
+		return &pb.CacheReplaceUserSessionRecordRes{}, grpcstatus.Error(grpccodes.Aborted, "user gatewaySession changed")
 	}
 	return &pb.CacheReplaceUserSessionRecordRes{}, nil
 }
@@ -117,7 +117,7 @@ func (s *cacheGRPCServer) CacheSetUserSessionExpire(ctx context.Context, req *pb
 	if len(expectedRecords) != 0 {
 		var valid bool
 		expected, valid = cacheUserSessionRecords(expectedRecords)
-		if !valid || !cacheUserSessionRecordsHas(expected, "gatewayKey", "onlineKey", "session") {
+		if !valid || !cacheUserSessionRecordsHas(expected, "gatewayKey", "onlineKey", "gatewaySession") {
 			return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 		}
 	}
@@ -127,9 +127,9 @@ func (s *cacheGRPCServer) CacheSetUserSessionExpire(ctx context.Context, req *pb
 	}
 	if !ok {
 		if len(expected) != 0 {
-			return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.Aborted, "user session changed")
+			return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.Aborted, "user gatewaySession changed")
 		}
-		return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.NotFound, "user session not exist")
+		return &pb.CacheSetUserSessionExpireRes{}, grpcstatus.Error(grpccodes.NotFound, "user gatewaySession not exist")
 	}
 	return &pb.CacheSetUserSessionExpireRes{}, nil
 }
@@ -164,7 +164,7 @@ func (s *cacheGRPCServer) CacheGetUserSessionRecord(ctx context.Context, req *pb
 		})
 	}
 	if len(records) == 0 {
-		return &pb.CacheGetUserSessionRecordRes{}, grpcstatus.Error(grpccodes.NotFound, "user session record not exist")
+		return &pb.CacheGetUserSessionRecordRes{}, grpcstatus.Error(grpccodes.NotFound, "user gatewaySession record not exist")
 	}
 	return &pb.CacheGetUserSessionRecordRes{
 		Records: records,

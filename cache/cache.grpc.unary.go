@@ -42,6 +42,9 @@ func (s *cacheGRPCServer) CacheSetUserRecord(ctx context.Context, req *pb.CacheS
 	if userRecord.GetUid() != 0 && userRecord.GetUid() != uid {
 		return &pb.CacheSetUserRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "uid mismatch")
 	}
+	if userRecord.GetUid() == 0 {
+		userRecord.Uid = uid
+	}
 
 	if err := GRedis.SetUserRecord(ctx, uid, userRecord); err != nil {
 		return &pb.CacheSetUserRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
@@ -49,52 +52,44 @@ func (s *cacheGRPCServer) CacheSetUserRecord(ctx context.Context, req *pb.CacheS
 	return &pb.CacheSetUserRecordRes{}, nil
 }
 
-func (s *cacheGRPCServer) CacheSetVerifyUserToken(ctx context.Context, req *pb.CacheSetVerifyUserTokenReq) (*pb.CacheSetVerifyUserTokenRes, error) {
-	uid := req.GetUid()
+func (s *cacheGRPCServer) CacheSetAccountVerifyToken(ctx context.Context, req *pb.CacheSetAccountVerifyTokenReq) (*pb.CacheSetAccountVerifyTokenRes, error) {
+	account := normalizeAccount(req.GetAccount())
 	token := req.GetToken()
 	expireSecond := req.GetExpireSecond()
-	if uid == 0 || token == "" || expireSecond == 0 {
-		return &pb.CacheSetVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
+	if account == "" || token == "" || expireSecond == 0 {
+		return &pb.CacheSetAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
 	}
-	ok, err := GRedis.SetVerifyUserToken(ctx, uid, token, time.Duration(expireSecond)*time.Second)
+	ok, err := GRedis.SetAccountVerifyToken(ctx, account, token, time.Duration(expireSecond)*time.Second)
 	if err != nil {
-		return &pb.CacheSetVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
+		return &pb.CacheSetAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	if !ok {
-		return &pb.CacheSetVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.AlreadyExists, "token already exists")
+		return &pb.CacheSetAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.AlreadyExists, "token already exists")
 	}
-	return &pb.CacheSetVerifyUserTokenRes{}, nil
+	return &pb.CacheSetAccountVerifyTokenRes{}, nil
 }
 
-func (s *cacheGRPCServer) CacheVerifyUserToken(ctx context.Context, req *pb.CacheVerifyUserTokenReq) (*pb.CacheVerifyUserTokenRes, error) {
-	uid := req.GetUid()
+func (s *cacheGRPCServer) CacheUseAccountVerifyToken(ctx context.Context, req *pb.CacheUseAccountVerifyTokenReq) (*pb.CacheUseAccountVerifyTokenRes, error) {
+	account := normalizeAccount(req.GetAccount())
 	token := req.GetToken()
-	if uid == 0 || token == "" {
-		return &pb.CacheVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
+	if account == "" || token == "" {
+		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
 	}
-	ok, err := GRedis.VerifyUserToken(ctx, uid, token)
+	ok, err := GRedis.UseAccountVerifyToken(ctx, account, token)
 	if err != nil {
-		return &pb.CacheVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
+		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	if !ok {
-		return &pb.CacheVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.NotFound, "token not found or expired")
+		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.NotFound, "token not found or used")
 	}
-
-	return &pb.CacheVerifyUserTokenRes{}, nil
-}
-
-func (s *cacheGRPCServer) CacheUseVerifyUserToken(ctx context.Context, req *pb.CacheUseVerifyUserTokenReq) (*pb.CacheUseVerifyUserTokenRes, error) {
-	uid := req.GetUid()
-	token := req.GetToken()
-	if uid == 0 || token == "" {
-		return &pb.CacheUseVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
-	}
-	ok, err := GRedis.UseVerifyUserToken(ctx, uid, token)
+	userRecord, _, err := GRedis.EnsureAccount(ctx, account)
 	if err != nil {
-		return &pb.CacheUseVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
+		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
-	if !ok {
-		return &pb.CacheUseVerifyUserTokenRes{}, grpcstatus.Error(grpccodes.NotFound, "token not found or used")
+	if userRecord == nil || userRecord.GetUid() == 0 {
+		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.Internal, "account uid is empty")
 	}
-	return &pb.CacheUseVerifyUserTokenRes{}, nil
+	return &pb.CacheUseAccountVerifyTokenRes{
+		Uid: userRecord.GetUid(),
+	}, nil
 }
