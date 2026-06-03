@@ -12,7 +12,7 @@ import "user.record.proto";
 message UserVerifyReq
 {
   uint64 uid = 1; // 用户唯一 ID，由 login 服务下发，客户端登录 gateway 时携带
-  string session = 2; // gateway 登录 session，由 login 服务下发，gateway 校验通过后消费
+  string gateway_session = 2; // gatewaySession，由 login 服务下发，客户端登录 gateway 时携带
 }
 
 //0x000002#gateway->client#登录验证-回复
@@ -29,13 +29,13 @@ message UserOfflineReq
 
 //0x00000A#client->gateway#心跳-请求
 message UserHeartbeatReq {
-  uint32 last_session = 1;   // 上次服务端下发的 session，首次心跳填 0
+  string last_gateway_session = 1;   // 上次 gateway 下发的 gatewaySession
 }
 
 //0x00000B#gateway->client#心跳-回复
 message UserHeartbeatRes {
   int64 server_time  = 1;   // 服务器时间毫秒
-  uint32 next_session = 2;   // 客户端下次心跳必须用这个 session（用于防重放）
+  string next_gateway_session = 2;   // 客户端下次心跳必须用这个 gatewaySession
 }
 
 //0x00000C#client->gateway#请求用户数据-请求
