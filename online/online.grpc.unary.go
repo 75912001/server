@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"strings"
 
 	pb "server/proto/pb"
 
@@ -11,43 +12,45 @@ import (
 
 func (p *onlineGRPCServer) OnlineUserOnline(_ context.Context, req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, error) {
 	uid := req.GetUid()
-	token := req.GetToken()
-	if err := unaryCacheVerifyUserToken(uid, token); err != nil {
-		return nil, grpcstatus.Error(grpccodes.Unauthenticated, err.Error())
+	account := strings.TrimSpace(req.GetAccount())
+	gatewaySession := req.GetGatewaySession()
+	if uid == 0 || account == "" || req.GetGatewayKey() == "" || gatewaySession == "" {
+		return nil, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	res, err := GUserMgr.Login(req)
+	req.Account = account
+	res, err := GUserMgr.Login(uid, req)
 	if err != nil {
 		return nil, err
 	}
-	if res == nil || res.GetSession() == "" {
-		return nil, grpcstatus.Error(grpccodes.Internal, "online login session is empty")
-	}
-	if err := unaryCacheUseVerifyUserToken(uid, token); err != nil {
-		cleanupOnlineLogin(req, res.GetSession())
-		return nil, grpcstatus.Error(grpccodes.Unauthenticated, err.Error())
+	if res == nil {
+		return nil, grpcstatus.Error(grpccodes.Internal, "online login response is empty")
 	}
 	return res, nil
 }
 
 func (p *onlineGRPCServer) OnlineUserOffline(_ context.Context, req *pb.OnlineUserOfflineReq) (*pb.OnlineUserOfflineRes, error) {
-	if req.GetUid() == 0 || req.GetGatewayKey() == "" || req.GetSession() == "" {
+	if req.GetUid() == 0 || req.GetGatewayKey() == "" || req.GetGatewaySession() == "" {
 		return &pb.OnlineUserOfflineRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 	user, ok := GUserMgr.users.Find(req.GetUid())
 	if !ok {
 		return &pb.OnlineUserOfflineRes{}, nil
 	}
-	user.PostOffline(req.GetGatewayKey(), req.GetSession())
+	user.PostOffline(req.GetGatewayKey(), req.GetGatewaySession())
 	return &pb.OnlineUserOfflineRes{}, nil
 }
 
-func cleanupOnlineLogin(req *pb.OnlineUserOnlineReq, session string) {
-	if req.GetUid() == 0 || req.GetGatewayKey() == "" || session == "" {
-		return
+func (p *onlineGRPCServer) OnlineUserUpdateGatewaySession(_ context.Context, req *pb.OnlineUserUpdateGatewaySessionReq) (*pb.OnlineUserUpdateGatewaySessionRes, error) {
+	uid := req.GetUid()
+	if uid == 0 || req.GetGatewayKey() == "" || req.GetOldGatewaySession() == "" || req.GetNewGatewaySession() == "" {
+		return &pb.OnlineUserUpdateGatewaySessionRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	user, ok := GUserMgr.users.Find(req.GetUid())
+	user, ok := GUserMgr.users.Find(uid)
 	if !ok {
-		return
+		return &pb.OnlineUserUpdateGatewaySessionRes{}, grpcstatus.Error(grpccodes.NotFound, "user not online")
 	}
-	user.PostOffline(req.GetGatewayKey(), session)
+	if err := user.PostUpdateGatewaySession(req.GetGatewayKey(), req.GetOldGatewaySession(), req.GetNewGatewaySession()); err != nil {
+		return &pb.OnlineUserUpdateGatewaySessionRes{}, err
+	}
+	return &pb.OnlineUserUpdateGatewaySessionRes{}, nil
 }

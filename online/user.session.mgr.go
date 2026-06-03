@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"time"
 
 	xcontrol "github.com/75912001/xlib/control"
@@ -37,6 +38,22 @@ func (p *userSessionMgr) CleanupOffline() error {
 	err := unaryCacheDelUserSession(p.user.uid, p.session)
 	p.session = nil
 	return err
+}
+
+func (p *userSessionMgr) UpdateGatewaySession(newGatewaySession string) error {
+	if p.session == nil {
+		return grpcstatus.Error(grpccodes.NotFound, "user gatewaySession not found")
+	}
+	expected := cloneCacheUserSession(p.session)
+	next := cloneCacheUserSession(p.session)
+	next.gatewaySession = newGatewaySession
+	next.loginTime = strconv.FormatInt(time.Now().UnixMilli(), 10)
+	if err := unaryCacheReplaceUserSession(p.user.uid, expected, next); err != nil {
+		return err
+	}
+	p.session = next
+	p.startExpireTimer()
+	return nil
 }
 
 func (p *userSessionMgr) startExpireTimer() {
