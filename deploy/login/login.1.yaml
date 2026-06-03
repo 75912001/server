@@ -1,0 +1,36 @@
+# ETCD 配置
+etcd:
+  endpoints:
+    - 192.168.71.123:2379
+    - 192.168.71.123:22379
+    - 192.168.71.123:32379
+  ttlDuration: 33000000s
+
+# 基础配置
+base:
+  projectName: project
+  groupID: 1
+  name: login
+  serverID: 1
+  version: v.0.0.1.2025.03.21.12.21
+  packetLengthMax: 100000
+  sendChannelCapacity: 100000
+  runMode: 1
+  availableLoad: 100000
+  processingMode: 1
+
+# 日志
+log:
+  level: 7
+
+custom:
+  httpAddr: 0.0.0.0:30401
+  tokenExpireSecond: 10s
+  # HTTP 服务读取请求头的超时时间
+  readHeaderTimeout: 5s
+  # 服务退出时 HTTP 优雅关闭最多等待时间
+  shutdownTimeout: 10s
+  # 调用 Cache gRPC 接口的超时时间
+  cacheRPCTimeout: 3s
+  # HTTP 请求体最大字节数
+  maxBodyBytes: 4096
