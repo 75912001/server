@@ -1,6 +1,8 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/75912001/xlib v0.0.0-20260603073225-4664145215f6 h1:fd6s1H5K6JZPOpLW8jNLJ0xGV7x4ZzPPaWjv3aOSofQ=
 github.com/75912001/xlib v0.0.0-20260603073225-4664145215f6/go.mod h1:0AgcVP4Bqg/XpULE8uF4qi4SWZtBN6eVek8EXq7fAC0=
+github.com/75912001/xlib v0.0.0-20260603145302-b8ea7b0a3f63 h1:LCoy0vFIC5fFYljBAqFDt2SDh2dpPJvZyIKylGnaUDc=
+github.com/75912001/xlib v0.0.0-20260603145302-b8ea7b0a3f63/go.mod h1:0AgcVP4Bqg/XpULE8uF4qi4SWZtBN6eVek8EXq7fAC0=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
