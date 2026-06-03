@@ -14,13 +14,19 @@ service OnlineService {
     timeout: "3s"
     loadBalancePolicy: LoadBalancePolicy_RingHash
   };
-  // 控制面：用户登录鉴权 (Unary RPC)
-  // 作用：TCP 刚连接时，网关通过此接口验证 Token。
-  // 特性：验证成功后，该连接才被允许进入 StreamTunnel 核心隧道。
+  // 控制面：用户上线 (Unary RPC)
+  // 作用：Gateway 校验 uid/gatewaySession 后，通过此接口通知 Online 建立在线状态。
+  // 特性：Online 负责顶号、写入用户在线 gatewaySession，并维护过期时间。
   rpc OnlineUserOnline(OnlineUserOnlineReq) returns (OnlineUserOnlineRes){
     option (proto.methodOpt) = {
       timeout : "60s"
-      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+  // 控制面：用户在线 gatewaySession 更新 (Unary RPC)
+  // 作用：Gateway 修改 gatewaySession 前，同步通知 Online 更新本地和 Cache gatewaySession。
+  rpc OnlineUserUpdateGatewaySession(OnlineUserUpdateGatewaySessionReq) returns (OnlineUserUpdateGatewaySessionRes) {
+    option (proto.methodOpt) = {
+      timeout : "60s"
     };
   }
   // 控制面：用户离线 (Unary RPC)
@@ -28,7 +34,6 @@ service OnlineService {
   rpc OnlineUserOffline(OnlineUserOfflineReq) returns (OnlineUserOfflineRes) {
     option (proto.methodOpt) = {
       timeout : "60s"
-      shardKeyFieldType: ShardKeyFieldType_UINT64
     };
   }
   // 数据面：全互联双向流隧道 (Bidirectional Stream)
