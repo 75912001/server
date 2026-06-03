@@ -22,8 +22,7 @@ func (p *UserMgr) GetByUID(uid uint64) *User {
 	return user
 }
 
-func (p *UserMgr) Login(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, error) {
-	uid := req.GetUid()
+func (p *UserMgr) Login(uid uint64, req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, error) {
 	user, existed := p.users.Find(uid)
 	if !existed {
 		user = newUser(uid)
