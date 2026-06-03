@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	GatewayService_GatewayUserOffline_FullMethodName = "/gateway.GatewayService/GatewayUserOffline"
+	GatewayService_GatewayUserOffline_FullMethodName  = "/gateway.GatewayService/GatewayUserOffline"
+	GatewayService_GatewayPrepareLogin_FullMethodName = "/gateway.GatewayService/GatewayPrepareLogin"
 )
 
 // GatewayServiceClient is the client API for GatewayService service.
@@ -27,7 +28,13 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GatewayServiceClient interface {
 	// 用户离线
+	// 调用方：Online 在顶号或清理旧在线状态时，直连旧 Gateway 发起。
+	// 作用：Gateway 根据 uid 查找已登录连接并断开。
 	GatewayUserOffline(ctx context.Context, in *GatewayUserOfflineReq, opts ...grpc.CallOption) (*GatewayUserOfflineRes, error)
+	// 准备登录
+	// 调用方：Login 在分配 Gateway 后，直连目标 Gateway 发起。
+	// 作用：Gateway 在本地 pending 表保存 uid/account/gatewaySession，等待客户端连接验证。
+	GatewayPrepareLogin(ctx context.Context, in *GatewayPrepareLoginReq, opts ...grpc.CallOption) (*GatewayPrepareLoginRes, error)
 }
 
 type gatewayServiceClient struct {
@@ -48,12 +55,28 @@ func (c *gatewayServiceClient) GatewayUserOffline(ctx context.Context, in *Gatew
 	return out, nil
 }
 
+func (c *gatewayServiceClient) GatewayPrepareLogin(ctx context.Context, in *GatewayPrepareLoginReq, opts ...grpc.CallOption) (*GatewayPrepareLoginRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GatewayPrepareLoginRes)
+	err := c.cc.Invoke(ctx, GatewayService_GatewayPrepareLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GatewayServiceServer is the server API for GatewayService service.
 // All implementations must embed UnimplementedGatewayServiceServer
 // for forward compatibility.
 type GatewayServiceServer interface {
 	// 用户离线
+	// 调用方：Online 在顶号或清理旧在线状态时，直连旧 Gateway 发起。
+	// 作用：Gateway 根据 uid 查找已登录连接并断开。
 	GatewayUserOffline(context.Context, *GatewayUserOfflineReq) (*GatewayUserOfflineRes, error)
+	// 准备登录
+	// 调用方：Login 在分配 Gateway 后，直连目标 Gateway 发起。
+	// 作用：Gateway 在本地 pending 表保存 uid/account/gatewaySession，等待客户端连接验证。
+	GatewayPrepareLogin(context.Context, *GatewayPrepareLoginReq) (*GatewayPrepareLoginRes, error)
 	mustEmbedUnimplementedGatewayServiceServer()
 }
 
@@ -66,6 +89,9 @@ type UnimplementedGatewayServiceServer struct{}
 
 func (UnimplementedGatewayServiceServer) GatewayUserOffline(context.Context, *GatewayUserOfflineReq) (*GatewayUserOfflineRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method GatewayUserOffline not implemented")
+}
+func (UnimplementedGatewayServiceServer) GatewayPrepareLogin(context.Context, *GatewayPrepareLoginReq) (*GatewayPrepareLoginRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GatewayPrepareLogin not implemented")
 }
 func (UnimplementedGatewayServiceServer) mustEmbedUnimplementedGatewayServiceServer() {}
 func (UnimplementedGatewayServiceServer) testEmbeddedByValue()                        {}
@@ -106,6 +132,24 @@ func _GatewayService_GatewayUserOffline_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GatewayService_GatewayPrepareLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayPrepareLoginReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayServiceServer).GatewayPrepareLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GatewayService_GatewayPrepareLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayServiceServer).GatewayPrepareLogin(ctx, req.(*GatewayPrepareLoginReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GatewayService_ServiceDesc is the grpc.ServiceDesc for GatewayService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -116,6 +160,10 @@ var GatewayService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GatewayUserOffline",
 			Handler:    _GatewayService_GatewayUserOffline_Handler,
+		},
+		{
+			MethodName: "GatewayPrepareLogin",
+			Handler:    _GatewayService_GatewayPrepareLogin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

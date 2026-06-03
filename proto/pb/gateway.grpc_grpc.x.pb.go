@@ -8,15 +8,12 @@ package pb
 import (
 	context "context"
 	control "github.com/75912001/xlib/control"
-	proto "github.com/75912001/xlib/grpc/proto"
 	interceptor "github.com/75912001/xlib/grpc/proto/interceptor"
-	selector "github.com/75912001/xlib/grpc/selector"
 	util "github.com/75912001/xlib/grpc/util"
 	runtime "github.com/75912001/xlib/runtime"
 	errors "github.com/pkg/errors"
 	grpc "google.golang.org/grpc"
 	insecure "google.golang.org/grpc/credentials/insecure"
-	strconv "strconv"
 )
 
 type XGatewayService struct {
@@ -105,23 +102,10 @@ func NewXGatewayServiceClient(clientConn *grpc.ClientConn) *XGatewayServiceClien
 // GatewayService 客户端-Stream
 // //////////////////////////////////////////////////////////////////////////////
 func (p *XGatewayServiceClient) GatewayUserOffline(ctx context.Context, in *GatewayUserOfflineReq, opts ...grpc.CallOption) (*GatewayUserOfflineRes, error) {
-	shardKeyValue, err := in.Get_XShardKey()
-	if err != nil {
-		return nil, errors.WithMessage(err, runtime.Location())
-	}
-	strValue := strconv.FormatUint(shardKeyValue, 10)
-
-	ctx, grpcConn, err := selector.Sel(ctx, GatewayService_GatewayUserOffline_FullMethodName, shardKeyValue)
-	if err != nil {
-		return nil, errors.WithMessage(err, runtime.Location())
-	}
-	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
-	x := NewGatewayServiceClient(grpcConn)
-	return x.GatewayUserOffline(ctx, in, opts...)
+	return p.Client.GatewayUserOffline(ctx, in, opts...)
 }
-
-func (x *GatewayUserOfflineReq) Get_XShardKey() (uint64, error) {
-	return x.GetUid(), nil
+func (p *XGatewayServiceClient) GatewayPrepareLogin(ctx context.Context, in *GatewayPrepareLoginReq, opts ...grpc.CallOption) (*GatewayPrepareLoginRes, error) {
+	return p.Client.GatewayPrepareLogin(ctx, in, opts...)
 }
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,6 +150,7 @@ func SetIStreamGatewayServiceServer(streamServer IStreamGatewayServiceServer) {
 // //////////////////////////////////////////////////////////////////////////////
 type IUnaryGatewayServiceServer interface {
 	GatewayUserOffline(ctx context.Context, req *GatewayUserOfflineReq) (*GatewayUserOfflineRes, error)
+	GatewayPrepareLogin(ctx context.Context, req *GatewayPrepareLoginReq) (*GatewayPrepareLoginRes, error)
 }
 
 var iUnaryGatewayServiceServer IUnaryGatewayServiceServer
@@ -176,4 +161,8 @@ func SetIUnaryGatewayServiceServer(unaryServer IUnaryGatewayServiceServer) {
 
 func (p *XGatewayServiceServer) GatewayUserOffline(ctx context.Context, req *GatewayUserOfflineReq) (*GatewayUserOfflineRes, error) {
 	return iUnaryGatewayServiceServer.GatewayUserOffline(ctx, req)
+}
+
+func (p *XGatewayServiceServer) GatewayPrepareLogin(ctx context.Context, req *GatewayPrepareLoginReq) (*GatewayPrepareLoginRes, error) {
+	return iUnaryGatewayServiceServer.GatewayPrepareLogin(ctx, req)
 }

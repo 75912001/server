@@ -144,64 +144,44 @@ func (x *CacheGetUserRecordReq) Get_XShardKey() (uint64, error) {
 	return x.GetUid(), nil
 }
 
-func (p *XCacheServiceClient) CacheSetVerifyUserToken(ctx context.Context, in *CacheSetVerifyUserTokenReq, opts ...grpc.CallOption) (*CacheSetVerifyUserTokenRes, error) {
+func (p *XCacheServiceClient) CacheSetAccountVerifyToken(ctx context.Context, in *CacheSetAccountVerifyTokenReq, opts ...grpc.CallOption) (*CacheSetAccountVerifyTokenRes, error) {
 	shardKeyValue, err := in.Get_XShardKey()
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
-	strValue := strconv.FormatUint(shardKeyValue, 10)
+	strValue := shardKeyValue
 
-	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheSetVerifyUserToken_FullMethodName, shardKeyValue)
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheSetAccountVerifyToken_FullMethodName, shardKeyValue)
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
 	x := NewCacheServiceClient(grpcConn)
-	return x.CacheSetVerifyUserToken(ctx, in, opts...)
+	return x.CacheSetAccountVerifyToken(ctx, in, opts...)
 }
 
-func (x *CacheSetVerifyUserTokenReq) Get_XShardKey() (uint64, error) {
-	return x.GetUid(), nil
+func (x *CacheSetAccountVerifyTokenReq) Get_XShardKey() (string, error) {
+	return x.GetAccount(), nil
 }
 
-func (p *XCacheServiceClient) CacheVerifyUserToken(ctx context.Context, in *CacheVerifyUserTokenReq, opts ...grpc.CallOption) (*CacheVerifyUserTokenRes, error) {
+func (p *XCacheServiceClient) CacheUseAccountVerifyToken(ctx context.Context, in *CacheUseAccountVerifyTokenReq, opts ...grpc.CallOption) (*CacheUseAccountVerifyTokenRes, error) {
 	shardKeyValue, err := in.Get_XShardKey()
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
-	strValue := strconv.FormatUint(shardKeyValue, 10)
+	strValue := shardKeyValue
 
-	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheVerifyUserToken_FullMethodName, shardKeyValue)
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheUseAccountVerifyToken_FullMethodName, shardKeyValue)
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
 	x := NewCacheServiceClient(grpcConn)
-	return x.CacheVerifyUserToken(ctx, in, opts...)
+	return x.CacheUseAccountVerifyToken(ctx, in, opts...)
 }
 
-func (x *CacheVerifyUserTokenReq) Get_XShardKey() (uint64, error) {
-	return x.GetUid(), nil
-}
-
-func (p *XCacheServiceClient) CacheUseVerifyUserToken(ctx context.Context, in *CacheUseVerifyUserTokenReq, opts ...grpc.CallOption) (*CacheUseVerifyUserTokenRes, error) {
-	shardKeyValue, err := in.Get_XShardKey()
-	if err != nil {
-		return nil, errors.WithMessage(err, runtime.Location())
-	}
-	strValue := strconv.FormatUint(shardKeyValue, 10)
-
-	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheUseVerifyUserToken_FullMethodName, shardKeyValue)
-	if err != nil {
-		return nil, errors.WithMessage(err, runtime.Location())
-	}
-	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
-	x := NewCacheServiceClient(grpcConn)
-	return x.CacheUseVerifyUserToken(ctx, in, opts...)
-}
-
-func (x *CacheUseVerifyUserTokenReq) Get_XShardKey() (uint64, error) {
-	return x.GetUid(), nil
+func (x *CacheUseAccountVerifyTokenReq) Get_XShardKey() (string, error) {
+	return x.GetAccount(), nil
 }
 
 func (p *XCacheServiceClient) CacheSetUserSessionRecord(ctx context.Context, in *CacheSetUserSessionRecordReq, opts ...grpc.CallOption) (*CacheSetUserSessionRecordRes, error) {
@@ -347,9 +327,8 @@ func SetIStreamCacheServiceServer(streamServer IStreamCacheServiceServer) {
 type IUnaryCacheServiceServer interface {
 	CacheSetUserRecord(ctx context.Context, req *CacheSetUserRecordReq) (*CacheSetUserRecordRes, error)
 	CacheGetUserRecord(ctx context.Context, req *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error)
-	CacheSetVerifyUserToken(ctx context.Context, req *CacheSetVerifyUserTokenReq) (*CacheSetVerifyUserTokenRes, error)
-	CacheVerifyUserToken(ctx context.Context, req *CacheVerifyUserTokenReq) (*CacheVerifyUserTokenRes, error)
-	CacheUseVerifyUserToken(ctx context.Context, req *CacheUseVerifyUserTokenReq) (*CacheUseVerifyUserTokenRes, error)
+	CacheSetAccountVerifyToken(ctx context.Context, req *CacheSetAccountVerifyTokenReq) (*CacheSetAccountVerifyTokenRes, error)
+	CacheUseAccountVerifyToken(ctx context.Context, req *CacheUseAccountVerifyTokenReq) (*CacheUseAccountVerifyTokenRes, error)
 	CacheSetUserSessionRecord(ctx context.Context, req *CacheSetUserSessionRecordReq) (*CacheSetUserSessionRecordRes, error)
 	CacheSetUserSessionExpire(ctx context.Context, req *CacheSetUserSessionExpireReq) (*CacheSetUserSessionExpireRes, error)
 	CacheGetUserSessionRecord(ctx context.Context, req *CacheGetUserSessionRecordReq) (*CacheGetUserSessionRecordRes, error)
@@ -371,16 +350,12 @@ func (p *XCacheServiceServer) CacheGetUserRecord(ctx context.Context, req *Cache
 	return iUnaryCacheServiceServer.CacheGetUserRecord(ctx, req)
 }
 
-func (p *XCacheServiceServer) CacheSetVerifyUserToken(ctx context.Context, req *CacheSetVerifyUserTokenReq) (*CacheSetVerifyUserTokenRes, error) {
-	return iUnaryCacheServiceServer.CacheSetVerifyUserToken(ctx, req)
+func (p *XCacheServiceServer) CacheSetAccountVerifyToken(ctx context.Context, req *CacheSetAccountVerifyTokenReq) (*CacheSetAccountVerifyTokenRes, error) {
+	return iUnaryCacheServiceServer.CacheSetAccountVerifyToken(ctx, req)
 }
 
-func (p *XCacheServiceServer) CacheVerifyUserToken(ctx context.Context, req *CacheVerifyUserTokenReq) (*CacheVerifyUserTokenRes, error) {
-	return iUnaryCacheServiceServer.CacheVerifyUserToken(ctx, req)
-}
-
-func (p *XCacheServiceServer) CacheUseVerifyUserToken(ctx context.Context, req *CacheUseVerifyUserTokenReq) (*CacheUseVerifyUserTokenRes, error) {
-	return iUnaryCacheServiceServer.CacheUseVerifyUserToken(ctx, req)
+func (p *XCacheServiceServer) CacheUseAccountVerifyToken(ctx context.Context, req *CacheUseAccountVerifyTokenReq) (*CacheUseAccountVerifyTokenRes, error) {
+	return iUnaryCacheServiceServer.CacheUseAccountVerifyToken(ctx, req)
 }
 
 func (p *XCacheServiceServer) CacheSetUserSessionRecord(ctx context.Context, req *CacheSetUserSessionRecordReq) (*CacheSetUserSessionRecordRes, error) {

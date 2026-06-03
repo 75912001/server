@@ -9,9 +9,7 @@ import (
 	context "context"
 	control "github.com/75912001/xlib/control"
 	error1 "github.com/75912001/xlib/error"
-	proto "github.com/75912001/xlib/grpc/proto"
 	interceptor "github.com/75912001/xlib/grpc/proto/interceptor"
-	selector "github.com/75912001/xlib/grpc/selector"
 	util "github.com/75912001/xlib/grpc/util"
 	log "github.com/75912001/xlib/log"
 	runtime "github.com/75912001/xlib/runtime"
@@ -22,7 +20,6 @@ import (
 	status "google.golang.org/grpc/status"
 	io "io"
 	debug "runtime/debug"
-	strconv "strconv"
 )
 
 type XOnlineService struct {
@@ -190,43 +187,15 @@ func (p *XOnlineServiceClient) OnlineStreamTunnel(ctx context.Context, opts ...g
 }
 
 func (p *XOnlineServiceClient) OnlineUserOnline(ctx context.Context, in *OnlineUserOnlineReq, opts ...grpc.CallOption) (*OnlineUserOnlineRes, error) {
-	shardKeyValue, err := in.Get_XShardKey()
-	if err != nil {
-		return nil, errors.WithMessage(err, runtime.Location())
-	}
-	strValue := strconv.FormatUint(shardKeyValue, 10)
-
-	ctx, grpcConn, err := selector.Sel(ctx, OnlineService_OnlineUserOnline_FullMethodName, shardKeyValue)
-	if err != nil {
-		return nil, errors.WithMessage(err, runtime.Location())
-	}
-	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
-	x := NewOnlineServiceClient(grpcConn)
-	return x.OnlineUserOnline(ctx, in, opts...)
+	return nil, errors.WithMessage(nil, runtime.Location())
 }
 
-func (x *OnlineUserOnlineReq) Get_XShardKey() (uint64, error) {
-	return x.GetUid(), nil
+func (p *XOnlineServiceClient) OnlineUserUpdateGatewaySession(ctx context.Context, in *OnlineUserUpdateGatewaySessionReq, opts ...grpc.CallOption) (*OnlineUserUpdateGatewaySessionRes, error) {
+	return nil, errors.WithMessage(nil, runtime.Location())
 }
 
 func (p *XOnlineServiceClient) OnlineUserOffline(ctx context.Context, in *OnlineUserOfflineReq, opts ...grpc.CallOption) (*OnlineUserOfflineRes, error) {
-	shardKeyValue, err := in.Get_XShardKey()
-	if err != nil {
-		return nil, errors.WithMessage(err, runtime.Location())
-	}
-	strValue := strconv.FormatUint(shardKeyValue, 10)
-
-	ctx, grpcConn, err := selector.Sel(ctx, OnlineService_OnlineUserOffline_FullMethodName, shardKeyValue)
-	if err != nil {
-		return nil, errors.WithMessage(err, runtime.Location())
-	}
-	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
-	x := NewOnlineServiceClient(grpcConn)
-	return x.OnlineUserOffline(ctx, in, opts...)
-}
-
-func (x *OnlineUserOfflineReq) Get_XShardKey() (uint64, error) {
-	return x.GetUid(), nil
+	return nil, errors.WithMessage(nil, runtime.Location())
 }
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -311,6 +280,7 @@ func (p *XOnlineServiceServer) OnlineStreamTunnel(stream OnlineService_OnlineStr
 // //////////////////////////////////////////////////////////////////////////////
 type IUnaryOnlineServiceServer interface {
 	OnlineUserOnline(ctx context.Context, req *OnlineUserOnlineReq) (*OnlineUserOnlineRes, error)
+	OnlineUserUpdateGatewaySession(ctx context.Context, req *OnlineUserUpdateGatewaySessionReq) (*OnlineUserUpdateGatewaySessionRes, error)
 	OnlineUserOffline(ctx context.Context, req *OnlineUserOfflineReq) (*OnlineUserOfflineRes, error)
 }
 
@@ -322,6 +292,10 @@ func SetIUnaryOnlineServiceServer(unaryServer IUnaryOnlineServiceServer) {
 
 func (p *XOnlineServiceServer) OnlineUserOnline(ctx context.Context, req *OnlineUserOnlineReq) (*OnlineUserOnlineRes, error) {
 	return iUnaryOnlineServiceServer.OnlineUserOnline(ctx, req)
+}
+
+func (p *XOnlineServiceServer) OnlineUserUpdateGatewaySession(ctx context.Context, req *OnlineUserUpdateGatewaySessionReq) (*OnlineUserUpdateGatewaySessionRes, error) {
+	return iUnaryOnlineServiceServer.OnlineUserUpdateGatewaySession(ctx, req)
 }
 
 func (p *XOnlineServiceServer) OnlineUserOffline(ctx context.Context, req *OnlineUserOfflineReq) (*OnlineUserOfflineRes, error) {
