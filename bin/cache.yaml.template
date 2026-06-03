@@ -47,5 +47,10 @@ redis:
 
 custom:
   redisKeyFormatUserRecord: "user:{%v}:record"
-  redisKeyFormatUserToken: "user:{%v}:token"
   redisKeyFormatUserSession: "user:{%v}:session"
+  redisKeyFormatAccountToken: "account:{%v}:token"
+  redisKeyFormatAccountUID: "account:{%v}:uid"
+  redisKeyFormatAccountLock: "account:{%v}:lock"
+  redisKeyUserUIDSequence: "user:uid:sequence"
+  redisUIDSequenceSeed: 10000
+  redisAccountCreateLockDuration: 5s
