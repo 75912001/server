@@ -44,9 +44,11 @@ func (p *UserHandlerTCP) OnUnmarshalPacket(remote xnetcommon.IRemote, data []byt
 	_ = remote
 	header := xpacket.NewHeader()
 	header.Unpack(data[:xpacket.HeaderSize])
+
+	rawData := append([]byte(nil), data...)
 	return &xpacket.PacketPassThrough{
 		Header:  header,
-		RawData: data,
+		RawData: rawData,
 	}, nil
 }
 
