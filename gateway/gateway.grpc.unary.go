@@ -15,14 +15,19 @@ import (
 )
 
 func (p *gatewayGRPCServer) GatewayUserOffline(_ context.Context, req *pb.GatewayUserOfflineReq) (*pb.GatewayUserOfflineRes, error) {
-	if req.GetUid() == 0 {
-		return &pb.GatewayUserOfflineRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid uid:0")
+	userSession := req.GetUserSession()
+	if req.GetUid() == 0 || userSession == "" {
+		return &pb.GatewayUserOfflineRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 
 	uid := req.GetUid()
 	user := GUserMgr.GetByUID(uid)
 	if user == nil {
 		return &pb.GatewayUserOfflineRes{}, grpcstatus.Errorf(grpccodes.NotFound, "not found uid:%d", req.GetUid())
+	}
+	// 只断开 userSession 匹配的连接，防迟到顶号误踢新连接。
+	if user.userSession != userSession {
+		return &pb.GatewayUserOfflineRes{}, grpcstatus.Errorf(grpccodes.Aborted, "user session changed uid:%d", req.GetUid())
 	}
 
 	user.Disconnect(xnetcommon.DisconnectReason(req.GetReason()))
