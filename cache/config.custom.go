@@ -17,8 +17,8 @@ var GCfgCustomRedisUIDSequenceSeed uint64
 var GCfgCustomRedisAccountCreateLockDuration time.Duration
 
 func initCustomConfig() {
-	GCfgCustomRedisKeyFormatUserRecord = xconfig.GConfigMgr.GetCustomString("redisKeyFormatUserRecord")
-	GCfgCustomRedisKeyFormatUserSession = xconfig.GConfigMgr.GetCustomString("redisKeyFormatUserSession")
+	GCfgCustomRedisKeyFormatUserRecord = xconfig.GConfigMgr.GetCustomString("redisKeyFormatUserRecord", "user:{%v}:record")
+	GCfgCustomRedisKeyFormatUserSession = xconfig.GConfigMgr.GetCustomString("redisKeyFormatUserSession", "user:{%v}:session")
 	GCfgCustomRedisKeyFormatAccountToken = xconfig.GConfigMgr.GetCustomString("redisKeyFormatAccountToken", "account:{%v}:token")
 	GCfgCustomRedisKeyFormatAccountUID = xconfig.GConfigMgr.GetCustomString("redisKeyFormatAccountUID", "account:{%v}:uid")
 	GCfgCustomRedisKeyFormatAccountLock = xconfig.GConfigMgr.GetCustomString("redisKeyFormatAccountLock", "account:{%v}:lock")
