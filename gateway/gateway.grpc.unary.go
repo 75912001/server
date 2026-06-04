@@ -48,7 +48,9 @@ func (p *gatewayGRPCServer) GatewayPrepareLogin(_ context.Context, req *pb.Gatew
 	if common.NewGatewaySession(uid, xetcd.GEtcd.GetKey(), gatewayNonce) != gatewaySession {
 		return &pb.GatewayPrepareLoginRes{}, grpcstatus.Error(grpccodes.Unauthenticated, "invalid gateway session")
 	}
-	GLoginSessionMgr.Add(uid, account, gatewayNonce, gatewaySession, time.Duration(expireSecond)*time.Second)
+	if err := GLoginSessionMgr.Add(uid, account, gatewayNonce, gatewaySession, time.Duration(expireSecond)*time.Second); err != nil {
+		return &pb.GatewayPrepareLoginRes{}, grpcstatus.Errorf(grpccodes.Internal, "add pending login session failed: %v", err)
+	}
 	xlog.GLog.Debugf("GatewayPrepareLogin uid:%d account:%s expireSecond:%d", uid, account, expireSecond)
 	return &pb.GatewayPrepareLoginRes{}, nil
 }
