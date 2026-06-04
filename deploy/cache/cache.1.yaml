@@ -1,6 +1,6 @@
 # ETCD 配置
 etcd:
-  endpoints: # ETCD 地址列表，例如: 127.0.0.1:2379
+  endpoints: # ETCD 地址列表，例如: 192.168.71.123:2379
     - 192.168.71.123:2379
     - 192.168.71.123:22379
     - 192.168.71.123:32379
@@ -13,11 +13,8 @@ base:
   name: cache # 服务名称
   serverID: 1 # 服务ID
   version: v.0.0.1.2025.03.21.12.21          # 项目版本
-  packetLengthMax: 100000        # 数据包最大长度
-  sendChannelCapacity: 100000      # 发送通道容量
-  runMode: 1                        # 运行模式 [0:release, 1:debug]
+  runMode: 1                       # 运行模式 [0:release, 1:debug]
   availableLoad: 100000            # 可用负载
-  processingMode: 1 # 处理-模式 [0:bus, 1:actor]
 
 # 日志
 log:
@@ -46,11 +43,5 @@ redis:
     writeTimeoutDuration: 3s # 写超时时间
 
 custom:
-  redisKeyFormatUserRecord: "user:{%v}:record"
-  redisKeyFormatUserSession: "user:{%v}:session"
-  redisKeyFormatAccountToken: "account:{%v}:token"
-  redisKeyFormatAccountUID: "account:{%v}:uid"
-  redisKeyFormatAccountLock: "account:{%v}:lock"
-  redisKeyUserUIDSequence: "user:uid:sequence"
   redisUIDSequenceSeed: 10000
   redisAccountCreateLockDuration: 5s
