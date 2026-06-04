@@ -25,6 +25,8 @@ type User struct {
 	actor   *xactor.Actor[string]
 
 	gatewaySession string
+	// 固定连接身份，一次登录生成，心跳不轮换。
+	userSession string
 
 	verifyTimer *xtimer.Second
 	hb          xheartbeat.HeartBeat
@@ -84,7 +86,7 @@ func (p *User) startVerifyTimer() {
 }
 
 // OnVerified 在登录验证成功后绑定 uid、account、online 和 gatewaySession。
-func (p *User) OnVerified(uid uint64, account string, online *Online, gatewaySession string) error {
+func (p *User) OnVerified(uid uint64, account string, online *Online, gatewaySession string, userSession string) error {
 	if p.IsClosed() {
 		return fmt.Errorf("remote disconnected")
 	}
@@ -100,10 +102,14 @@ func (p *User) OnVerified(uid uint64, account string, online *Online, gatewaySes
 	if gatewaySession == "" {
 		return fmt.Errorf("gatewaySession is empty")
 	}
+	if userSession == "" {
+		return fmt.Errorf("userSession is empty")
+	}
 	p.uid = uid
 	p.account = account
 	p.online = online
 	p.gatewaySession = gatewaySession
+	p.userSession = userSession
 	GUserMgr.BindUID(uid, p)
 	if p.verifyTimer != nil {
 		xtimer.GTimer.DelSecond(p.verifyTimer)
@@ -126,6 +132,9 @@ func (p *User) UpdateGatewaySession(newGatewaySession string) error {
 	if p.gatewaySession == "" {
 		return fmt.Errorf("gatewaySession is empty")
 	}
+	if p.userSession == "" {
+		return fmt.Errorf("userSession is empty")
+	}
 	if newGatewaySession == "" {
 		return fmt.Errorf("new gatewaySession is empty")
 	}
@@ -133,7 +142,7 @@ func (p *User) UpdateGatewaySession(newGatewaySession string) error {
 		return nil
 	}
 	oldGatewaySession := p.gatewaySession
-	if err := unaryOnlineUserUpdateGatewaySession(p.online, p.uid, xetcd.GEtcd.GetKey(), oldGatewaySession, newGatewaySession); err != nil {
+	if err := unaryOnlineUserUpdateGatewaySession(p.online, p.uid, xetcd.GEtcd.GetKey(), oldGatewaySession, newGatewaySession, p.userSession); err != nil {
 		p.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 		return err
 	}
@@ -168,12 +177,14 @@ func (p *User) Cleanup(reason xnetcommon.DisconnectReason) {
 	uid := p.uid
 	online := p.online
 	gatewaySession := p.gatewaySession
+	userSession := p.userSession
 	p.online = nil
 	p.gatewaySession = ""
+	p.userSession = ""
 	p.account = ""
 
-	if uid != 0 && online != nil && gatewaySession != "" {
-		if err := unaryOnlineUserOffline(online, uid, xetcd.GEtcd.GetKey(), gatewaySession, reason, "gateway user offline"); err != nil {
+	if uid != 0 && online != nil && gatewaySession != "" && userSession != "" {
+		if err := unaryOnlineUserOffline(online, uid, xetcd.GEtcd.GetKey(), gatewaySession, userSession, reason, "gateway user offline"); err != nil {
 			xlog.GLog.Warnf("notify offline failed uid:%d reason:%d online:%s err:%v", uid, reason, online.Key, err)
 		}
 	}
