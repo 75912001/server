@@ -12,7 +12,7 @@ service GatewayService {
 
   // 用户离线
   // 调用方：Online 在顶号或清理旧在线状态时，直连旧 Gateway 发起。
-  // 作用：Gateway 根据 uid 查找已登录连接并断开。
+  // 作用：Gateway 根据 uid 查找连接，并只断开 userSession 匹配的连接。
   rpc GatewayUserOffline(GatewayUserOfflineReq) returns (GatewayUserOfflineRes) {
     option (proto.methodOpt) = {
       timeout: "60s"
@@ -30,9 +30,10 @@ service GatewayService {
 }
 
 message GatewayUserOfflineReq {
-  uint64 uid = 1;                                    // 已登录用户 uid；gateway 只从登录完成表 byUID 中查找
+  uint64 uid = 1;                                    // 已登录用户 uid；gateway 先从 byUID 查找，再校验 userSession
   uint32 reason = 2;                                  // 离线原因码
   string msg = 3;                                     // 离线说明
+  string user_session = 4;                            // 固定连接身份，只断开匹配的连接
 }
 
 message GatewayUserOfflineRes {
