@@ -32,15 +32,13 @@ func (p *CacheServer) PreStart(ctx context.Context) error {
 	xgrpcprotoregistry.Init()
 	xgrpcselector.Init()
 
-	{ // 初始化 Redis 客户端
-		var err error
-		GRedis, err = newRedis(xconfig.GConfigMgr.Redis)
-		if err != nil {
-			return errors.WithMessagef(err, "newRedis err %v", xruntime.Location())
-		}
-		if err = GRedis.Ping(ctx); err != nil {
-			return errors.WithMessagef(err, "redis ping err %v", xruntime.Location())
-		}
+	var err error
+	GRedis, err = newRedis(xconfig.GConfigMgr.Redis)
+	if err != nil {
+		return errors.WithMessagef(err, "newRedis err %v", xruntime.Location())
+	}
+	if err = GRedis.Ping(ctx); err != nil {
+		return errors.WithMessagef(err, "redis ping err %v", xruntime.Location())
 	}
 
 	opts := xserver.NewServerOptions().
@@ -53,8 +51,7 @@ func (p *CacheServer) PreStart(ctx context.Context) error {
 		pb.RegisterCacheServiceServer(p.Server.GRPCServer.GrpcServer, &cacheGRPCServer{})
 
 		if xruntime.IsDebug() {
-			// grpcurl -plaintext localhost:20301 list cache.CacheService
-			// grpcurl -plaintext localhost:20301 describe cache.CacheService
+			// debug: grpcurl -plaintext localhost:20301 list cache.CacheService
 			reflection.Register(p.Server.GRPCServer.GrpcServer)
 		}
 	}
