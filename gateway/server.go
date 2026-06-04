@@ -15,6 +15,8 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+var GGatewayServer *GatewayServer
+
 type GatewayServer struct {
 	*xserver.Server
 }
@@ -26,8 +28,9 @@ func NewGatewayServer(args []string) *GatewayServer {
 	if srv == nil {
 		return nil
 	}
+	GGatewayServer = &GatewayServer{Server: srv}
 	initCustomConfig()
-	return &GatewayServer{Server: srv}
+	return GGatewayServer
 }
 
 // PreStart 配置 TCPHandler / HeaderStrategy / etcd 回调，再调用 xlib server 完成日志/actor/timer 初始化
