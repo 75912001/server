@@ -1,6 +1,6 @@
 # ETCD 配置
 etcd:
-  endpoints: # ETCD 地址列表，例如: 127.0.0.1:2379
+  endpoints: # ETCD 地址列表，例如: 192.168.71.123:2379
     - 192.168.71.123:2379
     - 192.168.71.123:22379
     - 192.168.71.123:32379
@@ -13,11 +13,10 @@ base:
   name: gateway # 服务名称
   serverID: 2 # 服务ID
   version: v.0.0.1.2025.03.21.12.21          # 项目版本
-  packetLengthMax: 100000        # 数据包最大长度
-  sendChannelCapacity: 100000      # 发送通道容量
+  #packetLengthMax: 100000        # 数据包最大长度
+  #sendChannelCapacity: 1024        # 发送通道容量
   runMode: 1                        # 运行模式 [0:release, 1:debug]
   availableLoad: 100000            # 可用负载
-  processingMode: 1 # 处理-模式 [0:bus, 1:actor]
 
 # 日志
 log:
@@ -38,10 +37,10 @@ net:
 
 # 用户自定义配置
 custom:
-  # 用户 verify 过期时间，支持 Go duration 格式，例如 300s、5m、24h
+  # 用户 verify 过期时间，支持 Go duration 格式，例如 300s、5m、24h 默认为 300s
   verifyExpireTimeDuration: 864000s
 
-  # 用户心跳过期时间，支持 Go duration 格式，例如 300s、5m、24h
+  # 用户心跳 过期时间-秒, 支持 Go duration 格式，例如 300s、5m、24h 默认为 300s
   heartBeatExpireTimeDuration: 864000s
 
   # 服务-消息映射

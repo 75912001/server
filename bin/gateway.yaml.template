@@ -37,10 +37,10 @@ net:
 
 # 用户自定义配置
 custom:
-  # 用户 verify 过期时间-秒 默认为 300s
+  # 用户 verify 过期时间，支持 Go duration 格式，例如 300s、5m、24h 默认为 300s
   verifyExpireTimeDuration: 864000s
 
-  # 用户心跳 过期时间-秒 默认为 300s
+  # 用户心跳 过期时间-秒, 支持 Go duration 格式，例如 300s、5m、24h 默认为 300s
   heartBeatExpireTimeDuration: 864000s
 
   # 服务-消息映射
@@ -48,5 +48,3 @@ custom:
     user: [0x000001, 0x0fffff] # 用户服务命令范围
     gateway: [0x100000, 0x1fffff] # 网关服务命令范围
     online: [0x200000, 0x2fffff] # 在线服务命令范围
-
-
