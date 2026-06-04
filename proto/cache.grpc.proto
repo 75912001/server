@@ -50,7 +50,7 @@ service CacheService {
   }
 
   // 写入用户在线 session 数据。
-  // 以 uid 做 RingHash 分片，用于 online 建立在线态后写入 gateway/online/session 等字段。
+  // 以 uid 做 RingHash 分片，用于 online 建立在线态后写入 gateway/online/userSession/gatewaySession 等字段。
   rpc CacheSetUserSessionRecord(CacheSetUserSessionRecordReq) returns (CacheSetUserSessionRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -59,7 +59,7 @@ service CacheService {
   }
 
   // 刷新用户在线 session 过期时间。
-  // 以 uid 做 RingHash 分片，仅在 expected_records 匹配当前在线态时刷新 TTL。
+  // 以 uid 做 RingHash 分片，仅在 expected_records 匹配稳定 identity 时刷新 TTL。
   rpc CacheSetUserSessionExpire(CacheSetUserSessionExpireReq) returns (CacheSetUserSessionExpireRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -77,7 +77,7 @@ service CacheService {
   }
 
   // 删除用户在线 session 数据。
-  // 以 uid 做 RingHash 分片，仅在 expected_records 匹配当前在线态时删除。
+  // 以 uid 做 RingHash 分片，仅在 expected_records 匹配稳定 identity 时删除。
   rpc CacheDelUserSessionRecord(CacheDelUserSessionRecordReq) returns (CacheDelUserSessionRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -86,7 +86,7 @@ service CacheService {
   }
 
   // 原子替换用户在线 session 数据。
-  // 以 uid 做 RingHash 分片，仅在 expected_records 匹配时替换 records 并刷新 TTL。
+  // 以 uid 做 RingHash 分片，登录替换匹配稳定 identity，心跳更新额外校验 old gatewaySession。
   rpc CacheReplaceUserSessionRecord(CacheReplaceUserSessionRecordReq) returns (CacheReplaceUserSessionRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -99,8 +99,9 @@ enum CacheUserSessionField {
   CacheUserSessionField_Unspecified = 0;
   CacheUserSessionField_GatewayKey = 1;
   CacheUserSessionField_OnlineKey = 2;
-  CacheUserSessionField_GatewaySession = 3;
+  CacheUserSessionField_GatewaySession = 3; // 可轮换认证凭证，客户端心跳后更新。
   CacheUserSessionField_LoginTime = 4;
+  CacheUserSessionField_UserSession = 5; // 固定连接身份，一次登录生成，心跳不轮换。
 }
 
 message CacheUserSessionRecord {
