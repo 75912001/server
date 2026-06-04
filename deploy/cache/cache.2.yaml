@@ -43,5 +43,4 @@ redis:
     writeTimeoutDuration: 3s # 写超时时间
 
 custom:
-  redisUIDSequenceSeed: 10000
   redisAccountCreateLockDuration: 5s
