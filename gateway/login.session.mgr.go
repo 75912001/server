@@ -47,7 +47,7 @@ func (p *loginSessionMgr) Add(uid uint64, account string, gatewayNonce string, g
 	if xtimer.GTimer == nil {
 		return fmt.Errorf("global timer is nil")
 	}
-	if GServer == nil || GServer.Server == nil || GServer.Server.GetActor() == nil {
+	if GGatewayServer == nil || GGatewayServer.Server == nil || GGatewayServer.Server.GetActor() == nil {
 		return fmt.Errorf("gateway server actor is nil")
 	}
 
@@ -63,7 +63,7 @@ func (p *loginSessionMgr) Add(uid uint64, account string, gatewayNonce string, g
 			p.Expire(key)
 			return nil
 		},
-	), time.Now().Unix()+int64(ttl/time.Second), GServer.Server.GetActor())
+	), time.Now().Unix()+int64(ttl/time.Second), GGatewayServer.Server.GetActor())
 
 	p.m.Add(key, pending)
 	return nil

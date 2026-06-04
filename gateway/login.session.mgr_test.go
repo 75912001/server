@@ -65,10 +65,10 @@ func TestLoginSessionMgrExpireAfterConsumeIsNoop(t *testing.T) {
 
 func TestLoginSessionMgrAddRequiresTimerOut(t *testing.T) {
 	mgr := newLoginSessionMgr()
-	old := GServer
-	GServer = nil
+	old := GGatewayServer
+	GGatewayServer = nil
 	t.Cleanup(func() {
-		GServer = old
+		GGatewayServer = old
 	})
 
 	if err := mgr.Add(1001, "account-1", "nonce-1", "gateway-session-1", 1); err == nil {
