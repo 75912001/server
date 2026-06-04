@@ -19,7 +19,7 @@ Cache 服务负责统一访问 Redis Cluster，提供账号登录 token、账号
 - `cache.grpc.unary.account.token.go`：账号 token 写入、消费和账号创建入口。
 - `cache.grpc.unary.user.record.go`：用户档案读写。
 - `cache.grpc.unary.user.session.go`：在线 session 字段转换、批量读写、CAS 替换、删除和续期。
-- `config.custom.go`：Redis key 格式、uid 起始值和账号创建锁时长。
+- `config.custom.go`：Redis key 格式、cache groupID 和账号创建锁时长。
 - `redis.go`：`go-redis` ClusterClient 初始化、Ping、Close 和基础 Get。
 - `redis.logic.account.token.go`：账号 token、账号到 uid 映射和账号创建锁。
 - `redis.logic.user.record.go`：`UserRecord` protobuf 读写。
@@ -61,7 +61,6 @@ custom 配置：
 
 ```yaml
 custom:
-  redisUIDSequenceSeed: 10000
   redisAccountCreateLockDuration: 5s
 ```
 
@@ -73,8 +72,6 @@ redisKeyFormatUserSession      user:{%v}:session
 redisKeyFormatAccountToken     account:{%v}:token
 redisKeyFormatAccountUID       account:{%v}:uid
 redisKeyFormatAccountLock      account:{%v}:lock
-redisKeyUserUIDSequence        user:uid:sequence
-redisUIDSequenceSeed           10000
 redisAccountCreateLockDuration 5s
 ```
 
@@ -86,7 +83,7 @@ redisAccountCreateLockDuration 5s
 account:{account}:token       一次性登录 token
 account:{account}:uid         account 到 uid 的映射
 account:{account}:lock        account 首次创建锁
-user:uid:sequence             uid 自增序列
+user:uid:sequence:{groupID}   当前 group 的 uid 自增序列
 user:{uid}:record             UserRecord protobuf 二进制，默认实际格式为 user:{uid}:record
 user:{uid}:session            在线 session hash，默认实际格式为 user:{uid}:session
 ```
@@ -155,13 +152,27 @@ loginTime
 
 ## 账号创建
 
+UID 起始值由 cache 自身配置的 `base.groupID` 计算，公式位于 `common.GroupUIDStart`：
+
+```text
+GroupUIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
+```
+
+示例：
+
+```text
+groupID=1 -> 1,000,000,000,001
+groupID=2 -> 2,000,000,000,001
+groupID=3 -> 3,000,000,000,001
+```
+
 `EnsureAccount` 处理顺序：
 
 1. 查询 `account:{account}:uid`。
 2. 已存在时读取 `user:{uid}:record` 并返回。
 3. 不存在时获取 `account:{account}:lock`。
 4. 拿到锁后再次查询账号映射，避免重复创建。
-5. 初始化 `user:uid:sequence`，并通过 `INCR` 生成 uid。
+5. 初始化 `user:uid:sequence:{groupID}` 为 `GroupUIDStart(groupID)-1`，并通过 `INCR` 生成 uid。
 6. 写入 `user:{uid}:record`，设置 `uid`、`account`、`account_create_time`，`user_create_time` 初始为 0。
 7. 写入 `account:{account}:uid`。
 8. 释放 `account:{account}:lock`。
