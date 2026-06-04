@@ -75,12 +75,25 @@ func unaryOnlineUserOnline(
 		)
 		return errors.WithMessagef(xerror.Unauthenticated, "OnlineUserOnline pending session not found uid:%v %v", uid, xruntime.Location())
 	}
+	userSession, err := common.NewUserSession()
+	if err != nil {
+		_ = sendClientRes(
+			remote,
+			uint32(pb.MsgIDUser_UserVerifyRes_CMD),
+			header.SessionID,
+			xerror.Internal.Code(),
+			header.Key,
+			nil,
+		)
+		return errors.WithMessagef(err, "new userSession failed uid:%v %v", uid, xruntime.Location())
+	}
 	req := &pb.OnlineUserOnlineReq{
 		Uid:            uid,
 		Account:        pending.account,
 		GatewayKey:     xetcd.GEtcd.GetKey(),
 		ClientIp:       remote.GetIP(),
 		GatewaySession: gatewaySession,
+		UserSession:    userSession,
 	}
 
 	online, err := GOnlineMgr.GetForLogin()
@@ -115,13 +128,14 @@ func unaryOnlineUserOnline(
 
 	account := req.GetAccount()
 	onlineGatewaySession := req.GetGatewaySession()
+	onlineUserSession := req.GetUserSession()
 	xlog.GLog.Tracef("OnlineUserOnline account:%s uid:%d", account, uid)
 
 	// 校验通过：绑定 User 到 online 实例
 	// 停止「未校验超时」定时器，启动心跳超时定时器。
 	u := GUserMgr.Get(remote)
 	if u == nil || !remote.IsConnect() {
-		cleanupOnlineLoginGatewaySession(online, uid, req.GetGatewayKey(), onlineGatewaySession, "gateway remote not connected after online login")
+		cleanupOnlineLoginGatewaySession(online, uid, req.GetGatewayKey(), onlineGatewaySession, onlineUserSession, "gateway remote not connected after online login")
 		_ = sendClientRes(
 			remote,
 			uint32(pb.MsgIDUser_UserVerifyRes_CMD),
@@ -133,8 +147,8 @@ func unaryOnlineUserOnline(
 		return errors.WithMessagef(xerror.Disconnect, "OnlineUserOnline remote not connect account:%v uid:%v %v", account, uid, xruntime.Location())
 	}
 
-	if err = u.PostSyncVerified(uid, account, online, onlineGatewaySession); err != nil {
-		cleanupOnlineLoginGatewaySession(online, uid, req.GetGatewayKey(), onlineGatewaySession, "gateway bind failed after online login")
+	if err = u.PostSyncVerified(uid, account, online, onlineGatewaySession, onlineUserSession); err != nil {
+		cleanupOnlineLoginGatewaySession(online, uid, req.GetGatewayKey(), onlineGatewaySession, onlineUserSession, "gateway bind failed after online login")
 		_ = sendClientRes(
 			remote,
 			uint32(pb.MsgIDUser_UserVerifyRes_CMD),
@@ -157,16 +171,16 @@ func unaryOnlineUserOnline(
 	)
 }
 
-func cleanupOnlineLoginGatewaySession(online *Online, uid uint64, gatewayKey string, gatewaySession string, msg string) {
-	if online == nil || uid == 0 || gatewayKey == "" || gatewaySession == "" {
+func cleanupOnlineLoginGatewaySession(online *Online, uid uint64, gatewayKey string, gatewaySession string, userSession string, msg string) {
+	if online == nil || uid == 0 || gatewayKey == "" || gatewaySession == "" || userSession == "" {
 		return
 	}
-	if err := unaryOnlineUserOffline(online, uid, gatewayKey, gatewaySession, xnetcommon.DisconnectReasonServerShutdown, msg); err != nil {
+	if err := unaryOnlineUserOffline(online, uid, gatewayKey, gatewaySession, userSession, xnetcommon.DisconnectReasonServerShutdown, msg); err != nil {
 		xlog.GLog.Warnf("cleanup online login session failed uid:%d online:%s err:%v", uid, online.Key, err)
 	}
 }
 
-func unaryOnlineUserUpdateGatewaySession(online *Online, uid uint64, gatewayKey string, oldGatewaySession string, newGatewaySession string) error {
+func unaryOnlineUserUpdateGatewaySession(online *Online, uid uint64, gatewayKey string, oldGatewaySession string, newGatewaySession string, userSession string) error {
 	if online == nil {
 		return errors.Errorf("online is nil")
 	}
@@ -176,6 +190,7 @@ func unaryOnlineUserUpdateGatewaySession(online *Online, uid uint64, gatewayKey 
 			GatewayKey:        gatewayKey,
 			OldGatewaySession: oldGatewaySession,
 			NewGatewaySession: newGatewaySession,
+			UserSession:       userSession,
 		})
 	return err
 }
@@ -226,7 +241,7 @@ func grpcErrorToResultCode(err error) uint32 {
 	}
 }
 
-func unaryOnlineUserOffline(online *Online, uid uint64, gatewayKey string, gatewaySession string, reason xnetcommon.DisconnectReason, msg string) error {
+func unaryOnlineUserOffline(online *Online, uid uint64, gatewayKey string, gatewaySession string, userSession string, reason xnetcommon.DisconnectReason, msg string) error {
 	_, err := pb.NewOnlineServiceClient(online.GetClientConn()).OnlineUserOffline(context.Background(),
 		&pb.OnlineUserOfflineReq{
 			Uid:            uid,
@@ -234,6 +249,7 @@ func unaryOnlineUserOffline(online *Online, uid uint64, gatewayKey string, gatew
 			Msg:            msg,
 			GatewayKey:     gatewayKey,
 			GatewaySession: gatewaySession,
+			UserSession:    userSession,
 		})
 	return err
 }
