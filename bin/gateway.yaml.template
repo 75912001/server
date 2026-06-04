@@ -13,11 +13,10 @@ base:
   name: gateway # 服务名称
   serverID: 1 # 服务ID
   version: v.0.0.1.2025.03.21.12.21          # 项目版本
-  packetLengthMax: 100000        # 数据包最大长度
-  sendChannelCapacity: 100000      # 发送通道容量
+  #packetLengthMax: 100000        # 数据包最大长度
+  #sendChannelCapacity: 1024        # 发送通道容量
   runMode: 1                        # 运行模式 [0:release, 1:debug]
   availableLoad: 100000            # 可用负载
-  processingMode: 1 # 处理-模式 [0:bus, 1:actor]
 
 # 日志
 log:
