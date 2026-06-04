@@ -49,19 +49,19 @@ type CacheServiceClient interface {
 	// 以 account 做 RingHash 分片，消费成功后确保账号存在并返回可信 uid。
 	CacheUseAccountVerifyToken(ctx context.Context, in *CacheUseAccountVerifyTokenReq, opts ...grpc.CallOption) (*CacheUseAccountVerifyTokenRes, error)
 	// 写入用户在线 session 数据。
-	// 以 uid 做 RingHash 分片，用于 online 建立在线态后写入 gateway/online/session 等字段。
+	// 以 uid 做 RingHash 分片，用于 online 建立在线态后写入 gateway/online/userSession/gatewaySession 等字段。
 	CacheSetUserSessionRecord(ctx context.Context, in *CacheSetUserSessionRecordReq, opts ...grpc.CallOption) (*CacheSetUserSessionRecordRes, error)
 	// 刷新用户在线 session 过期时间。
-	// 以 uid 做 RingHash 分片，仅在 expected_records 匹配当前在线态时刷新 TTL。
+	// 以 uid 做 RingHash 分片，仅在 expected_records 匹配稳定 identity 时刷新 TTL。
 	CacheSetUserSessionExpire(ctx context.Context, in *CacheSetUserSessionExpireReq, opts ...grpc.CallOption) (*CacheSetUserSessionExpireRes, error)
 	// 读取用户在线 session 数据。
 	// 以 uid 做 RingHash 分片，可按 fields 读取当前在线态中的指定字段。
 	CacheGetUserSessionRecord(ctx context.Context, in *CacheGetUserSessionRecordReq, opts ...grpc.CallOption) (*CacheGetUserSessionRecordRes, error)
 	// 删除用户在线 session 数据。
-	// 以 uid 做 RingHash 分片，仅在 expected_records 匹配当前在线态时删除。
+	// 以 uid 做 RingHash 分片，仅在 expected_records 匹配稳定 identity 时删除。
 	CacheDelUserSessionRecord(ctx context.Context, in *CacheDelUserSessionRecordReq, opts ...grpc.CallOption) (*CacheDelUserSessionRecordRes, error)
 	// 原子替换用户在线 session 数据。
-	// 以 uid 做 RingHash 分片，仅在 expected_records 匹配时替换 records 并刷新 TTL。
+	// 以 uid 做 RingHash 分片，登录替换匹配稳定 identity，心跳更新额外校验 old gatewaySession。
 	CacheReplaceUserSessionRecord(ctx context.Context, in *CacheReplaceUserSessionRecordReq, opts ...grpc.CallOption) (*CacheReplaceUserSessionRecordRes, error)
 }
 
@@ -182,19 +182,19 @@ type CacheServiceServer interface {
 	// 以 account 做 RingHash 分片，消费成功后确保账号存在并返回可信 uid。
 	CacheUseAccountVerifyToken(context.Context, *CacheUseAccountVerifyTokenReq) (*CacheUseAccountVerifyTokenRes, error)
 	// 写入用户在线 session 数据。
-	// 以 uid 做 RingHash 分片，用于 online 建立在线态后写入 gateway/online/session 等字段。
+	// 以 uid 做 RingHash 分片，用于 online 建立在线态后写入 gateway/online/userSession/gatewaySession 等字段。
 	CacheSetUserSessionRecord(context.Context, *CacheSetUserSessionRecordReq) (*CacheSetUserSessionRecordRes, error)
 	// 刷新用户在线 session 过期时间。
-	// 以 uid 做 RingHash 分片，仅在 expected_records 匹配当前在线态时刷新 TTL。
+	// 以 uid 做 RingHash 分片，仅在 expected_records 匹配稳定 identity 时刷新 TTL。
 	CacheSetUserSessionExpire(context.Context, *CacheSetUserSessionExpireReq) (*CacheSetUserSessionExpireRes, error)
 	// 读取用户在线 session 数据。
 	// 以 uid 做 RingHash 分片，可按 fields 读取当前在线态中的指定字段。
 	CacheGetUserSessionRecord(context.Context, *CacheGetUserSessionRecordReq) (*CacheGetUserSessionRecordRes, error)
 	// 删除用户在线 session 数据。
-	// 以 uid 做 RingHash 分片，仅在 expected_records 匹配当前在线态时删除。
+	// 以 uid 做 RingHash 分片，仅在 expected_records 匹配稳定 identity 时删除。
 	CacheDelUserSessionRecord(context.Context, *CacheDelUserSessionRecordReq) (*CacheDelUserSessionRecordRes, error)
 	// 原子替换用户在线 session 数据。
-	// 以 uid 做 RingHash 分片，仅在 expected_records 匹配时替换 records 并刷新 TTL。
+	// 以 uid 做 RingHash 分片，登录替换匹配稳定 identity，心跳更新额外校验 old gatewaySession。
 	CacheReplaceUserSessionRecord(context.Context, *CacheReplaceUserSessionRecordReq) (*CacheReplaceUserSessionRecordRes, error)
 	mustEmbedUnimplementedCacheServiceServer()
 }

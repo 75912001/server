@@ -29,7 +29,7 @@ const (
 type GatewayServiceClient interface {
 	// 用户离线
 	// 调用方：Online 在顶号或清理旧在线状态时，直连旧 Gateway 发起。
-	// 作用：Gateway 根据 uid 查找已登录连接并断开。
+	// 作用：Gateway 根据 uid 查找连接，并只断开 userSession 匹配的连接。
 	GatewayUserOffline(ctx context.Context, in *GatewayUserOfflineReq, opts ...grpc.CallOption) (*GatewayUserOfflineRes, error)
 	// 准备登录
 	// 调用方：Login 在分配 Gateway 后，直连目标 Gateway 发起。
@@ -71,7 +71,7 @@ func (c *gatewayServiceClient) GatewayPrepareLogin(ctx context.Context, in *Gate
 type GatewayServiceServer interface {
 	// 用户离线
 	// 调用方：Online 在顶号或清理旧在线状态时，直连旧 Gateway 发起。
-	// 作用：Gateway 根据 uid 查找已登录连接并断开。
+	// 作用：Gateway 根据 uid 查找连接，并只断开 userSession 匹配的连接。
 	GatewayUserOffline(context.Context, *GatewayUserOfflineReq) (*GatewayUserOfflineRes, error)
 	// 准备登录
 	// 调用方：Login 在分配 Gateway 后，直连目标 Gateway 发起。
