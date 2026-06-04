@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"server/common"
 	"server/proto/pb"
 	"strconv"
 	"time"
@@ -65,10 +66,13 @@ func (p *Redis) createAccountAfterLock(ctx context.Context, account string) (*pb
 		return userRecord, false, err
 	}
 
-	if err = p.client.SetNX(ctx, RedisKeyUserUIDSequence(), GCfgCustomRedisUIDSequenceSeed, 0).Err(); err != nil {
+	groupID := GCfgBaseGroupID
+	startUID := common.GroupUIDStart(groupID)
+	sequenceKey := RedisKeyUserUIDSequence(groupID)
+	if err = p.client.SetNX(ctx, sequenceKey, startUID-1, 0).Err(); err != nil {
 		return nil, false, errors.WithMessagef(err, "init uid sequence failed, account: %s %v", account, xruntime.Location())
 	}
-	uid, err := p.client.Incr(ctx, RedisKeyUserUIDSequence()).Uint64()
+	uid, err := p.client.Incr(ctx, sequenceKey).Uint64()
 	if err != nil {
 		return nil, false, errors.WithMessagef(err, "incr uid sequence failed, account: %s %v", account, xruntime.Location())
 	}
