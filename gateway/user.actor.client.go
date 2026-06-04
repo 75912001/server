@@ -55,8 +55,9 @@ func (p *User) OnClientPacket(header *xpacket.Header, body []byte) error {
 // OnHeartbeatReq 处理客户端心跳请求。
 //
 //	验证 last_gateway_session 与 gateway 本地 gatewaySession 是否一致；
+//	gatewaySession 是可轮换认证凭证，userSession 是固定连接身份；
 //	若不一致视为重放/篡改，主动断开；
-//	否则生成新 gatewaySession，同步 online/cache 后下发，并重置心跳超时定时器。
+//	一致时生成新 gatewaySession，同步 online/cache 后下发，并重置心跳超时定时器。
 func (p *User) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
 	var req pb.UserHeartbeatReq
 	if err := proto.Unmarshal(body, &req); err != nil {
