@@ -108,7 +108,3 @@ func (p *OnlineMgr) GetByAvailableLoad() (*Online, error) {
 	}
 	return selected, nil
 }
-
-func (p *OnlineMgr) GetForLogin() (*Online, error) {
-	return p.GetByAvailableLoad()
-}
