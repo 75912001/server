@@ -50,14 +50,14 @@ type CacheServiceClient interface {
 	// 获取用户在线 session。
 	// 以 uid 做 RingHash 分片，返回当前在线态中的 gatewayKey/userSession/loginTime/onlineKey。
 	CacheGetUserSession(ctx context.Context, in *CacheGetUserSessionReq, opts ...grpc.CallOption) (*CacheGetUserSessionRes, error)
-	// 按 expected 创建用户在线 session。
-	// 以 uid 做 RingHash 分片，expected 为空时要求当前 session 不存在。
+	// 按 expected_user_session 创建用户在线 session。
+	// 以 uid 做 RingHash 分片，expected_user_session 为空时要求当前 session 不存在。
 	CacheBeginUserSessionCAS(ctx context.Context, in *CacheBeginUserSessionCASReq, opts ...grpc.CallOption) (*CacheBeginUserSessionCASRes, error)
-	// 按 expected 结束用户在线 session。
-	// 以 uid 做 RingHash 分片，仅在 expected_session.user_session 匹配时删除。
+	// 按 expected_user_session 结束用户在线 session。
+	// 以 uid 做 RingHash 分片，仅在 expected_user_session 匹配时删除。
 	CacheEndUserSessionCAS(ctx context.Context, in *CacheEndUserSessionCASReq, opts ...grpc.CallOption) (*CacheEndUserSessionCASRes, error)
-	// 按 expected 刷新用户在线 session TTL。
-	// 以 uid 做 RingHash 分片，仅在 expected_session.user_session 匹配时刷新 TTL。
+	// 按 expected_user_session 刷新用户在线 session TTL。
+	// 以 uid 做 RingHash 分片，仅在 expected_user_session 匹配时刷新 TTL。
 	CacheRefreshUserSessionCAS(ctx context.Context, in *CacheRefreshUserSessionCASReq, opts ...grpc.CallOption) (*CacheRefreshUserSessionCASRes, error)
 }
 
@@ -170,14 +170,14 @@ type CacheServiceServer interface {
 	// 获取用户在线 session。
 	// 以 uid 做 RingHash 分片，返回当前在线态中的 gatewayKey/userSession/loginTime/onlineKey。
 	CacheGetUserSession(context.Context, *CacheGetUserSessionReq) (*CacheGetUserSessionRes, error)
-	// 按 expected 创建用户在线 session。
-	// 以 uid 做 RingHash 分片，expected 为空时要求当前 session 不存在。
+	// 按 expected_user_session 创建用户在线 session。
+	// 以 uid 做 RingHash 分片，expected_user_session 为空时要求当前 session 不存在。
 	CacheBeginUserSessionCAS(context.Context, *CacheBeginUserSessionCASReq) (*CacheBeginUserSessionCASRes, error)
-	// 按 expected 结束用户在线 session。
-	// 以 uid 做 RingHash 分片，仅在 expected_session.user_session 匹配时删除。
+	// 按 expected_user_session 结束用户在线 session。
+	// 以 uid 做 RingHash 分片，仅在 expected_user_session 匹配时删除。
 	CacheEndUserSessionCAS(context.Context, *CacheEndUserSessionCASReq) (*CacheEndUserSessionCASRes, error)
-	// 按 expected 刷新用户在线 session TTL。
-	// 以 uid 做 RingHash 分片，仅在 expected_session.user_session 匹配时刷新 TTL。
+	// 按 expected_user_session 刷新用户在线 session TTL。
+	// 以 uid 做 RingHash 分片，仅在 expected_user_session 匹配时刷新 TTL。
 	CacheRefreshUserSessionCAS(context.Context, *CacheRefreshUserSessionCASReq) (*CacheRefreshUserSessionCASRes, error)
 	mustEmbedUnimplementedCacheServiceServer()
 }

@@ -58,8 +58,8 @@ service CacheService {
     };
   }
 
-  // 按 expected 创建用户在线 session。
-  // 以 uid 做 RingHash 分片，expected 为空时要求当前 session 不存在。
+  // 按 expected_user_session 创建用户在线 session。
+  // 以 uid 做 RingHash 分片，expected_user_session 为空时要求当前 session 不存在。
   rpc CacheBeginUserSessionCAS(CacheBeginUserSessionCASReq) returns (CacheBeginUserSessionCASRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -67,8 +67,8 @@ service CacheService {
     };
   }
 
-  // 按 expected 结束用户在线 session。
-  // 以 uid 做 RingHash 分片，仅在 expected_session.user_session 匹配时删除。
+  // 按 expected_user_session 结束用户在线 session。
+  // 以 uid 做 RingHash 分片，仅在 expected_user_session 匹配时删除。
   rpc CacheEndUserSessionCAS(CacheEndUserSessionCASReq) returns (CacheEndUserSessionCASRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -76,8 +76,8 @@ service CacheService {
     };
   }
 
-  // 按 expected 刷新用户在线 session TTL。
-  // 以 uid 做 RingHash 分片，仅在 expected_session.user_session 匹配时刷新 TTL。
+  // 按 expected_user_session 刷新用户在线 session TTL。
+  // 以 uid 做 RingHash 分片，仅在 expected_user_session 匹配时刷新 TTL。
   rpc CacheRefreshUserSessionCAS(CacheRefreshUserSessionCASReq) returns (CacheRefreshUserSessionCASRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -99,32 +99,32 @@ message CacheGetUserRecordReq {
 }
 
 message CacheGetUserRecordRes {
-  user.UserRecord user_record = 1; // 用户数据
+  user.UserRecord user_record = 1; // 用户数据，成功时有效，表示 uid 对应的用户档案。
 }
 
 message CacheSetAccountVerifyTokenReq {
-  string account = 1 [(proto.fieldOpt).shardKey = true];
-  string token = 2;
-  uint64 expire_second = 3;
+  string account = 1 [(proto.fieldOpt).shardKey = true]; // 账号
+  string token = 2; // 使用一次性 SETNX 语义, 未消费前不覆盖
+  uint64 expire_second = 3; // 单位为秒
 }
 
 message CacheSetAccountVerifyTokenRes {
 }
 
 message CacheUseAccountVerifyTokenReq {
-  string account = 1 [(proto.fieldOpt).shardKey = true];
+  string account = 1 [(proto.fieldOpt).shardKey = true]; // 账号
   string token = 2;
 }
 
 message CacheUseAccountVerifyTokenRes {
-  uint64 uid = 1;
+  uint64 uid = 1; // 表示 account 绑定或新创建的可信 uid
 }
 
 message CacheUserSession {
-  string gateway_key = 1;
-  string user_session = 2;
-  int64 login_time = 3;
-  string online_key = 4;
+  string gateway_key = 1; // 用于定位当前 gateway
+  string user_session = 2; // 是 CAS 匹配的稳定身份字段
+  int64 login_time = 3; // 毫秒
+  string online_key = 4; // 用于定位当前 online。
 }
 
 message CacheGetUserSessionReq {
@@ -132,14 +132,17 @@ message CacheGetUserSessionReq {
 }
 
 message CacheGetUserSessionRes {
-  CacheUserSession session = 1;
+  CacheUserSession session = 1; // 成功时有效，包含 CacheUserSession 全部字段
 }
 
 message CacheBeginUserSessionCASReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
-  CacheUserSession expected_session = 2;
-  CacheUserSession session = 3;
-  uint64 expire_second = 4;
+  string expected_user_session = 2; // 表示预期当前 user_session 必须匹配
+  string gateway_key = 3; // 用于定位当前 gateway
+  string user_session = 4; // 是新在线会话的稳定身份字段
+  int64 login_time = 5; // 毫秒
+  string online_key = 6; // 用于定位当前 online
+  uint64 expire_second = 7; // 单位为秒
 }
 
 message CacheBeginUserSessionCASRes {
@@ -147,7 +150,7 @@ message CacheBeginUserSessionCASRes {
 
 message CacheEndUserSessionCASReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
-  CacheUserSession expected_session = 2;
+  string expected_user_session = 2; // 用于 CAS 删除前匹配当前 session
 }
 
 message CacheEndUserSessionCASRes {
@@ -155,8 +158,8 @@ message CacheEndUserSessionCASRes {
 
 message CacheRefreshUserSessionCASReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
-  CacheUserSession expected_session = 2;
-  uint64 expire_second = 3;
+  string expected_user_session = 2; // 用于 CAS 续期前匹配当前 session
+  uint64 expire_second = 3; // 单位为秒
 }
 
 message CacheRefreshUserSessionCASRes {
