@@ -1,50 +1,43 @@
-# ETCD 配置
-etcd:
-  endpoints: # ETCD 地址列表，例如: 192.168.71.123:2379
+etcd: # ETCD 配置
+  endpoints: # ETCD 地址列表，例如 192.168.71.123:2379
     - 192.168.71.123:2379
     - 192.168.71.123:22379
     - 192.168.71.123:32379
-  ttlDuration: 33000000s # ttl [default]: xetcdconstants.TtlSecondDefault, e.g.:系统每10秒续约一次,该参数至少为11秒
+  ttlDuration: 33000000s # etcd 租约 TTL；需要大于续约间隔，支持 Go duration 格式
 
-# 基础配置
-base:
-  projectName: project  # 项目名称
-  groupID: 1 # 分组ID
+base: # 基础配置
+  projectName: project # 项目名称
+  groupID: 1 # 分组 ID
   name: gateway # 服务名称
-  serverID: 2 # 服务ID
-  version: v.0.0.1.2025.03.21.12.21          # 项目版本
-  #packetLengthMax: 100000        # 数据包最大长度
-  #sendChannelCapacity: 1024        # 发送通道容量
-  runMode: 1                        # 运行模式 [0:release, 1:debug]
-  availableLoad: 100000            # 可用负载
+  serverID: 2 # 服务 ID
+  version: v.0.0.1.2025.03.21.12.21 # 服务版本
+  # packetLengthMax: 100000 # 数据包最大长度
+  # sendChannelCapacity: 1024 # 发送通道容量
+  runMode: 1 # 运行模式：0=release，1=debug
+  availableLoad: 100000 # 服务可用负载，上报到注册中心供选择器使用
 
-# 日志
-log:
-  level: 7        # 日志级别
+log: # 日志配置
+  level: 7 # 日志级别
 
-# gRPC 配置
-grpc:
-  packageName: gateway
-  serviceName: GatewayService
-  listenAddr: 0.0.0.0:20102
-  externalAddr: 192.168.71.123:20102
+grpc: # gRPC 配置
+  packageName: gateway # gRPC package 名称
+  serviceName: GatewayService # gRPC service 名称
+  listenAddr: 0.0.0.0:20102 # gRPC 监听地址
+  externalAddr: 192.168.71.123:20102 # gRPC 对外地址，写入 etcd 供其他服务调用
 
-# 网络配置
-net:
-  - listenAddr: 0.0.0.0:10102 # TCP 地址 e.g.:127.0.0.x:10101
-    externalAddr: 192.168.71.123:10102
-    type: tcp
+net: # 网络配置
+  - listenAddr: 0.0.0.0:10102 # TCP 监听地址
+    externalAddr: 192.168.71.123:10102 # TCP 对外地址，返回给客户端连接
+    type: tcp # 网络类型
 
-# 用户自定义配置
-custom:
-  # 用户 verify 过期时间，支持 Go duration 格式，例如 300s、5m、24h 默认为 300s
-  verifyExpireTimeDuration: 864000s
+custom: # 用户自定义配置
+  verifyExpireTimeDuration: 864000s # 用户登录验证过期时间，支持 Go duration 格式，例如 300s、5m、24h
+  heartBeatExpireTimeDuration: 864000s # 用户心跳过期时间，支持 Go duration 格式，例如 300s、5m、24h
+  cacheRPCTimeout: 3s # 调用 cache 服务的 gRPC 超时时间
+  onlineRPCTimeout: 60s # 调用 online 服务的 gRPC 超时时间
+  gatewayRPCTimeout: 60s # 调用 gateway 服务的 gRPC 超时时间
 
-  # 用户心跳 过期时间-秒, 支持 Go duration 格式，例如 300s、5m、24h 默认为 300s
-  heartBeatExpireTimeDuration: 864000s
-
-  # 服务-消息映射
-  cmdMapping:
+  cmdMapping: # 服务消息 ID 映射
     user: [0x000001, 0x0fffff] # 用户服务命令范围
     gateway: [0x100000, 0x1fffff] # 网关服务命令范围
     online: [0x200000, 0x2fffff] # 在线服务命令范围
