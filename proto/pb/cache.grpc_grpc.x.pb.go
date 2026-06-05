@@ -184,103 +184,83 @@ func (x *CacheUseAccountVerifyTokenReq) Get_XShardKey() (string, error) {
 	return x.GetAccount(), nil
 }
 
-func (p *XCacheServiceClient) CacheSetUserSessionRecord(ctx context.Context, in *CacheSetUserSessionRecordReq, opts ...grpc.CallOption) (*CacheSetUserSessionRecordRes, error) {
+func (p *XCacheServiceClient) CacheGetUserSession(ctx context.Context, in *CacheGetUserSessionReq, opts ...grpc.CallOption) (*CacheGetUserSessionRes, error) {
 	shardKeyValue, err := in.Get_XShardKey()
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	strValue := strconv.FormatUint(shardKeyValue, 10)
 
-	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheSetUserSessionRecord_FullMethodName, shardKeyValue)
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheGetUserSession_FullMethodName, shardKeyValue)
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
 	x := NewCacheServiceClient(grpcConn)
-	return x.CacheSetUserSessionRecord(ctx, in, opts...)
+	return x.CacheGetUserSession(ctx, in, opts...)
 }
 
-func (x *CacheSetUserSessionRecordReq) Get_XShardKey() (uint64, error) {
+func (x *CacheGetUserSessionReq) Get_XShardKey() (uint64, error) {
 	return x.GetUid(), nil
 }
 
-func (p *XCacheServiceClient) CacheSetUserSessionExpire(ctx context.Context, in *CacheSetUserSessionExpireReq, opts ...grpc.CallOption) (*CacheSetUserSessionExpireRes, error) {
+func (p *XCacheServiceClient) CacheBeginUserSessionCAS(ctx context.Context, in *CacheBeginUserSessionCASReq, opts ...grpc.CallOption) (*CacheBeginUserSessionCASRes, error) {
 	shardKeyValue, err := in.Get_XShardKey()
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	strValue := strconv.FormatUint(shardKeyValue, 10)
 
-	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheSetUserSessionExpire_FullMethodName, shardKeyValue)
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheBeginUserSessionCAS_FullMethodName, shardKeyValue)
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
 	x := NewCacheServiceClient(grpcConn)
-	return x.CacheSetUserSessionExpire(ctx, in, opts...)
+	return x.CacheBeginUserSessionCAS(ctx, in, opts...)
 }
 
-func (x *CacheSetUserSessionExpireReq) Get_XShardKey() (uint64, error) {
+func (x *CacheBeginUserSessionCASReq) Get_XShardKey() (uint64, error) {
 	return x.GetUid(), nil
 }
 
-func (p *XCacheServiceClient) CacheGetUserSessionRecord(ctx context.Context, in *CacheGetUserSessionRecordReq, opts ...grpc.CallOption) (*CacheGetUserSessionRecordRes, error) {
+func (p *XCacheServiceClient) CacheEndUserSessionCAS(ctx context.Context, in *CacheEndUserSessionCASReq, opts ...grpc.CallOption) (*CacheEndUserSessionCASRes, error) {
 	shardKeyValue, err := in.Get_XShardKey()
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	strValue := strconv.FormatUint(shardKeyValue, 10)
 
-	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheGetUserSessionRecord_FullMethodName, shardKeyValue)
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheEndUserSessionCAS_FullMethodName, shardKeyValue)
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
 	x := NewCacheServiceClient(grpcConn)
-	return x.CacheGetUserSessionRecord(ctx, in, opts...)
+	return x.CacheEndUserSessionCAS(ctx, in, opts...)
 }
 
-func (x *CacheGetUserSessionRecordReq) Get_XShardKey() (uint64, error) {
+func (x *CacheEndUserSessionCASReq) Get_XShardKey() (uint64, error) {
 	return x.GetUid(), nil
 }
 
-func (p *XCacheServiceClient) CacheDelUserSessionRecord(ctx context.Context, in *CacheDelUserSessionRecordReq, opts ...grpc.CallOption) (*CacheDelUserSessionRecordRes, error) {
+func (p *XCacheServiceClient) CacheRefreshUserSessionCAS(ctx context.Context, in *CacheRefreshUserSessionCASReq, opts ...grpc.CallOption) (*CacheRefreshUserSessionCASRes, error) {
 	shardKeyValue, err := in.Get_XShardKey()
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	strValue := strconv.FormatUint(shardKeyValue, 10)
 
-	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheDelUserSessionRecord_FullMethodName, shardKeyValue)
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheRefreshUserSessionCAS_FullMethodName, shardKeyValue)
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
 	}
 	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
 	x := NewCacheServiceClient(grpcConn)
-	return x.CacheDelUserSessionRecord(ctx, in, opts...)
+	return x.CacheRefreshUserSessionCAS(ctx, in, opts...)
 }
 
-func (x *CacheDelUserSessionRecordReq) Get_XShardKey() (uint64, error) {
-	return x.GetUid(), nil
-}
-
-func (p *XCacheServiceClient) CacheReplaceUserSessionRecord(ctx context.Context, in *CacheReplaceUserSessionRecordReq, opts ...grpc.CallOption) (*CacheReplaceUserSessionRecordRes, error) {
-	shardKeyValue, err := in.Get_XShardKey()
-	if err != nil {
-		return nil, errors.WithMessage(err, runtime.Location())
-	}
-	strValue := strconv.FormatUint(shardKeyValue, 10)
-
-	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheReplaceUserSessionRecord_FullMethodName, shardKeyValue)
-	if err != nil {
-		return nil, errors.WithMessage(err, runtime.Location())
-	}
-	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
-	x := NewCacheServiceClient(grpcConn)
-	return x.CacheReplaceUserSessionRecord(ctx, in, opts...)
-}
-
-func (x *CacheReplaceUserSessionRecordReq) Get_XShardKey() (uint64, error) {
+func (x *CacheRefreshUserSessionCASReq) Get_XShardKey() (uint64, error) {
 	return x.GetUid(), nil
 }
 
@@ -329,11 +309,10 @@ type IUnaryCacheServiceServer interface {
 	CacheGetUserRecord(ctx context.Context, req *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error)
 	CacheSetAccountVerifyToken(ctx context.Context, req *CacheSetAccountVerifyTokenReq) (*CacheSetAccountVerifyTokenRes, error)
 	CacheUseAccountVerifyToken(ctx context.Context, req *CacheUseAccountVerifyTokenReq) (*CacheUseAccountVerifyTokenRes, error)
-	CacheSetUserSessionRecord(ctx context.Context, req *CacheSetUserSessionRecordReq) (*CacheSetUserSessionRecordRes, error)
-	CacheSetUserSessionExpire(ctx context.Context, req *CacheSetUserSessionExpireReq) (*CacheSetUserSessionExpireRes, error)
-	CacheGetUserSessionRecord(ctx context.Context, req *CacheGetUserSessionRecordReq) (*CacheGetUserSessionRecordRes, error)
-	CacheDelUserSessionRecord(ctx context.Context, req *CacheDelUserSessionRecordReq) (*CacheDelUserSessionRecordRes, error)
-	CacheReplaceUserSessionRecord(ctx context.Context, req *CacheReplaceUserSessionRecordReq) (*CacheReplaceUserSessionRecordRes, error)
+	CacheGetUserSession(ctx context.Context, req *CacheGetUserSessionReq) (*CacheGetUserSessionRes, error)
+	CacheBeginUserSessionCAS(ctx context.Context, req *CacheBeginUserSessionCASReq) (*CacheBeginUserSessionCASRes, error)
+	CacheEndUserSessionCAS(ctx context.Context, req *CacheEndUserSessionCASReq) (*CacheEndUserSessionCASRes, error)
+	CacheRefreshUserSessionCAS(ctx context.Context, req *CacheRefreshUserSessionCASReq) (*CacheRefreshUserSessionCASRes, error)
 }
 
 var iUnaryCacheServiceServer IUnaryCacheServiceServer
@@ -358,22 +337,18 @@ func (p *XCacheServiceServer) CacheUseAccountVerifyToken(ctx context.Context, re
 	return iUnaryCacheServiceServer.CacheUseAccountVerifyToken(ctx, req)
 }
 
-func (p *XCacheServiceServer) CacheSetUserSessionRecord(ctx context.Context, req *CacheSetUserSessionRecordReq) (*CacheSetUserSessionRecordRes, error) {
-	return iUnaryCacheServiceServer.CacheSetUserSessionRecord(ctx, req)
+func (p *XCacheServiceServer) CacheGetUserSession(ctx context.Context, req *CacheGetUserSessionReq) (*CacheGetUserSessionRes, error) {
+	return iUnaryCacheServiceServer.CacheGetUserSession(ctx, req)
 }
 
-func (p *XCacheServiceServer) CacheSetUserSessionExpire(ctx context.Context, req *CacheSetUserSessionExpireReq) (*CacheSetUserSessionExpireRes, error) {
-	return iUnaryCacheServiceServer.CacheSetUserSessionExpire(ctx, req)
+func (p *XCacheServiceServer) CacheBeginUserSessionCAS(ctx context.Context, req *CacheBeginUserSessionCASReq) (*CacheBeginUserSessionCASRes, error) {
+	return iUnaryCacheServiceServer.CacheBeginUserSessionCAS(ctx, req)
 }
 
-func (p *XCacheServiceServer) CacheGetUserSessionRecord(ctx context.Context, req *CacheGetUserSessionRecordReq) (*CacheGetUserSessionRecordRes, error) {
-	return iUnaryCacheServiceServer.CacheGetUserSessionRecord(ctx, req)
+func (p *XCacheServiceServer) CacheEndUserSessionCAS(ctx context.Context, req *CacheEndUserSessionCASReq) (*CacheEndUserSessionCASRes, error) {
+	return iUnaryCacheServiceServer.CacheEndUserSessionCAS(ctx, req)
 }
 
-func (p *XCacheServiceServer) CacheDelUserSessionRecord(ctx context.Context, req *CacheDelUserSessionRecordReq) (*CacheDelUserSessionRecordRes, error) {
-	return iUnaryCacheServiceServer.CacheDelUserSessionRecord(ctx, req)
-}
-
-func (p *XCacheServiceServer) CacheReplaceUserSessionRecord(ctx context.Context, req *CacheReplaceUserSessionRecordReq) (*CacheReplaceUserSessionRecordRes, error) {
-	return iUnaryCacheServiceServer.CacheReplaceUserSessionRecord(ctx, req)
+func (p *XCacheServiceServer) CacheRefreshUserSessionCAS(ctx context.Context, req *CacheRefreshUserSessionCASReq) (*CacheRefreshUserSessionCASRes, error) {
+	return iUnaryCacheServiceServer.CacheRefreshUserSessionCAS(ctx, req)
 }

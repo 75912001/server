@@ -49,64 +49,41 @@ service CacheService {
     };
   }
 
-  // 写入用户在线 session 数据。
-  // 以 uid 做 RingHash 分片，用于 online 建立在线态后写入 gateway/online/userSession/gatewaySession 等字段。
-  rpc CacheSetUserSessionRecord(CacheSetUserSessionRecordReq) returns (CacheSetUserSessionRecordRes) {
+  // 获取用户在线 session。
+  // 以 uid 做 RingHash 分片，返回当前在线态中的 gatewayKey/userSession/loginTime/onlineKey。
+  rpc CacheGetUserSession(CacheGetUserSessionReq) returns (CacheGetUserSessionRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
       shardKeyFieldType: ShardKeyFieldType_UINT64
     };
   }
 
-  // 刷新用户在线 session 过期时间。
-  // 以 uid 做 RingHash 分片，仅在 expected_records 匹配稳定 identity 时刷新 TTL。
-  rpc CacheSetUserSessionExpire(CacheSetUserSessionExpireReq) returns (CacheSetUserSessionExpireRes) {
+  // 按 expected 创建用户在线 session。
+  // 以 uid 做 RingHash 分片，expected 为空时要求当前 session 不存在。
+  rpc CacheBeginUserSessionCAS(CacheBeginUserSessionCASReq) returns (CacheBeginUserSessionCASRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
       shardKeyFieldType: ShardKeyFieldType_UINT64
     };
   }
 
-  // 读取用户在线 session 数据。
-  // 以 uid 做 RingHash 分片，可按 fields 读取当前在线态中的指定字段。
-  rpc CacheGetUserSessionRecord(CacheGetUserSessionRecordReq) returns (CacheGetUserSessionRecordRes) {
+  // 按 expected 结束用户在线 session。
+  // 以 uid 做 RingHash 分片，仅在 expected_session.user_session 匹配时删除。
+  rpc CacheEndUserSessionCAS(CacheEndUserSessionCASReq) returns (CacheEndUserSessionCASRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
       shardKeyFieldType: ShardKeyFieldType_UINT64
     };
   }
 
-  // 删除用户在线 session 数据。
-  // 以 uid 做 RingHash 分片，仅在 expected_records 匹配稳定 identity 时删除。
-  rpc CacheDelUserSessionRecord(CacheDelUserSessionRecordReq) returns (CacheDelUserSessionRecordRes) {
+  // 按 expected 刷新用户在线 session TTL。
+  // 以 uid 做 RingHash 分片，仅在 expected_session.user_session 匹配时刷新 TTL。
+  rpc CacheRefreshUserSessionCAS(CacheRefreshUserSessionCASReq) returns (CacheRefreshUserSessionCASRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
       shardKeyFieldType: ShardKeyFieldType_UINT64
     };
   }
-
-  // 原子替换用户在线 session 数据。
-  // 以 uid 做 RingHash 分片，登录替换匹配稳定 identity，心跳更新额外校验 old gatewaySession。
-  rpc CacheReplaceUserSessionRecord(CacheReplaceUserSessionRecordReq) returns (CacheReplaceUserSessionRecordRes) {
-    option (proto.methodOpt) = {
-      timeout : "3s"
-      shardKeyFieldType: ShardKeyFieldType_UINT64
-    };
-  }
-}
-
-enum CacheUserSessionField {
-  CacheUserSessionField_Unspecified = 0;
-  CacheUserSessionField_GatewayKey = 1;
-  CacheUserSessionField_OnlineKey = 2;
-  CacheUserSessionField_GatewaySession = 3; // 可轮换认证凭证，客户端心跳后更新。
-  CacheUserSessionField_LoginTime = 4;
-  CacheUserSessionField_UserSession = 5; // 固定连接身份，一次登录生成，心跳不轮换。
-}
-
-message CacheUserSessionRecord {
-  CacheUserSessionField field = 1;
-  string value = 2;
 }
 
 message CacheSetUserRecordReq {
@@ -143,46 +120,44 @@ message CacheUseAccountVerifyTokenRes {
   uint64 uid = 1;
 }
 
-message CacheSetUserSessionRecordReq {
+message CacheUserSession {
+  string gateway_key = 1;
+  string user_session = 2;
+  int64 login_time = 3;
+  string online_key = 4;
+}
+
+message CacheGetUserSessionReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
-  repeated CacheUserSessionRecord records = 2;
 }
 
-message CacheSetUserSessionRecordRes {
+message CacheGetUserSessionRes {
+  CacheUserSession session = 1;
 }
 
-message CacheSetUserSessionExpireReq {
+message CacheBeginUserSessionCASReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
-  uint64 expire_second = 2;
-  repeated CacheUserSessionRecord expected_records = 3;
-}
-
-message CacheSetUserSessionExpireRes {
-}
-
-message CacheGetUserSessionRecordReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
-  repeated CacheUserSessionField fields = 2;
-}
-
-message CacheGetUserSessionRecordRes {
-  repeated CacheUserSessionRecord records = 1;
-}
-
-message CacheDelUserSessionRecordReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
-  repeated CacheUserSessionRecord expected_records = 2;
-}
-
-message CacheDelUserSessionRecordRes {
-}
-
-message CacheReplaceUserSessionRecordReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
-  repeated CacheUserSessionRecord expected_records = 2;
-  repeated CacheUserSessionRecord records = 3;
+  CacheUserSession expected_session = 2;
+  CacheUserSession session = 3;
   uint64 expire_second = 4;
 }
 
-message CacheReplaceUserSessionRecordRes {
+message CacheBeginUserSessionCASRes {
+}
+
+message CacheEndUserSessionCASReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  CacheUserSession expected_session = 2;
+}
+
+message CacheEndUserSessionCASRes {
+}
+
+message CacheRefreshUserSessionCASReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  CacheUserSession expected_session = 2;
+  uint64 expire_second = 3;
+}
+
+message CacheRefreshUserSessionCASRes {
 }
