@@ -19,22 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	GatewayService_GatewayUserOffline_FullMethodName  = "/gateway.GatewayService/GatewayUserOffline"
-	GatewayService_GatewayPrepareLogin_FullMethodName = "/gateway.GatewayService/GatewayPrepareLogin"
+	GatewayService_GatewayKickUser_FullMethodName = "/gateway.GatewayService/GatewayKickUser"
 )
 
 // GatewayServiceClient is the client API for GatewayService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GatewayServiceClient interface {
-	// 用户离线
-	// 调用方：Online 在顶号或清理旧在线状态时，直连旧 Gateway 发起。
-	// 作用：Gateway 根据 uid 查找连接，并只断开 userSession 匹配的连接。
-	GatewayUserOffline(ctx context.Context, in *GatewayUserOfflineReq, opts ...grpc.CallOption) (*GatewayUserOfflineRes, error)
-	// 准备登录
-	// 调用方：Login 在分配 Gateway 后，直连目标 Gateway 发起。
-	// 作用：Gateway 在本地 pending 表保存 uid/account/gatewaySession，等待客户端连接验证。
-	GatewayPrepareLogin(ctx context.Context, in *GatewayPrepareLoginReq, opts ...grpc.CallOption) (*GatewayPrepareLoginRes, error)
+	// 踢旧用户
+	// 调用方：新 Gateway 顶号时直连旧 Gateway 发起。
+	// 作用：旧 Gateway 断开匹配连接，通知 old online 下线，并按 expected 删除 cache session。
+	GatewayKickUser(ctx context.Context, in *GatewayKickUserReq, opts ...grpc.CallOption) (*GatewayKickUserRes, error)
 }
 
 type gatewayServiceClient struct {
@@ -45,20 +40,10 @@ func NewGatewayServiceClient(cc grpc.ClientConnInterface) GatewayServiceClient {
 	return &gatewayServiceClient{cc}
 }
 
-func (c *gatewayServiceClient) GatewayUserOffline(ctx context.Context, in *GatewayUserOfflineReq, opts ...grpc.CallOption) (*GatewayUserOfflineRes, error) {
+func (c *gatewayServiceClient) GatewayKickUser(ctx context.Context, in *GatewayKickUserReq, opts ...grpc.CallOption) (*GatewayKickUserRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GatewayUserOfflineRes)
-	err := c.cc.Invoke(ctx, GatewayService_GatewayUserOffline_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gatewayServiceClient) GatewayPrepareLogin(ctx context.Context, in *GatewayPrepareLoginReq, opts ...grpc.CallOption) (*GatewayPrepareLoginRes, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GatewayPrepareLoginRes)
-	err := c.cc.Invoke(ctx, GatewayService_GatewayPrepareLogin_FullMethodName, in, out, cOpts...)
+	out := new(GatewayKickUserRes)
+	err := c.cc.Invoke(ctx, GatewayService_GatewayKickUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,14 +54,10 @@ func (c *gatewayServiceClient) GatewayPrepareLogin(ctx context.Context, in *Gate
 // All implementations must embed UnimplementedGatewayServiceServer
 // for forward compatibility.
 type GatewayServiceServer interface {
-	// 用户离线
-	// 调用方：Online 在顶号或清理旧在线状态时，直连旧 Gateway 发起。
-	// 作用：Gateway 根据 uid 查找连接，并只断开 userSession 匹配的连接。
-	GatewayUserOffline(context.Context, *GatewayUserOfflineReq) (*GatewayUserOfflineRes, error)
-	// 准备登录
-	// 调用方：Login 在分配 Gateway 后，直连目标 Gateway 发起。
-	// 作用：Gateway 在本地 pending 表保存 uid/account/gatewaySession，等待客户端连接验证。
-	GatewayPrepareLogin(context.Context, *GatewayPrepareLoginReq) (*GatewayPrepareLoginRes, error)
+	// 踢旧用户
+	// 调用方：新 Gateway 顶号时直连旧 Gateway 发起。
+	// 作用：旧 Gateway 断开匹配连接，通知 old online 下线，并按 expected 删除 cache session。
+	GatewayKickUser(context.Context, *GatewayKickUserReq) (*GatewayKickUserRes, error)
 	mustEmbedUnimplementedGatewayServiceServer()
 }
 
@@ -87,11 +68,8 @@ type GatewayServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedGatewayServiceServer struct{}
 
-func (UnimplementedGatewayServiceServer) GatewayUserOffline(context.Context, *GatewayUserOfflineReq) (*GatewayUserOfflineRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method GatewayUserOffline not implemented")
-}
-func (UnimplementedGatewayServiceServer) GatewayPrepareLogin(context.Context, *GatewayPrepareLoginReq) (*GatewayPrepareLoginRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method GatewayPrepareLogin not implemented")
+func (UnimplementedGatewayServiceServer) GatewayKickUser(context.Context, *GatewayKickUserReq) (*GatewayKickUserRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GatewayKickUser not implemented")
 }
 func (UnimplementedGatewayServiceServer) mustEmbedUnimplementedGatewayServiceServer() {}
 func (UnimplementedGatewayServiceServer) testEmbeddedByValue()                        {}
@@ -114,38 +92,20 @@ func RegisterGatewayServiceServer(s grpc.ServiceRegistrar, srv GatewayServiceSer
 	s.RegisterService(&GatewayService_ServiceDesc, srv)
 }
 
-func _GatewayService_GatewayUserOffline_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GatewayUserOfflineReq)
+func _GatewayService_GatewayKickUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayKickUserReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GatewayServiceServer).GatewayUserOffline(ctx, in)
+		return srv.(GatewayServiceServer).GatewayKickUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GatewayService_GatewayUserOffline_FullMethodName,
+		FullMethod: GatewayService_GatewayKickUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GatewayServiceServer).GatewayUserOffline(ctx, req.(*GatewayUserOfflineReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _GatewayService_GatewayPrepareLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GatewayPrepareLoginReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GatewayServiceServer).GatewayPrepareLogin(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: GatewayService_GatewayPrepareLogin_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GatewayServiceServer).GatewayPrepareLogin(ctx, req.(*GatewayPrepareLoginReq))
+		return srv.(GatewayServiceServer).GatewayKickUser(ctx, req.(*GatewayKickUserReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -158,12 +118,8 @@ var GatewayService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GatewayServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GatewayUserOffline",
-			Handler:    _GatewayService_GatewayUserOffline_Handler,
-		},
-		{
-			MethodName: "GatewayPrepareLogin",
-			Handler:    _GatewayService_GatewayPrepareLogin_Handler,
+			MethodName: "GatewayKickUser",
+			Handler:    _GatewayService_GatewayKickUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

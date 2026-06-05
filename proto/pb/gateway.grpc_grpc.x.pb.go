@@ -101,11 +101,8 @@ func NewXGatewayServiceClient(clientConn *grpc.ClientConn) *XGatewayServiceClien
 // //////////////////////////////////////////////////////////////////////////////
 // GatewayService 客户端-Stream
 // //////////////////////////////////////////////////////////////////////////////
-func (p *XGatewayServiceClient) GatewayUserOffline(ctx context.Context, in *GatewayUserOfflineReq, opts ...grpc.CallOption) (*GatewayUserOfflineRes, error) {
-	return p.Client.GatewayUserOffline(ctx, in, opts...)
-}
-func (p *XGatewayServiceClient) GatewayPrepareLogin(ctx context.Context, in *GatewayPrepareLoginReq, opts ...grpc.CallOption) (*GatewayPrepareLoginRes, error) {
-	return p.Client.GatewayPrepareLogin(ctx, in, opts...)
+func (p *XGatewayServiceClient) GatewayKickUser(ctx context.Context, in *GatewayKickUserReq, opts ...grpc.CallOption) (*GatewayKickUserRes, error) {
+	return p.Client.GatewayKickUser(ctx, in, opts...)
 }
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,8 +146,7 @@ func SetIStreamGatewayServiceServer(streamServer IStreamGatewayServiceServer) {
 //
 // //////////////////////////////////////////////////////////////////////////////
 type IUnaryGatewayServiceServer interface {
-	GatewayUserOffline(ctx context.Context, req *GatewayUserOfflineReq) (*GatewayUserOfflineRes, error)
-	GatewayPrepareLogin(ctx context.Context, req *GatewayPrepareLoginReq) (*GatewayPrepareLoginRes, error)
+	GatewayKickUser(ctx context.Context, req *GatewayKickUserReq) (*GatewayKickUserRes, error)
 }
 
 var iUnaryGatewayServiceServer IUnaryGatewayServiceServer
@@ -159,10 +155,6 @@ func SetIUnaryGatewayServiceServer(unaryServer IUnaryGatewayServiceServer) {
 	iUnaryGatewayServiceServer = unaryServer
 }
 
-func (p *XGatewayServiceServer) GatewayUserOffline(ctx context.Context, req *GatewayUserOfflineReq) (*GatewayUserOfflineRes, error) {
-	return iUnaryGatewayServiceServer.GatewayUserOffline(ctx, req)
-}
-
-func (p *XGatewayServiceServer) GatewayPrepareLogin(ctx context.Context, req *GatewayPrepareLoginReq) (*GatewayPrepareLoginRes, error) {
-	return iUnaryGatewayServiceServer.GatewayPrepareLogin(ctx, req)
+func (p *XGatewayServiceServer) GatewayKickUser(ctx context.Context, req *GatewayKickUserReq) (*GatewayKickUserRes, error) {
+	return iUnaryGatewayServiceServer.GatewayKickUser(ctx, req)
 }

@@ -10,42 +10,23 @@ service GatewayService {
     loadBalancePolicy: LoadBalancePolicy_Direct
   };
 
-  // 用户离线
-  // 调用方：Online 在顶号或清理旧在线状态时，直连旧 Gateway 发起。
-  // 作用：Gateway 根据 uid 查找连接，并只断开 userSession 匹配的连接。
-  rpc GatewayUserOffline(GatewayUserOfflineReq) returns (GatewayUserOfflineRes) {
+  // 踢旧用户
+  // 调用方：新 Gateway 顶号时直连旧 Gateway 发起。
+  // 作用：旧 Gateway 断开匹配连接，通知 old online 下线，并按 expected 删除 cache session。
+  rpc GatewayKickUser(GatewayKickUserReq) returns (GatewayKickUserRes) {
     option (proto.methodOpt) = {
       timeout: "60s"
     };
   }
 
-  // 准备登录
-  // 调用方：Login 在分配 Gateway 后，直连目标 Gateway 发起。
-  // 作用：Gateway 在本地 pending 表保存 uid/account/gatewaySession，等待客户端连接验证。
-  rpc GatewayPrepareLogin(GatewayPrepareLoginReq) returns (GatewayPrepareLoginRes) {
-    option (proto.methodOpt) = {
-      timeout: "3s"
-    };
-  }
 }
 
-message GatewayUserOfflineReq {
+message GatewayKickUserReq {
   uint64 uid = 1;                                    // 已登录用户 uid；gateway 先从 byUID 查找，再校验 userSession
   uint32 reason = 2;                                  // 离线原因码
   string msg = 3;                                     // 离线说明
   string user_session = 4;                            // 固定连接身份，只断开匹配的连接
 }
 
-message GatewayUserOfflineRes {
-}
-
-message GatewayPrepareLoginReq {
-  uint64 uid = 1;
-  string account = 2;
-  string gateway_session = 3;
-  uint64 expire_second = 4;
-  string gateway_nonce = 5;
-}
-
-message GatewayPrepareLoginRes {
+message GatewayKickUserRes {
 }
