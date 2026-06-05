@@ -25,6 +25,7 @@ func onEtcdAdd(args ...any) error {
 			return errors.WithMessagef(err, "add cache key:%s %v", key, xruntime.Location())
 		}
 	case common.GatewayServerName:
+		GGatewayMgr.Remove(key)
 		if err := GGatewayMgr.Add(key, valueJson); err != nil {
 			return errors.WithMessagef(err, "add gateway key:%s %v", key, xruntime.Location())
 		}
