@@ -1,45 +1,16 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
+	"server/common"
 	"strings"
 
-	"server/common"
-	pb "server/proto/pb"
-
 	xlog "github.com/75912001/xlib/log"
-	"google.golang.org/grpc/codes"
-	grpcstatus "google.golang.org/grpc/status"
 )
 
-type tokenReq struct {
-	Account string `json:"account"`
-	Token   string `json:"token"`
-}
-
-type tokenRes struct {
-	Account      string `json:"account"`
-	Token        string `json:"token"`
-	ExpireSecond uint64 `json:"expireSecond"`
-}
-
-type sessionRes struct {
-	Account        string `json:"account"`
-	Uid            uint64 `json:"uid"`
-	GatewayNonce   string `json:"gatewayNonce"`
-	GatewaySession string `json:"gatewaySession"`
-	GatewayKey     string `json:"gatewayKey"`
-	GatewayAddr    string `json:"gatewayAddr"`
-	ExpireSecond   uint64 `json:"sessionExpireSecond"`
-}
-
-type errorRes struct {
-	Error string `json:"error"`
-}
-
+// newHTTPServer 创建 login HTTP 服务，并按配置注册 token/session 两个接口。
 func newHTTPServer() *http.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc(GCfgCustomTokenPath, handleLoginToken)
@@ -51,100 +22,7 @@ func newHTTPServer() *http.Server {
 	}
 }
 
-func handleLoginToken(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-
-	req, ok := decodeTokenReq(w, r)
-	if !ok {
-		return
-	}
-
-	ctx, cancel := context.WithTimeout(r.Context(), GCfgCustomCacheRPCTimeout)
-	defer cancel()
-
-	_, err := pb.GXCacheServiceService.CacheSetAccountVerifyToken(ctx, &pb.CacheSetAccountVerifyTokenReq{
-		Account:      req.Account,
-		Token:        req.Token,
-		ExpireSecond: GCfgCustomTokenExpireSecond,
-	})
-	if err != nil {
-		statusCode, message := cacheErrorToHTTP(err)
-		writeError(w, statusCode, message)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, &tokenRes{
-		Account:      req.Account,
-		Token:        req.Token,
-		ExpireSecond: GCfgCustomTokenExpireSecond,
-	})
-}
-
-func handleLoginSession(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-
-	req, ok := decodeTokenReq(w, r)
-	if !ok {
-		return
-	}
-
-	cacheCtx, cacheCancel := context.WithTimeout(r.Context(), GCfgCustomCacheRPCTimeout)
-	defer cacheCancel()
-
-	cacheRes, err := pb.GXCacheServiceService.CacheUseAccountVerifyToken(cacheCtx, &pb.CacheUseAccountVerifyTokenReq{
-		Account: req.Account,
-		Token:   req.Token,
-	})
-	if err != nil {
-		statusCode, message := cacheErrorToHTTP(err)
-		writeError(w, statusCode, message)
-		return
-	}
-	uid := cacheRes.GetUid()
-	if uid == 0 {
-		writeError(w, http.StatusBadGateway, "cache account uid is empty")
-		return
-	}
-
-	gateway, ok := GGatewayMgr.GetByAvailableLoad()
-	if !ok {
-		writeError(w, http.StatusServiceUnavailable, "gateway not available")
-		return
-	}
-
-	gatewayNonce, err := common.NewGatewayNonce()
-	if err != nil {
-		writeError(w, http.StatusInternalServerError, "new gateway nonce failed")
-		return
-	}
-	gatewaySession := common.NewGatewaySession(uid, gateway.Key, gatewayNonce)
-	gatewayCtx, gatewayCancel := context.WithTimeout(r.Context(), GCfgCustomGatewayRPCTimeout)
-	defer gatewayCancel()
-
-	err = prepareGatewayLogin(gatewayCtx, gateway, uid, req.Account, gatewayNonce, gatewaySession)
-	if err != nil {
-		statusCode, message := gatewayErrorToHTTP(err)
-		writeError(w, statusCode, message)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, &sessionRes{
-		Account:        req.Account,
-		Uid:            uid,
-		GatewayNonce:   gatewayNonce,
-		GatewaySession: gatewaySession,
-		GatewayKey:     gateway.Key,
-		GatewayAddr:    gateway.Addr,
-		ExpireSecond:   GCfgCustomSessionExpireSecond,
-	})
-}
-
+// decodeTokenReq 读取并校验账号 token 请求，拒绝未知字段和空 account/token。
 func decodeTokenReq(w http.ResponseWriter, r *http.Request) (*tokenReq, bool) {
 	r.Body = http.MaxBytesReader(w, r.Body, GCfgCustomMaxBodyBytes)
 	defer r.Body.Close()
@@ -169,48 +47,21 @@ func decodeTokenReq(w http.ResponseWriter, r *http.Request) (*tokenReq, bool) {
 	return &req, true
 }
 
+// cacheErrorToHTTP 将 Cache gRPC 错误转换为 login HTTP 错误码和错误信息。
 func cacheErrorToHTTP(err error) (int, string) {
-	status, ok := grpcstatus.FromError(err)
-	if !ok {
-		return http.StatusServiceUnavailable, "cache not available"
-	}
-	switch status.Code() {
-	case codes.InvalidArgument:
-		return http.StatusBadRequest, status.Message()
-	case codes.AlreadyExists:
-		return http.StatusConflict, status.Message()
-	case codes.NotFound, codes.Unauthenticated:
-		return http.StatusUnauthorized, status.Message()
-	case codes.Unavailable:
-		return http.StatusServiceUnavailable, status.Message()
-	case codes.DeadlineExceeded:
-		return http.StatusGatewayTimeout, status.Message()
-	default:
-		return http.StatusBadGateway, status.Message()
-	}
+	return common.GRPCStatusToHTTP(err, "cache not available")
 }
 
-func gatewayErrorToHTTP(err error) (int, string) {
-	status, ok := grpcstatus.FromError(err)
-	if !ok {
-		return http.StatusServiceUnavailable, "gateway not available"
-	}
-	switch status.Code() {
-	case codes.InvalidArgument:
-		return http.StatusBadRequest, status.Message()
-	case codes.Unavailable:
-		return http.StatusServiceUnavailable, status.Message()
-	case codes.DeadlineExceeded:
-		return http.StatusGatewayTimeout, status.Message()
-	default:
-		return http.StatusBadGateway, status.Message()
-	}
-}
-
+// writeError 写入统一 JSON 错误响应。
 func writeError(w http.ResponseWriter, statusCode int, message string) {
+	// errorRes 是 login HTTP 接口统一错误响应体。
+	type errorRes struct {
+		Error string `json:"error"` // 错误信息
+	}
 	writeJSON(w, statusCode, &errorRes{Error: message})
 }
 
+// writeJSON 写入 JSON 响应。
 func writeJSON(w http.ResponseWriter, statusCode int, value any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(statusCode)
