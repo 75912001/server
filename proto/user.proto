@@ -12,14 +12,14 @@ import "user.record.proto";
 message UserVerifyReq
 {
   uint64 uid = 1; // 用户唯一 ID，由 login 服务下发，客户端登录 gateway 时携带
-  string gateway_session = 2; // gatewaySession，由 login 服务下发，客户端登录 gateway 时携带
-  string gateway_nonce = 3; // gatewayNonce，由 login 服务下发，参与 gatewaySession 校验
+  string connect_ticket = 2; // login 签发的短期连接票据，客户端登录 gateway 时携带
 }
 
 //0x000002#gateway->client#登录验证-回复
 message UserVerifyRes
 {
   int64  server_time = 1;   // 服务器当前时间戳，单位毫秒（用于客户端对时）
+  string heartbeat_session = 2; // 心跳认证凭证，客户端后续心跳携带
 }
 
 //0x000003#client->gateway#主动下线-请求
@@ -30,13 +30,13 @@ message UserOfflineReq
 
 //0x00000A#client->gateway#心跳-请求
 message UserHeartbeatReq {
-  string last_gateway_session = 1;   // 上次 gateway 下发的 gatewaySession
+  string last_heartbeat_session = 1;   // 上次 gateway 下发的 heartbeatSession
 }
 
 //0x00000B#gateway->client#心跳-回复
 message UserHeartbeatRes {
   int64 server_time  = 1;   // 服务器时间毫秒
-  string next_gateway_session = 2;   // 客户端下次心跳必须用这个 gatewaySession
+  string next_heartbeat_session = 2;   // 客户端下次心跳必须用这个 heartbeatSession
 }
 
 //0x00000C#client->gateway#请求用户数据-请求
