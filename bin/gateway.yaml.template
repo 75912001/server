@@ -37,11 +37,17 @@ net:
 
 # 用户自定义配置
 custom:
+  # login 签发 connectTicket、gateway 验签使用的共享密钥
+  ticketSecret: server-dev-connect-ticket-secret
+
   # 用户 verify 过期时间，支持 Go duration 格式，例如 300s、5m、24h 默认为 300s
   verifyExpireTimeDuration: 864000s
 
   # 用户心跳 过期时间-秒, 支持 Go duration 格式，例如 300s、5m、24h 默认为 300s
   heartBeatExpireTimeDuration: 864000s
+  cacheRPCTimeout: 3s
+  onlineRPCTimeout: 60s
+  gatewayRPCTimeout: 60s
 
   # 服务-消息映射
   cmdMapping:
