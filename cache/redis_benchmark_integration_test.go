@@ -20,18 +20,20 @@ func BenchmarkIntegrationSetAccountVerifyToken(b *testing.B) {
 	}
 }
 
-func BenchmarkIntegrationSetUserSessionRecord(b *testing.B) {
+func BenchmarkIntegrationBeginUserSessionCAS(b *testing.B) {
 	r, ctx := newIntegrationRedisForBenchmark(b)
 	uid := uint64(9000000000000000)
-	records := map[string]string{
-		userSessionFieldGatewayKey:  "gateway",
-		userSessionFieldOnlineKey:   "online",
-		userSessionFieldUserSession: "session",
-	}
 
 	for i := 0; i < b.N; i++ {
-		if err := r.SetUserSessionRecord(ctx, uid+uint64(i), records); err != nil {
-			b.Fatalf("SetUserSessionRecord failed: %v", err)
+		records := map[string]string{
+			userSessionFieldGatewayKey:  "gateway",
+			userSessionFieldUserSession: "session",
+			userSessionFieldLoginTime:   "1",
+			userSessionFieldOnlineKey:   "online",
+		}
+		ok, err := r.BeginUserSessionCAS(ctx, uid+uint64(i), "", records, 30)
+		if err != nil || !ok {
+			b.Fatalf("BeginUserSessionCAS = %v, %v; want true, nil", ok, err)
 		}
 		_ = r.client.Del(ctx, RedisKeyUserSession(uid+uint64(i))).Err()
 	}

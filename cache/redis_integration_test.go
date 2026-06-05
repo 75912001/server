@@ -14,6 +14,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"server/common"
+	pb "server/proto/pb"
 )
 
 type integrationTB interface {
@@ -163,12 +164,38 @@ func TestIntegrationEnsureAccount(t *testing.T) {
 
 	userRecordKey := RedisKeyUserRecord(wantUID)
 	cleanupRedisKeys(t, r, ctx, userRecordKey)
-	repairedRecord, found, err := r.GetAccountUserRecord(ctx, account)
-	if err != nil {
-		t.Fatalf("GetAccountUserRecord repair failed: %v", err)
+	if _, found, err := r.GetAccountUserRecord(ctx, account); err == nil || !found {
+		t.Fatalf("GetAccountUserRecord missing record err = %v, found = %v; want error and found", err, found)
 	}
-	if !found || repairedRecord.GetUid() != wantUID || repairedRecord.GetAccount() != account {
-		t.Fatalf("repaired record = %#v, found = %v", repairedRecord, found)
+
+	now := time.Now().UnixMilli()
+	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID + 1, Account: account, AccountCreateTimeMs: now}); err != nil {
+		t.Fatalf("set mismatched uid user record failed: %v", err)
+	}
+	if _, found, err := r.GetAccountUserRecord(ctx, account); err == nil || !found {
+		t.Fatalf("GetAccountUserRecord mismatched uid err = %v, found = %v; want error and found", err, found)
+	}
+
+	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID, Account: account + "-other", AccountCreateTimeMs: now}); err != nil {
+		t.Fatalf("set mismatched account user record failed: %v", err)
+	}
+	if _, found, err := r.GetAccountUserRecord(ctx, account); err == nil || !found {
+		t.Fatalf("GetAccountUserRecord mismatched account err = %v, found = %v; want error and found", err, found)
+	}
+
+	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID, Account: account}); err != nil {
+		t.Fatalf("set empty account create time user record failed: %v", err)
+	}
+	if _, found, err := r.GetAccountUserRecord(ctx, account); err == nil || !found {
+		t.Fatalf("GetAccountUserRecord empty account create time err = %v, found = %v; want error and found", err, found)
+	}
+
+	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID, Account: account, AccountCreateTimeMs: now, UserCreateTimeMs: 0}); err != nil {
+		t.Fatalf("set valid user record with empty user create time failed: %v", err)
+	}
+	validRecord, found, err := r.GetAccountUserRecord(ctx, account)
+	if err != nil || !found {
+		t.Fatalf("GetAccountUserRecord valid empty user create time = %#v, %v, %v; want record, true, nil", validRecord, found, err)
 	}
 
 	cleanupRedisKeys(t, r, ctx, sequenceKey, accountUIDKey, accountLockKey, userRecordKey)
@@ -230,78 +257,52 @@ func TestIntegrationUserSessionCAS(t *testing.T) {
 		cleanupRedisKeys(t, r, ctx, sessionKey)
 	})
 
-	if err := r.SetUserSessionRecord(ctx, uid, map[string]string{
-		userSessionFieldGatewayKey: "gateway-a",
-		userSessionFieldOnlineKey:  "online-a",
-	}); err != nil {
-		t.Fatalf("SetUserSessionRecord failed: %v", err)
+	oldUserSession := "user-session-1"
+	oldRecords := map[string]string{
+		userSessionFieldGatewayKey:  "gateway-1",
+		userSessionFieldUserSession: "user-session-1",
+		userSessionFieldLoginTime:   "111",
+		userSessionFieldOnlineKey:   "online-1",
 	}
-	values, err := r.GetUserSessionRecord(ctx, uid, []string{
-		userSessionFieldGatewayKey,
-		userSessionFieldOnlineKey,
-		userSessionFieldLoginTime,
-	})
+	newUserSession := "user-session-2"
+	newRecords := map[string]string{
+		userSessionFieldGatewayKey:  "gateway-2",
+		userSessionFieldUserSession: "user-session-2",
+		userSessionFieldLoginTime:   "222",
+		userSessionFieldOnlineKey:   "online-2",
+	}
+
+	begun, err := r.BeginUserSessionCAS(ctx, uid, "", oldRecords, 30)
+	if err != nil || !begun {
+		t.Fatalf("initial BeginUserSessionCAS = %v, %v; want true, nil", begun, err)
+	}
+
+	values, err := r.GetUserSession(ctx, uid)
 	if err != nil {
-		t.Fatalf("GetUserSessionRecord failed: %v", err)
+		t.Fatalf("GetUserSession failed: %v", err)
 	}
-	if len(values) != 2 || values[userSessionFieldGatewayKey] != "gateway-a" || values[userSessionFieldOnlineKey] != "online-a" {
+	if values[userSessionFieldGatewayKey] != "gateway-1" || values[userSessionFieldUserSession] != "user-session-1" || values[userSessionFieldOnlineKey] != "online-1" {
 		t.Fatalf("session values = %#v", values)
 	}
 
-	cleanupRedisKeys(t, r, ctx, sessionKey)
-	emptyExpected := map[string]string{
-		userSessionFieldGatewayKey:  "",
-		userSessionFieldOnlineKey:   "",
-		userSessionFieldUserSession: "",
-	}
-	oldIdentity := map[string]string{
-		userSessionFieldGatewayKey:  "gateway-1",
-		userSessionFieldOnlineKey:   "online-1",
-		userSessionFieldUserSession: "user-session-1",
-	}
-	oldRecords := map[string]string{
-		userSessionFieldGatewayKey:     "gateway-1",
-		userSessionFieldOnlineKey:      "online-1",
-		userSessionFieldUserSession:    "user-session-1",
-		userSessionFieldGatewaySession: "gateway-session-1",
-		userSessionFieldLoginTime:      "111",
-	}
-	newIdentity := map[string]string{
-		userSessionFieldGatewayKey:  "gateway-2",
-		userSessionFieldOnlineKey:   "online-2",
-		userSessionFieldUserSession: "user-session-2",
-	}
-	newRecords := map[string]string{
-		userSessionFieldGatewayKey:     "gateway-2",
-		userSessionFieldOnlineKey:      "online-2",
-		userSessionFieldUserSession:    "user-session-2",
-		userSessionFieldGatewaySession: "gateway-session-2",
-		userSessionFieldLoginTime:      "222",
+	begun, err = r.BeginUserSessionCAS(ctx, uid, oldUserSession, newRecords, 30)
+	if err != nil || !begun {
+		t.Fatalf("replace with old identity = %v, %v; want true, nil", begun, err)
 	}
 
-	replaced, err := r.ReplaceUserSessionRecord(ctx, uid, emptyExpected, oldRecords, 30)
-	if err != nil || !replaced {
-		t.Fatalf("initial ReplaceUserSessionRecord = %v, %v; want true, nil", replaced, err)
-	}
-
-	replaced, err = r.ReplaceUserSessionRecord(ctx, uid, oldIdentity, newRecords, 30)
-	if err != nil || !replaced {
-		t.Fatalf("replace with old identity = %v, %v; want true, nil", replaced, err)
-	}
-
-	deleted, err := r.DelUserSessionRecord(ctx, uid, oldIdentity)
+	deleted, err := r.EndUserSessionCAS(ctx, uid, oldUserSession)
 	if err != nil || deleted {
-		t.Fatalf("stale DelUserSessionRecord = %v, %v; want false, nil", deleted, err)
+		t.Fatalf("stale EndUserSessionCAS = %v, %v; want false, nil", deleted, err)
 	}
 
-	expired, err := r.SetUserSessionExpire(ctx, uid, time.Minute, oldIdentity)
-	if err != nil || expired {
-		t.Fatalf("stale SetUserSessionExpire = %v, %v; want false, nil", expired, err)
+	refreshed, err := r.RefreshUserSessionCAS(ctx, uid, oldUserSession, 30)
+	if err != nil || refreshed {
+		t.Fatalf("stale RefreshUserSessionCAS = %v, %v; want false, nil", refreshed, err)
 	}
 
-	expired, err = r.SetUserSessionExpire(ctx, uid, time.Minute, newIdentity)
-	if err != nil || !expired {
-		t.Fatalf("SetUserSessionExpire = %v, %v; want true, nil", expired, err)
+	refreshed, err = r.RefreshUserSessionCAS(ctx, uid, newUserSession, 30)
+	if err != nil || !refreshed {
+		t.Fatalf("RefreshUserSessionCAS = %v, %v; want true, nil", refreshed, err)
 	}
 	ttl, err := r.client.TTL(ctx, sessionKey).Result()
 	if err != nil {
@@ -311,8 +312,8 @@ func TestIntegrationUserSessionCAS(t *testing.T) {
 		t.Fatalf("TTL = %v, want positive", ttl)
 	}
 
-	deleted, err = r.DelUserSessionRecord(ctx, uid, newIdentity)
+	deleted, err = r.EndUserSessionCAS(ctx, uid, newUserSession)
 	if err != nil || !deleted {
-		t.Fatalf("DelUserSessionRecord = %v, %v; want true, nil", deleted, err)
+		t.Fatalf("EndUserSessionCAS = %v, %v; want true, nil", deleted, err)
 	}
 }

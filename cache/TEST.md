@@ -27,7 +27,7 @@ GOCACHE="$PWD/../.gocache" go test ../common . ../proto/pb
 - `common.GroupUIDStart` 公式。
 - cache Redis key 生成。
 - session enum 到 Redis hash field 的映射。
-- session records/fields 转换。
+- session identity/record 转换。
 - session response 组装。
 - handler 参数错误对应的 gRPC status。
 
@@ -88,7 +88,7 @@ GOCACHE="$PWD/../.gocache" go test -tags=integration .
 覆盖内容：
 
 - token 首次设置、重复设置、错误 token、消费后删除。
-- 新账号创建、重复读取、UserRecord 缺失补建。
+- 新账号创建、重复读取、UserRecord 缺失或关键字段不一致时报错。
 - 同账号并发创建只生成一个 uid。
 - session HSET/HMGET。
 - session CAS replace、expire、delete。
