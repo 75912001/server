@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// onEtcdAdd 处理 cache/gateway 服务注册事件。
 func onEtcdAdd(args ...any) error {
 	key, valueJson, ok := parseEtcdCallbackArgs(args...)
 	if !ok || valueJson == nil {
@@ -33,6 +34,7 @@ func onEtcdAdd(args ...any) error {
 	return nil
 }
 
+// onEtcdUpdate 处理服务信息更新事件；login 只关心 gateway 负载和地址变化。
 func onEtcdUpdate(args ...any) error {
 	key, valueJson, ok := parseEtcdCallbackArgs(args...)
 	if !ok || valueJson == nil {
@@ -51,6 +53,7 @@ func onEtcdUpdate(args ...any) error {
 	return nil
 }
 
+// onEtcdDel 处理 cache/gateway 服务下线事件。
 func onEtcdDel(args ...any) error {
 	if len(args) == 0 {
 		return nil
@@ -69,6 +72,7 @@ func onEtcdDel(args ...any) error {
 	return nil
 }
 
+// parseEtcdCallbackArgs 从 xlib etcd 回调参数中解析 key 和 ValueJson。
 func parseEtcdCallbackArgs(args ...any) (string, *xetcd.ValueJson, bool) {
 	if len(args) < 2 {
 		return "", nil, false

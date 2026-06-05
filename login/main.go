@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// main 按 xlib 生命周期启动 login 服务。
 func main() {
 	srv := NewLoginServer(os.Args)
 	if srv == nil {
