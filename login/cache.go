@@ -1,8 +1,6 @@
 package main
 
 import (
-	"sync"
-
 	pb "server/proto/pb"
 
 	xetcd "github.com/75912001/xlib/etcd"
@@ -16,8 +14,7 @@ import (
 var GCacheMgr = newCacheMgr()
 
 type CacheMgr struct {
-	mu sync.Mutex
-	m  map[string]*Cache
+	m map[string]*Cache
 }
 
 type Cache struct {
@@ -46,7 +43,7 @@ func newCache(key, addr string) (*Cache, error) {
 }
 
 func (p *CacheMgr) Add(key string, valueJson *xetcd.ValueJson) error {
-	if valueJson == nil || valueJson.GrpcService == nil || valueJson.GrpcService.Addr == nil ||
+	if valueJson.GrpcService == nil || valueJson.GrpcService.Addr == nil ||
 		valueJson.GrpcService.ServiceName == nil || valueJson.GrpcService.PackageName == nil {
 		return nil
 	}
@@ -62,10 +59,8 @@ func (p *CacheMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 	cache.PackageName = *gs.PackageName
 	cache.ServiceName = *gs.ServiceName
 
-	p.mu.Lock()
 	p.m[key] = cache
 	total := len(p.m)
-	p.mu.Unlock()
 
 	xgrpcresolve.AddServer(groupID, serverName, serverID, cache, cache.PackageName, cache.ServiceName)
 	xlog.GLog.Infof("CacheMgr.Add key:%s addr:%s total:%d", key, *gs.Addr, total)
@@ -73,15 +68,12 @@ func (p *CacheMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 }
 
 func (p *CacheMgr) Remove(key string) {
-	p.mu.Lock()
 	cache, ok := p.m[key]
 	if !ok {
-		p.mu.Unlock()
 		return
 	}
 	delete(p.m, key)
 	total := len(p.m)
-	p.mu.Unlock()
 
 	if _, err := xgrpcresolve.RemoveServer(cache.GroupID, cache.ServerName, cache.ServerID, cache.PackageName, cache.ServiceName); err != nil {
 		xlog.GLog.Warnf("CacheMgr.Remove RemoveServer key:%s err:%v", key, err)
@@ -93,12 +85,10 @@ func (p *CacheMgr) Remove(key string) {
 }
 
 func (p *CacheMgr) StopAll() {
-	p.mu.Lock()
 	keys := make([]string, 0, len(p.m))
 	for key := range p.m {
 		keys = append(keys, key)
 	}
-	p.mu.Unlock()
 
 	for _, key := range keys {
 		p.Remove(key)
