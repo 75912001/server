@@ -19,12 +19,3 @@ log: # 日志配置
 
 custom: # login 自定义配置
   httpAddr: 0.0.0.0:30401 # HTTP 监听地址
-  tokenPath: /api/login/token # 外部程序写入账号 token 的 HTTP 路径
-  sessionPath: /api/login/session # 客户端使用 account/token 换取 gateway 登录信息的 HTTP 路径
-  tokenExpireSecond: 10s # 账号 token 有效时间，支持 Go duration 格式
-  ticketExpireSecond: 30s # connectTicket 有效时间，支持 Go duration 格式
-  ticketSecret: server-dev-connect-ticket-secret # connectTicket 签名密钥，login 和 gateway 必须配置一致
-  readHeaderTimeout: 5s # HTTP 读取请求头超时时间，支持 Go duration 格式
-  shutdownTimeout: 10s # 服务退出时 HTTP 优雅关闭等待时间，支持 Go duration 格式
-  cacheRPCTimeout: 3s # 调用 Cache gRPC 接口超时时间，支持 Go duration 格式
-  maxBodyBytes: 4096 # HTTP 请求体最大字节数
