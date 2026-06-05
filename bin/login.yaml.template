@@ -1,39 +1,30 @@
-etcd:
-  endpoints:
+etcd: # ETCD 配置：用于服务注册、发现 cache/gateway 服务
+  endpoints: # ETCD 客户端地址列表
     - 192.168.71.123:2379
     - 192.168.71.123:22379
     - 192.168.71.123:32379
-  ttlDuration: 33000000s
+  ttlDuration: 33000000s # ETCD 租约 TTL，支持 Go duration 格式，例如 30s、5m、24h
 
-base:
-  projectName: project
-  groupID: 1
-  name: login
-  serverID: 1
-  version: v.0.0.1.2025.03.21.12.21
-  packetLengthMax: 100000
-  sendChannelCapacity: 100000
-  runMode: 1
-  availableLoad: 100000
-  processingMode: 1
+base: # 基础配置
+  projectName: project # 项目名
+  groupID: 1 # 服务分组 ID
+  name: login # 服务名，必须为 login
+  serverID: 1 # 服务实例 ID，同一分组内保持唯一
+  version: v.0.0.1.2025.03.21.12.21 # 服务版本号
+  runMode: 1 # 运行模式，0=release，1=debug
+  availableLoad: 100000 # 服务可用负载，供 ETCD 服务发现信息使用
 
-log:
-  level: 7
+log: # 日志配置
+  level: 7 # 日志级别
 
-custom:
-  httpAddr: 0.0.0.0:30401
-  tokenPath: /api/login/token
-  sessionPath: /api/login/session
-  tokenExpireSecond: 10s
-  # gateway pending 登录 session 的有效时间
-  sessionExpireSecond: 30s
-  # HTTP 服务读取请求头的超时时间
-  readHeaderTimeout: 5s
-  # 服务退出时 HTTP 优雅关闭最多等待时间
-  shutdownTimeout: 10s
-  # 调用 Cache gRPC 接口的超时时间
-  cacheRPCTimeout: 3s
-  # 调用 Gateway gRPC 接口的超时时间
-  gatewayRPCTimeout: 3s
-  # HTTP 请求体最大字节数
-  maxBodyBytes: 4096
+custom: # login 自定义配置
+  httpAddr: 0.0.0.0:30401 # HTTP 监听地址
+  tokenPath: /api/login/token # 外部程序写入账号 token 的 HTTP 路径
+  sessionPath: /api/login/session # 客户端使用 account/token 换取 gateway 登录信息的 HTTP 路径
+  tokenExpireSecond: 10s # 账号 token 有效时间，支持 Go duration 格式
+  ticketExpireSecond: 30s # connectTicket 有效时间，支持 Go duration 格式
+  ticketSecret: server-dev-connect-ticket-secret # connectTicket 签名密钥，login 和 gateway 必须配置一致
+  readHeaderTimeout: 5s # HTTP 读取请求头超时时间，支持 Go duration 格式
+  shutdownTimeout: 10s # 服务退出时 HTTP 优雅关闭等待时间，支持 Go duration 格式
+  cacheRPCTimeout: 3s # 调用 Cache gRPC 接口超时时间，支持 Go duration 格式
+  maxBodyBytes: 4096 # HTTP 请求体最大字节数
