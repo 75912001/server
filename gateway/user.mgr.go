@@ -47,20 +47,19 @@ func (p *UserMgr) BindUID(uid uint64, u *User) {
 }
 
 // Remove 摘除 remote 对应用户，同步执行 Cleanup，并移除 uid 索引。
-func (p *UserMgr) Remove(remote xnetcommon.IRemote) *User {
+func (p *UserMgr) Remove(remote xnetcommon.IRemote) (*User, error) {
 	u, ok := p.byRemote.Find(remote)
 	if !ok {
-		return nil
+		return nil, nil
 	}
 	p.byRemote.Del(remote)
 
-	p.byUID.Del(u.uid)
+	if current := p.GetByUID(u.uid); current == u {
+		p.byUID.Del(u.uid)
+	}
 
-	u.PostSyncCleanup(remote.GetDisconnectReason())
+	err := u.PostSyncCleanup(remote.GetDisconnectReason())
 
 	u.remote.Stop()
-	return u
+	return u, err
 }
-
-// Len 当前在线用户数。
-func (p *UserMgr) Len() int { return p.byRemote.Len() }
