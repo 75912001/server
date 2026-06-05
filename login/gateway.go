@@ -1,12 +1,11 @@
 package main
 
 import (
-	"sync"
-
 	pb "server/proto/pb"
 
 	xetcd "github.com/75912001/xlib/etcd"
 	xlog "github.com/75912001/xlib/log"
+	xmap "github.com/75912001/xlib/map"
 	xnetcommon "github.com/75912001/xlib/net/common"
 	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
@@ -15,8 +14,7 @@ import (
 var GGatewayMgr = newGatewayMgr()
 
 type GatewayMgr struct {
-	mu sync.RWMutex
-	m  map[string]*Gateway
+	m *xmap.MapMutexMgr[string, *Gateway]
 }
 
 type Gateway struct {
@@ -33,14 +31,11 @@ type Gateway struct {
 
 func newGatewayMgr() *GatewayMgr {
 	return &GatewayMgr{
-		m: make(map[string]*Gateway),
+		m: xmap.NewMapMutexMgr[string, *Gateway](),
 	}
 }
 
 func (p *GatewayMgr) Add(key string, valueJson *xetcd.ValueJson) error {
-	if valueJson == nil {
-		return nil
-	}
 	_, groupID, serverName, serverID := xetcd.Parse(key)
 	addr := extractGatewayAddr(valueJson)
 	grpcAddr := extractGatewayGRPCAddr(valueJson)
@@ -64,70 +59,55 @@ func (p *GatewayMgr) Add(key string, valueJson *xetcd.ValueJson) error {
 		AvailableLoad:   valueJson.AvailableLoad,
 	}
 
-	p.mu.Lock()
-	old := p.m[key]
-	p.m[key] = gateway
-	total := len(p.m)
-	p.mu.Unlock()
+	p.m.Add(key, gateway)
+	total := p.m.Len()
 
-	p.stopGateway(old)
 	xlog.GLog.Infof("GatewayMgr.Add key:%s addr:%s grpcAddr:%s availableLoad:%d total:%d", key, gateway.Addr, gateway.GrpcAddr, gateway.AvailableLoad, total)
 	return nil
 }
 
 func (p *GatewayMgr) Update(key string, valueJson *xetcd.ValueJson) error {
-	if valueJson == nil {
-		return nil
-	}
 	_, groupID, serverName, serverID := xetcd.Parse(key)
 	addr := extractGatewayAddr(valueJson)
 	grpcAddr := extractGatewayGRPCAddr(valueJson)
 	if grpcAddr == "" {
-		p.Remove(key)
-		return nil
+		return errors.Errorf("gateway grpc addr is empty key:%s %v", key, xruntime.Location())
 	}
 
-	p.mu.Lock()
-	old := p.m[key]
+	old, _ := p.m.Find(key)
 	if old != nil && old.GrpcAddr == grpcAddr && old.XGatewayService != nil {
 		old.Addr = addr
 		old.GroupID = groupID
 		old.ServerName = serverName
 		old.ServerID = serverID
 		old.AvailableLoad = valueJson.AvailableLoad
-		total := len(p.m)
-		p.mu.Unlock()
+		total := p.m.Len()
 
 		xlog.GLog.Infof("GatewayMgr.Update reuse key:%s addr:%s grpcAddr:%s availableLoad:%d total:%d", key, old.Addr, old.GrpcAddr, old.AvailableLoad, total)
 		return nil
 	}
-	p.mu.Unlock()
 
 	return p.Add(key, valueJson)
 }
 
 func (p *GatewayMgr) Remove(key string) {
-	p.mu.Lock()
-	gateway, ok := p.m[key]
+	gateway, ok := p.m.Find(key)
 	if !ok {
-		p.mu.Unlock()
 		return
 	}
-	delete(p.m, key)
-	total := len(p.m)
-	p.mu.Unlock()
+	p.m.Del(key)
+	total := p.m.Len()
 
 	p.stopGateway(gateway)
 	xlog.GLog.Infof("GatewayMgr.Remove key:%s total:%d", key, total)
 }
 
 func (p *GatewayMgr) StopAll() {
-	p.mu.Lock()
-	keys := make([]string, 0, len(p.m))
-	for key := range p.m {
+	keys := make([]string, 0, p.m.Len())
+	p.m.Foreach(func(key string, _ *Gateway) bool {
 		keys = append(keys, key)
-	}
-	p.mu.Unlock()
+		return true
+	})
 
 	for _, key := range keys {
 		p.Remove(key)
@@ -135,14 +115,11 @@ func (p *GatewayMgr) StopAll() {
 }
 
 func (p *GatewayMgr) GetByAvailableLoad() (*Gateway, bool) {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-
 	var selected *Gateway
-	for key, gateway := range p.m {
+	p.m.Foreach(func(key string, gateway *Gateway) bool {
 		if gateway == nil || gateway.Addr == "" || gateway.GrpcAddr == "" ||
 			gateway.XGatewayService == nil || !gateway.Available() || gateway.AvailableLoad == 0 {
-			continue
+			return true
 		}
 		if selected == nil ||
 			gateway.AvailableLoad > selected.AvailableLoad ||
@@ -150,12 +127,13 @@ func (p *GatewayMgr) GetByAvailableLoad() (*Gateway, bool) {
 			cp := *gateway
 			selected = &cp
 		}
-	}
+		return true
+	})
 	return selected, selected != nil
 }
 
 func (p *GatewayMgr) stopGateway(gateway *Gateway) {
-	if gateway == nil || gateway.XGatewayService == nil {
+	if gateway.XGatewayService == nil {
 		return
 	}
 	gateway.Disabled()
@@ -165,7 +143,7 @@ func (p *GatewayMgr) stopGateway(gateway *Gateway) {
 }
 
 func extractGatewayGRPCAddr(valueJson *xetcd.ValueJson) string {
-	if valueJson == nil || valueJson.GrpcService == nil || valueJson.GrpcService.Addr == nil {
+	if valueJson.GrpcService == nil || valueJson.GrpcService.Addr == nil {
 		return ""
 	}
 	return *valueJson.GrpcService.Addr
