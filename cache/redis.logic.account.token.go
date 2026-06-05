@@ -19,6 +19,20 @@ func (p *Redis) SetAccountVerifyToken(ctx context.Context, account string, token
 	return p.client.SetNX(ctx, key, token, expire).Result()
 }
 
+// useAccountVerifyTokenScript 原子校验并消费 token。
+// 成功时删除 token key；key 不存在或 token 不匹配时返回 0。
+const useAccountVerifyTokenScript = `
+local current = redis.call("GET", KEYS[1])
+if current == false then
+	return 0
+end
+if current ~= ARGV[1] then
+	return 0
+end
+redis.call("DEL", KEYS[1])
+return 1
+`
+
 // UseAccountVerifyToken 验证并消费账号级 token。
 // 消费成功后删除 token key，避免同一 token 被重复使用。
 func (p *Redis) UseAccountVerifyToken(ctx context.Context, account string, token string) (bool, error) {
@@ -79,10 +93,10 @@ func (p *Redis) createAccountAfterLock(ctx context.Context, account string) (*pb
 
 	now := time.Now().UnixMilli()
 	userRecord = &pb.UserRecord{
-		Uid:               uid,
-		Account:           account,
-		AccountCreateTime: now,
-		UserCreateTime:    0,
+		Uid:                 uid,
+		Account:             account,
+		AccountCreateTimeMs: now,
+		UserCreateTimeMs:    0,
 	}
 	if err = p.SetUserRecord(ctx, uid, userRecord); err != nil {
 		return nil, false, err
@@ -94,7 +108,7 @@ func (p *Redis) createAccountAfterLock(ctx context.Context, account string) (*pb
 }
 
 // GetAccountUserRecord 通过 account 读取 uid 和 UserRecord。
-// 如果账号映射存在但 UserRecord 缺失或关键字段为空，会补建或补齐后写回。
+// 如果账号映射存在但 UserRecord 缺失或关键字段不一致，直接返回错误。
 func (p *Redis) GetAccountUserRecord(ctx context.Context, account string) (*pb.UserRecord, bool, error) {
 	uid, found, err := p.GetAccountUID(ctx, account)
 	if err != nil || !found {
@@ -102,37 +116,22 @@ func (p *Redis) GetAccountUserRecord(ctx context.Context, account string) (*pb.U
 	}
 	userRecord, err := p.GetUserRecord(ctx, uid)
 	if errors.Is(err, redis.Nil) {
-		userRecord = &pb.UserRecord{
-			Uid:               uid,
-			Account:           account,
-			AccountCreateTime: time.Now().UnixMilli(),
-			UserCreateTime:    0,
-		}
-		if err = p.SetUserRecord(ctx, uid, userRecord); err != nil {
-			return nil, true, err
-		}
-		return userRecord, true, nil
+		return nil, true, errors.Errorf("account user record missing, account: %s uid: %d %v", account, uid, xruntime.Location())
 	}
 	if err != nil {
 		return nil, true, err
 	}
-	changed := false
-	if userRecord.GetUid() == 0 {
-		userRecord.Uid = uid
-		changed = true
+	if userRecord == nil {
+		return nil, true, errors.Errorf("account user record is nil, account: %s uid: %d %v", account, uid, xruntime.Location())
 	}
-	if userRecord.GetAccount() == "" {
-		userRecord.Account = account
-		changed = true
+	if userRecord.GetUid() != uid {
+		return nil, true, errors.Errorf("account user record uid mismatch, account: %s uid: %d record_uid: %d %v", account, uid, userRecord.GetUid(), xruntime.Location())
 	}
-	if userRecord.GetAccountCreateTime() == 0 {
-		userRecord.AccountCreateTime = time.Now().UnixMilli()
-		changed = true
+	if userRecord.GetAccount() != account {
+		return nil, true, errors.Errorf("account user record account mismatch, account: %s uid: %d record_account: %s %v", account, uid, userRecord.GetAccount(), xruntime.Location())
 	}
-	if changed {
-		if err = p.SetUserRecord(ctx, uid, userRecord); err != nil {
-			return nil, true, err
-		}
+	if userRecord.GetAccountCreateTimeMs() == 0 {
+		return nil, true, errors.Errorf("account user record create time is empty, account: %s uid: %d %v", account, uid, xruntime.Location())
 	}
 	return userRecord, true, nil
 }
@@ -156,17 +155,3 @@ func (p *Redis) GetAccountUID(ctx context.Context, account string) (uint64, bool
 	}
 	return uid, true, nil
 }
-
-// useAccountVerifyTokenScript 原子校验并消费 token。
-// 成功时删除 token key；key 不存在或 token 不匹配时返回 0。
-const useAccountVerifyTokenScript = `
-local current = redis.call("GET", KEYS[1])
-if current == false then
-	return 0
-end
-if current ~= ARGV[1] then
-	return 0
-end
-redis.call("DEL", KEYS[1])
-return 1
-`
