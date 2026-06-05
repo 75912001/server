@@ -44,10 +44,10 @@ func cacheUserSessionFromMap(records map[string]string) (*pb.CacheUserSession, b
 	session := &pb.CacheUserSession{
 		GatewayKey:  records[userSessionFieldGatewayKey],
 		UserSession: records[userSessionFieldUserSession],
-		LoginTime:   loginTime,
+		LoginTimeMs: loginTime,
 		OnlineKey:   records[userSessionFieldOnlineKey],
 	}
-	if session.GetGatewayKey() == "" || session.GetUserSession() == "" || session.GetLoginTime() == 0 || session.GetOnlineKey() == "" {
+	if session.GetGatewayKey() == "" || session.GetUserSession() == "" || session.GetLoginTimeMs() == 0 || session.GetOnlineKey() == "" {
 		return nil, false
 	}
 	return session, true
@@ -85,7 +85,7 @@ func (s *cacheGRPCServer) CacheBeginUserSessionCAS(ctx context.Context, req *pb.
 	if uid == 0 || req.GetExpireSecond() == 0 {
 		return &pb.CacheBeginUserSessionCASRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	session, ok := cacheUserSessionRecordMap(req.GetGatewayKey(), req.GetUserSession(), req.GetLoginTime(), req.GetOnlineKey())
+	session, ok := cacheUserSessionRecordMap(req.GetGatewayKey(), req.GetUserSession(), req.GetLoginTimeMs(), req.GetOnlineKey())
 	if !ok {
 		return &pb.CacheBeginUserSessionCASRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}

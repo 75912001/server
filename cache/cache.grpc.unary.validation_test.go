@@ -41,30 +41,35 @@ func TestUserSessionHandlerInvalidArguments(t *testing.T) {
 	s := &cacheGRPCServer{}
 	ctx := context.Background()
 
-	_, err := s.CacheSetUserSessionRecord(ctx, &pb.CacheSetUserSessionRecordReq{})
+	_, err := s.CacheGetUserSession(ctx, &pb.CacheGetUserSessionReq{})
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 
-	_, err = s.CacheSetUserSessionRecord(ctx, &pb.CacheSetUserSessionRecordReq{
-		Uid:     1,
-		Records: []*pb.CacheUserSessionRecord{{Field: pb.CacheUserSessionField_CacheUserSessionField_Unspecified}},
+	_, err = s.CacheBeginUserSessionCAS(ctx, &pb.CacheBeginUserSessionCASReq{
+		Uid:          1,
+		ExpireSecond: 1,
+		GatewayKey:   "gateway-1",
+		UserSession:  "session-1",
 	})
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 
-	_, err = s.CacheGetUserSessionRecord(ctx, &pb.CacheGetUserSessionRecordReq{Uid: 1})
-	requireStatusCode(t, err, grpccodes.InvalidArgument)
-
-	_, err = s.CacheGetUserSessionRecord(ctx, &pb.CacheGetUserSessionRecordReq{
-		Uid:    1,
-		Fields: []pb.CacheUserSessionField{pb.CacheUserSessionField_CacheUserSessionField_Unspecified},
+	_, err = s.CacheBeginUserSessionCAS(ctx, &pb.CacheBeginUserSessionCASReq{
+		Uid:          1,
+		ExpireSecond: 1,
+		GatewayKey:   "gateway-1",
+		UserSession:  "session-1",
+		LoginTimeMs:  123,
 	})
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 
-	_, err = s.CacheReplaceUserSessionRecord(ctx, &pb.CacheReplaceUserSessionRecordReq{Uid: 1})
+	_, err = s.CacheEndUserSessionCAS(ctx, &pb.CacheEndUserSessionCASReq{Uid: 1})
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 
-	_, err = s.CacheSetUserSessionExpire(ctx, &pb.CacheSetUserSessionExpireReq{Uid: 1})
+	_, err = s.CacheRefreshUserSessionCAS(ctx, &pb.CacheRefreshUserSessionCASReq{Uid: 1})
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 
-	_, err = s.CacheDelUserSessionRecord(ctx, &pb.CacheDelUserSessionRecordReq{Uid: 1})
+	_, err = s.CacheRefreshUserSessionCAS(ctx, &pb.CacheRefreshUserSessionCASReq{
+		Uid:          1,
+		ExpireSecond: 1,
+	})
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 }
