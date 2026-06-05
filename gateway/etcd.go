@@ -22,6 +22,20 @@ func onEtcdAdd(args ...any) error {
 		return nil
 	}
 	switch serverName {
+	case common.CacheServerName:
+		GCacheMgr.Remove(key)
+
+		if err := GCacheMgr.Add(key, valueJson); err != nil {
+			return errors.WithMessagef(err, "onEtcdAdd key=%s %v", key, xruntime.Location())
+		}
+		xlog.GLog.Infof("onEtcdAdd key:%s", key)
+	case common.GatewayServerName:
+		GGatewayPeerMgr.Remove(key)
+
+		if err := GGatewayPeerMgr.Add(key, valueJson); err != nil {
+			return errors.WithMessagef(err, "onEtcdAdd key=%s %v", key, xruntime.Location())
+		}
+		xlog.GLog.Infof("onEtcdAdd key:%s", key)
 	case common.OnlineServerName:
 		GOnlineMgr.Remove(key)
 
@@ -57,6 +71,12 @@ func onEtcdDel(args ...any) error {
 	key := args[0].(string)
 	_, _, serverName, _ := xetcd.Parse(key)
 	switch serverName {
+	case common.CacheServerName:
+		GCacheMgr.Remove(key)
+		xlog.GLog.Infof("onEtcdDel key:%s", key)
+	case common.GatewayServerName:
+		GGatewayPeerMgr.Remove(key)
+		xlog.GLog.Infof("onEtcdDel key:%s", key)
 	case common.OnlineServerName:
 		GOnlineMgr.Remove(key)
 		xlog.GLog.Infof("onEtcdDel key:%s", key)
