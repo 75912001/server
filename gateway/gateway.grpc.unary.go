@@ -2,55 +2,43 @@ package main
 
 import (
 	"context"
-	"time"
-
 	"server/common"
+
 	pb "server/proto/pb"
 
-	xetcd "github.com/75912001/xlib/etcd"
 	xlog "github.com/75912001/xlib/log"
 	xnetcommon "github.com/75912001/xlib/net/common"
 	grpccodes "google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 )
 
-func (p *gatewayGRPCServer) GatewayUserOffline(_ context.Context, req *pb.GatewayUserOfflineReq) (*pb.GatewayUserOfflineRes, error) {
+// GatewayKickUser 处理新 gateway 发来的顶号请求。
+// 调用方必须携带旧连接的 uid 和 userSession；本 gateway 只清理本地仍然匹配该 userSession 的旧连接。
+// 返回成功表示旧 TCP、旧 online actor 和 cache session 清理流程已经同步执行完成。
+func (p *gatewayGRPCServer) GatewayKickUser(_ context.Context, req *pb.GatewayKickUserReq) (*pb.GatewayKickUserRes, error) {
 	userSession := req.GetUserSession()
 	if req.GetUid() == 0 || userSession == "" {
-		return &pb.GatewayUserOfflineRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
+		return &pb.GatewayKickUserRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 
 	uid := req.GetUid()
+	// 顶号只面向已经完成登录验证的用户；未绑定 uid 说明旧连接已不在当前 gateway。
 	user := GUserMgr.GetByUID(uid)
 	if user == nil {
-		return &pb.GatewayUserOfflineRes{}, grpcstatus.Errorf(grpccodes.NotFound, "not found uid:%d", req.GetUid())
+		return &pb.GatewayKickUserRes{}, grpcstatus.Errorf(grpccodes.NotFound, "not found uid:%d", req.GetUid())
 	}
 	// 只断开 userSession 匹配的连接，防迟到顶号误踢新连接。
 	if user.userSession != userSession {
-		return &pb.GatewayUserOfflineRes{}, grpcstatus.Errorf(grpccodes.Aborted, "user session changed uid:%d", req.GetUid())
+		return &pb.GatewayKickUserRes{}, grpcstatus.Errorf(grpccodes.Aborted, "user session changed uid:%d", req.GetUid())
 	}
 
-	user.Disconnect(xnetcommon.DisconnectReason(req.GetReason()))
+	// 设置断开原因后走统一 Remove 路径，确保本地索引、online actor 和 cache session 按同一套清理逻辑处理。
+	user.remote.SetDisconnectReason(xnetcommon.DisconnectReason(req.GetReason()))
+	if _, err := GUserMgr.Remove(user.remote); err != nil {
+		return &pb.GatewayKickUserRes{}, grpcstatus.Errorf(grpccodes.FailedPrecondition, "kick cleanup failed uid:%d err:%v", req.GetUid(), err)
+	}
 
-	xlog.GLog.Debugf("GatewayUserOffline uid:%d reason:%v msg:%s", req.GetUid(), xnetcommon.DisconnectReason(req.GetReason()), req.GetMsg())
-	return &pb.GatewayUserOfflineRes{}, nil
-}
-
-func (p *gatewayGRPCServer) GatewayPrepareLogin(_ context.Context, req *pb.GatewayPrepareLoginReq) (*pb.GatewayPrepareLoginRes, error) {
-	uid := req.GetUid()
-	account := req.GetAccount()
-	gatewayNonce := req.GetGatewayNonce()
-	gatewaySession := req.GetGatewaySession()
-	expireSecond := req.GetExpireSecond()
-	if uid == 0 || account == "" || gatewayNonce == "" || gatewaySession == "" || expireSecond == 0 {
-		return &pb.GatewayPrepareLoginRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
-	}
-	if common.NewGatewaySession(uid, xetcd.GEtcd.GetKey(), gatewayNonce) != gatewaySession {
-		return &pb.GatewayPrepareLoginRes{}, grpcstatus.Error(grpccodes.Unauthenticated, "invalid gateway session")
-	}
-	if err := GLoginSessionMgr.Add(uid, account, gatewayNonce, gatewaySession, time.Duration(expireSecond)*time.Second); err != nil {
-		return &pb.GatewayPrepareLoginRes{}, grpcstatus.Errorf(grpccodes.Internal, "add pending login session failed: %v", err)
-	}
-	xlog.GLog.Debugf("GatewayPrepareLogin uid:%d account:%s expireSecond:%d", uid, account, expireSecond)
-	return &pb.GatewayPrepareLoginRes{}, nil
+	xlog.GLog.Debugf("phase=kick_user uid=%d userSession=%s reason=%v msg=%s",
+		req.GetUid(), common.ShortSession(userSession), xnetcommon.DisconnectReason(req.GetReason()), req.GetMsg())
+	return &pb.GatewayKickUserRes{}, nil
 }
