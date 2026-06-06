@@ -22,13 +22,13 @@ func (p *UserMgr) GetByUID(uid uint64) *User {
 	return user
 }
 
-func (p *UserMgr) Login(uid uint64, req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, error) {
+func (p *UserMgr) Bind(uid uint64, req *pb.OnlineBindUserReq, userRecord *pb.UserRecord) (*pb.OnlineBindUserRes, error) {
 	user, existed := p.users.Find(uid)
 	if !existed {
 		user = newUser(uid)
 		p.users.Add(uid, user)
 	}
-	res, err := user.PostLogin(req)
+	res, err := user.PostBind(req, userRecord)
 	if err != nil {
 		current, ok := p.users.Find(uid)
 		if !existed {
