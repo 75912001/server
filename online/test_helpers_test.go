@@ -34,8 +34,9 @@ func newTestOnlineGRPCServer() *onlineGRPCServer {
 	return &onlineGRPCServer{
 		cacheGetUserRecord: func(uid uint64) (*pb.UserRecord, error) {
 			return &pb.UserRecord{
-				Uid:     uid,
-				Account: fmt.Sprintf("robot.%d", uid),
+				Uid:                 uid,
+				Account:             fmt.Sprintf("robot.%d", uid),
+				AccountCreateTimeMs: 111,
 			}, nil
 		},
 	}

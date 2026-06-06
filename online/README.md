@@ -85,7 +85,7 @@ client TCP
 当前已实现业务：
 
 - `UserRecordReq`：返回 online 本地缓存的 `UserRecord`。
-- `UserCreateReq`：设置 `user_create_time` 并调用 `CacheSetUserRecord`。
+- `UserCreateReq`：只设置 `user_create_time` 并调用 `CacheSetUserRecord`，`uid/account/account_create_time_ms` 必须来自 `OnlineBindUser` 绑定阶段已校验的 cache 档案。
 - `RobotPingReq`：返回 seq、clientTime、serverTime 和 payload。
 
 ## 一致性约定
