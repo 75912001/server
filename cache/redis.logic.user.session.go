@@ -33,6 +33,18 @@ redis.call("EXPIRE", KEYS[1], expireSecond)
 return 1
 `
 
+/*
+expectedUserSession == ""
+  -> 期望当前 Redis 里没有 user:{uid}:session
+  -> 如果 key 已存在, 返回 0, 不写入
+  -> 如果 key 不存在, 写入新 session, 设置 TTL, 返回 1
+
+expectedUserSession != ""
+  -> 期望当前 Redis hash 里的 userSession 字段等于 expectedUserSession
+  -> 如果不存在或不匹配, 返回 0, 不写入
+  -> 如果匹配, 删除旧 hash, 写入新 records, 设置 TTL, 返回 1
+*/
+
 func (p *Redis) BeginUserSessionCAS(ctx context.Context, uid uint64, expectedUserSession string, records map[string]string, expireSecond uint64) (bool, error) {
 	key := RedisKeyUserSession(uid)
 	args := []any{expectedUserSession}
