@@ -581,7 +581,16 @@ type CacheBeginUserSessionCASReq struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid                 uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Uid uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	// expected_user_session == ""
+	// -> 期望当前 Redis 里没有 user:{uid}:session
+	// -> 如果 key 已存在, 返回 0, 不写入
+	// -> 如果 key 不存在, 写入新 session, 设置 TTL, 返回 1
+	//
+	// expected_user_session != ""
+	// -> 期望当前 Redis hash 里的 userSession 字段等于 expectedUserSession
+	// -> 如果不存在或不匹配, 返回 0, 不写入
+	// -> 如果匹配, 删除旧 hash, 写入新 records, 设置 TTL, 返回 1
 	ExpectedUserSession string `protobuf:"bytes,2,opt,name=expected_user_session,json=expectedUserSession,proto3" json:"expected_user_session,omitempty"` // 表示预期当前 user_session 必须匹配
 	GatewayKey          string `protobuf:"bytes,3,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`                              // 用于定位当前 gateway
 	UserSession         string `protobuf:"bytes,4,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"`                           // 是新在线会话的稳定身份字段

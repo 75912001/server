@@ -4,35 +4,25 @@ package online;
 option go_package = "server/proto/pb;pb";
 import "options.proto";
 
-message OnlineUserOnlineReq {
+message OnlineBindUserReq {
   string gateway_key = 1; // gateway 服务在 etcd 中注册的唯一 key
   string client_ip = 2; // 客户端连接 gateway 的 IP
-  string account = 3; // 登录账号，由 gateway 根据 pending session 解析后传入
+  string account = 3; // 登录账号，由 gateway 校验 connectTicket 后传入
   uint64 uid = 4; // 用户唯一 ID，由 login/cache 可信链路生成
-  string gateway_session = 5; // gatewaySession，online 写入用户在线状态时使用
+  string user_session = 6; // 固定连接身份，一次登录生成，心跳不轮换。
 }
 
-message OnlineUserOnlineRes {
+message OnlineBindUserRes {
 }
 
-message OnlineUserUpdateGatewaySessionReq {
-  uint64 uid = 1; // 用户唯一 ID
-  string gateway_key = 2; // 当前绑定用户的 gateway key
-  string old_gateway_session = 3; // gateway 当前持有的旧 gatewaySession
-  string new_gateway_session = 4; // gateway 准备切换的新 gatewaySession
-}
-
-message OnlineUserUpdateGatewaySessionRes {
-}
-
-// 用户离线请求 (Gateway -> Online)，网关在 TCP 断开、顶号、主动离线等场景下发出。
-message OnlineUserOfflineReq {
+// 用户 actor 解绑请求 (Gateway -> Online)，网关在 TCP 断开、顶号、主动离线和回滚等场景下发出。
+message OnlineUnbindUserReq {
   uint64 uid = 1;                                    // 离线用户 uid
   uint32 reason = 2;                                 // 离线原因
   string msg = 3;                                    // 离线说明
   string gateway_key = 4;                            // 发起离线的 gateway key
-  string gateway_session = 5;                        // 待清理的 gatewaySession
+  string user_session = 5;                           // 固定连接身份，只清理匹配的在线态
 }
 
-message OnlineUserOfflineRes {
+message OnlineUnbindUserRes {
 }

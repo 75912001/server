@@ -186,14 +186,11 @@ func (p *XOnlineServiceClient) OnlineStreamTunnel(ctx context.Context, opts ...g
 	return p.Client.OnlineStreamTunnel(ctx, opts...)
 }
 
-func (p *XOnlineServiceClient) OnlineUserOnline(ctx context.Context, in *OnlineUserOnlineReq, opts ...grpc.CallOption) (*OnlineUserOnlineRes, error) {
-	return p.Client.OnlineUserOnline(ctx, in, opts...)
+func (p *XOnlineServiceClient) OnlineBindUser(ctx context.Context, in *OnlineBindUserReq, opts ...grpc.CallOption) (*OnlineBindUserRes, error) {
+	return p.Client.OnlineBindUser(ctx, in, opts...)
 }
-func (p *XOnlineServiceClient) OnlineUserUpdateGatewaySession(ctx context.Context, in *OnlineUserUpdateGatewaySessionReq, opts ...grpc.CallOption) (*OnlineUserUpdateGatewaySessionRes, error) {
-	return p.Client.OnlineUserUpdateGatewaySession(ctx, in, opts...)
-}
-func (p *XOnlineServiceClient) OnlineUserOffline(ctx context.Context, in *OnlineUserOfflineReq, opts ...grpc.CallOption) (*OnlineUserOfflineRes, error) {
-	return p.Client.OnlineUserOffline(ctx, in, opts...)
+func (p *XOnlineServiceClient) OnlineUnbindUser(ctx context.Context, in *OnlineUnbindUserReq, opts ...grpc.CallOption) (*OnlineUnbindUserRes, error) {
+	return p.Client.OnlineUnbindUser(ctx, in, opts...)
 }
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -277,9 +274,8 @@ func (p *XOnlineServiceServer) OnlineStreamTunnel(stream OnlineService_OnlineStr
 //
 // //////////////////////////////////////////////////////////////////////////////
 type IUnaryOnlineServiceServer interface {
-	OnlineUserOnline(ctx context.Context, req *OnlineUserOnlineReq) (*OnlineUserOnlineRes, error)
-	OnlineUserUpdateGatewaySession(ctx context.Context, req *OnlineUserUpdateGatewaySessionReq) (*OnlineUserUpdateGatewaySessionRes, error)
-	OnlineUserOffline(ctx context.Context, req *OnlineUserOfflineReq) (*OnlineUserOfflineRes, error)
+	OnlineBindUser(ctx context.Context, req *OnlineBindUserReq) (*OnlineBindUserRes, error)
+	OnlineUnbindUser(ctx context.Context, req *OnlineUnbindUserReq) (*OnlineUnbindUserRes, error)
 }
 
 var iUnaryOnlineServiceServer IUnaryOnlineServiceServer
@@ -288,14 +284,10 @@ func SetIUnaryOnlineServiceServer(unaryServer IUnaryOnlineServiceServer) {
 	iUnaryOnlineServiceServer = unaryServer
 }
 
-func (p *XOnlineServiceServer) OnlineUserOnline(ctx context.Context, req *OnlineUserOnlineReq) (*OnlineUserOnlineRes, error) {
-	return iUnaryOnlineServiceServer.OnlineUserOnline(ctx, req)
+func (p *XOnlineServiceServer) OnlineBindUser(ctx context.Context, req *OnlineBindUserReq) (*OnlineBindUserRes, error) {
+	return iUnaryOnlineServiceServer.OnlineBindUser(ctx, req)
 }
 
-func (p *XOnlineServiceServer) OnlineUserUpdateGatewaySession(ctx context.Context, req *OnlineUserUpdateGatewaySessionReq) (*OnlineUserUpdateGatewaySessionRes, error) {
-	return iUnaryOnlineServiceServer.OnlineUserUpdateGatewaySession(ctx, req)
-}
-
-func (p *XOnlineServiceServer) OnlineUserOffline(ctx context.Context, req *OnlineUserOfflineReq) (*OnlineUserOfflineRes, error) {
-	return iUnaryOnlineServiceServer.OnlineUserOffline(ctx, req)
+func (p *XOnlineServiceServer) OnlineUnbindUser(ctx context.Context, req *OnlineUnbindUserReq) (*OnlineUnbindUserRes, error) {
+	return iUnaryOnlineServiceServer.OnlineUnbindUser(ctx, req)
 }

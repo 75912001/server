@@ -15,7 +15,7 @@ service GatewayService {
   // 作用：旧 Gateway 断开匹配连接，通知 old online 下线，并按 expected 删除 cache session。
   rpc GatewayKickUser(GatewayKickUserReq) returns (GatewayKickUserRes) {
     option (proto.methodOpt) = {
-      timeout: "60s"
+      timeout: "10s"
     };
   }
 

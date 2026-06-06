@@ -19,26 +19,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	OnlineService_OnlineUserOnline_FullMethodName               = "/online.OnlineService/OnlineUserOnline"
-	OnlineService_OnlineUserUpdateGatewaySession_FullMethodName = "/online.OnlineService/OnlineUserUpdateGatewaySession"
-	OnlineService_OnlineUserOffline_FullMethodName              = "/online.OnlineService/OnlineUserOffline"
-	OnlineService_OnlineStreamTunnel_FullMethodName             = "/online.OnlineService/OnlineStreamTunnel"
+	OnlineService_OnlineBindUser_FullMethodName     = "/online.OnlineService/OnlineBindUser"
+	OnlineService_OnlineUnbindUser_FullMethodName   = "/online.OnlineService/OnlineUnbindUser"
+	OnlineService_OnlineStreamTunnel_FullMethodName = "/online.OnlineService/OnlineStreamTunnel"
 )
 
 // OnlineServiceClient is the client API for OnlineService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OnlineServiceClient interface {
-	// 控制面：用户上线 (Unary RPC)
-	// 作用：Gateway 校验 uid/gatewaySession 后，通过此接口通知 Online 建立在线状态。
-	// 特性：Online 负责顶号、写入用户在线 gatewaySession，并维护过期时间。
-	OnlineUserOnline(ctx context.Context, in *OnlineUserOnlineReq, opts ...grpc.CallOption) (*OnlineUserOnlineRes, error)
-	// 控制面：用户在线 gatewaySession 更新 (Unary RPC)
-	// 作用：Gateway 修改 gatewaySession 前，同步通知 Online 更新本地和 Cache gatewaySession。
-	OnlineUserUpdateGatewaySession(ctx context.Context, in *OnlineUserUpdateGatewaySessionReq, opts ...grpc.CallOption) (*OnlineUserUpdateGatewaySessionRes, error)
-	// 控制面：用户离线 (Unary RPC)
-	// 作用：网关在 TCP 断开、顶号、主动离线等场景下，同步通知 Online 清理用户状态。
-	OnlineUserOffline(ctx context.Context, in *OnlineUserOfflineReq, opts ...grpc.CallOption) (*OnlineUserOfflineRes, error)
+	// 控制面：绑定用户 actor (Unary RPC)
+	// 作用：Gateway 完成票据校验和 session 抢占后，通过此接口通知 Online 建立用户 actor。
+	// 特性：Online 只负责绑定用户 actor，不读写在线 session。
+	OnlineBindUser(ctx context.Context, in *OnlineBindUserReq, opts ...grpc.CallOption) (*OnlineBindUserRes, error)
+	// 控制面：解绑用户 actor (Unary RPC)
+	// 作用：网关在 TCP 断开、顶号、主动离线和回滚等场景下，同步通知 Online 解绑用户 actor。
+	OnlineUnbindUser(ctx context.Context, in *OnlineUnbindUserReq, opts ...grpc.CallOption) (*OnlineUnbindUserRes, error)
 	// 数据面：全互联双向流隧道 (Bidirectional Stream)
 	// 作用：承载网关与该 Online 节点之间【所有玩家】的上下行数据。
 	// 特性：支持批量打包 (Batching)，极其高效。
@@ -53,30 +49,20 @@ func NewOnlineServiceClient(cc grpc.ClientConnInterface) OnlineServiceClient {
 	return &onlineServiceClient{cc}
 }
 
-func (c *onlineServiceClient) OnlineUserOnline(ctx context.Context, in *OnlineUserOnlineReq, opts ...grpc.CallOption) (*OnlineUserOnlineRes, error) {
+func (c *onlineServiceClient) OnlineBindUser(ctx context.Context, in *OnlineBindUserReq, opts ...grpc.CallOption) (*OnlineBindUserRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OnlineUserOnlineRes)
-	err := c.cc.Invoke(ctx, OnlineService_OnlineUserOnline_FullMethodName, in, out, cOpts...)
+	out := new(OnlineBindUserRes)
+	err := c.cc.Invoke(ctx, OnlineService_OnlineBindUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *onlineServiceClient) OnlineUserUpdateGatewaySession(ctx context.Context, in *OnlineUserUpdateGatewaySessionReq, opts ...grpc.CallOption) (*OnlineUserUpdateGatewaySessionRes, error) {
+func (c *onlineServiceClient) OnlineUnbindUser(ctx context.Context, in *OnlineUnbindUserReq, opts ...grpc.CallOption) (*OnlineUnbindUserRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OnlineUserUpdateGatewaySessionRes)
-	err := c.cc.Invoke(ctx, OnlineService_OnlineUserUpdateGatewaySession_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *onlineServiceClient) OnlineUserOffline(ctx context.Context, in *OnlineUserOfflineReq, opts ...grpc.CallOption) (*OnlineUserOfflineRes, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OnlineUserOfflineRes)
-	err := c.cc.Invoke(ctx, OnlineService_OnlineUserOffline_FullMethodName, in, out, cOpts...)
+	out := new(OnlineUnbindUserRes)
+	err := c.cc.Invoke(ctx, OnlineService_OnlineUnbindUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -100,16 +86,13 @@ type OnlineService_OnlineStreamTunnelClient = grpc.BidiStreamingClient[OnlineStr
 // All implementations must embed UnimplementedOnlineServiceServer
 // for forward compatibility.
 type OnlineServiceServer interface {
-	// 控制面：用户上线 (Unary RPC)
-	// 作用：Gateway 校验 uid/gatewaySession 后，通过此接口通知 Online 建立在线状态。
-	// 特性：Online 负责顶号、写入用户在线 gatewaySession，并维护过期时间。
-	OnlineUserOnline(context.Context, *OnlineUserOnlineReq) (*OnlineUserOnlineRes, error)
-	// 控制面：用户在线 gatewaySession 更新 (Unary RPC)
-	// 作用：Gateway 修改 gatewaySession 前，同步通知 Online 更新本地和 Cache gatewaySession。
-	OnlineUserUpdateGatewaySession(context.Context, *OnlineUserUpdateGatewaySessionReq) (*OnlineUserUpdateGatewaySessionRes, error)
-	// 控制面：用户离线 (Unary RPC)
-	// 作用：网关在 TCP 断开、顶号、主动离线等场景下，同步通知 Online 清理用户状态。
-	OnlineUserOffline(context.Context, *OnlineUserOfflineReq) (*OnlineUserOfflineRes, error)
+	// 控制面：绑定用户 actor (Unary RPC)
+	// 作用：Gateway 完成票据校验和 session 抢占后，通过此接口通知 Online 建立用户 actor。
+	// 特性：Online 只负责绑定用户 actor，不读写在线 session。
+	OnlineBindUser(context.Context, *OnlineBindUserReq) (*OnlineBindUserRes, error)
+	// 控制面：解绑用户 actor (Unary RPC)
+	// 作用：网关在 TCP 断开、顶号、主动离线和回滚等场景下，同步通知 Online 解绑用户 actor。
+	OnlineUnbindUser(context.Context, *OnlineUnbindUserReq) (*OnlineUnbindUserRes, error)
 	// 数据面：全互联双向流隧道 (Bidirectional Stream)
 	// 作用：承载网关与该 Online 节点之间【所有玩家】的上下行数据。
 	// 特性：支持批量打包 (Batching)，极其高效。
@@ -124,14 +107,11 @@ type OnlineServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedOnlineServiceServer struct{}
 
-func (UnimplementedOnlineServiceServer) OnlineUserOnline(context.Context, *OnlineUserOnlineReq) (*OnlineUserOnlineRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method OnlineUserOnline not implemented")
+func (UnimplementedOnlineServiceServer) OnlineBindUser(context.Context, *OnlineBindUserReq) (*OnlineBindUserRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method OnlineBindUser not implemented")
 }
-func (UnimplementedOnlineServiceServer) OnlineUserUpdateGatewaySession(context.Context, *OnlineUserUpdateGatewaySessionReq) (*OnlineUserUpdateGatewaySessionRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method OnlineUserUpdateGatewaySession not implemented")
-}
-func (UnimplementedOnlineServiceServer) OnlineUserOffline(context.Context, *OnlineUserOfflineReq) (*OnlineUserOfflineRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method OnlineUserOffline not implemented")
+func (UnimplementedOnlineServiceServer) OnlineUnbindUser(context.Context, *OnlineUnbindUserReq) (*OnlineUnbindUserRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method OnlineUnbindUser not implemented")
 }
 func (UnimplementedOnlineServiceServer) OnlineStreamTunnel(grpc.BidiStreamingServer[OnlineStreamTunnelReq, OnlineStreamTunnelRes]) error {
 	return status.Error(codes.Unimplemented, "method OnlineStreamTunnel not implemented")
@@ -157,56 +137,38 @@ func RegisterOnlineServiceServer(s grpc.ServiceRegistrar, srv OnlineServiceServe
 	s.RegisterService(&OnlineService_ServiceDesc, srv)
 }
 
-func _OnlineService_OnlineUserOnline_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(OnlineUserOnlineReq)
+func _OnlineService_OnlineBindUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OnlineBindUserReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OnlineServiceServer).OnlineUserOnline(ctx, in)
+		return srv.(OnlineServiceServer).OnlineBindUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: OnlineService_OnlineUserOnline_FullMethodName,
+		FullMethod: OnlineService_OnlineBindUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OnlineServiceServer).OnlineUserOnline(ctx, req.(*OnlineUserOnlineReq))
+		return srv.(OnlineServiceServer).OnlineBindUser(ctx, req.(*OnlineBindUserReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OnlineService_OnlineUserUpdateGatewaySession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(OnlineUserUpdateGatewaySessionReq)
+func _OnlineService_OnlineUnbindUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OnlineUnbindUserReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OnlineServiceServer).OnlineUserUpdateGatewaySession(ctx, in)
+		return srv.(OnlineServiceServer).OnlineUnbindUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: OnlineService_OnlineUserUpdateGatewaySession_FullMethodName,
+		FullMethod: OnlineService_OnlineUnbindUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OnlineServiceServer).OnlineUserUpdateGatewaySession(ctx, req.(*OnlineUserUpdateGatewaySessionReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _OnlineService_OnlineUserOffline_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(OnlineUserOfflineReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(OnlineServiceServer).OnlineUserOffline(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: OnlineService_OnlineUserOffline_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OnlineServiceServer).OnlineUserOffline(ctx, req.(*OnlineUserOfflineReq))
+		return srv.(OnlineServiceServer).OnlineUnbindUser(ctx, req.(*OnlineUnbindUserReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -226,16 +188,12 @@ var OnlineService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*OnlineServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "OnlineUserOnline",
-			Handler:    _OnlineService_OnlineUserOnline_Handler,
+			MethodName: "OnlineBindUser",
+			Handler:    _OnlineService_OnlineBindUser_Handler,
 		},
 		{
-			MethodName: "OnlineUserUpdateGatewaySession",
-			Handler:    _OnlineService_OnlineUserUpdateGatewaySession_Handler,
-		},
-		{
-			MethodName: "OnlineUserOffline",
-			Handler:    _OnlineService_OnlineUserOffline_Handler,
+			MethodName: "OnlineUnbindUser",
+			Handler:    _OnlineService_OnlineUnbindUser_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

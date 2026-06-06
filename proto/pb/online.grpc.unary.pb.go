@@ -21,20 +21,20 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type OnlineUserOnlineReq struct {
+type OnlineBindUserReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	GatewayKey     string `protobuf:"bytes,1,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`             // gateway 服务在 etcd 中注册的唯一 key
-	ClientIp       string `protobuf:"bytes,2,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`                   // 客户端连接 gateway 的 IP
-	Account        string `protobuf:"bytes,3,opt,name=account,proto3" json:"account,omitempty"`                                     // 登录账号，由 gateway 根据 pending session 解析后传入
-	Uid            uint64 `protobuf:"varint,4,opt,name=uid,proto3" json:"uid,omitempty"`                                            // 用户唯一 ID，由 login/cache 可信链路生成
-	GatewaySession string `protobuf:"bytes,5,opt,name=gateway_session,json=gatewaySession,proto3" json:"gateway_session,omitempty"` // gatewaySession，online 写入用户在线状态时使用
+	GatewayKey  string `protobuf:"bytes,1,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`    // gateway 服务在 etcd 中注册的唯一 key
+	ClientIp    string `protobuf:"bytes,2,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`          // 客户端连接 gateway 的 IP
+	Account     string `protobuf:"bytes,3,opt,name=account,proto3" json:"account,omitempty"`                            // 登录账号，由 gateway 校验 connectTicket 后传入
+	Uid         uint64 `protobuf:"varint,4,opt,name=uid,proto3" json:"uid,omitempty"`                                   // 用户唯一 ID，由 login/cache 可信链路生成
+	UserSession string `protobuf:"bytes,6,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"` // 固定连接身份，一次登录生成，心跳不轮换。
 }
 
-func (x *OnlineUserOnlineReq) Reset() {
-	*x = OnlineUserOnlineReq{}
+func (x *OnlineBindUserReq) Reset() {
+	*x = OnlineBindUserReq{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_online_grpc_unary_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -42,13 +42,13 @@ func (x *OnlineUserOnlineReq) Reset() {
 	}
 }
 
-func (x *OnlineUserOnlineReq) String() string {
+func (x *OnlineBindUserReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*OnlineUserOnlineReq) ProtoMessage() {}
+func (*OnlineBindUserReq) ProtoMessage() {}
 
-func (x *OnlineUserOnlineReq) ProtoReflect() protoreflect.Message {
+func (x *OnlineBindUserReq) ProtoReflect() protoreflect.Message {
 	mi := &file_online_grpc_unary_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -60,54 +60,54 @@ func (x *OnlineUserOnlineReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use OnlineUserOnlineReq.ProtoReflect.Descriptor instead.
-func (*OnlineUserOnlineReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use OnlineBindUserReq.ProtoReflect.Descriptor instead.
+func (*OnlineBindUserReq) Descriptor() ([]byte, []int) {
 	return file_online_grpc_unary_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *OnlineUserOnlineReq) GetGatewayKey() string {
+func (x *OnlineBindUserReq) GetGatewayKey() string {
 	if x != nil {
 		return x.GatewayKey
 	}
 	return ""
 }
 
-func (x *OnlineUserOnlineReq) GetClientIp() string {
+func (x *OnlineBindUserReq) GetClientIp() string {
 	if x != nil {
 		return x.ClientIp
 	}
 	return ""
 }
 
-func (x *OnlineUserOnlineReq) GetAccount() string {
+func (x *OnlineBindUserReq) GetAccount() string {
 	if x != nil {
 		return x.Account
 	}
 	return ""
 }
 
-func (x *OnlineUserOnlineReq) GetUid() uint64 {
+func (x *OnlineBindUserReq) GetUid() uint64 {
 	if x != nil {
 		return x.Uid
 	}
 	return 0
 }
 
-func (x *OnlineUserOnlineReq) GetGatewaySession() string {
+func (x *OnlineBindUserReq) GetUserSession() string {
 	if x != nil {
-		return x.GatewaySession
+		return x.UserSession
 	}
 	return ""
 }
 
-type OnlineUserOnlineRes struct {
+type OnlineBindUserRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *OnlineUserOnlineRes) Reset() {
-	*x = OnlineUserOnlineRes{}
+func (x *OnlineBindUserRes) Reset() {
+	*x = OnlineBindUserRes{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_online_grpc_unary_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -115,13 +115,13 @@ func (x *OnlineUserOnlineRes) Reset() {
 	}
 }
 
-func (x *OnlineUserOnlineRes) String() string {
+func (x *OnlineBindUserRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*OnlineUserOnlineRes) ProtoMessage() {}
+func (*OnlineBindUserRes) ProtoMessage() {}
 
-func (x *OnlineUserOnlineRes) ProtoReflect() protoreflect.Message {
+func (x *OnlineBindUserRes) ProtoReflect() protoreflect.Message {
 	mi := &file_online_grpc_unary_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -133,24 +133,26 @@ func (x *OnlineUserOnlineRes) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use OnlineUserOnlineRes.ProtoReflect.Descriptor instead.
-func (*OnlineUserOnlineRes) Descriptor() ([]byte, []int) {
+// Deprecated: Use OnlineBindUserRes.ProtoReflect.Descriptor instead.
+func (*OnlineBindUserRes) Descriptor() ([]byte, []int) {
 	return file_online_grpc_unary_proto_rawDescGZIP(), []int{1}
 }
 
-type OnlineUserUpdateGatewaySessionReq struct {
+// 用户 actor 解绑请求 (Gateway -> Online)，网关在 TCP 断开、顶号、主动离线和回滚等场景下发出。
+type OnlineUnbindUserReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid               uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                                                       // 用户唯一 ID
-	GatewayKey        string `protobuf:"bytes,2,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`                        // 当前绑定用户的 gateway key
-	OldGatewaySession string `protobuf:"bytes,3,opt,name=old_gateway_session,json=oldGatewaySession,proto3" json:"old_gateway_session,omitempty"` // gateway 当前持有的旧 gatewaySession
-	NewGatewaySession string `protobuf:"bytes,4,opt,name=new_gateway_session,json=newGatewaySession,proto3" json:"new_gateway_session,omitempty"` // gateway 准备切换的新 gatewaySession
+	Uid         uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                                   // 离线用户 uid
+	Reason      uint32 `protobuf:"varint,2,opt,name=reason,proto3" json:"reason,omitempty"`                             // 离线原因
+	Msg         string `protobuf:"bytes,3,opt,name=msg,proto3" json:"msg,omitempty"`                                    // 离线说明
+	GatewayKey  string `protobuf:"bytes,4,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`    // 发起离线的 gateway key
+	UserSession string `protobuf:"bytes,5,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"` // 固定连接身份，只清理匹配的在线态
 }
 
-func (x *OnlineUserUpdateGatewaySessionReq) Reset() {
-	*x = OnlineUserUpdateGatewaySessionReq{}
+func (x *OnlineUnbindUserReq) Reset() {
+	*x = OnlineUnbindUserReq{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_online_grpc_unary_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -158,13 +160,13 @@ func (x *OnlineUserUpdateGatewaySessionReq) Reset() {
 	}
 }
 
-func (x *OnlineUserUpdateGatewaySessionReq) String() string {
+func (x *OnlineUnbindUserReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*OnlineUserUpdateGatewaySessionReq) ProtoMessage() {}
+func (*OnlineUnbindUserReq) ProtoMessage() {}
 
-func (x *OnlineUserUpdateGatewaySessionReq) ProtoReflect() protoreflect.Message {
+func (x *OnlineUnbindUserReq) ProtoReflect() protoreflect.Message {
 	mi := &file_online_grpc_unary_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -176,47 +178,54 @@ func (x *OnlineUserUpdateGatewaySessionReq) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use OnlineUserUpdateGatewaySessionReq.ProtoReflect.Descriptor instead.
-func (*OnlineUserUpdateGatewaySessionReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use OnlineUnbindUserReq.ProtoReflect.Descriptor instead.
+func (*OnlineUnbindUserReq) Descriptor() ([]byte, []int) {
 	return file_online_grpc_unary_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *OnlineUserUpdateGatewaySessionReq) GetUid() uint64 {
+func (x *OnlineUnbindUserReq) GetUid() uint64 {
 	if x != nil {
 		return x.Uid
 	}
 	return 0
 }
 
-func (x *OnlineUserUpdateGatewaySessionReq) GetGatewayKey() string {
+func (x *OnlineUnbindUserReq) GetReason() uint32 {
+	if x != nil {
+		return x.Reason
+	}
+	return 0
+}
+
+func (x *OnlineUnbindUserReq) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
+}
+
+func (x *OnlineUnbindUserReq) GetGatewayKey() string {
 	if x != nil {
 		return x.GatewayKey
 	}
 	return ""
 }
 
-func (x *OnlineUserUpdateGatewaySessionReq) GetOldGatewaySession() string {
+func (x *OnlineUnbindUserReq) GetUserSession() string {
 	if x != nil {
-		return x.OldGatewaySession
+		return x.UserSession
 	}
 	return ""
 }
 
-func (x *OnlineUserUpdateGatewaySessionReq) GetNewGatewaySession() string {
-	if x != nil {
-		return x.NewGatewaySession
-	}
-	return ""
-}
-
-type OnlineUserUpdateGatewaySessionRes struct {
+type OnlineUnbindUserRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *OnlineUserUpdateGatewaySessionRes) Reset() {
-	*x = OnlineUserUpdateGatewaySessionRes{}
+func (x *OnlineUnbindUserRes) Reset() {
+	*x = OnlineUnbindUserRes{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_online_grpc_unary_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -224,13 +233,13 @@ func (x *OnlineUserUpdateGatewaySessionRes) Reset() {
 	}
 }
 
-func (x *OnlineUserUpdateGatewaySessionRes) String() string {
+func (x *OnlineUnbindUserRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*OnlineUserUpdateGatewaySessionRes) ProtoMessage() {}
+func (*OnlineUnbindUserRes) ProtoMessage() {}
 
-func (x *OnlineUserUpdateGatewaySessionRes) ProtoReflect() protoreflect.Message {
+func (x *OnlineUnbindUserRes) ProtoReflect() protoreflect.Message {
 	mi := &file_online_grpc_unary_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -242,127 +251,9 @@ func (x *OnlineUserUpdateGatewaySessionRes) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use OnlineUserUpdateGatewaySessionRes.ProtoReflect.Descriptor instead.
-func (*OnlineUserUpdateGatewaySessionRes) Descriptor() ([]byte, []int) {
+// Deprecated: Use OnlineUnbindUserRes.ProtoReflect.Descriptor instead.
+func (*OnlineUnbindUserRes) Descriptor() ([]byte, []int) {
 	return file_online_grpc_unary_proto_rawDescGZIP(), []int{3}
-}
-
-// 用户离线请求 (Gateway -> Online)，网关在 TCP 断开、顶号、主动离线等场景下发出。
-type OnlineUserOfflineReq struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Uid            uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                                            // 离线用户 uid
-	Reason         uint32 `protobuf:"varint,2,opt,name=reason,proto3" json:"reason,omitempty"`                                      // 离线原因
-	Msg            string `protobuf:"bytes,3,opt,name=msg,proto3" json:"msg,omitempty"`                                             // 离线说明
-	GatewayKey     string `protobuf:"bytes,4,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`             // 发起离线的 gateway key
-	GatewaySession string `protobuf:"bytes,5,opt,name=gateway_session,json=gatewaySession,proto3" json:"gateway_session,omitempty"` // 待清理的 gatewaySession
-}
-
-func (x *OnlineUserOfflineReq) Reset() {
-	*x = OnlineUserOfflineReq{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_online_grpc_unary_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *OnlineUserOfflineReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*OnlineUserOfflineReq) ProtoMessage() {}
-
-func (x *OnlineUserOfflineReq) ProtoReflect() protoreflect.Message {
-	mi := &file_online_grpc_unary_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use OnlineUserOfflineReq.ProtoReflect.Descriptor instead.
-func (*OnlineUserOfflineReq) Descriptor() ([]byte, []int) {
-	return file_online_grpc_unary_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *OnlineUserOfflineReq) GetUid() uint64 {
-	if x != nil {
-		return x.Uid
-	}
-	return 0
-}
-
-func (x *OnlineUserOfflineReq) GetReason() uint32 {
-	if x != nil {
-		return x.Reason
-	}
-	return 0
-}
-
-func (x *OnlineUserOfflineReq) GetMsg() string {
-	if x != nil {
-		return x.Msg
-	}
-	return ""
-}
-
-func (x *OnlineUserOfflineReq) GetGatewayKey() string {
-	if x != nil {
-		return x.GatewayKey
-	}
-	return ""
-}
-
-func (x *OnlineUserOfflineReq) GetGatewaySession() string {
-	if x != nil {
-		return x.GatewaySession
-	}
-	return ""
-}
-
-type OnlineUserOfflineRes struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *OnlineUserOfflineRes) Reset() {
-	*x = OnlineUserOfflineRes{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_online_grpc_unary_proto_msgTypes[5]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *OnlineUserOfflineRes) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*OnlineUserOfflineRes) ProtoMessage() {}
-
-func (x *OnlineUserOfflineRes) ProtoReflect() protoreflect.Message {
-	mi := &file_online_grpc_unary_proto_msgTypes[5]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use OnlineUserOfflineRes.ProtoReflect.Descriptor instead.
-func (*OnlineUserOfflineRes) Descriptor() ([]byte, []int) {
-	return file_online_grpc_unary_proto_rawDescGZIP(), []int{5}
 }
 
 var File_online_grpc_unary_proto protoreflect.FileDescriptor
@@ -371,44 +262,29 @@ var file_online_grpc_unary_proto_rawDesc = []byte{
 	0x0a, 0x17, 0x6f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x2e, 0x75, 0x6e,
 	0x61, 0x72, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x6f, 0x6e, 0x6c, 0x69, 0x6e,
 	0x65, 0x1a, 0x0d, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x22, 0xa8, 0x01, 0x0a, 0x13, 0x4f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x55, 0x73, 0x65, 0x72, 0x4f,
-	0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x12, 0x1f, 0x0a, 0x0b, 0x67, 0x61, 0x74, 0x65,
-	0x77, 0x61, 0x79, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x67,
-	0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x4b, 0x65, 0x79, 0x12, 0x1b, 0x0a, 0x09, 0x63, 0x6c, 0x69,
-	0x65, 0x6e, 0x74, 0x5f, 0x69, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x6c,
-	0x69, 0x65, 0x6e, 0x74, 0x49, 0x70, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e,
-	0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74,
-	0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x03, 0x75,
-	0x69, 0x64, 0x12, 0x27, 0x0a, 0x0f, 0x67, 0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x5f, 0x73, 0x65,
-	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x67, 0x61, 0x74,
-	0x65, 0x77, 0x61, 0x79, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0x15, 0x0a, 0x13, 0x4f,
-	0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x55, 0x73, 0x65, 0x72, 0x4f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x52,
-	0x65, 0x73, 0x22, 0xb6, 0x01, 0x0a, 0x21, 0x4f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x55, 0x73, 0x65,
-	0x72, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x47, 0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x53, 0x65,
-	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x67, 0x61,
-	0x74, 0x65, 0x77, 0x61, 0x79, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x0a, 0x67, 0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x4b, 0x65, 0x79, 0x12, 0x2e, 0x0a, 0x13, 0x6f,
-	0x6c, 0x64, 0x5f, 0x67, 0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x5f, 0x73, 0x65, 0x73, 0x73, 0x69,
-	0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x6f, 0x6c, 0x64, 0x47, 0x61, 0x74,
-	0x65, 0x77, 0x61, 0x79, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x2e, 0x0a, 0x13, 0x6e,
-	0x65, 0x77, 0x5f, 0x67, 0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x5f, 0x73, 0x65, 0x73, 0x73, 0x69,
-	0x6f, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x6e, 0x65, 0x77, 0x47, 0x61, 0x74,
-	0x65, 0x77, 0x61, 0x79, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0x23, 0x0a, 0x21, 0x4f,
-	0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x55, 0x73, 0x65, 0x72, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x47,
-	0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73,
-	0x22, 0x9c, 0x01, 0x0a, 0x14, 0x4f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x55, 0x73, 0x65, 0x72, 0x4f,
-	0x66, 0x66, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x72,
-	0x65, 0x61, 0x73, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x72, 0x65, 0x61,
-	0x73, 0x6f, 0x6e, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x03, 0x6d, 0x73, 0x67, 0x12, 0x1f, 0x0a, 0x0b, 0x67, 0x61, 0x74, 0x65, 0x77, 0x61, 0x79,
-	0x5f, 0x6b, 0x65, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x67, 0x61, 0x74, 0x65,
-	0x77, 0x61, 0x79, 0x4b, 0x65, 0x79, 0x12, 0x27, 0x0a, 0x0f, 0x67, 0x61, 0x74, 0x65, 0x77, 0x61,
-	0x79, 0x5f, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x0e, 0x67, 0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x22,
-	0x16, 0x0a, 0x14, 0x4f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x55, 0x73, 0x65, 0x72, 0x4f, 0x66, 0x66,
-	0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x73, 0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72, 0x76, 0x65,
+	0x22, 0xa0, 0x01, 0x0a, 0x11, 0x4f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x42, 0x69, 0x6e, 0x64, 0x55,
+	0x73, 0x65, 0x72, 0x52, 0x65, 0x71, 0x12, 0x1f, 0x0a, 0x0b, 0x67, 0x61, 0x74, 0x65, 0x77, 0x61,
+	0x79, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x67, 0x61, 0x74,
+	0x65, 0x77, 0x61, 0x79, 0x4b, 0x65, 0x79, 0x12, 0x1b, 0x0a, 0x09, 0x63, 0x6c, 0x69, 0x65, 0x6e,
+	0x74, 0x5f, 0x69, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x6c, 0x69, 0x65,
+	0x6e, 0x74, 0x49, 0x70, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x10,
+	0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x03, 0x75, 0x69, 0x64,
+	0x12, 0x21, 0x0a, 0x0c, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e,
+	0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x75, 0x73, 0x65, 0x72, 0x53, 0x65, 0x73, 0x73,
+	0x69, 0x6f, 0x6e, 0x22, 0x13, 0x0a, 0x11, 0x4f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x42, 0x69, 0x6e,
+	0x64, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x73, 0x22, 0x95, 0x01, 0x0a, 0x13, 0x4f, 0x6e, 0x6c,
+	0x69, 0x6e, 0x65, 0x55, 0x6e, 0x62, 0x69, 0x6e, 0x64, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71,
+	0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x03, 0x75,
+	0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65, 0x61, 0x73, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0d, 0x52, 0x06, 0x72, 0x65, 0x61, 0x73, 0x6f, 0x6e, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73,
+	0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x12, 0x1f, 0x0a, 0x0b,
+	0x67, 0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0a, 0x67, 0x61, 0x74, 0x65, 0x77, 0x61, 0x79, 0x4b, 0x65, 0x79, 0x12, 0x21, 0x0a,
+	0x0c, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x05, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0b, 0x75, 0x73, 0x65, 0x72, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e,
+	0x22, 0x15, 0x0a, 0x13, 0x4f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x55, 0x6e, 0x62, 0x69, 0x6e, 0x64,
+	0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x73, 0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72, 0x76, 0x65,
 	0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
@@ -425,14 +301,12 @@ func file_online_grpc_unary_proto_rawDescGZIP() []byte {
 	return file_online_grpc_unary_proto_rawDescData
 }
 
-var file_online_grpc_unary_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_online_grpc_unary_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_online_grpc_unary_proto_goTypes = []any{
-	(*OnlineUserOnlineReq)(nil),               // 0: online.OnlineUserOnlineReq
-	(*OnlineUserOnlineRes)(nil),               // 1: online.OnlineUserOnlineRes
-	(*OnlineUserUpdateGatewaySessionReq)(nil), // 2: online.OnlineUserUpdateGatewaySessionReq
-	(*OnlineUserUpdateGatewaySessionRes)(nil), // 3: online.OnlineUserUpdateGatewaySessionRes
-	(*OnlineUserOfflineReq)(nil),              // 4: online.OnlineUserOfflineReq
-	(*OnlineUserOfflineRes)(nil),              // 5: online.OnlineUserOfflineRes
+	(*OnlineBindUserReq)(nil),   // 0: online.OnlineBindUserReq
+	(*OnlineBindUserRes)(nil),   // 1: online.OnlineBindUserRes
+	(*OnlineUnbindUserReq)(nil), // 2: online.OnlineUnbindUserReq
+	(*OnlineUnbindUserRes)(nil), // 3: online.OnlineUnbindUserRes
 }
 var file_online_grpc_unary_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -449,7 +323,7 @@ func file_online_grpc_unary_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_online_grpc_unary_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*OnlineUserOnlineReq); i {
+			switch v := v.(*OnlineBindUserReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -461,7 +335,7 @@ func file_online_grpc_unary_proto_init() {
 			}
 		}
 		file_online_grpc_unary_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*OnlineUserOnlineRes); i {
+			switch v := v.(*OnlineBindUserRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -473,7 +347,7 @@ func file_online_grpc_unary_proto_init() {
 			}
 		}
 		file_online_grpc_unary_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*OnlineUserUpdateGatewaySessionReq); i {
+			switch v := v.(*OnlineUnbindUserReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -485,31 +359,7 @@ func file_online_grpc_unary_proto_init() {
 			}
 		}
 		file_online_grpc_unary_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*OnlineUserUpdateGatewaySessionRes); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_online_grpc_unary_proto_msgTypes[4].Exporter = func(v any, i int) any {
-			switch v := v.(*OnlineUserOfflineReq); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_online_grpc_unary_proto_msgTypes[5].Exporter = func(v any, i int) any {
-			switch v := v.(*OnlineUserOfflineRes); i {
+			switch v := v.(*OnlineUnbindUserRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -527,7 +377,7 @@ func file_online_grpc_unary_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_online_grpc_unary_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
