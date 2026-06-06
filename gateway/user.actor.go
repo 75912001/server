@@ -24,8 +24,8 @@ func (p *User) PostFrame(frame *pb.OnlineTunnelFrame) {
 // UserActorCmdUserVerified 登录验证成功后操作, 绑定 uid、online，并启动心跳定时器
 const UserActorCmdUserVerified xactor.CMD = 101
 
-func (p *User) PostSyncVerified(uid uint64, account string, online *Online, gatewaySession string, userSession string) error {
-	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserVerified, uid, account, online, gatewaySession, userSession))
+func (p *User) PostSyncVerified(uid uint64, account string, online *Online, heartbeatSession string, userSession string) error {
+	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserVerified, uid, account, online, heartbeatSession, userSession))
 	if err != nil {
 		return errors.WithMessagef(err, "user verified sync failed uid:%v online:%v %v", uid, online, xruntime.Location())
 	}
@@ -42,15 +42,15 @@ func (p *User) PostClientPacket(header *xpacket.Header, body []byte) {
 // UserActorCmdUserCleanup 清理用户
 const UserActorCmdUserCleanup xactor.CMD = 103
 
-func (p *User) PostSyncCleanup(reason xnetcommon.DisconnectReason) {
+func (p *User) PostSyncCleanup(reason xnetcommon.DisconnectReason) error {
 	defer func() {
 		p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
 	}()
 	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), UserActorCmdUserCleanup, reason))
 	if err != nil {
-		xlog.GLog.Errorf("user cleanup sync failed remote=%p err=%v", p.remote, err)
-		return
+		return errors.WithMessagef(err, "user cleanup sync failed remote=%p", p.remote)
 	}
+	return nil
 }
 
 func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
@@ -87,7 +87,7 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if !ok {
 				continue
 			}
-			gatewaySession, ok := msg.Args[3].(string)
+			heartbeatSession, ok := msg.Args[3].(string)
 			if !ok {
 				continue
 			}
@@ -95,7 +95,7 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if !ok {
 				continue
 			}
-			if err := p.OnVerified(uid, account, online, gatewaySession, userSession); err != nil {
+			if err := p.OnVerified(uid, account, online, heartbeatSession, userSession); err != nil {
 				return p.behavior, resp, errors.WithMessagef(err, "user verified failed uid:%v online:%v %v", uid, online, xruntime.Location())
 			}
 		case UserActorCmdUserPacket:
@@ -112,7 +112,10 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 		case UserActorCmdUserCleanup:
 			reason, ok := msg.Args[0].(xnetcommon.DisconnectReason)
 			if ok {
-				p.Cleanup(reason)
+				if errTmp := p.Cleanup(reason); errTmp != nil {
+					xlog.GLog.Errorf("user cleanup failed uid=%d err=%v", p.uid, errTmp)
+					err = xerror.AppendError(err, errTmp)
+				}
 			}
 		}
 	}
