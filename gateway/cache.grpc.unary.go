@@ -17,10 +17,7 @@ const (
 // unaryCacheGetUserSession 从 cache 读取用户当前在线 session。
 // cache 返回 NotFound 时表示当前无在线态，gateway 按 nil session 继续登录流程。
 func unaryCacheGetUserSession(uid uint64) (*pb.CacheUserSession, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), GCfgCustomCacheRPCTimeout)
-	defer cancel()
-
-	res, err := pb.GXCacheServiceService.CacheGetUserSession(ctx,
+	res, err := pb.GXCacheServiceService.CacheGetUserSession(context.Background(),
 		&pb.CacheGetUserSessionReq{
 			Uid: uid,
 		},
@@ -40,10 +37,7 @@ func unaryCacheGetUserSession(uid uint64) (*pb.CacheUserSession, error) {
 // unaryCacheBeginUserSession 使用 CAS 创建或替换用户在线 session。
 // expected 为空时要求 cache 中没有旧 session；非空时要求旧 userSession 匹配。
 func unaryCacheBeginUserSession(uid uint64, expectedUserSession string, session *pb.CacheUserSession) error {
-	ctx, cancel := context.WithTimeout(context.Background(), GCfgCustomCacheRPCTimeout)
-	defer cancel()
-
-	_, err := pb.GXCacheServiceService.CacheBeginUserSessionCAS(ctx,
+	_, err := pb.GXCacheServiceService.CacheBeginUserSessionCAS(context.Background(),
 		&pb.CacheBeginUserSessionCASReq{
 			Uid:                 uid,
 			ExpectedUserSession: expectedUserSession,
@@ -59,10 +53,7 @@ func unaryCacheBeginUserSession(uid uint64, expectedUserSession string, session 
 
 // unaryCacheEndUserSession 在 userSession 匹配时删除 cache 在线 session。
 func unaryCacheEndUserSession(uid uint64, expectedUserSession string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), GCfgCustomCacheRPCTimeout)
-	defer cancel()
-
-	_, err := pb.GXCacheServiceService.CacheEndUserSessionCAS(ctx, &pb.CacheEndUserSessionCASReq{
+	_, err := pb.GXCacheServiceService.CacheEndUserSessionCAS(context.Background(), &pb.CacheEndUserSessionCASReq{
 		Uid:                 uid,
 		ExpectedUserSession: expectedUserSession,
 	})
@@ -71,10 +62,7 @@ func unaryCacheEndUserSession(uid uint64, expectedUserSession string) error {
 
 // unaryCacheRefreshUserSession 在 userSession 匹配时刷新 cache 在线 session TTL。
 func unaryCacheRefreshUserSession(uid uint64, expectedUserSession string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), GCfgCustomCacheRPCTimeout)
-	defer cancel()
-
-	_, err := pb.GXCacheServiceService.CacheRefreshUserSessionCAS(ctx, &pb.CacheRefreshUserSessionCASReq{
+	_, err := pb.GXCacheServiceService.CacheRefreshUserSessionCAS(context.Background(), &pb.CacheRefreshUserSessionCASReq{
 		Uid:                 uid,
 		ExpectedUserSession: expectedUserSession,
 		ExpireSecond:        userSessionExpireSecond,
