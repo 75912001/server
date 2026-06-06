@@ -126,8 +126,8 @@ RobotPingReq:
 
 动态字段：
 
-- `UserVerifyReq.uid` 和 `UserVerifyReq.token` 会被 robot 自己的 UID/token 覆盖。
-- `UserHeartbeatReq.lastSession` 为 `0` 时，会使用当前 robot 的 `nextSession`。
+- `UserVerifyReq.uid` 和 `UserVerifyReq.connectTicket` 会被 robot 当前登录结果覆盖。
+- `UserHeartbeatReq.lastHeartbeatSession` 为空时，会使用当前 robot 的 heartbeatSession。
 - `RobotPingReq.seq` 为 `0` 时，会使用当前 robot 自增序号。
 - `RobotPingReq.clientTime` 为 `0` 时，会使用当前毫秒时间。
 
@@ -161,7 +161,7 @@ http://127.0.0.1:18080/
 面板支持：
 
 - 查看 robot 总数、在线数、登录成功数、发送/接收/失败统计。
-- 查看最多前 200 个 robot 的 UID、连接、登录、用户数据、gateway、session、seq、队列。
+- 查看最多前 200 个 robot 的 UID、连接、登录、用户数据、gateway、heartbeatSession、seq、队列。
 - 查看当前发现的 gateway 列表。
 - 从 `api.yaml` 读取消息列表。
 - 点击 `all` 给所有 robot 发送当前选择的消息。
@@ -172,7 +172,7 @@ http://127.0.0.1:18080/
 - `GET /api/overview`：返回统计、robot 快照、gateway、api 消息。
 - `POST /api/send`：发送消息，body 示例：`{"scope":"uid","uid":10001,"message":"RobotPingReq"}`。
 
-如果指定 UID 的 robot 正在登录，业务命令会先进入待发送队列。`RobotPingReq` 必须等用户数据创建或确认存在后才会发送。如果已经登录但第一次心跳还没返回，业务消息仍可发送，`SessionID` 使用当前 `nextSession`，通常为 `0`。
+如果指定 UID 的 robot 正在登录，业务命令会先进入待发送队列。`RobotPingReq` 必须等用户数据创建或确认存在后才会发送。如果已经登录但第一次心跳还没返回，业务消息仍可发送，包头 `SessionID` 使用 robot 本地递增值。
 
 ## RobotPing
 
