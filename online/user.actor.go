@@ -11,36 +11,30 @@ import (
 )
 
 const (
-	OnlineUserActorCmdLogin                xactor.CMD = 101
-	OnlineUserActorCmdOffline              xactor.CMD = 102
-	OnlineUserActorCmdClientPacket         xactor.CMD = 103
-	OnlineUserActorCmdUpdateGatewaySession xactor.CMD = 104
+	OnlineUserActorCmdBind         xactor.CMD = 101
+	OnlineUserActorCmdUnbind       xactor.CMD = 102
+	OnlineUserActorCmdClientPacket xactor.CMD = 103
 )
 
-func (p *User) PostLogin(req *pb.OnlineUserOnlineReq) (*pb.OnlineUserOnlineRes, error) {
-	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineUserActorCmdLogin, req))
+func (p *User) PostBind(req *pb.OnlineBindUserReq, userRecord *pb.UserRecord) (*pb.OnlineBindUserRes, error) {
+	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineUserActorCmdBind, req, userRecord))
 	if err != nil {
 		return nil, err
 	}
-	res, _ := resp.(*pb.OnlineUserOnlineRes)
+	res, _ := resp.(*pb.OnlineBindUserRes)
 	return res, nil
 }
 
-func (p *User) PostOffline(gatewayKey string, gatewaySession string) {
-	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineUserActorCmdOffline, gatewayKey, gatewaySession))
+func (p *User) PostUnbind(gatewayKey string, userSession string) {
+	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineUserActorCmdUnbind, gatewayKey, userSession))
 	if err != nil {
-		xlog.GLog.Errorf("user offline sync failed uid=%d err=%v", p.uid, err)
+		xlog.GLog.Errorf("user unbind sync failed uid=%d err=%v", p.uid, err)
 		return
 	}
 	stopped, _ := resp.(bool)
 	if stopped {
 		p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
 	}
-}
-
-func (p *User) PostUpdateGatewaySession(gatewayKey string, oldGatewaySession string, newGatewaySession string) error {
-	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineUserActorCmdUpdateGatewaySession, gatewayKey, oldGatewaySession, newGatewaySession))
-	return err
 }
 
 func (p *User) PostClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
@@ -64,52 +58,41 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			continue
 		}
 		switch msg.Cmd {
-		case OnlineUserActorCmdLogin:
-			req, ok := msg.Args[0].(*pb.OnlineUserOnlineReq)
+		case OnlineUserActorCmdBind:
+			if len(msg.Args) < 2 {
+				continue
+			}
+			req, ok := msg.Args[0].(*pb.OnlineBindUserReq)
 			if !ok {
 				continue
 			}
-			resp, err = p.onLogin(req)
+			userRecord, ok := msg.Args[1].(*pb.UserRecord)
+			if !ok {
+				continue
+			}
+			resp, err = p.onBind(req, userRecord)
 			if err != nil {
 				return p.behavior, resp, err
 			}
-		case OnlineUserActorCmdOffline:
+		case OnlineUserActorCmdUnbind:
 			gatewayKey, ok := msg.Args[0].(string)
 			if !ok {
 				continue
 			}
-			gatewaySession, ok := msg.Args[1].(string)
+			userSession, ok := msg.Args[1].(string)
 			if !ok {
 				continue
 			}
-			if !p.offlineGatewaySessionMatch(gatewayKey, gatewaySession) {
+			if !p.offlineUserSessionMatch(gatewayKey, userSession) {
 				resp = false
 				continue
-			}
-			if err := p.sessionMgr.CleanupOffline(); err != nil {
-				xlog.GLog.Warnf("cleanup offline user session failed uid=%d err=%v", p.uid, err)
 			}
 			if currentUser, ok := GUserMgr.users.Find(p.uid); ok && currentUser == p {
 				GUserMgr.users.Del(p.uid)
 			}
+			p.gatewayID = ""
+			p.userSession = ""
 			resp = true
-		case OnlineUserActorCmdUpdateGatewaySession:
-			gatewayKey, ok := msg.Args[0].(string)
-			if !ok {
-				continue
-			}
-			oldGatewaySession, ok := msg.Args[1].(string)
-			if !ok {
-				continue
-			}
-			newGatewaySession, ok := msg.Args[2].(string)
-			if !ok {
-				continue
-			}
-			err = p.onUpdateGatewaySession(gatewayKey, oldGatewaySession, newGatewaySession)
-			if err != nil {
-				return p.behavior, resp, err
-			}
 		case OnlineUserActorCmdClientPacket:
 			gateway, ok := msg.Args[0].(*Gateway)
 			if !ok {
@@ -125,9 +108,9 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 	return p.behavior, resp, nil
 }
 
-func (p *User) offlineGatewaySessionMatch(gatewayKey string, gatewaySession string) bool {
-	if gatewayKey == "" || gatewaySession == "" || p.gatewayID != gatewayKey || p.sessionMgr.session == nil {
+func (p *User) offlineUserSessionMatch(gatewayKey string, userSession string) bool {
+	if gatewayKey == "" || userSession == "" || p.gatewayID != gatewayKey {
 		return false
 	}
-	return p.sessionMgr.session.gatewaySession == gatewaySession
+	return p.userSession == userSession
 }
