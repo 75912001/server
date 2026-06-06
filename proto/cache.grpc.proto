@@ -137,6 +137,17 @@ message CacheGetUserSessionRes {
 
 message CacheBeginUserSessionCASReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  /*
+expected_user_session == ""
+  -> 期望当前 Redis 里没有 user:{uid}:session
+  -> 如果 key 已存在, 返回 0, 不写入
+  -> 如果 key 不存在, 写入新 session, 设置 TTL, 返回 1
+
+expected_user_session != ""
+  -> 期望当前 Redis hash 里的 userSession 字段等于 expectedUserSession
+  -> 如果不存在或不匹配, 返回 0, 不写入
+  -> 如果匹配, 删除旧 hash, 写入新 records, 设置 TTL, 返回 1
+*/
   string expected_user_session = 2; // 表示预期当前 user_session 必须匹配
   string gateway_key = 3; // 用于定位当前 gateway
   string user_session = 4; // 是新在线会话的稳定身份字段
