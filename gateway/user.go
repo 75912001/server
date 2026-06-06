@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"server/common"
 	"time"
 
 	xactor "github.com/75912001/xlib/actor"
 	xcontrol "github.com/75912001/xlib/control"
+	xerror "github.com/75912001/xlib/error"
 	xetcd "github.com/75912001/xlib/etcd"
-	xheartbeat "github.com/75912001/xlib/heartbeat"
 	xlog "github.com/75912001/xlib/log"
 	xnetcommon "github.com/75912001/xlib/net/common"
 	xpacket "github.com/75912001/xlib/packet"
@@ -24,12 +25,12 @@ type User struct {
 	online  *Online
 	actor   *xactor.Actor[string]
 
-	gatewaySession string
-	// 固定连接身份，一次登录生成，心跳不轮换。
-	userSession string
+	userSession string // 固定连接身份，一次登录生成，心跳不轮换。
 
 	verifyTimer *xtimer.Second
-	hb          xheartbeat.HeartBeat
+
+	heartbeatTimer   *xtimer.Second
+	heartbeatSession string
 }
 
 // newUser 创建用户 actor，并启动未验证超时定时器。
@@ -69,7 +70,9 @@ func (p *User) Disconnect(reason xnetcommon.DisconnectReason) {
 		return
 	}
 	p.remote.SetDisconnectReason(reason)
-	GUserMgr.Remove(p.remote)
+	if _, err := GUserMgr.Remove(p.remote); err != nil {
+		xlog.GLog.Warnf("phase=disconnect_cleanup uid=%d reason=%d err=%v", p.uid, reason, err)
+	}
 }
 
 // startVerifyTimer 注册验证超时回调，未验证完成则断开连接。
@@ -85,8 +88,8 @@ func (p *User) startVerifyTimer() {
 	p.verifyTimer = xtimer.GTimer.AddSecond(cb, time.Now().Unix()+int64(GCfgCustomVerifyExpireTimeDuration/time.Second), p.actor)
 }
 
-// OnVerified 在登录验证成功后绑定 uid、account、online 和 gatewaySession。
-func (p *User) OnVerified(uid uint64, account string, online *Online, gatewaySession string, userSession string) error {
+// OnVerified 在登录验证成功后绑定 uid、account、online 和 heartbeatSession。
+func (p *User) OnVerified(uid uint64, account string, online *Online, heartbeatSession string, userSession string) error {
 	if p.IsClosed() {
 		return fmt.Errorf("remote disconnected")
 	}
@@ -99,8 +102,8 @@ func (p *User) OnVerified(uid uint64, account string, online *Online, gatewaySes
 	if online == nil {
 		return fmt.Errorf("online is nil")
 	}
-	if gatewaySession == "" {
-		return fmt.Errorf("gatewaySession is empty")
+	if heartbeatSession == "" {
+		return fmt.Errorf("heartbeatSession is empty")
 	}
 	if userSession == "" {
 		return fmt.Errorf("userSession is empty")
@@ -108,7 +111,7 @@ func (p *User) OnVerified(uid uint64, account string, online *Online, gatewaySes
 	p.uid = uid
 	p.account = account
 	p.online = online
-	p.gatewaySession = gatewaySession
+	p.heartbeatSession = heartbeatSession
 	p.userSession = userSession
 	GUserMgr.BindUID(uid, p)
 	if p.verifyTimer != nil {
@@ -119,7 +122,7 @@ func (p *User) OnVerified(uid uint64, account string, online *Online, gatewaySes
 	return nil
 }
 
-func (p *User) UpdateGatewaySession(newGatewaySession string) error {
+func (p *User) UpdateHeartbeatSession(newHeartbeatSession string) error {
 	if p.IsClosed() {
 		return fmt.Errorf("remote disconnected")
 	}
@@ -129,29 +132,32 @@ func (p *User) UpdateGatewaySession(newGatewaySession string) error {
 	if p.online == nil {
 		return fmt.Errorf("online is nil")
 	}
-	if p.gatewaySession == "" {
-		return fmt.Errorf("gatewaySession is empty")
+	if p.heartbeatSession == "" {
+		return fmt.Errorf("heartbeatSession is empty")
 	}
 	if p.userSession == "" {
 		return fmt.Errorf("userSession is empty")
 	}
-	if newGatewaySession == "" {
-		return fmt.Errorf("new gatewaySession is empty")
+	if newHeartbeatSession == "" {
+		return fmt.Errorf("new heartbeatSession is empty")
 	}
-	if p.gatewaySession == newGatewaySession {
+	if p.heartbeatSession == newHeartbeatSession {
 		return nil
 	}
-	oldGatewaySession := p.gatewaySession
-	if err := unaryOnlineUserUpdateGatewaySession(p.online, p.uid, xetcd.GEtcd.GetKey(), oldGatewaySession, newGatewaySession, p.userSession); err != nil {
+	if err := unaryCacheRefreshUserSession(p.uid, p.userSession); err != nil {
 		p.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 		return err
 	}
-	p.gatewaySession = newGatewaySession
+	p.heartbeatSession = newHeartbeatSession
 	return nil
 }
 
 // restartHeartbeatTimer 启动或重置心跳超时定时器。
 func (p *User) restartHeartbeatTimer() {
+	if p.heartbeatTimer != nil {
+		xtimer.GTimer.DelSecond(p.heartbeatTimer)
+		p.heartbeatTimer = nil
+	}
 	cb := xcontrol.NewCallBack(
 		func(args ...any) error {
 			if p.IsClosed() {
@@ -160,32 +166,44 @@ func (p *User) restartHeartbeatTimer() {
 			xlog.PrintInfo(fmt.Sprintf("user[uid=%d] heartbeat timeout, disconnect", p.uid))
 			p.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 			return nil
-		},
-		p, xtimer.GTimer, int64(GCfgCustomHeartBeatExpireDuration/time.Second))
-	p.hb.Stop()
-	p.hb.Start(cb, p.actor)
+		})
+	p.heartbeatTimer = xtimer.GTimer.AddSecond(cb, time.Now().Unix()+int64(GCfgCustomHeartBeatExpireDuration/time.Second), p.actor)
 }
 
-// Cleanup 在连接断开后清理定时器，并通知 online 清理当前 gatewaySession。
-func (p *User) Cleanup(reason xnetcommon.DisconnectReason) {
+// Cleanup 在连接断开后清理定时器，并通知 online/cache 清理当前 userSession。
+func (p *User) Cleanup(reason xnetcommon.DisconnectReason) error {
 	if p.verifyTimer != nil {
 		xtimer.GTimer.DelSecond(p.verifyTimer)
 		p.verifyTimer = nil
 	}
-	p.hb.Stop()
+	if p.heartbeatTimer != nil {
+		xtimer.GTimer.DelSecond(p.heartbeatTimer)
+		p.heartbeatTimer = nil
+	}
 
 	uid := p.uid
 	online := p.online
-	gatewaySession := p.gatewaySession
 	userSession := p.userSession
 	p.online = nil
-	p.gatewaySession = ""
+	p.heartbeatSession = ""
 	p.userSession = ""
 	p.account = ""
 
-	if uid != 0 && online != nil && gatewaySession != "" && userSession != "" {
-		if err := unaryOnlineUserOffline(online, uid, xetcd.GEtcd.GetKey(), gatewaySession, userSession, reason, "gateway user offline"); err != nil {
-			xlog.GLog.Warnf("notify offline failed uid:%d reason:%d online:%s err:%v", uid, reason, online.Key, err)
+	var err error
+	if uid != 0 && userSession != "" {
+		gatewayKey := xetcd.GEtcd.GetKey()
+		if online != nil {
+			if errTmp := unaryOnlineUnbindUser(online, uid, gatewayKey, userSession, reason, "gateway user offline"); errTmp != nil {
+				err = xerror.AppendError(err, errTmp)
+				xlog.GLog.Warnf("phase=cleanup_online uid=%d gatewayKey=%s onlineKey=%s userSession=%s reason=%d err=%v",
+					uid, gatewayKey, online.Key, common.ShortSession(userSession), reason, errTmp)
+			}
+		}
+		if errTmp := unaryCacheEndUserSession(uid, userSession); errTmp != nil {
+			err = xerror.AppendError(err, errTmp)
+			xlog.GLog.Warnf("phase=cleanup_cache uid=%d gatewayKey=%s userSession=%s reason=%d err=%v",
+				uid, gatewayKey, common.ShortSession(userSession), reason, errTmp)
 		}
 	}
+	return err
 }
