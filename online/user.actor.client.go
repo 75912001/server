@@ -11,21 +11,20 @@ import (
 )
 
 func (p *User) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
-	if gateway == nil || pkt == nil {
-		return
-	}
 	msgID := pb.MsgIDUser(pkt.GetMessageId())
 	switch msgID {
 	case pb.MsgIDUser_UserRecordReq_CMD:
-		p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_UserRecordRes_CMD), xerror.Success.Code(), &pb.UserRecordRes{
-			UserRecord: p.userRecord,
-		})
+		p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_UserRecordRes_CMD), xerror.Success.Code(),
+			&pb.UserRecordRes{
+				UserRecord: p.userRecord,
+			},
+		)
 		return
 	case pb.MsgIDUser_UserCreateReq_CMD:
 		p.onUserCreateReq(gateway, pkt)
 		return
 	default:
-		if p.userRecord == nil || p.userRecord.GetUserCreateTime() == 0 {
+		if p.userRecord == nil || p.userRecord.GetUserCreateTimeMs() == 0 {
 			p.sendClientErr(gateway, pkt, uint32(msgID), common.ECOnlineUserNotCreated.Code())
 			return
 		}
@@ -47,12 +46,14 @@ func (p *User) onRobotPingReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_RobotPingRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
-	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_RobotPingRes_CMD), xerror.Success.Code(), &pb.RobotPingRes{
-		Seq:        req.GetSeq(),
-		ClientTime: req.GetClientTime(),
-		ServerTime: time.Now().UnixMilli(),
-		Payload:    req.GetPayload(),
-	})
+	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_RobotPingRes_CMD), xerror.Success.Code(),
+		&pb.RobotPingRes{
+			Seq:        req.GetSeq(),
+			ClientTime: req.GetClientTime(),
+			ServerTime: time.Now().UnixMilli(),
+			Payload:    req.GetPayload(),
+		},
+	)
 }
 
 func (p *User) onUserCreateReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
@@ -61,29 +62,24 @@ func (p *User) onUserCreateReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
-	if p.userRecord != nil && p.userRecord.GetUserCreateTime() != 0 {
+
+	if p.userRecord == nil {
+		xlog.GLog.Errorf("user record is nil uid:%d", p.uid)
+		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.Internal.Code())
+		return
+	}
+
+	if p.userRecord.GetUserCreateTimeMs() != 0 {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.AlreadyExists.Code())
 		return
 	}
 	now := time.Now().UnixMilli()
-	userRecord := p.userRecord
-	if userRecord == nil {
-		userRecord = &pb.UserRecord{Uid: p.uid, Account: p.account, AccountCreateTime: now}
-	}
-	userRecord.Uid = p.uid
-	if userRecord.GetAccount() == "" {
-		userRecord.Account = p.account
-	}
-	if userRecord.GetAccountCreateTime() == 0 {
-		userRecord.AccountCreateTime = now
-	}
-	userRecord.UserCreateTime = now
-	if err := unaryCacheSetUserRecord(p.uid, userRecord); err != nil {
+	p.userRecord.UserCreateTimeMs = now
+	if err := unaryCacheSetUserRecord(p.uid, p.userRecord); err != nil {
 		xlog.GLog.Errorf("set user record failed uid:%d err:%v", p.uid, err)
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.Internal.Code())
 		return
 	}
-	p.userRecord = userRecord
 	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.Success.Code(), &pb.UserCreateRes{
 		UserRecord: p.userRecord,
 	})
