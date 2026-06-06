@@ -13,7 +13,7 @@ GOCACHE="$PWD/.gocache" go test ./gateway
 
 当前 `gateway` 单元测试不依赖真实 TCP、etcd、online、cache 或 Redis，主要覆盖：
 
-- `GatewayUserOffline` 的参数校验、用户不存在、用户会话变更保护。
+- `GatewayKickUser` 的参数校验、用户不存在、用户会话变更保护。
 - `grpcErrorToResultCode` 对 gRPC 标准错误码到客户端 `ResultID` 的映射。
 - `grpcErrorToResultCode` 的轻量性能基准。
 
@@ -50,7 +50,7 @@ go tool cover -html=.coverage/gateway.out -o .coverage/gateway.html
 
 ## 4. Race 检查
 
-`gateway` 存在 actor、TCP 回调、stream 回调、timer 回调等并发路径。涉及用户生命周期、online stream、GatewayUserOffline、UserMgr 或 OnlineMgr 时，建议执行 race 检查：
+`gateway` 存在 actor、TCP 回调、stream 回调、timer 回调等并发路径。涉及用户生命周期、online stream、GatewayKickUser、UserMgr、CacheMgr 或 OnlineMgr 时，建议执行 race 检查：
 
 ```bash
 cd /d/src/github.com/server
@@ -80,30 +80,30 @@ docker ps
 确认依赖容器和服务运行后，使用客户端模拟器连接 gateway：
 
 ```bash
-cd /d/src/github.com/server/src/client.simulator/bin
-./client.simulator.exe
+cd /d/src/github.com/server/tool/robot/bin
+./robot.exe
 ```
 
 重点验证：
 
 - 输入 `UserVerifyReq` 后，客户端收到 `UserVerifyRes`，并且 `ResultID == 0`。
-- 登录成功后，客户端按配置自动发送 `UserHeartbeatReq`，服务端返回 `UserHeartbeatRes.next_session`。
+- 登录成功后，客户端按配置自动发送 `UserHeartbeatReq`，服务端返回 `UserHeartbeatRes.next_heartbeat_session`。
 - 输入业务命令时，gateway 通过当前用户绑定的 online 透传上行包。
-- 输入 `UserOfflineReq` 或由 online 调用 `GatewayUserOffline` 时，gateway 清理本地 user，并通知绑定的 online 下线。
+- 输入 `UserOfflineReq` 或由新 gateway 调用旧 gateway `GatewayKickUser` 时，gateway 清理本地 user，并通知绑定的 online 下线，同时按 CAS 删除 cache session。
 - gateway stream 建立后，online 能识别 `gateway_id` 并绑定下行 stream。
 
 ## 7. 常见失败定位
 
 - `selector for method ... not exist`：检查 online 是否已注册到 etcd，且 gateway 是否收到 online 的 etcd add/update 消息。
 - `shard key not found`：检查对应 unary 调用是否传入 selector 需要的 key，或是否应该指定用户已绑定的 online。
-- `GatewayUserOffline` 返回 `InvalidArgument`：检查 `uid` 和 `user_session` 是否为空。
-- `GatewayUserOffline` 返回 `Aborted`：表示请求中的 `user_session` 已不是当前连接的会话，通常是重复登录或旧请求晚到。
+- `GatewayKickUser` 返回 `InvalidArgument`：检查 `uid` 和 `user_session` 是否为空。
+- `GatewayKickUser` 返回 `Aborted`：表示请求中的 `user_session` 已不是当前连接的会话，通常是重复登录或旧请求晚到。
 - 客户端无响应：检查 gateway 日志、online 日志、client.simulator 的 `bin/log`，确认包头长度、消息 ID、session 和 key 是否正确。
 
 ## 8. 后续待补测试
 
 - `User.OnClientPacket`：未验证包、心跳包、离线包、业务包分流。
-- `User.Cleanup`：断线后只通知一次 online，并正确清理 `gatewaySession/userSession`。
+- `User.Cleanup`：断线后只通知一次 online，并正确清理 `userSession` 对应的 cache session。
 - `OnlineMgr`：etcd add/update/remove 与 stream actor Stop 的生命周期。
 - `OnlineStreamTunnelPre/Post`：gateway stream 注册包发送与 reset 行为。
 - `sendClientRes`：remote 断开、nil message、ResultID 透传。

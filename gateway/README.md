@@ -1,66 +1,107 @@
 # Gateway 服务
 
-Gateway 服务负责客户端 TCP 接入、登录验证、连接状态维护、业务包透传、心跳和离线清理。部署、端口、容器启动和验证命令见 `deploy/gateway/README.md`。
+Gateway 服务负责客户端 TCP 接入、首次登录验票、单登录顶号编排、在线 session CAS、心跳续期、离线清理和业务包透传。部署、端口、容器启动和验证命令见 `deploy/gateway/README.md`。
 
 ## 能力边界
 
-- 监听客户端 TCP 连接。
-- 接收 login 的 `GatewayPrepareLogin`，在本地保存 pending login session。
-- 校验客户端 `UserVerifyReq` 中的 uid、`gatewaySession` 和 `gatewayNonce`。
-- 选择可用 online 并调用 `OnlineUserOnline`。
-- 登录成功后绑定本地 User、固定 `userSession`、启动心跳超时计时器，并通过 stream 向 online 透传业务包。
-- 处理心跳，轮换 `gatewaySession`。
-- 在 TCP 断开、主动离线、顶号等场景通知 online 清理 session。
-
-## 登录准备
-
-`GatewayPrepareLogin` 来自 login，字段包括：
-
-```text
-uid
-account
-gatewayNonce
-gatewaySession
-expireSecond
-```
-
-处理顺序：
-
-1. 校验字段非空。
-2. 使用当前 gateway etcd key 重新计算 `gatewaySession`。
-3. 计算公式：
-
-```text
-sha256(uid + ":" + gatewayKey + ":" + gatewayNonce + ":" + "menglc-session")
-```
-
-4. 校验通过后写入本地 pending 表。
-5. pending 到期未被客户端验证时自动删除。
-
-pending 是 gateway 本地状态，不写 Redis。它只用于桥接 login HTTP 返回和客户端 TCP 登录验证。
+- 监听客户端 TCP 长连接。
+- 验证 `UserVerifyReq.uid + connectTicket`。
+- 从 cache 读取 `user:{uid}:session`。
+- 发现并调用旧 gateway `GatewayKickUser` 完成严格顶号。
+- 通过 cache `CacheBeginUserSessionCAS` 抢占新在线 session。
+- 选择可用 online，调用 `OnlineBindUser` 绑定 user actor。
+- 维护本地 `heartbeatSession`，处理心跳轮换和 `CacheRefreshUserSessionCAS`。
+- 在 TCP 断开、主动离线、心跳超时、顶号等场景调用 `OnlineUnbindUser` 和 `CacheEndUserSessionCAS`。
+- gateway 到 cache、online 和旧 gateway 的 unary 超时统一由 proto `methodOpt.timeout` 控制；当前 cache 为 `3s`，online bind/unbind 和旧 gateway kick 为 `60s`。
 
 ## TCP 登录验证
 
-客户端连接 gateway 后发送 `UserVerifyReq`：
+客户端连接 gateway 后发送：
 
 ```text
-uid
-gatewaySession
-gatewayNonce
+UserVerifyReq {
+  uid
+  connectTicket
+}
 ```
 
 处理顺序：
 
 1. 反序列化 `UserVerifyReq`。
-2. 校验 uid、`gatewayNonce`、`gatewaySession` 非空。
-3. 使用当前 gateway key 重新计算并比较 `gatewaySession`。
-4. 消费本地 pending login session；同一个 pending 只能消费一次。
-5. 选择 `availableLoad` 最大的 online。
-6. 生成固定 `userSession`，调用 online `OnlineUserOnline`。
-7. online 成功后绑定本地 User 到 uid、account、online、`userSession` 和 `gatewaySession`。
-8. 返回 `UserVerifyRes`。
+2. 校验 uid 和 `connectTicket` 非空。
+3. 使用 `ticketSecret` 验证 HMAC-SHA256 签名。
+4. 校验票据未过期、payload uid 匹配、payload gatewayKey 等于当前 gateway key。
+5. 从 payload 取得 account。
+6. 生成固定 `userSession`。
+7. 调用 `CacheGetUserSession` 查询旧在线态；不存在视为空 session。
+8. 如果旧 session 存在，调用旧 gateway `GatewayKickUser(uid, oldUserSession)`；旧 gateway 不存在、找不到本地连接、`userSession` 不匹配或 cleanup 失败时，本次登录失败。
+9. 选择 `availableLoad` 最大的 online。
+10. 调用 `CacheBeginUserSessionCAS(expected_user_session="")` 写入带 `gatewayKey/userSession/login_time_ms/onlineKey` 的新 session；如果返回 `Aborted`，说明旧 session 仍存在或并发登录已抢占，本次登录失败。
+11. 调用 `OnlineBindUser`，由 online 读取并校验 `UserRecord` 后绑定 actor。
+12. 生成随机 `heartbeatSession`，绑定本地 User 到 uid、account、online、`userSession` 和 `heartbeatSession`。
+13. 返回 `UserVerifyRes.server_time` 和 `UserVerifyRes.heartbeat_session`。
 
-验证失败会返回对应 ResultID，例如 session 不匹配、pending 不存在、online 不可用或 RPC 超时。
+`OnlineBindUser` 只会在 `CacheBeginUserSessionCAS` 成功后调用。`CacheBeginUserSessionCAS` 失败时不会创建 online actor。
+
+## 顶号流程
+
+```text
+new gateway
+  -> cache CacheGetUserSession
+  -> old gateway GatewayKickUser(uid, oldUserSession)
+  -> old gateway 关闭旧 TCP
+  -> old online OnlineUnbindUser(gatewayKey, oldUserSession)
+  -> cache CacheEndUserSessionCAS(expected_user_session=oldUserSession)
+  <- old gateway OK
+  -> cache CacheBeginUserSessionCAS(expected_user_session="", new gatewayKey + userSession + login_time_ms + onlineKey)
+  -> online OnlineBindUser
+```
+
+严格语义：
+
+- 旧连接确认下线后，新连接才上线。
+- 旧 gateway 不可达时不强制覆盖 Redis session。
+- 旧 gateway 本地找不到连接时返回失败，等待 TTL 或运维清理。
+- Redis CAS identity 固定为 `userSession`，防止旧请求误删新 session。
+- 旧 gateway 返回成功后，新 gateway 不再二次读取 session，而是直接执行 `CacheBeginUserSessionCAS(expected_user_session="")`；CAS 冲突则失败关闭。
+- 新 session 抢占成功后，如果 `OnlineBindUser`、本地 User 绑定或客户端连接状态检查失败，gateway 会调用 `OnlineUnbindUser` 和 `CacheEndUserSessionCAS(expected_user_session=userSession)` 回滚。
+
+## 心跳
+
+客户端心跳发送：
+
+```text
+UserHeartbeatReq.last_heartbeat_session
+```
+
+处理顺序：
+
+1. gateway 校验客户端带回的 `last_heartbeat_session` 必须等于本地当前 `heartbeatSession`。
+2. 不匹配视为重放、乱序或篡改，主动断开连接。
+3. 生成随机 `next_heartbeat_session`。
+4. 调用 `CacheRefreshUserSessionCAS(expected_user_session=userSession)` 刷新 Redis TTL。
+5. cache 成功后更新本地 `heartbeatSession`。
+6. 返回 `UserHeartbeatRes.next_heartbeat_session`。
+
+`heartbeatSession` 只存在于客户端和 gateway 本地，不写入 Redis。
+
+## 离线清理
+
+离线来源：
+
+- 客户端 TCP 主动关闭。
+- 客户端发送 `UserOfflineReq`。
+- 心跳超时。
+- 新 gateway 调用 `GatewayKickUser`。
+- gateway 本地异常导致连接关闭。
+
+处理顺序：
+
+1. gateway 从本地 UserMgr 删除 remote 和 uid 索引。
+2. User actor 停止心跳/验证定时器。
+3. 调用 online `OnlineUnbindUser(gatewayKey, userSession)` 清理 actor。
+4. 调用 cache `CacheEndUserSessionCAS(expected_user_session=userSession)` 删除 Redis session。
+5. `GatewayKickUser` 只有在旧 TCP 已断开、旧 online actor 已确认下线或不存在、Redis session 已 CAS 删除后才返回成功。
 
 ## 业务数据流
 
@@ -74,63 +115,38 @@ client TCP
 
 非登录包必须在 User 绑定 online 后才允许转发。未验证或 online 缺失时，gateway 会断开连接或返回错误。
 
-## 心跳和 gatewaySession 轮换
-
-客户端心跳发送 `UserHeartbeatReq.last_gateway_session`。
-
-处理顺序：
-
-1. gateway 校验客户端带回的 `last_gateway_session` 必须等于本地当前 `gatewaySession`。
-2. 校验失败视为重放、乱序或篡改，gateway 主动断开连接。
-3. gateway 生成随机 `next_gateway_session`。
-4. 调用 online `OnlineUserUpdateGatewaySession`，请求携带固定 `userSession` 和旧 `gatewaySession`。
-5. online 成功替换 Redis session 后，gateway 更新本地 `gatewaySession`。
-6. 返回 `UserHeartbeatRes.next_gateway_session`。
-
-## 离线清理
-
-离线来源：
-
-- 客户端 TCP 主动关闭。
-- 客户端发送 `UserOfflineReq`。
-- 心跳超时。
-- online 顶号时调用 `GatewayUserOffline`。
-- gateway 本地异常导致连接关闭。
-
-处理顺序：
-
-1. gateway 从本地 UserMgr 删除 remote 和 uid 索引。
-2. User actor 执行 cleanup。
-3. 若 uid、online、`userSession`、`gatewaySession` 有效，则调用 online `OnlineUserOffline`。
-4. online 按 expected session 删除 Redis 在线态。
-
 ## 一致性约定
 
-- gateway 不直接写 `user:{uid}:session`，在线态由 online 作为权威维护。
-- gateway 本地 `userSession` 是固定连接身份，顶号和离线只处理匹配的连接。
-- gateway 本地 `gatewaySession` 必须与 online/cache 中的 session 同步更新。
-- pending login session 一次性消费，过期后不能用于登录。
-- `GatewayUserOffline` 只断开 `userSession` 匹配的本地连接；Redis session 是否删除由旧 online 的 expected session 决定。
+- `user:{uid}:session` 由 gateway 写入、删除和续期。
+- online 不再决定“谁能上线”，只管理 user actor。
+- `userSession` 是固定连接身份，一次登录生成，心跳不轮换。
+- `gatewayKey` 和 `onlineKey` 只作为 Redis session 元数据，分别用于定位旧 gateway 和排障定位 online。
+- `heartbeatSession` 是客户端心跳凭证，可轮换，不进入 Redis。
+- `connectTicket` 只负责首次 TCP 验证，不包含 `heartbeatSession`，不写 gateway pending 表，也不写 Redis。
+- 所有 Redis session 写入、删除、续期都必须带 expected。
+- `CacheGetUserSession` 对空 session 返回 `NotFound`。
+- 当前不引入 Redis `binding` 状态。gateway 在 `CacheBeginUserSessionCAS` 成功后、`OnlineBindUser` 成功前崩溃时，Redis session 依赖 5 分钟 TTL 自然释放。
+
+## 错误码和日志
+
+- 服务间以 gRPC status code 为权威：CAS 冲突为 `Aborted`，票据或身份错误为 `Unauthenticated`，服务不可达为 `Unavailable`，超时为 `DeadlineExceeded`。
+- TCP 边界通过公共映射转换为 `xerror` ResultID。
+- 登录、顶号、回滚、心跳失败和 CAS 失败日志使用 `phase uid gatewayKey onlineKey userSession reason err` 这类 key=value 字段。
+- `userSession` 和 `heartbeatSession` 只记录短前后缀，不打印完整凭证。
+- 高频 TCP 每包日志为 Debug 级别，避免并发连接时日志放大。
 
 ## 排障
 
-- `gatewaySession mismatch`：客户端提交的 uid、gateway key、nonce 或 session 不匹配。
-- `pending session not found`：pending 已过期、已消费、gateway 重启或客户端连接了错误 gateway。
-- `DeadlineExceeded`：调用 online 登录或更新 session 超时。当前 X gRPC 连接有超时拦截器，后续建议在调用点显式 `context.WithTimeout`。
-- `packet from unknown remote`：连接没有成功绑定 User 或连接已清理后仍收到包。
-- `heartbeat gatewaySession mismatch`：客户端心跳使用了旧 session、乱序 session 或被篡改的 session。
-- `user session changed`：离线或顶号请求携带的 `userSession` 已不是当前连接。
+- `connectTicket invalid`：票据签名错误、过期、uid 不匹配或客户端连接了错误 gateway。
+- `old gateway not found`：Redis session 指向的旧 gateway 当前未被 etcd 发现，新登录按严格语义失败。
+- `heartbeatSession mismatch`：客户端心跳使用了旧 session、乱序 session 或被篡改的 session。
+- `user session changed`：离线、顶号或 CAS 请求携带的 `userSession` 已不是当前连接。
+- `DeadlineExceeded`：调用 cache、online 或旧 gateway 超时，检查 proto `methodOpt.timeout`、目标服务日志、网络和服务发现状态。
 
 ## 后续建议
 
-- 为 gateway 到 online 的登录、离线、session 更新调用显式设置超时和日志字段。
-- 记录 `uid`、`gatewayKey`、`onlineKey`、`userSession`、`gatewaySession` 的短 hash，便于跨服务排查。
-- 增加 pending 过期、错误 gateway、心跳乱序、顶号断开和 online 超时的测试。
-
-## 实现细节补充
-
-- pending login session 使用 xlib `MapMutexMgr` 存储，单次 `Add/Find/Del` 由 map 内部锁保护。
-- pending login session 过期使用 xlib 全局 `GTimer`，到期事件投递到 gateway 主 actor 后执行删除。
-- pending 不保存 timer 句柄，登录验证 `Consume` 只删除 map key，不调用 `DelSecond`，避免 unary 路径与 timer 状态竞争。
-- 每次登录准备都会生成新的 `gatewayNonce/gatewaySession`，同一个 `loginSessionKey(uid, gatewaySession)` 不预期重复，`Add` 直接写入当前 pending。
-- `Expire` 只按 key 删除；如果 pending 已被 `Consume` 删除，过期事件晚到时就是 no-op。
+- 收口 gateway gRPC 控制面暴露风险：`GatewayKickUser` 会断开用户连接并清理 session，当前部署示例会发布 `20101/20102` gRPC 端口且接口本身未做服务间鉴权。后续需要限制端口只对可信内网服务开放，并增加 mTLS 或 metadata token/HMAC 校验调用方身份。
+- 增加顶号测试：旧 gateway 不存在、旧 gateway NotFound、kick 成功后 begin 成功、begin 失败回滚。
+- 按压测结果继续调短 `online.grpc.proto` / `gateway.grpc.proto` 中 60 秒 `methodOpt.timeout`，避免异常场景连接长时间占用。
+- CacheMgr 使用 xlib `MapMutexMgr` 缓存 cache 服务发现结果，由 etcd add/del 回调维护，并同步注册或摘除 gRPC resolve。
+- User 心跳超时直接使用 `xtimer.Second` 维护；`heartbeatSession` 只负责客户端心跳凭证校验，不再使用 xlib `HeartBeat.WaitID`。
