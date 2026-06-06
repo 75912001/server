@@ -62,12 +62,12 @@ func (p *UserHandlerTCP) OnPacket(remote xnetcommon.IRemote, packet xpacket.IPac
 	header := pt.Header
 	body := pt.RawData[xpacket.HeaderSize:header.Length]
 
-	xlog.GLog.Infof("OnPacket MessageID: %d, Length: %d, Key: %d", header.MessageID, header.Length, header.Key)
+	xlog.GLog.Debugf("phase=tcp_packet messageID=%d length=%d key=%d", header.MessageID, header.Length, header.Key)
 
 	if header.MessageID == uint32(pb.MsgIDUser_UserVerifyReq_CMD) { // 登录鉴权
-		err := unaryOnlineUserOnline(remote, header, body)
+		err := handleUserVerifyReq(remote, header, body)
 		if err != nil {
-			xlog.GLog.Warnf("unaryOnlineUserOnline error: %v", err)
+			xlog.GLog.Warnf("handleUserVerifyReq error: %v", err)
 		}
 		return err
 	}
@@ -84,7 +84,10 @@ func (p *UserHandlerTCP) OnPacket(remote xnetcommon.IRemote, packet xpacket.IPac
 
 // OnDisconnect 当客户端连接断开：从 UserMgr 摘除并清理定时器。
 func (p *UserHandlerTCP) OnDisconnect(remote xnetcommon.IRemote) error {
-	u := GUserMgr.Remove(remote)
+	u, err := GUserMgr.Remove(remote)
+	if err != nil {
+		xlog.GLog.Warnf("Client cleanup failed: %p reason=%d err=%v", remote, remote.GetDisconnectReason(), err)
+	}
 	if u == nil {
 		xlog.GLog.Infof("Client disconnected: %p reason=%d", remote, remote.GetDisconnectReason())
 		return nil
