@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"strings"
-
 	pb "server/proto/pb"
 
 	grpccodes "google.golang.org/grpc/codes"
@@ -12,7 +10,7 @@ import (
 
 func (p *onlineGRPCServer) OnlineBindUser(_ context.Context, req *pb.OnlineBindUserReq) (*pb.OnlineBindUserRes, error) {
 	uid := req.GetUid()
-	account := strings.TrimSpace(req.GetAccount())
+	account := req.GetAccount()
 	if uid == 0 || account == "" || req.GetGatewayKey() == "" || req.GetUserSession() == "" {
 		return nil, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
@@ -23,8 +21,11 @@ func (p *onlineGRPCServer) OnlineBindUser(_ context.Context, req *pb.OnlineBindU
 		}
 		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
-	if userRecord == nil || userRecord.GetUid() != uid || strings.TrimSpace(userRecord.GetAccount()) != account {
+	if userRecord == nil || userRecord.GetUid() != uid || userRecord.GetAccount() != account {
 		return nil, grpcstatus.Error(grpccodes.Unauthenticated, "user record mismatch")
+	}
+	if userRecord.GetAccountCreateTimeMs() == 0 {
+		return nil, grpcstatus.Error(grpccodes.Internal, "invalid user record")
 	}
 	req.Account = account
 	res, err := GUserMgr.Bind(uid, req, userRecord)
