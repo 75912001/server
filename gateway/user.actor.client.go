@@ -54,31 +54,31 @@ func (p *User) OnClientPacket(header *xpacket.Header, body []byte) error {
 
 // OnHeartbeatReq 处理客户端心跳请求。
 //
-//	验证 last_gateway_session 与 gateway 本地 gatewaySession 是否一致；
-//	gatewaySession 是可轮换认证凭证，userSession 是固定连接身份；
+//	验证 last_heartbeat_session 与 gateway 本地 heartbeatSession 是否一致；
+//	heartbeatSession 是可轮换认证凭证，userSession 是固定连接身份；
 //	若不一致视为重放/篡改，主动断开；
-//	一致时生成新 gatewaySession，同步 online/cache 后下发，并重置心跳超时定时器。
+//	一致时生成新 heartbeatSession，刷新 cache TTL 后下发，并重置心跳超时定时器。
 func (p *User) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
 	var req pb.UserHeartbeatReq
 	if err := proto.Unmarshal(body, &req); err != nil {
 		return errors.WithMessagef(err, "UserHeartbeatReq unmarshal %v", xruntime.Location())
 	}
 
-	lastGatewaySession := req.GetLastGatewaySession()
-	if lastGatewaySession == "" || lastGatewaySession != p.gatewaySession {
+	lastHeartbeatSession := req.GetLastHeartbeatSession()
+	if lastHeartbeatSession == "" || lastHeartbeatSession != p.heartbeatSession {
 		p.Disconnect(xnetcommon.DisconnectReasonClientLogic)
-		return errors.WithMessagef(xerror.Mismatch, "heartbeat gatewaySession mismatch for user[uid=%d] got=%s expect=%s %v",
-			p.uid, lastGatewaySession, p.gatewaySession, xruntime.Location())
+		return errors.WithMessagef(xerror.Mismatch, "phase=heartbeat uid=%d reason=heartbeatSession_mismatch got=%s expect=%s %v",
+			p.uid, common.ShortSession(lastHeartbeatSession), common.ShortSession(p.heartbeatSession), xruntime.Location())
 	}
 
-	nextGatewaySession, err := common.NewRandomGatewaySession()
+	nextHeartbeatSession, err := common.NewHeartbeatSession()
 	if err != nil {
 		p.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
-		return errors.WithMessagef(err, "new random gatewaySession for user[uid=%d] %v", p.uid, xruntime.Location())
+		return errors.WithMessagef(err, "new heartbeatSession for user[uid=%d] %v", p.uid, xruntime.Location())
 	}
 
-	if err := p.UpdateGatewaySession(nextGatewaySession); err != nil {
-		return errors.WithMessagef(err, "update gatewaySession for user[uid=%d] %v", p.uid, xruntime.Location())
+	if err := p.UpdateHeartbeatSession(nextHeartbeatSession); err != nil {
+		return errors.WithMessagef(err, "update heartbeatSession for user[uid=%d] %v", p.uid, xruntime.Location())
 	}
 
 	p.restartHeartbeatTimer()
@@ -89,8 +89,8 @@ func (p *User) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
 		xerror.Success.Code(),
 		header.Key,
 		&pb.UserHeartbeatRes{
-			ServerTime:         time.Now().UnixMilli(),
-			NextGatewaySession: nextGatewaySession,
+			ServerTime:           time.Now().UnixMilli(),
+			NextHeartbeatSession: nextHeartbeatSession,
 		},
 	)
 }
