@@ -3,7 +3,7 @@ module server
 go 1.25.0
 
 require (
-	github.com/75912001/xlib v0.0.0-20260604025356-00f90a144c87
+	github.com/75912001/xlib v0.0.0-20260608055154-31b8b835ab1f
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.19.0
 	google.golang.org/grpc v1.81.1

@@ -5,6 +5,8 @@ github.com/75912001/xlib v0.0.0-20260603145302-b8ea7b0a3f63 h1:LCoy0vFIC5fFYljBA
 github.com/75912001/xlib v0.0.0-20260603145302-b8ea7b0a3f63/go.mod h1:0AgcVP4Bqg/XpULE8uF4qi4SWZtBN6eVek8EXq7fAC0=
 github.com/75912001/xlib v0.0.0-20260604025356-00f90a144c87 h1:i+Mqcyo28Uvght/CeHNdJjmLAAM/4y1W0H7+b6mtDQg=
 github.com/75912001/xlib v0.0.0-20260604025356-00f90a144c87/go.mod h1:0AgcVP4Bqg/XpULE8uF4qi4SWZtBN6eVek8EXq7fAC0=
+github.com/75912001/xlib v0.0.0-20260608055154-31b8b835ab1f h1:34qQF/97cOmwn4QX0eEYfK1rEP9oG3os1TWZb5Mbal0=
+github.com/75912001/xlib v0.0.0-20260608055154-31b8b835ab1f/go.mod h1:0AgcVP4Bqg/XpULE8uF4qi4SWZtBN6eVek8EXq7fAC0=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
