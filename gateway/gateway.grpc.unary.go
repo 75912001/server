@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"server/common"
 
 	pb "server/proto/pb"
 
@@ -39,6 +38,6 @@ func (p *gatewayGRPCServer) GatewayKickUser(_ context.Context, req *pb.GatewayKi
 	}
 
 	xlog.GLog.Debugf("phase=kick_user uid=%d userSession=%s reason=%v msg=%s",
-		req.GetUid(), common.ShortSession(userSession), xnetcommon.DisconnectReason(req.GetReason()), req.GetMsg())
+		req.GetUid(), userSession, xnetcommon.DisconnectReason(req.GetReason()), req.GetMsg())
 	return &pb.GatewayKickUserRes{}, nil
 }

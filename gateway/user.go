@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"server/common"
 	"time"
 
 	xactor "github.com/75912001/xlib/actor"
@@ -196,13 +195,13 @@ func (p *User) Cleanup(reason xnetcommon.DisconnectReason) error {
 			if errTmp := unaryOnlineUnbindUser(online, uid, gatewayKey, userSession, reason, "gateway user offline"); errTmp != nil {
 				err = xerror.AppendError(err, errTmp)
 				xlog.GLog.Warnf("phase=cleanup_online uid=%d gatewayKey=%s onlineKey=%s userSession=%s reason=%d err=%v",
-					uid, gatewayKey, online.Key, common.ShortSession(userSession), reason, errTmp)
+					uid, gatewayKey, online.Key, userSession, reason, errTmp)
 			}
 		}
 		if errTmp := unaryCacheEndUserSession(uid, userSession); errTmp != nil {
 			err = xerror.AppendError(err, errTmp)
 			xlog.GLog.Warnf("phase=cleanup_cache uid=%d gatewayKey=%s userSession=%s reason=%d err=%v",
-				uid, gatewayKey, common.ShortSession(userSession), reason, errTmp)
+				uid, gatewayKey, userSession, reason, errTmp)
 		}
 	}
 	return err

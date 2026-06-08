@@ -10,6 +10,7 @@ import (
 	xnetcommon "github.com/75912001/xlib/net/common"
 	xpacket "github.com/75912001/xlib/packet"
 	xruntime "github.com/75912001/xlib/runtime"
+	xutil "github.com/75912001/xlib/util"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 )
@@ -68,10 +69,10 @@ func (p *User) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
 	if lastHeartbeatSession == "" || lastHeartbeatSession != p.heartbeatSession {
 		p.Disconnect(xnetcommon.DisconnectReasonClientLogic)
 		return errors.WithMessagef(xerror.Mismatch, "phase=heartbeat uid=%d reason=heartbeatSession_mismatch got=%s expect=%s %v",
-			p.uid, common.ShortSession(lastHeartbeatSession), common.ShortSession(p.heartbeatSession), xruntime.Location())
+			p.uid, lastHeartbeatSession, p.heartbeatSession, xruntime.Location())
 	}
 
-	nextHeartbeatSession, err := common.NewHeartbeatSession()
+	nextHeartbeatSession, err := xutil.RandomHex32()
 	if err != nil {
 		p.Disconnect(xnetcommon.DisconnectReasonServerShutdown)
 		return errors.WithMessagef(err, "new heartbeatSession for user[uid=%d] %v", p.uid, xruntime.Location())
