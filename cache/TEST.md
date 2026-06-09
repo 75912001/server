@@ -11,7 +11,7 @@ cache 测试重点不是单纯追求覆盖率，而是稳定覆盖服务契约�
 - accountVerifyToken 设置、消费和删除。
 - uid 按 `base.groupID` 分段生成。
 - `UserRecord` protobuf 读写。
-- 用户在线 session 的批量读写、CAS 替换、续期、删除和迟到请求保护。
+- cache userSession 的批量读写、CAS 替换、续期、删除和迟到请求保护。
 
 ## 快速单元测试
 
@@ -26,9 +26,9 @@ GOCACHE="$PWD/../.gocache" go test ../common . ../proto/pb
 
 - `common.GroupUIDStart` 公式。
 - cache Redis key 生成。
-- session enum 到 Redis hash field 的映射。
-- session identity/record 转换。
-- session response 组装。
+- cache userSession enum 到 Redis hash field 的映射。
+- cache userSession identity/record 转换。
+- cache userSession response 组装。
 - handler 参数错误对应的 gRPC status。
 
 ## 依赖编译检查
@@ -90,9 +90,9 @@ GOCACHE="$PWD/../.gocache" go test -tags=integration .
 - accountVerifyToken 首次设置、重复设置、错误 accountVerifyToken、消费后删除。
 - 新账号创建、重复读取、UserRecord 缺失或关键字段不一致时报错。
 - 同账号并发创建只生成一个 uid。
-- session HSET/HMGET。
-- session CAS replace、expire、delete。
-- 旧 identity 的迟到 expire/delete 不影响新 session。
+- cache userSession HSET/HMGET。
+- cache userSession CAS replace、expire、delete。
+- 旧 userSession 的迟到 expire/delete 不影响新 cache userSession。
 
 ## Benchmark
 
@@ -151,7 +151,7 @@ rmdir ../.coverage 2>/dev/null || true
 
 - accountVerifyToken 设置和消费流程。
 - user record 读写。
-- user session set/get/replace/delete/expire。
+- cache userSession set/get/replace/delete/expire。
 - 参数错误返回 `InvalidArgument`。
 - 记录不存在返回 `NotFound`。
-- expected session 过期或不匹配返回 `Aborted`。
+- expected userSession 过期或不匹配返回 `Aborted`。

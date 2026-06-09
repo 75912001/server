@@ -27,9 +27,9 @@ type OnlineBindUserReq struct {
 	unknownFields protoimpl.UnknownFields
 
 	GatewayKey  string `protobuf:"bytes,1,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`    // gatewayKey, Gateway 服务在 etcd 中注册的唯一身份
-	ClientIp    string `protobuf:"bytes,2,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`          // 客户端连接 gateway 的 IP
+	ClientIp    string `protobuf:"bytes,2,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`          // 客户端 IP, 由 Gateway 从 TCP remote 提取
 	Account     string `protobuf:"bytes,3,opt,name=account,proto3" json:"account,omitempty"`                            // 登录账号, 由 Gateway 校验 connectTicket 后传入
-	Uid         uint64 `protobuf:"varint,4,opt,name=uid,proto3" json:"uid,omitempty"`                                   // 用户唯一 ID，由 login/cache 可信链路生成
+	Uid         uint64 `protobuf:"varint,4,opt,name=uid,proto3" json:"uid,omitempty"`                                   // uid, 用户唯一标识, 由 login/cache 可信链路生成
 	UserSession string `protobuf:"bytes,6,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"` // userSession, 一次登录生成的固定连接身份, 心跳不轮换
 }
 

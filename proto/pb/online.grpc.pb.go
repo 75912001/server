@@ -132,7 +132,7 @@ type OnlineTunnelFrame struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"` // 定位具体的用户 Actor 或 TCP Socket
+	Uid uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"` // uid, 用于定位 Online 用户 actor 或 Gateway 用户连接
 	// payload 强互斥：一个 Frame 只能是下面类型之一
 	//
 	// Types that are assignable to Payload:

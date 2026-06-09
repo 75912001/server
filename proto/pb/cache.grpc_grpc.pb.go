@@ -35,7 +35,7 @@ const (
 type CacheServiceClient interface {
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 写入用户档案。
-	// 以 uid 做 RingHash 分片，用户创建和用户资料更新都会走这个接口。
+	// 以 uid 做 RingHash 分片, 用户创建完成和用户档案更新都会走这个接口。
 	CacheSetUserRecord(ctx context.Context, in *CacheSetUserRecordReq, opts ...grpc.CallOption) (*CacheSetUserRecordRes, error)
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 读取用户档案。
@@ -155,7 +155,7 @@ func (c *cacheServiceClient) CacheRefreshUserSessionCAS(ctx context.Context, in 
 type CacheServiceServer interface {
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 写入用户档案。
-	// 以 uid 做 RingHash 分片，用户创建和用户资料更新都会走这个接口。
+	// 以 uid 做 RingHash 分片, 用户创建完成和用户档案更新都会走这个接口。
 	CacheSetUserRecord(context.Context, *CacheSetUserRecordReq) (*CacheSetUserRecordRes, error)
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 读取用户档案。

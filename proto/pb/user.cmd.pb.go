@@ -31,10 +31,10 @@ const (
 	MsgIDUser_UserOfflineReq_CMD   MsgIDUser = 3  //0x000003#client->gateway#主动下线-请求
 	MsgIDUser_UserHeartbeatReq_CMD MsgIDUser = 10 //0x00000A#client->gateway#心跳-请求
 	MsgIDUser_UserHeartbeatRes_CMD MsgIDUser = 11 //0x00000B#gateway->client#心跳-回复
-	MsgIDUser_UserRecordReq_CMD    MsgIDUser = 12 //0x00000C#client->gateway#请求用户数据-请求
-	MsgIDUser_UserRecordRes_CMD    MsgIDUser = 13 //0x00000D#gateway->client#请求用户数据-回复
-	MsgIDUser_UserCreateReq_CMD    MsgIDUser = 14 //0x00000E#client->gateway#创建用户-请求
-	MsgIDUser_UserCreateRes_CMD    MsgIDUser = 15 //0x00000F#gateway->client#创建用户-回复
+	MsgIDUser_UserRecordReq_CMD    MsgIDUser = 12 //0x00000C#client->gateway#请求用户档案-请求
+	MsgIDUser_UserRecordRes_CMD    MsgIDUser = 13 //0x00000D#gateway->client#请求用户档案-回复
+	MsgIDUser_UserCreateReq_CMD    MsgIDUser = 14 //0x00000E#client->gateway#完成用户创建-请求
+	MsgIDUser_UserCreateRes_CMD    MsgIDUser = 15 //0x00000F#gateway->client#完成用户创建-回复
 	MsgIDUser_RobotPingReq_CMD     MsgIDUser = 16 //0x000010#client->gateway#机器人压测-请求
 	MsgIDUser_RobotPingRes_CMD     MsgIDUser = 17 //0x000011#gateway->client#机器人压测-回复
 )

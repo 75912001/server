@@ -26,8 +26,8 @@ type UserVerifyReq struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid           uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                                         // 用户唯一 ID，由 login 服务下发，客户端登录 gateway 时携带
-	ConnectTicket string `protobuf:"bytes,2,opt,name=connect_ticket,json=connectTicket,proto3" json:"connect_ticket,omitempty"` // login 签发的短期连接票据，客户端登录 gateway 时携带
+	Uid           uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                                         // uid, 用户唯一标识, 由 login 服务下发, 客户端登录 Gateway 时携带
+	ConnectTicket string `protobuf:"bytes,2,opt,name=connect_ticket,json=connectTicket,proto3" json:"connect_ticket,omitempty"` // connectTicket, login 签发的短期连接票据, 客户端登录 Gateway 时携带
 }
 
 func (x *UserVerifyReq) Reset() {
@@ -83,7 +83,7 @@ type UserVerifyRes struct {
 	unknownFields protoimpl.UnknownFields
 
 	ServerTime       int64  `protobuf:"varint,1,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"`                  // 服务器当前时间戳，单位毫秒（用于客户端对时）
-	HeartbeatSession string `protobuf:"bytes,2,opt,name=heartbeat_session,json=heartbeatSession,proto3" json:"heartbeat_session,omitempty"` // 心跳认证凭证，客户端后续心跳携带
+	HeartbeatSession string `protobuf:"bytes,2,opt,name=heartbeat_session,json=heartbeatSession,proto3" json:"heartbeat_session,omitempty"` // heartbeatSession, 客户端后续心跳携带的心跳认证凭证
 }
 
 func (x *UserVerifyRes) Reset() {
@@ -186,7 +186,7 @@ type UserHeartbeatReq struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	LastHeartbeatSession string `protobuf:"bytes,1,opt,name=last_heartbeat_session,json=lastHeartbeatSession,proto3" json:"last_heartbeat_session,omitempty"` // 上次 gateway 下发的 heartbeatSession
+	LastHeartbeatSession string `protobuf:"bytes,1,opt,name=last_heartbeat_session,json=lastHeartbeatSession,proto3" json:"last_heartbeat_session,omitempty"` // 上次 Gateway 下发的 heartbeatSession
 }
 
 func (x *UserHeartbeatReq) Reset() {
@@ -235,7 +235,7 @@ type UserHeartbeatRes struct {
 	unknownFields protoimpl.UnknownFields
 
 	ServerTime           int64  `protobuf:"varint,1,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"`                                // 服务器时间毫秒
-	NextHeartbeatSession string `protobuf:"bytes,2,opt,name=next_heartbeat_session,json=nextHeartbeatSession,proto3" json:"next_heartbeat_session,omitempty"` // 客户端下次心跳必须用这个 heartbeatSession
+	NextHeartbeatSession string `protobuf:"bytes,2,opt,name=next_heartbeat_session,json=nextHeartbeatSession,proto3" json:"next_heartbeat_session,omitempty"` // 客户端下次心跳必须使用的 heartbeatSession
 }
 
 func (x *UserHeartbeatRes) Reset() {
@@ -284,7 +284,7 @@ func (x *UserHeartbeatRes) GetNextHeartbeatSession() string {
 	return ""
 }
 
-// 0x00000C#client->gateway#请求用户数据-请求
+// 0x00000C#client->gateway#请求用户档案-请求
 type UserRecordReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -323,13 +323,13 @@ func (*UserRecordReq) Descriptor() ([]byte, []int) {
 	return file_user_proto_rawDescGZIP(), []int{5}
 }
 
-// 0x00000D#gateway->client#请求用户数据-回复
+// 0x00000D#gateway->client#请求用户档案-回复
 type UserRecordRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserRecord *UserRecord `protobuf:"bytes,1,opt,name=user_record,json=userRecord,proto3" json:"user_record,omitempty"` // 用户数据
+	UserRecord *UserRecord `protobuf:"bytes,1,opt,name=user_record,json=userRecord,proto3" json:"user_record,omitempty"` // 用户档案
 }
 
 func (x *UserRecordRes) Reset() {
@@ -371,7 +371,7 @@ func (x *UserRecordRes) GetUserRecord() *UserRecord {
 	return nil
 }
 
-// 0x00000E#client->gateway#创建用户-请求
+// 0x00000E#client->gateway#完成用户创建-请求
 type UserCreateReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -410,13 +410,13 @@ func (*UserCreateReq) Descriptor() ([]byte, []int) {
 	return file_user_proto_rawDescGZIP(), []int{7}
 }
 
-// 0x00000F#gateway->client#创建用户-回复
+// 0x00000F#gateway->client#完成用户创建-回复
 type UserCreateRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserRecord *UserRecord `protobuf:"bytes,1,opt,name=user_record,json=userRecord,proto3" json:"user_record,omitempty"` // 创建成功后的用户数据
+	UserRecord *UserRecord `protobuf:"bytes,1,opt,name=user_record,json=userRecord,proto3" json:"user_record,omitempty"` // 完成用户创建后的用户档案
 }
 
 func (x *UserCreateRes) Reset() {

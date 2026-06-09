@@ -25,12 +25,12 @@ type UserRecord struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid                 uint64                    `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                                                                                                                         // 用户唯一 ID
+	Uid                 uint64                    `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                                                                                                                         // uid, 用户唯一标识
 	Name                string                    `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                                                                                                                        // 用户昵称
 	Account             string                    `protobuf:"bytes,3,opt,name=account,proto3" json:"account,omitempty"`                                                                                                                  // 登录账号，去除首尾空格后保存，大小写敏感
 	AccountCreateTimeMs int64                     `protobuf:"varint,4,opt,name=account_create_time_ms,json=accountCreateTimeMs,proto3" json:"account_create_time_ms,omitempty"`                                                          // 账号创建时间戳，单位毫秒
-	UserCreateTimeMs    int64                     `protobuf:"varint,5,opt,name=user_create_time_ms,json=userCreateTimeMs,proto3" json:"user_create_time_ms,omitempty"`                                                                   // 用户创建时间戳，单位毫秒；0 表示账号已创建但用户未创建
-	AssetMap            map[uint64]uint64         `protobuf:"bytes,10,rep,name=asset_map,json=assetMap,proto3" json:"asset_map,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`     // 资产表 key: AssetID value: 数值
+	UserCreateTimeMs    int64                     `protobuf:"varint,5,opt,name=user_create_time_ms,json=userCreateTimeMs,proto3" json:"user_create_time_ms,omitempty"`                                                                   // 用户创建完成时间戳, 单位毫秒; 0 表示账号和 uid 已创建, 但用户创建尚未完成
+	AssetMap            map[uint64]uint64         `protobuf:"bytes,10,rep,name=asset_map,json=assetMap,proto3" json:"asset_map,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`     // 资产表, key 为 asset_id, value 为数值
 	RecordMap           map[uint64]*RecordPrimary `protobuf:"bytes,1000,rep,name=record_map,json=recordMap,proto3" json:"record_map,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // 用户扩展记录表, key 为 primary_id
 }
 
@@ -121,7 +121,7 @@ type RecordPrimary struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	PrimaryId          uint64                      `protobuf:"varint,1,opt,name=primary_id,json=primaryId,proto3" json:"primary_id,omitempty"`                                                                                                                      // 一级分组 ID
+	PrimaryId          uint64                      `protobuf:"varint,1,opt,name=primary_id,json=primaryId,proto3" json:"primary_id,omitempty"`                                                                                                                      // 一级分组标识
 	SecondaryRecordMap map[uint64]*RecordSecondary `protobuf:"bytes,2,rep,name=secondary_record_map,json=secondaryRecordMap,proto3" json:"secondary_record_map,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // 二级记录表, key 为 secondary_id
 }
 
@@ -177,7 +177,7 @@ type RecordSecondary struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	SecondaryId uint64   `protobuf:"varint,1,opt,name=secondary_id,json=secondaryId,proto3" json:"secondary_id,omitempty"` // 二级记录 ID
+	SecondaryId uint64   `protobuf:"varint,1,opt,name=secondary_id,json=secondaryId,proto3" json:"secondary_id,omitempty"` // 二级记录标识
 	Timestamp   int64    `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                        // 记录时间戳
 	Data        []uint64 `protobuf:"varint,3,rep,packed,name=data,proto3" json:"data,omitempty"`                           // 数值数据, 具体含义由 primary_id/secondary_id 对应的业务定义
 	StrData     []string `protobuf:"bytes,4,rep,name=str_data,json=strData,proto3" json:"str_data,omitempty"`              // 字符串数据, 具体含义由 primary_id/secondary_id 对应的业务定义

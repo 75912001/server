@@ -27,7 +27,7 @@ type CacheSetUserRecordReq struct {
 	unknownFields protoimpl.UnknownFields
 
 	Uid        uint64      `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	UserRecord *UserRecord `protobuf:"bytes,2,opt,name=user_record,json=userRecord,proto3" json:"user_record,omitempty"` // 用户数据
+	UserRecord *UserRecord `protobuf:"bytes,2,opt,name=user_record,json=userRecord,proto3" json:"user_record,omitempty"` // 用户档案
 }
 
 func (x *CacheSetUserRecordReq) Reset() {
@@ -166,7 +166,7 @@ type CacheGetUserRecordRes struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserRecord *UserRecord `protobuf:"bytes,1,opt,name=user_record,json=userRecord,proto3" json:"user_record,omitempty"` // 用户数据，成功时有效，表示 uid 对应的用户档案。
+	UserRecord *UserRecord `protobuf:"bytes,1,opt,name=user_record,json=userRecord,proto3" json:"user_record,omitempty"` // 用户档案, 成功时有效, 表示 uid 对应的 UserRecord。
 }
 
 func (x *CacheGetUserRecordRes) Reset() {
@@ -593,7 +593,7 @@ type CacheBeginUserSessionCASReq struct {
 	// -> 如果匹配, 删除旧 hash, 写入新 records, 设置 TTL, 返回 1
 	ExpectedUserSession string `protobuf:"bytes,2,opt,name=expected_user_session,json=expectedUserSession,proto3" json:"expected_user_session,omitempty"` // 表示预期当前 user_session 必须匹配
 	GatewayKey          string `protobuf:"bytes,3,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`                              // gatewayKey, 用于定位当前 Gateway
-	UserSession         string `protobuf:"bytes,4,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"`                           // 是新在线会话的稳定身份字段
+	UserSession         string `protobuf:"bytes,4,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"`                           // userSession, 新 cache userSession 的稳定身份字段
 	LoginTimeMs         int64  `protobuf:"varint,5,opt,name=login_time_ms,json=loginTimeMs,proto3" json:"login_time_ms,omitempty"`                        // 毫秒
 	OnlineKey           string `protobuf:"bytes,6,opt,name=online_key,json=onlineKey,proto3" json:"online_key,omitempty"`                                 // onlineKey, 用于定位当前 Online
 	ExpireSecond        uint64 `protobuf:"varint,7,opt,name=expire_second,json=expireSecond,proto3" json:"expire_second,omitempty"`                       // 单位为秒

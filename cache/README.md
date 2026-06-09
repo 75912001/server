@@ -1,14 +1,14 @@
 # Cache 服务
 
-Cache 服务负责统一访问 Redis Cluster, 提供 accountVerifyToken、账号到 uid 映射、用户档案和在线 session CAS gRPC 接口。部署、端口、容器启动和验证命令见 `deploy/cache/README.md`。
+Cache 服务负责统一访问 Redis Cluster, 提供 accountVerifyToken、账号到 uid 映射、用户档案和 cache userSession CAS gRPC 接口。部署、端口、容器启动和验证命令见 `deploy/cache/README.md`。
 
 ## 能力边界
 
 - 存储和消费 accountVerifyToken。
 - 确保账号存在，并为新账号分配 uid。
 - 存储 `UserRecord`，Redis 中以 protobuf 二进制保存。
-- 维护 `user:{uid}:session` 的读取、开始、结束和 TTL 刷新 CAS。
-- 通过 Redis Lua 脚本实现 accountVerifyToken 消费和 session CAS 操作。
+- 维护 `user:{uid}:session` 对应 cache userSession 的读取、开始、结束和 TTL 刷新 CAS。
+- 通过 Redis Lua 脚本实现 accountVerifyToken 消费和 cache userSession CAS 操作。
 - cache 只保存和校验数据，不决定用户应该归属哪个 gateway 或 online。
 
 ## Redis Key
@@ -19,12 +19,12 @@ account:{account}:uid         account 到 uid 的映射
 account:{account}:lock        account 首次创建锁
 user:uid:sequence:{groupID}   当前 group 的 uid 自增序列
 user:{uid}:record             UserRecord protobuf 二进制
-user:{uid}:session            在线 session hash
+user:{uid}:session            cache userSession hash
 ```
 
 `{...}` 是 Redis Cluster hash tag。`user:{uid}:record` 和 `user:{uid}:session` 会按同一个 uid 分到同一 slot; `account:{account}:accountVerifyToken`、`uid`、`lock` 会按同一个 account 分到同一 slot。
 
-## UserSession
+## cache userSession
 
 `user:{uid}:session` 当前由 gateway 作为写入方维护。hash 字段：
 
@@ -52,7 +52,7 @@ userSession
 
 `heartbeatSession` 不进入 Redis，只存在于客户端和 gateway 本地。
 
-当前不保存 `state` 或 `binding` 字段。gateway 抢占 session 后才会调用 online 绑定 actor；如果绑定失败，gateway 负责删除 session。若 gateway 在抢占成功后、绑定完成前崩溃，cache 不主动判定半成品状态，该 session 依赖 TTL 过期释放。
+当前不保存 `state` 或 `binding` 字段。gateway 抢占 cache userSession 后才会调用 online 绑定 actor; 如果绑定失败, gateway 负责删除 cache userSession。若 gateway 在抢占成功后、绑定完成前崩溃, cache 不主动判定半成品状态, 该 cache userSession 依赖 TTL 过期释放。
 
 ## gRPC 接口
 
@@ -64,29 +64,29 @@ userSession
 | `CacheUseAccountVerifyToken` | `account` | 验证并消费 accountVerifyToken, 成功后确保账号存在并返回 uid。 |
 | `CacheSetUserRecord` | `uid` | 写入 `UserRecord`，要求请求 `uid` 与 `UserRecord.uid` 一致。 |
 | `CacheGetUserRecord` | `uid` | 读取 `UserRecord`。 |
-| `CacheGetUserSession` | `uid` | 读取当前 `gatewayKey/userSession/loginTime/onlineKey`；`login_time_ms` 对外表示登录时间毫秒值，读取不到完整 session 时返回 `NotFound`。 |
-| `CacheBeginUserSessionCAS` | `uid` | `expected_user_session` 为空时要求当前 session 不存在；非空时要求当前 `userSession` 匹配后替换为新 session。 |
-| `CacheEndUserSessionCAS` | `uid` | `expected_user_session` 匹配时删除 session。 |
-| `CacheRefreshUserSessionCAS` | `uid` | `expected_user_session` 匹配时刷新 session TTL。 |
+| `CacheGetUserSession` | `uid` | 读取当前 `gatewayKey/userSession/loginTime/onlineKey`；`login_time_ms` 对外表示登录时间毫秒值，读取不到完整 cache userSession 时返回 `NotFound`。 |
+| `CacheBeginUserSessionCAS` | `uid` | `expected_user_session` 为空时要求当前 cache userSession 不存在; 非空时要求当前 `userSession` 匹配后替换为新 cache userSession。 |
+| `CacheEndUserSessionCAS` | `uid` | `expected_user_session` 匹配时删除 cache userSession。 |
+| `CacheRefreshUserSessionCAS` | `uid` | `expected_user_session` 匹配时刷新 cache userSession TTL。 |
 
-Session CAS 请求字段：
+cache userSession CAS 请求字段:
 
-- `expected_user_session`：CAS 预期身份。begin 接口允许为空，表示预期当前 session 不存在；end/refresh 接口必须非空。
-- `gateway_key`：begin 接口使用，用于定位当前 gateway，不能为空。
-- `user_session`：begin 接口使用，是新在线会话的稳定身份字段，不能为空。
-- `login_time_ms`：begin 接口使用，单位毫秒，必须大于 0。
-- `online_key`：begin 接口使用，用于定位当前 online，不能为空。
-- `expire_second`：begin/refresh 接口使用，必须大于 0。
+- `expected_user_session`: CAS 预期身份。begin 接口允许为空, 表示预期当前 cache userSession 不存在; end/refresh 接口必须非空。
+- `gateway_key`: begin 接口使用, gatewayKey, 用于定位当前 Gateway, 不能为空。
+- `user_session`: begin 接口使用, 是新 cache userSession 的稳定身份字段, 不能为空。
+- `login_time_ms`: begin 接口使用, 单位毫秒, 必须大于 0。
+- `online_key`: begin 接口使用, onlineKey, 用于定位当前 Online, 不能为空。
+- `expire_second`: begin/refresh 接口使用, 必须大于 0。
 
 ## 错误语义
 
 | 场景 | code |
 | --- | --- |
-| 参数为空、uid 为 0、写入 session 字段缺失、expire_second 为 0 | `InvalidArgument` |
+| 参数为空、uid 为 0、写入 cache userSession 字段缺失、expire_second 为 0 | `InvalidArgument` |
 | Redis 执行错误、序列化失败、账号数据异常 | `Internal` |
 | accountVerifyToken 已存在 | `AlreadyExists` |
 | accountVerifyToken 不存在、已使用或读取数据不存在 | `NotFound` |
-| session expected 不匹配 | `Aborted` |
+| userSession expected 不匹配 | `Aborted` |
 
 ## accountVerifyToken
 
@@ -140,10 +140,10 @@ GroupUIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 ## Redis 原子操作
 
 - accountVerifyToken 消费使用 Lua: `GET`、比较 accountVerifyToken、`DEL` 在 Redis 内一次完成。
-- session begin 使用 Lua：expected 为空时检查 key 不存在；expected 非空时校验 identity，再写入完整 session 并设置 TTL。
-- session end 使用 Lua：校验 expected identity 后执行 `DEL`。
-- session refresh 使用 Lua：校验 expected identity 后执行 `EXPIRE`。
-- Lua 脚本返回 `1` 表示成功, 返回 `0` 表示 accountVerifyToken 不匹配、session 不匹配或 key 不存在。
+- cache userSession begin 使用 Lua：expected 为空时检查 key 不存在；expected 非空时校验 identity，再写入完整 cache userSession 并设置 TTL。
+- cache userSession end 使用 Lua：校验 expected identity 后执行 `DEL`。
+- cache userSession refresh 使用 Lua：校验 expected identity 后执行 `EXPIRE`。
+- Lua 脚本返回 `1` 表示成功, 返回 `0` 表示 accountVerifyToken 不匹配、userSession 不匹配或 key 不存在。
 
 ## 数据流
 
@@ -174,8 +174,8 @@ online
 
 - `accountVerifyToken already exists`: 同 account 已有未消费 accountVerifyToken。
 - `accountVerifyToken not found or used`: accountVerifyToken 不存在、过期、已消费或值不匹配。
-- `user session changed`：CAS expected 不匹配，说明在线态已被其他登录、离线或 TTL 变化接管。
-- `user session not found`：当前 uid 没有在线 session。
+- `user session changed`：CAS expected 不匹配，说明 cache userSession 已被其他登录、离线或 TTL 变化接管。
+- `user session not found`：当前 uid 没有 cache userSession。
 - `redis: nil` 读取 `UserRecord`：用户档案缺失；如果账号映射已存在，`EnsureAccount` 会按账号数据不一致返回错误。
 - `redis addrs is empty`：`redis` 配置存在空地址列表。
 - `redis config not found`：未配置 `redis` 项。
@@ -184,4 +184,4 @@ online
 
 - cache actor/worker 可按 shardKey 分发，让同 key 请求在 cache 进程内串行执行；这能减少锁竞争和乱序处理，但不能替代 Redis 锁和 CAS。
 - 如需移除 `account:{account}:lock`，必须把账号创建改为 Redis Lua 原子流程，覆盖查询账号、生成 uid、写账号映射和写 UserRecord。
-- 增加账号并发创建、accountVerifyToken 重放、session CAS 冲突、旧删除迟到、新旧 session 乱序的自动化测试。
+- 增加账号并发创建、accountVerifyToken 重放、cache userSession CAS 冲突、旧删除迟到、新旧 cache userSession 乱序的自动化测试。
