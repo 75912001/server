@@ -31,13 +31,13 @@ var (
 
 // ConnectTicketPayload 是 login 签发给客户端、gateway 验签后信任的登录票据内容。
 type ConnectTicketPayload struct {
-	Version    uint32 `json:"version"`    // 票据协议版本
-	UID        uint64 `json:"uid"`        // Cache 解析账号后得到的可信 uid
-	Account    string `json:"account"`    // 登录账号
-	GatewayKey string `json:"gatewayKey"` // 票据绑定的目标 gateway etcd key
-	Nonce      string `json:"nonce"`      // 每次签发生成的随机数，避免同用户同 gateway 票据重复
-	IssuedAt   int64  `json:"issuedAt"`   // 签发时间戳，单位毫秒
-	ExpireAt   int64  `json:"expireAt"`   // 过期时间戳，单位毫秒
+	Version           uint32 `json:"version"`           // 票据协议版本
+	UID               uint64 `json:"uid"`               // Cache 解析账号后得到的可信 uid
+	Account           string `json:"account"`           // 登录账号
+	GatewayKey        string `json:"gatewayKey"`        // 票据绑定的目标 gateway etcd key
+	Nonce             string `json:"nonce"`             // 每次签发生成的随机数，避免同用户同 gateway 票据重复
+	IssuedTimestampMs int64  `json:"issuedTimestampMs"` // 签发时间戳，单位毫秒
+	ExpireTimestampMs int64  `json:"expireTimestampMs"` // 过期时间戳，单位毫秒
 }
 
 // ConnectTicketVerifyOptions 是 gateway 验证 connectTicket 时的本地约束。
@@ -58,13 +58,13 @@ func NewConnectTicketPayload(uid uint64, account string, gatewayKey string, ttl 
 		return nil, err
 	}
 	return &ConnectTicketPayload{
-		Version:    ConnectTicketVersion,
-		UID:        uid,
-		Account:    account,
-		GatewayKey: gatewayKey,
-		Nonce:      nonce,
-		IssuedAt:   now.UnixMilli(),
-		ExpireAt:   now.Add(ttl).UnixMilli(),
+		Version:           ConnectTicketVersion,
+		UID:               uid,
+		Account:           account,
+		GatewayKey:        gatewayKey,
+		Nonce:             nonce,
+		IssuedTimestampMs: now.UnixMilli(),
+		ExpireTimestampMs: now.Add(ttl).UnixMilli(),
 	}, nil
 }
 
@@ -72,7 +72,7 @@ func NewConnectTicketPayload(uid uint64, account string, gatewayKey string, ttl 
 func SignConnectTicket(payload *ConnectTicketPayload, secret string) (string, error) {
 	if payload == nil || secret == "" || payload.Version != ConnectTicketVersion || payload.UID == 0 ||
 		payload.Account == "" || payload.GatewayKey == "" || payload.Nonce == "" ||
-		payload.IssuedAt == 0 || payload.ExpireAt == 0 {
+		payload.IssuedTimestampMs == 0 || payload.ExpireTimestampMs == 0 {
 		return "", ErrConnectTicketInvalid
 	}
 	data, err := json.Marshal(payload)
@@ -106,8 +106,8 @@ func VerifyConnectTicket(ticket string, opts ConnectTicketVerifyOptions) (*Conne
 		return nil, ErrConnectTicketInvalid
 	}
 	if payload.Version != ConnectTicketVersion || payload.UID == 0 || payload.Account == "" ||
-		payload.GatewayKey == "" || payload.Nonce == "" || payload.IssuedAt == 0 ||
-		payload.ExpireAt == 0 {
+		payload.GatewayKey == "" || payload.Nonce == "" || payload.IssuedTimestampMs == 0 ||
+		payload.ExpireTimestampMs == 0 {
 		return nil, ErrConnectTicketInvalid
 	}
 	if opts.GatewayKey != "" && payload.GatewayKey != opts.GatewayKey {
@@ -116,7 +116,7 @@ func VerifyConnectTicket(ticket string, opts ConnectTicketVerifyOptions) (*Conne
 	if opts.UID != 0 && payload.UID != opts.UID {
 		return nil, ErrConnectTicketUIDMismatch
 	}
-	if opts.Now.UnixMilli() > payload.ExpireAt {
+	if opts.Now.UnixMilli() > payload.ExpireTimestampMs {
 		return nil, ErrConnectTicketExpired
 	}
 	return &payload, nil

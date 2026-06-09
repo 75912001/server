@@ -24,7 +24,7 @@ func (p *onlineGRPCServer) OnlineBindUser(_ context.Context, req *pb.OnlineBindU
 	if userRecord == nil || userRecord.GetUid() != uid || userRecord.GetAccount() != account {
 		return nil, grpcstatus.Error(grpccodes.Unauthenticated, "user record mismatch")
 	}
-	if userRecord.GetAccountCreateTimeMs() == 0 {
+	if userRecord.GetAccountCreateTimestampMs() == 0 {
 		return nil, grpcstatus.Error(grpccodes.Internal, "invalid user record")
 	}
 	req.Account = account

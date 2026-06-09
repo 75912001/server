@@ -46,6 +46,18 @@ func TestConnectTicketSignVerify(t *testing.T) {
 	if _, ok := fields["keyId"]; ok {
 		t.Fatalf("connect ticket payload should not contain keyId: %s", payloadJSON)
 	}
+	if _, ok := fields["issued"+"At"]; ok {
+		t.Fatalf("connect ticket payload should not contain old issued timestamp field: %s", payloadJSON)
+	}
+	if _, ok := fields["expire"+"At"]; ok {
+		t.Fatalf("connect ticket payload should not contain old expire timestamp field: %s", payloadJSON)
+	}
+	if _, ok := fields["issuedTimestampMs"]; !ok {
+		t.Fatalf("connect ticket payload should contain issuedTimestampMs: %s", payloadJSON)
+	}
+	if _, ok := fields["expireTimestampMs"]; !ok {
+		t.Fatalf("connect ticket payload should contain expireTimestampMs: %s", payloadJSON)
+	}
 }
 
 func TestConnectTicketVerifyRejectsInvalidTicket(t *testing.T) {

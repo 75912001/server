@@ -54,10 +54,10 @@ func TestUserCreateReqCreatedUserReturnsAlreadyExists(t *testing.T) {
 		uid:     10002,
 		account: "account-10002",
 		userRecord: &pb.UserRecord{
-			Uid:                 10002,
-			Account:             "account-10002",
-			AccountCreateTimeMs: 111,
-			UserCreateTimeMs:    222,
+			Uid:                      10002,
+			Account:                  "account-10002",
+			AccountCreateTimestampMs: 111,
+			UserCreateTimestampMs:    222,
 		},
 	}
 
@@ -78,9 +78,9 @@ func TestUserCreateReqExistingRecordCreatesUser(t *testing.T) {
 		uid:     10003,
 		account: "account-10003",
 		userRecord: &pb.UserRecord{
-			Uid:                 10003,
-			Account:             "account-10003",
-			AccountCreateTimeMs: accountCreateTimeMs,
+			Uid:                      10003,
+			Account:                  "account-10003",
+			AccountCreateTimestampMs: accountCreateTimeMs,
 		},
 	}
 
@@ -97,10 +97,10 @@ func TestUserCreateReqExistingRecordCreatesUser(t *testing.T) {
 	if got, want := record.GetAccount(), user.account; got != want {
 		t.Fatalf("record account = %q, want %q", got, want)
 	}
-	if got, want := record.GetAccountCreateTimeMs(), accountCreateTimeMs; got != want {
+	if got, want := record.GetAccountCreateTimestampMs(), accountCreateTimeMs; got != want {
 		t.Fatalf("record account create time = %d, want %d", got, want)
 	}
-	if record.GetUserCreateTimeMs() == 0 {
+	if record.GetUserCreateTimestampMs() == 0 {
 		t.Fatal("record user create time is zero")
 	}
 
@@ -112,7 +112,7 @@ func TestUserCreateReqExistingRecordCreatesUser(t *testing.T) {
 	if err := proto.Unmarshal(pkt.GetBody(), &res); err != nil {
 		t.Fatalf("unmarshal user create res: %v", err)
 	}
-	if got, want := res.GetUserRecord().GetUserCreateTimeMs(), record.GetUserCreateTimeMs(); got != want {
+	if got, want := res.GetUserRecord().GetUserCreateTimestampMs(), record.GetUserCreateTimestampMs(); got != want {
 		t.Fatalf("response user create time = %d, want %d", got, want)
 	}
 }

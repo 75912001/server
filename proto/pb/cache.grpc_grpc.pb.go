@@ -48,7 +48,7 @@ type CacheServiceClient interface {
 	// 以 account 做 RingHash 分片，消费成功后确保账号存在并返回可信 uid。
 	CacheUseAccountVerifyToken(ctx context.Context, in *CacheUseAccountVerifyTokenReq, opts ...grpc.CallOption) (*CacheUseAccountVerifyTokenRes, error)
 	// 获取用户 cache userSession。
-	// 以 uid 做 RingHash 分片, 返回当前 cache userSession 中的 gatewayKey/userSession/loginTime/onlineKey。
+	// 以 uid 做 RingHash 分片, 返回当前 cache userSession 中的 gatewayKey/userSession/loginTimestampMs/onlineKey。
 	CacheGetUserSession(ctx context.Context, in *CacheGetUserSessionReq, opts ...grpc.CallOption) (*CacheGetUserSessionRes, error)
 	// 按 expected_user_session 创建用户 cache userSession。
 	// 以 uid 做 RingHash 分片, expected_user_session 为空时要求当前 userSession 不存在。
@@ -168,7 +168,7 @@ type CacheServiceServer interface {
 	// 以 account 做 RingHash 分片，消费成功后确保账号存在并返回可信 uid。
 	CacheUseAccountVerifyToken(context.Context, *CacheUseAccountVerifyTokenReq) (*CacheUseAccountVerifyTokenRes, error)
 	// 获取用户 cache userSession。
-	// 以 uid 做 RingHash 分片, 返回当前 cache userSession 中的 gatewayKey/userSession/loginTime/onlineKey。
+	// 以 uid 做 RingHash 分片, 返回当前 cache userSession 中的 gatewayKey/userSession/loginTimestampMs/onlineKey。
 	CacheGetUserSession(context.Context, *CacheGetUserSessionReq) (*CacheGetUserSessionRes, error)
 	// 按 expected_user_session 创建用户 cache userSession。
 	// 以 uid 做 RingHash 分片, expected_user_session 为空时要求当前 userSession 不存在。

@@ -13,10 +13,10 @@ func BenchmarkCacheUserSessionRecordMap(b *testing.B) {
 
 func BenchmarkCacheUserSessionFromMap(b *testing.B) {
 	records := map[string]string{
-		userSessionFieldGatewayKey:  "gateway-1",
-		userSessionFieldUserSession: "session-1",
-		userSessionFieldLoginTime:   strconv.FormatInt(123456, 10),
-		userSessionFieldOnlineKey:   "online-1",
+		userSessionFieldGatewayKey:       "gateway-1",
+		userSessionFieldUserSession:      "session-1",
+		userSessionFieldLoginTimestampMs: strconv.FormatInt(123456, 10),
+		userSessionFieldOnlineKey:        "online-1",
 	}
 
 	for b.Loop() {

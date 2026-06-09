@@ -43,7 +43,7 @@ func unaryCacheBeginUserSession(uid uint64, expectedUserSession string, session 
 			ExpectedUserSession: expectedUserSession,
 			GatewayKey:          session.GetGatewayKey(),
 			UserSession:         session.GetUserSession(),
-			LoginTimeMs:         session.GetLoginTimeMs(),
+			LoginTimestampMs:    session.GetLoginTimestampMs(),
 			OnlineKey:           session.GetOnlineKey(),
 			ExpireSecond:        userSessionExpireSecond,
 		},

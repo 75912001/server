@@ -14,9 +14,9 @@ func TestOnlineBindUserValidation(t *testing.T) {
 
 	cache := setupFakeCacheGetUserRecord(t, func(uid uint64) (*pb.UserRecord, error) {
 		return &pb.UserRecord{
-			Uid:                 uid,
-			Account:             "robot.other",
-			AccountCreateTimeMs: 111,
+			Uid:                      uid,
+			Account:                  "robot.other",
+			AccountCreateTimestampMs: 111,
 		}, nil
 	})
 	srv := &onlineGRPCServer{}

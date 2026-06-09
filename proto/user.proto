@@ -18,7 +18,7 @@ message UserVerifyReq
 //0x000002#gateway->client#登录验证-回复
 message UserVerifyRes
 {
-  int64  server_time = 1;   // 服务器当前时间戳，单位毫秒（用于客户端对时）
+  int64  server_timestamp_ms = 1;   // 服务器当前时间戳，单位毫秒（用于客户端对时）
   string heartbeat_session = 2; // heartbeatSession, 客户端后续心跳携带的心跳认证凭证
 }
 
@@ -35,7 +35,7 @@ message UserHeartbeatReq {
 
 //0x00000B#gateway->client#心跳-回复
 message UserHeartbeatRes {
-  int64 server_time  = 1;   // 服务器时间毫秒
+  int64 server_timestamp_ms  = 1;   // 服务器时间毫秒
   string next_heartbeat_session = 2;   // 客户端下次心跳必须使用的 heartbeatSession
 }
 
@@ -63,7 +63,7 @@ message UserCreateRes
 message RobotPingReq
 {
   uint64 seq = 1; // 客户端递增序号
-  int64 client_time = 2; // 客户端发送时间戳，单位毫秒
+  int64 client_timestamp_ms = 2; // 客户端发送时间戳，单位毫秒
   string payload = 3; // 压测透传数据
 }
 
@@ -71,7 +71,7 @@ message RobotPingReq
 message RobotPingRes
 {
   uint64 seq = 1; // 对应请求中的客户端递增序号
-  int64 client_time = 2; // 对应请求中的客户端发送时间戳，单位毫秒
-  int64 server_time = 3; // 服务端回复时间戳，单位毫秒
+  int64 client_timestamp_ms = 2; // 对应请求中的客户端发送时间戳，单位毫秒
+  int64 server_timestamp_ms = 3; // 服务端回复时间戳，单位毫秒
   string payload = 4; // 对应请求中的压测透传数据
 }

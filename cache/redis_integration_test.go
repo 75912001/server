@@ -169,14 +169,14 @@ func TestIntegrationEnsureAccount(t *testing.T) {
 	}
 
 	now := time.Now().UnixMilli()
-	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID + 1, Account: account, AccountCreateTimeMs: now}); err != nil {
+	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID + 1, Account: account, AccountCreateTimestampMs: now}); err != nil {
 		t.Fatalf("set mismatched uid user record failed: %v", err)
 	}
 	if _, found, err := r.GetAccountUserRecord(ctx, account); err == nil || !found {
 		t.Fatalf("GetAccountUserRecord mismatched uid err = %v, found = %v; want error and found", err, found)
 	}
 
-	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID, Account: account + "-other", AccountCreateTimeMs: now}); err != nil {
+	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID, Account: account + "-other", AccountCreateTimestampMs: now}); err != nil {
 		t.Fatalf("set mismatched account user record failed: %v", err)
 	}
 	if _, found, err := r.GetAccountUserRecord(ctx, account); err == nil || !found {
@@ -190,7 +190,7 @@ func TestIntegrationEnsureAccount(t *testing.T) {
 		t.Fatalf("GetAccountUserRecord empty account create time err = %v, found = %v; want error and found", err, found)
 	}
 
-	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID, Account: account, AccountCreateTimeMs: now, UserCreateTimeMs: 0}); err != nil {
+	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID, Account: account, AccountCreateTimestampMs: now, UserCreateTimestampMs: 0}); err != nil {
 		t.Fatalf("set valid user record with empty user create time failed: %v", err)
 	}
 	validRecord, found, err := r.GetAccountUserRecord(ctx, account)
@@ -259,17 +259,17 @@ func TestIntegrationUserSessionCAS(t *testing.T) {
 
 	oldUserSession := "user-session-1"
 	oldRecords := map[string]string{
-		userSessionFieldGatewayKey:  "gateway-1",
-		userSessionFieldUserSession: "user-session-1",
-		userSessionFieldLoginTime:   "111",
-		userSessionFieldOnlineKey:   "online-1",
+		userSessionFieldGatewayKey:       "gateway-1",
+		userSessionFieldUserSession:      "user-session-1",
+		userSessionFieldLoginTimestampMs: "111",
+		userSessionFieldOnlineKey:        "online-1",
 	}
 	newUserSession := "user-session-2"
 	newRecords := map[string]string{
-		userSessionFieldGatewayKey:  "gateway-2",
-		userSessionFieldUserSession: "user-session-2",
-		userSessionFieldLoginTime:   "222",
-		userSessionFieldOnlineKey:   "online-2",
+		userSessionFieldGatewayKey:       "gateway-2",
+		userSessionFieldUserSession:      "user-session-2",
+		userSessionFieldLoginTimestampMs: "222",
+		userSessionFieldOnlineKey:        "online-2",
 	}
 
 	begun, err := r.BeginUserSessionCAS(ctx, uid, "", oldRecords, 30)

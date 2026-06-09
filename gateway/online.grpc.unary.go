@@ -97,10 +97,10 @@ func handleUserVerifyReq(
 
 	if err = unaryCacheBeginUserSession(uid, "",
 		&pb.CacheUserSession{
-			GatewayKey:  gatewayKey,
-			UserSession: userSession,
-			LoginTimeMs: time.Now().UnixMilli(),
-			OnlineKey:   online.Key,
+			GatewayKey:       gatewayKey,
+			UserSession:      userSession,
+			LoginTimestampMs: time.Now().UnixMilli(),
+			OnlineKey:        online.Key,
 		},
 	); err != nil {
 		_ = sendClientRes(remote, uint32(pb.MsgIDUser_UserVerifyRes_CMD), header.SessionID, grpcErrorToResultCode(err), header.Key, nil)
@@ -141,8 +141,8 @@ func handleUserVerifyReq(
 		xerror.Success.Code(),
 		header.Key,
 		&pb.UserVerifyRes{
-			ServerTime:       time.Now().UnixMilli(),
-			HeartbeatSession: heartbeatSession,
+			ServerTimestampMs: time.Now().UnixMilli(),
+			HeartbeatSession:  heartbeatSession,
 		},
 	)
 }

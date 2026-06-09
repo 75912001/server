@@ -90,7 +90,7 @@ curl -i -X POST "http://127.0.0.1:30401/api/login/session" \
 期望：
 
 - HTTP `200`。
-- 响应包含 `account/uid/connectTicket/ticketExpireAt/gatewayKey/gatewayAddr`。
+- 响应包含 `account/uid/connectTicket/ticketExpireTimestampMs/gatewayKey/gatewayAddr`。
 - `uid` 由 cache 返回，客户端没有提交 uid。
 - `connectTicket` 只可用于响应中的目标 gateway。
 - 同一个 `account/accountVerifyToken` 再次调用 `/api/login/session` 应失败。

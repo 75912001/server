@@ -53,11 +53,11 @@ func TestUserSessionHandlerInvalidArguments(t *testing.T) {
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 
 	_, err = s.CacheBeginUserSessionCAS(ctx, &pb.CacheBeginUserSessionCASReq{
-		Uid:          1,
-		ExpireSecond: 1,
-		GatewayKey:   "gateway-1",
-		UserSession:  "session-1",
-		LoginTimeMs:  123,
+		Uid:              1,
+		ExpireSecond:     1,
+		GatewayKey:       "gateway-1",
+		UserSession:      "session-1",
+		LoginTimestampMs: 123,
 	})
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 

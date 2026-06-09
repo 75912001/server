@@ -110,7 +110,7 @@ func (p *Redis) GetUserSession(ctx context.Context, uid uint64) (map[string]stri
 	fields := []string{
 		userSessionFieldGatewayKey,
 		userSessionFieldUserSession,
-		userSessionFieldLoginTime,
+		userSessionFieldLoginTimestampMs,
 		userSessionFieldOnlineKey,
 	}
 	values, err := p.client.HMGet(ctx, key, fields...).Result()

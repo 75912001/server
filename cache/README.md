@@ -31,7 +31,7 @@ user:{uid}:session            cache userSession hash
 ```text
 gatewayKey
 userSession
-loginTime
+loginTimestampMs
 onlineKey
 ```
 
@@ -39,7 +39,7 @@ onlineKey
 
 - `gatewayKey`：当前用户连接的 gateway 标识，用于顶号时定位旧 gateway。
 - `userSession`：一次登录生成的固定连接身份，心跳不轮换。
-- `loginTime`：Redis hash 字段名，表示登录时间毫秒值。
+- `loginTimestampMs`：Redis hash 字段名，表示登录时间毫秒值。
 - `onlineKey`：当前绑定的 online 标识，只用于排障定位。
 
 CAS identity 固定为：
@@ -48,7 +48,7 @@ CAS identity 固定为：
 userSession
 ```
 
-`gatewayKey`、`onlineKey`、`loginTime` 都不参与 CAS 判断。`user:{uid}:session` 的 Redis key 已经限定 uid，因此 CAS 等价于 `uid + userSession`。
+`gatewayKey`、`onlineKey`、`loginTimestampMs` 都不参与 CAS 判断。`user:{uid}:session` 的 Redis key 已经限定 uid，因此 CAS 等价于 `uid + userSession`。
 
 `heartbeatSession` 不进入 Redis，只存在于客户端和 gateway 本地。
 
@@ -64,7 +64,7 @@ userSession
 | `CacheUseAccountVerifyToken` | `account` | 验证并消费 accountVerifyToken, 成功后确保账号存在并返回 uid。 |
 | `CacheSetUserRecord` | `uid` | 写入 `UserRecord`，要求请求 `uid` 与 `UserRecord.uid` 一致。 |
 | `CacheGetUserRecord` | `uid` | 读取 `UserRecord`。 |
-| `CacheGetUserSession` | `uid` | 读取当前 `gatewayKey/userSession/loginTime/onlineKey`；`login_time_ms` 对外表示登录时间毫秒值，读取不到完整 cache userSession 时返回 `NotFound`。 |
+| `CacheGetUserSession` | `uid` | 读取当前 `gatewayKey/userSession/loginTimestampMs/onlineKey`；`login_timestamp_ms` 对外表示登录时间毫秒值，读取不到完整 cache userSession 时返回 `NotFound`。 |
 | `CacheBeginUserSessionCAS` | `uid` | `expected_user_session` 为空时要求当前 cache userSession 不存在; 非空时要求当前 `userSession` 匹配后替换为新 cache userSession。 |
 | `CacheEndUserSessionCAS` | `uid` | `expected_user_session` 匹配时删除 cache userSession。 |
 | `CacheRefreshUserSessionCAS` | `uid` | `expected_user_session` 匹配时刷新 cache userSession TTL。 |
@@ -74,7 +74,7 @@ cache userSession CAS 请求字段:
 - `expected_user_session`: CAS 预期身份。begin 接口允许为空, 表示预期当前 cache userSession 不存在; end/refresh 接口必须非空。
 - `gateway_key`: begin 接口使用, gatewayKey, 用于定位当前 Gateway, 不能为空。
 - `user_session`: begin 接口使用, 是新 cache userSession 的稳定身份字段, 不能为空。
-- `login_time_ms`: begin 接口使用, 单位毫秒, 必须大于 0。
+- `login_timestamp_ms`: begin 接口使用, 单位毫秒, 必须大于 0。
 - `online_key`: begin 接口使用, onlineKey, 用于定位当前 Online, 不能为空。
 - `expire_second`: begin/refresh 接口使用, 必须大于 0。
 

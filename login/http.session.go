@@ -11,12 +11,12 @@ import (
 
 // sessionRes 是客户端换取 gateway 登录信息后的响应体。
 type sessionRes struct {
-	Account        string `json:"account"`        // 登录账号
-	Uid            uint64 `json:"uid"`            // Cache 根据账号解析或创建的可信 uid
-	ConnectTicket  string `json:"connectTicket"`  // 客户端连接 gateway 时携带的短期登录票据
-	TicketExpireAt int64  `json:"ticketExpireAt"` // connectTicket 过期时间戳，单位毫秒
-	GatewayKey     string `json:"gatewayKey"`     // login 分配的目标 gateway etcd key
-	GatewayAddr    string `json:"gatewayAddr"`    // 客户端连接目标 gateway 的 TCP 地址
+	Account                 string `json:"account"`                 // 登录账号
+	Uid                     uint64 `json:"uid"`                     // Cache 根据账号解析或创建的可信 uid
+	ConnectTicket           string `json:"connectTicket"`           // 客户端连接 gateway 时携带的短期登录票据
+	TicketExpireTimestampMs int64  `json:"ticketExpireTimestampMs"` // connectTicket 过期时间戳，单位毫秒
+	GatewayKey              string `json:"gatewayKey"`              // login 分配的目标 gateway etcd key
+	GatewayAddr             string `json:"gatewayAddr"`             // 客户端连接目标 gateway 的 TCP 地址
 }
 
 // handleLoginSession 供客户端消费 accountVerifyToken, 换取 uid、connectTicket 和目标 gateway。
@@ -74,11 +74,11 @@ func handleLoginSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, &sessionRes{
-		Account:        req.Account,
-		Uid:            uid,
-		ConnectTicket:  connectTicket,
-		TicketExpireAt: payload.ExpireAt,
-		GatewayKey:     gateway.Key,
-		GatewayAddr:    gateway.Addr,
+		Account:                 req.Account,
+		Uid:                     uid,
+		ConnectTicket:           connectTicket,
+		TicketExpireTimestampMs: payload.ExpireTimestampMs,
+		GatewayKey:              gateway.Key,
+		GatewayAddr:             gateway.Addr,
 	})
 }

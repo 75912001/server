@@ -24,7 +24,7 @@ func (p *User) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		p.onUserCreateReq(gateway, pkt)
 		return
 	default:
-		if p.userRecord == nil || p.userRecord.GetUserCreateTimeMs() == 0 {
+		if p.userRecord == nil || p.userRecord.GetUserCreateTimestampMs() == 0 {
 			p.sendClientErr(gateway, pkt, uint32(msgID), common.ECOnlineUserNotCreated.Code())
 			return
 		}
@@ -48,10 +48,10 @@ func (p *User) onRobotPingReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	}
 	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_RobotPingRes_CMD), xerror.Success.Code(),
 		&pb.RobotPingRes{
-			Seq:        req.GetSeq(),
-			ClientTime: req.GetClientTime(),
-			ServerTime: time.Now().UnixMilli(),
-			Payload:    req.GetPayload(),
+			Seq:               req.GetSeq(),
+			ClientTimestampMs: req.GetClientTimestampMs(),
+			ServerTimestampMs: time.Now().UnixMilli(),
+			Payload:           req.GetPayload(),
 		},
 	)
 }
@@ -69,12 +69,12 @@ func (p *User) onUserCreateReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		return
 	}
 
-	if p.userRecord.GetUserCreateTimeMs() != 0 {
+	if p.userRecord.GetUserCreateTimestampMs() != 0 {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.AlreadyExists.Code())
 		return
 	}
 	now := time.Now().UnixMilli()
-	p.userRecord.UserCreateTimeMs = now
+	p.userRecord.UserCreateTimestampMs = now
 	if err := unaryCacheSetUserRecord(p.uid, p.userRecord); err != nil {
 		xlog.GLog.Errorf("set user record failed uid:%d err:%v", p.uid, err)
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.Internal.Code())

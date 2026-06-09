@@ -90,7 +90,7 @@ func (p *User) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
 		xerror.Success.Code(),
 		header.Key,
 		&pb.UserHeartbeatRes{
-			ServerTime:           time.Now().UnixMilli(),
+			ServerTimestampMs:    time.Now().UnixMilli(),
 			NextHeartbeatSession: nextHeartbeatSession,
 		},
 	)

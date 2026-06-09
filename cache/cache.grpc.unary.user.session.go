@@ -12,22 +12,22 @@ import (
 
 const (
 	// Redis 哈希字段名对应 user:{uid}:session。
-	userSessionFieldGatewayKey  = "gatewayKey"
-	userSessionFieldUserSession = "userSession" // 身份字段用于判断 CAS 操作的预期值是否匹配
-	userSessionFieldLoginTime   = "loginTime"
-	userSessionFieldOnlineKey   = "onlineKey"
+	userSessionFieldGatewayKey       = "gatewayKey"
+	userSessionFieldUserSession      = "userSession" // 身份字段用于判断 CAS 操作的预期值是否匹配
+	userSessionFieldLoginTimestampMs = "loginTimestampMs"
+	userSessionFieldOnlineKey        = "onlineKey"
 )
 
 // cacheUserSessionRecordMap 将完整在线会话转成 Redis 哈希字段。
-func cacheUserSessionRecordMap(gatewayKey string, userSession string, loginTime int64, onlineKey string) (map[string]string, bool) {
-	if gatewayKey == "" || userSession == "" || loginTime == 0 || onlineKey == "" {
+func cacheUserSessionRecordMap(gatewayKey string, userSession string, loginTimestampMs int64, onlineKey string) (map[string]string, bool) {
+	if gatewayKey == "" || userSession == "" || loginTimestampMs == 0 || onlineKey == "" {
 		return nil, false
 	}
 	records := map[string]string{
 		userSessionFieldUserSession: userSession,
 	}
 	records[userSessionFieldGatewayKey] = gatewayKey
-	records[userSessionFieldLoginTime] = formatUserSessionLoginTime(loginTime)
+	records[userSessionFieldLoginTimestampMs] = formatUserSessionLoginTimestampMs(loginTimestampMs)
 	records[userSessionFieldOnlineKey] = onlineKey
 	return records, true
 }
@@ -37,29 +37,29 @@ func cacheUserSessionFromMap(records map[string]string) (*pb.CacheUserSession, b
 	if len(records) == 0 {
 		return nil, false
 	}
-	loginTime, ok := parseUserSessionLoginTime(records[userSessionFieldLoginTime])
+	loginTimestampMs, ok := parseUserSessionLoginTimestampMs(records[userSessionFieldLoginTimestampMs])
 	if !ok {
 		return nil, false
 	}
 	session := &pb.CacheUserSession{
-		GatewayKey:  records[userSessionFieldGatewayKey],
-		UserSession: records[userSessionFieldUserSession],
-		LoginTimeMs: loginTime,
-		OnlineKey:   records[userSessionFieldOnlineKey],
+		GatewayKey:       records[userSessionFieldGatewayKey],
+		UserSession:      records[userSessionFieldUserSession],
+		LoginTimestampMs: loginTimestampMs,
+		OnlineKey:        records[userSessionFieldOnlineKey],
 	}
-	if session.GetGatewayKey() == "" || session.GetUserSession() == "" || session.GetLoginTimeMs() == 0 || session.GetOnlineKey() == "" {
+	if session.GetGatewayKey() == "" || session.GetUserSession() == "" || session.GetLoginTimestampMs() == 0 || session.GetOnlineKey() == "" {
 		return nil, false
 	}
 	return session, true
 }
 
-func formatUserSessionLoginTime(loginTime int64) string {
-	return strconv.FormatInt(loginTime, 10)
+func formatUserSessionLoginTimestampMs(loginTimestampMs int64) string {
+	return strconv.FormatInt(loginTimestampMs, 10)
 }
 
-func parseUserSessionLoginTime(value string) (int64, bool) {
-	loginTime, err := strconv.ParseInt(value, 10, 64)
-	return loginTime, err == nil && loginTime != 0
+func parseUserSessionLoginTimestampMs(value string) (int64, bool) {
+	loginTimestampMs, err := strconv.ParseInt(value, 10, 64)
+	return loginTimestampMs, err == nil && loginTimestampMs != 0
 }
 
 // CacheGetUserSession 读取指定 uid 当前完整在线会话。
@@ -85,7 +85,7 @@ func (s *cacheGRPCServer) CacheBeginUserSessionCAS(ctx context.Context, req *pb.
 	if uid == 0 || req.GetExpireSecond() == 0 {
 		return &pb.CacheBeginUserSessionCASRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	session, ok := cacheUserSessionRecordMap(req.GetGatewayKey(), req.GetUserSession(), req.GetLoginTimeMs(), req.GetOnlineKey())
+	session, ok := cacheUserSessionRecordMap(req.GetGatewayKey(), req.GetUserSession(), req.GetLoginTimestampMs(), req.GetOnlineKey())
 	if !ok {
 		return &pb.CacheBeginUserSessionCASRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}

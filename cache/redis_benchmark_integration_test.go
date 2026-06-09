@@ -26,10 +26,10 @@ func BenchmarkIntegrationBeginUserSessionCAS(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		records := map[string]string{
-			userSessionFieldGatewayKey:  "gateway",
-			userSessionFieldUserSession: "session",
-			userSessionFieldLoginTime:   "1",
-			userSessionFieldOnlineKey:   "online",
+			userSessionFieldGatewayKey:       "gateway",
+			userSessionFieldUserSession:      "session",
+			userSessionFieldLoginTimestampMs: "1",
+			userSessionFieldOnlineKey:        "online",
 		}
 		ok, err := r.BeginUserSessionCAS(ctx, uid+uint64(i), "", records, 30)
 		if err != nil || !ok {

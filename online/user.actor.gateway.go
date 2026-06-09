@@ -20,7 +20,7 @@ func (p *User) onBind(req *pb.OnlineBindUserReq, userRecord *pb.UserRecord) (*pb
 	if userRecord == nil || userRecord.GetUid() != uid || strings.TrimSpace(userRecord.GetAccount()) != account {
 		return nil, grpcstatus.Error(grpccodes.Unauthenticated, "user record mismatch")
 	}
-	if userRecord.GetAccountCreateTimeMs() == 0 {
+	if userRecord.GetAccountCreateTimestampMs() == 0 {
 		return nil, grpcstatus.Error(grpccodes.Internal, "invalid user record")
 	}
 

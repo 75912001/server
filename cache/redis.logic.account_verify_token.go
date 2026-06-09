@@ -93,10 +93,10 @@ func (p *Redis) createAccountAfterLock(ctx context.Context, account string) (*pb
 
 	now := time.Now().UnixMilli()
 	userRecord = &pb.UserRecord{
-		Uid:                 uid,
-		Account:             account,
-		AccountCreateTimeMs: now,
-		UserCreateTimeMs:    0,
+		Uid:                      uid,
+		Account:                  account,
+		AccountCreateTimestampMs: now,
+		UserCreateTimestampMs:    0,
 	}
 	if err = p.SetUserRecord(ctx, uid, userRecord); err != nil {
 		return nil, false, err
@@ -130,7 +130,7 @@ func (p *Redis) GetAccountUserRecord(ctx context.Context, account string) (*pb.U
 	if userRecord.GetAccount() != account {
 		return nil, true, errors.Errorf("account user record account mismatch, account: %s uid: %d record_account: %s %v", account, uid, userRecord.GetAccount(), xruntime.Location())
 	}
-	if userRecord.GetAccountCreateTimeMs() == 0 {
+	if userRecord.GetAccountCreateTimestampMs() == 0 {
 		return nil, true, errors.Errorf("account user record create time is empty, account: %s uid: %d %v", account, uid, xruntime.Location())
 	}
 	return userRecord, true, nil
