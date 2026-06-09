@@ -21,7 +21,7 @@ type Online struct {
 	ServerID      uint32
 	PackageName   string
 	ServiceName   string
-	AvailableLoad uint32
+	AvailableLoad uint32 // online 本地估算可用负载，etcd 更新会覆盖
 }
 
 // newOnline 建立 gRPC 连接，启动 recvLoop 和 stream actor。

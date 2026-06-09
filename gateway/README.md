@@ -9,7 +9,7 @@ Gateway 服务负责客户端 TCP 接入、首次登录验票、单登录顶号�
 - 从 cache 读取 `user:{uid}:session`。
 - 发现并调用旧 gateway `GatewayKickUser` 完成严格顶号。
 - 通过 cache `CacheBeginUserSessionCAS` 抢占新在线 session。
-- 选择可用 online，调用 `OnlineBindUser` 绑定 user actor。
+- 选择本地 `availableLoad` 最大的可用 online，选中后本地扣减 1，再调用 `OnlineBindUser` 绑定 user actor；后续 etcd 更新会用权威 `availableLoad` 覆盖本地估算值。
 - 维护本地 `heartbeatSession`，处理心跳轮换和 `CacheRefreshUserSessionCAS`。
 - 在 TCP 断开、主动离线、心跳超时、顶号等场景调用 `OnlineUnbindUser` 和 `CacheEndUserSessionCAS`。
 - gateway 到 cache、online 和旧 gateway 的 unary 超时统一由 proto `methodOpt.timeout` 控制；当前 cache 为 `3s`，online bind/unbind 和旧 gateway kick 为 `60s`。
@@ -35,7 +35,7 @@ UserVerifyReq {
 6. 生成固定 `userSession`。
 7. 调用 `CacheGetUserSession` 查询旧在线态；不存在视为空 session。
 8. 如果旧 session 存在，调用旧 gateway `GatewayKickUser(uid, oldUserSession)`；旧 gateway 不存在、找不到本地连接、`userSession` 不匹配或 cleanup 失败时，本次登录失败。
-9. 选择 `availableLoad` 最大的 online。
+9. 选择本地 `availableLoad` 最大的 online，并立即本地扣减 1，后续 etcd 更新会覆盖本地估算值。
 10. 调用 `CacheBeginUserSessionCAS(expected_user_session="")` 写入带 `gatewayKey/userSession/login_time_ms/onlineKey` 的新 session；如果返回 `Aborted`，说明旧 session 仍存在或并发登录已抢占，本次登录失败。
 11. 调用 `OnlineBindUser`，由 online 读取并校验 `UserRecord` 后绑定 actor。
 12. 生成随机 `heartbeatSession`，绑定本地 User 到 uid、account、online、`userSession` 和 `heartbeatSession`。

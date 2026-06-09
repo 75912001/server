@@ -18,7 +18,7 @@ var GOnlineMgr = &OnlineMgr{
 }
 
 // OnlineMgr 管理所有 online 服务实例
-// 写操作只在 etcd actor 协程中触发（串行），读操作来自 TCP 处理协程（并发）→ MapMutexMgr
+// etcd actor 负责增删和覆盖负载；TCP 登录链路会 CAS 扣减本地负载估算值。
 type OnlineMgr struct {
 	m *xmap.MapMutexMgr[string, *Online] // key: etcd key
 }
@@ -86,11 +86,24 @@ func (p *OnlineMgr) UpdateAvailableLoad(key string, valueJson *xetcd.ValueJson) 
 	xlog.GLog.Infof("OnlineMgr.UpdateAvailableLoad key:%s availableLoad:%d", key, valueJson.AvailableLoad)
 }
 
-func (p *OnlineMgr) GetByAvailableLoad() (*Online, error) {
+func (p *OnlineMgr) ReserveByAvailableLoad() (*Online, error) {
+	for {
+		selected, selectedLoad := p.selectByAvailableLoad()
+		if selected == nil {
+			return nil, errors.WithMessagef(xerror.Unavailable, "online available load not found %v", xruntime.Location())
+		}
+		if !reserveAvailableLoad(&selected.AvailableLoad, selectedLoad) {
+			continue
+		}
+		return selected, nil
+	}
+}
+
+func (p *OnlineMgr) selectByAvailableLoad() (*Online, uint32) {
 	var selected *Online
 	var selectedLoad uint32
 	p.m.Foreach(func(key string, online *Online) bool {
-		if online == nil || online.XOnlineService == nil || online.GetClientConn() == nil {
+		if online == nil || online.XOnlineService == nil || !online.Available() || online.GetClientConn() == nil {
 			return true
 		}
 		availableLoad := atomic.LoadUint32(&online.AvailableLoad)
@@ -103,8 +116,12 @@ func (p *OnlineMgr) GetByAvailableLoad() (*Online, error) {
 		}
 		return true
 	})
-	if selected == nil {
-		return nil, errors.WithMessagef(xerror.Unavailable, "online available load not found %v", xruntime.Location())
+	return selected, selectedLoad
+}
+
+func reserveAvailableLoad(load *uint32, expected uint32) bool {
+	if expected == 0 {
+		return false
 	}
-	return selected, nil
+	return atomic.CompareAndSwapUint32(load, expected, expected-1)
 }

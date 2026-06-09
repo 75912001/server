@@ -14,6 +14,7 @@ GOCACHE="$PWD/.gocache" go test ./gateway
 当前 `gateway` 单元测试不依赖真实 TCP、etcd、online、cache 或 Redis，主要覆盖：
 
 - `GatewayKickUser` 的参数校验、用户不存在、用户会话变更保护。
+- `OnlineMgr` 按本地 `availableLoad` 预留 online，覆盖同负载分流、不同负载消耗、etcd 更新覆盖和不可用实例跳过。
 - `grpcErrorToResultCode` 对 gRPC 标准错误码到客户端 `ResultID` 的映射。
 - `grpcErrorToResultCode` 的轻量性能基准。
 
@@ -89,6 +90,7 @@ cd /d/src/github.com/server/tool/robot/bin
 - 输入 `UserVerifyReq` 后，客户端收到 `UserVerifyRes`，并且 `ResultID == 0`。
 - 登录成功后，客户端按配置自动发送 `UserHeartbeatReq`，服务端返回 `UserHeartbeatRes.next_heartbeat_session`。
 - 输入业务命令时，gateway 通过当前用户绑定的 online 透传上行包。
+- 双 online 同 `availableLoad` 时，批量登录不应全部集中到 `/online/1/`，选中实例的本地负载会先扣减，后续 etcd 更新再覆盖本地估算值。
 - 输入 `UserOfflineReq` 或由新 gateway 调用旧 gateway `GatewayKickUser` 时，gateway 清理本地 user，并通知绑定的 online 下线，同时按 CAS 删除 cache session。
 - gateway stream 建立后，online 能识别 `gateway_id` 并绑定下行 stream。
 
@@ -104,6 +106,6 @@ cd /d/src/github.com/server/tool/robot/bin
 
 - `User.OnClientPacket`：未验证包、心跳包、离线包、业务包分流。
 - `User.Cleanup`：断线后只通知一次 online，并正确清理 `userSession` 对应的 cache session。
-- `OnlineMgr`：etcd add/update/remove 与 stream actor Stop 的生命周期。
+- `OnlineMgr`：etcd add/remove 与 stream actor Stop 的生命周期。
 - `OnlineStreamTunnelPre/Post`：gateway stream 注册包发送与 reset 行为。
 - `sendClientRes`：remote 断开、nil message、ResultID 透传。

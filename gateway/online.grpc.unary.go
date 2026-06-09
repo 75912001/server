@@ -76,7 +76,7 @@ func handleUserVerifyReq(
 	}
 
 	gatewayKey := xetcd.GEtcd.GetKey()
-	online, err := GOnlineMgr.GetByAvailableLoad()
+	online, err := GOnlineMgr.ReserveByAvailableLoad()
 	if err != nil {
 		_ = sendClientRes(remote, uint32(pb.MsgIDUser_UserVerifyRes_CMD), header.SessionID, xerror.Unavailable.Code(), header.Key, nil)
 		return errors.WithMessagef(err, "select online for login uid:%v account:%v fail %v", uid, ticketPayload.Account, xruntime.Location())
