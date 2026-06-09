@@ -5,30 +5,37 @@
 ## 组件
 
 ```text
-client.simulator
+robot
+  -> login
+      -> cache
+      -> 返回 gatewayAddr + connectTicket
   -> gateway
       -> online
           -> cache
               -> Redis Cluster
 
-gateway / online / cache
+login / gateway / online / cache
   -> etcd Cluster
 ```
 
 职责：
 
 - `gateway`：客户端接入、连接管理、用户请求转发。
-- `online`：在线状态、用户登录流程、跨 gateway/online 协调。
+- `login`：HTTP 登录入口、一次性 token 签发/消费、gateway 分配和 connectTicket 签发。
+- `online`：用户 actor、业务逻辑入口和 gateway stream 下行。
 - `cache`：用户记录、用户 session、token 等缓存数据访问。
 - `Redis Cluster`：cache 后端数据存储。
 - `etcd Cluster`：服务注册发现。
-- `client.simulator`：本地客户端模拟器。
+- `robot`：本地客户端模拟器。
 
 ## 配置入口
 
 服务注册发现、对外注册地址、Docker 网络访问规则、启动命令和验证命令分别查看对应组件文档：
 
 - cache：`deploy/cache/README.md`
+- online：`deploy/online/README.md`
+- gateway：`deploy/gateway/README.md`
+- login：`deploy/login/README.md`
 - Redis Cluster：`deploy/redis.cluster/README.md`
 - etcd Cluster：`deploy/etcd.cluster/README.md`
 
