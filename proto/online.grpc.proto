@@ -73,7 +73,7 @@ message OnlineTunnelFrame {
 message OnlineClientPacket {
   // 这 4 个字段由 Gateway 从 TCP 的 24 字节 Header 中精准切出并赋值
   uint32 message_id = 1;       // 业务指令号 (极其重要，Online 服据此路由到对应 Handler)
-  uint32 session_id = 2;       // 会话 ID
+  uint32 session_id = 2;       // TCP 包会话 ID, 由 Gateway 从客户端 Header.SessionID 透传
   uint32 result_id = 3;        // 结果 ID
   uint64 key = 4;              // 校验/路由 Key
 
