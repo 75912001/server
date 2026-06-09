@@ -13,7 +13,7 @@ service CacheService {
 
   // todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
   // 写入用户档案。
-  // 以 uid 做 RingHash 分片，用户创建和用户资料更新都会走这个接口。
+  // 以 uid 做 RingHash 分片, 用户创建完成和用户档案更新都会走这个接口。
   rpc CacheSetUserRecord(CacheSetUserRecordReq) returns (CacheSetUserRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
@@ -88,7 +88,7 @@ service CacheService {
 
 message CacheSetUserRecordReq {
   uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
-  user.UserRecord user_record = 2; // 用户数据
+  user.UserRecord user_record = 2; // 用户档案
 }
 
 message CacheSetUserRecordRes {
@@ -99,7 +99,7 @@ message CacheGetUserRecordReq {
 }
 
 message CacheGetUserRecordRes {
-  user.UserRecord user_record = 1; // 用户数据，成功时有效，表示 uid 对应的用户档案。
+  user.UserRecord user_record = 1; // 用户档案, 成功时有效, 表示 uid 对应的 UserRecord。
 }
 
 message CacheSetAccountVerifyTokenReq {
@@ -150,7 +150,7 @@ expected_user_session != ""
 */
   string expected_user_session = 2; // 表示预期当前 user_session 必须匹配
   string gateway_key = 3; // gatewayKey, 用于定位当前 Gateway
-  string user_session = 4; // 是新在线会话的稳定身份字段
+  string user_session = 4; // userSession, 新 cache userSession 的稳定身份字段
   int64 login_time_ms = 5; // 毫秒
   string online_key = 6; // onlineKey, 用于定位当前 Online
   uint64 expire_second = 7; // 单位为秒

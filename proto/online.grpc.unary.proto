@@ -6,9 +6,9 @@ import "options.proto";
 
 message OnlineBindUserReq {
   string gateway_key = 1; // gatewayKey, Gateway 服务在 etcd 中注册的唯一身份
-  string client_ip = 2; // 客户端连接 gateway 的 IP
+  string client_ip = 2; // 客户端 IP, 由 Gateway 从 TCP remote 提取
   string account = 3; // 登录账号, 由 Gateway 校验 connectTicket 后传入
-  uint64 uid = 4; // 用户唯一 ID，由 login/cache 可信链路生成
+  uint64 uid = 4; // uid, 用户唯一标识, 由 login/cache 可信链路生成
   string user_session = 6; // userSession, 一次登录生成的固定连接身份, 心跳不轮换
 }
 

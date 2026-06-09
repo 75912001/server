@@ -11,15 +11,15 @@ import "user.record.proto";
 //0x000001#client->gateway#登录验证-请求
 message UserVerifyReq
 {
-  uint64 uid = 1; // 用户唯一 ID，由 login 服务下发，客户端登录 gateway 时携带
-  string connect_ticket = 2; // login 签发的短期连接票据，客户端登录 gateway 时携带
+  uint64 uid = 1; // uid, 用户唯一标识, 由 login 服务下发, 客户端登录 Gateway 时携带
+  string connect_ticket = 2; // connectTicket, login 签发的短期连接票据, 客户端登录 Gateway 时携带
 }
 
 //0x000002#gateway->client#登录验证-回复
 message UserVerifyRes
 {
   int64  server_time = 1;   // 服务器当前时间戳，单位毫秒（用于客户端对时）
-  string heartbeat_session = 2; // 心跳认证凭证，客户端后续心跳携带
+  string heartbeat_session = 2; // heartbeatSession, 客户端后续心跳携带的心跳认证凭证
 }
 
 //0x000003#client->gateway#主动下线-请求
@@ -30,33 +30,33 @@ message UserOfflineReq
 
 //0x00000A#client->gateway#心跳-请求
 message UserHeartbeatReq {
-  string last_heartbeat_session = 1;   // 上次 gateway 下发的 heartbeatSession
+  string last_heartbeat_session = 1;   // 上次 Gateway 下发的 heartbeatSession
 }
 
 //0x00000B#gateway->client#心跳-回复
 message UserHeartbeatRes {
   int64 server_time  = 1;   // 服务器时间毫秒
-  string next_heartbeat_session = 2;   // 客户端下次心跳必须用这个 heartbeatSession
+  string next_heartbeat_session = 2;   // 客户端下次心跳必须使用的 heartbeatSession
 }
 
-//0x00000C#client->gateway#请求用户数据-请求
+//0x00000C#client->gateway#请求用户档案-请求
 message UserRecordReq {
 }
 
-//0x00000D#gateway->client#请求用户数据-回复
+//0x00000D#gateway->client#请求用户档案-回复
 message UserRecordRes {
-  UserRecord user_record = 1; // 用户数据
+  UserRecord user_record = 1; // 用户档案
 }
 
-//0x00000E#client->gateway#创建用户-请求
+//0x00000E#client->gateway#完成用户创建-请求
 message UserCreateReq
 {
 }
 
-//0x00000F#gateway->client#创建用户-回复
+//0x00000F#gateway->client#完成用户创建-回复
 message UserCreateRes
 {
-  UserRecord user_record = 1; // 创建成功后的用户数据
+  UserRecord user_record = 1; // 完成用户创建后的用户档案
 }
 
 //0x000010#client->gateway#机器人压测-请求
