@@ -1,6 +1,8 @@
 package main
 
 import (
+	"sync/atomic"
+
 	pb "server/proto/pb"
 
 	xetcd "github.com/75912001/xlib/etcd"
@@ -14,7 +16,7 @@ import (
 // GGatewayMgr 管理 login 发现到的 gateway 节点，用于按 availableLoad 分配客户端入口。
 var GGatewayMgr = newGatewayMgr()
 
-// GatewayMgr 保存 gateway 节点连接；并发读写由 xlib MapMutexMgr 保护。
+// GatewayMgr 保存 gateway 节点连接；节点 map 由 xlib MapMutexMgr 保护，AvailableLoad 使用 atomic 维护本地估算值。
 type GatewayMgr struct {
 	m *xmap.MapMutexMgr[string, *Gateway] // key: etcd server key
 }
@@ -29,7 +31,7 @@ type Gateway struct {
 	GroupID       uint32 // etcd 分组 ID
 	ServerName    string // 服务名
 	ServerID      uint32 // 服务实例 ID
-	AvailableLoad uint32 // gateway 当前可用负载
+	AvailableLoad uint32 // gateway 本地估算可用负载，etcd 更新会覆盖
 }
 
 // newGatewayMgr 创建 gateway 节点管理器。
@@ -86,10 +88,10 @@ func (p *GatewayMgr) Update(key string, valueJson *xetcd.ValueJson) error {
 		old.GroupID = groupID
 		old.ServerName = serverName
 		old.ServerID = serverID
-		old.AvailableLoad = valueJson.AvailableLoad
+		atomic.StoreUint32(&old.AvailableLoad, valueJson.AvailableLoad)
 		total := p.m.Len()
 
-		xlog.GLog.Infof("GatewayMgr.Update reuse key:%s addr:%s grpcAddr:%s availableLoad:%d total:%d", key, old.Addr, old.GrpcAddr, old.AvailableLoad, total)
+		xlog.GLog.Infof("GatewayMgr.Update reuse key:%s addr:%s grpcAddr:%s availableLoad:%d total:%d", key, old.Addr, old.GrpcAddr, valueJson.AvailableLoad, total)
 		return nil
 	}
 
@@ -122,23 +124,51 @@ func (p *GatewayMgr) StopAll() {
 	}
 }
 
-// GetByAvailableLoad 选择 availableLoad 最大的 gateway；负载相同时按 key 字典序稳定选择。
-func (p *GatewayMgr) GetByAvailableLoad() (*Gateway, bool) {
+// ReserveByAvailableLoad 选择本地 availableLoad 最大的 gateway，并先扣减本地负载；etcd 更新会覆盖本地负载。
+func (p *GatewayMgr) ReserveByAvailableLoad() (*Gateway, bool) {
+	for {
+		selected, selectedLoad := p.selectByAvailableLoad()
+		if selected == nil {
+			return nil, false
+		}
+		if !reserveAvailableLoad(&selected.AvailableLoad, selectedLoad) {
+			continue
+		}
+
+		cp := *selected
+		cp.AvailableLoad = selectedLoad - 1
+		return &cp, true
+	}
+}
+
+func (p *GatewayMgr) selectByAvailableLoad() (*Gateway, uint32) {
 	var selected *Gateway
+	var selectedLoad uint32
 	p.m.Foreach(func(key string, gateway *Gateway) bool {
 		if gateway == nil || gateway.Addr == "" || gateway.GrpcAddr == "" ||
-			gateway.XGatewayService == nil || !gateway.Available() || gateway.AvailableLoad == 0 {
+			gateway.XGatewayService == nil || !gateway.Available() {
+			return true
+		}
+		availableLoad := atomic.LoadUint32(&gateway.AvailableLoad)
+		if availableLoad == 0 {
 			return true
 		}
 		if selected == nil ||
-			gateway.AvailableLoad > selected.AvailableLoad ||
-			(gateway.AvailableLoad == selected.AvailableLoad && key < selected.Key) {
-			cp := *gateway
-			selected = &cp
+			availableLoad > selectedLoad ||
+			(availableLoad == selectedLoad && key < selected.Key) {
+			selected = gateway
+			selectedLoad = availableLoad
 		}
 		return true
 	})
-	return selected, selected != nil
+	return selected, selectedLoad
+}
+
+func reserveAvailableLoad(load *uint32, expected uint32) bool {
+	if expected == 0 {
+		return false
+	}
+	return atomic.CompareAndSwapUint32(load, expected, expected-1)
 }
 
 // stopGateway 将 gateway 标记为不可用并关闭 gRPC 连接。

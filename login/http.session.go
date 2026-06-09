@@ -49,7 +49,7 @@ func handleLoginSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gateway, ok := GGatewayMgr.GetByAvailableLoad()
+	gateway, ok := GGatewayMgr.ReserveByAvailableLoad()
 	if !ok {
 		writeError(w, http.StatusServiceUnavailable, "gateway not available")
 		return

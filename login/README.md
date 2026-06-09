@@ -6,7 +6,7 @@ Login 服务负责对外提供 HTTP 登录入口，完成一次性 token 的签�
 
 - 提供 `POST /api/login/token`，接收外部程序提交的 `account` 和 `token`，通过 cache 写入一次性登录 token。
 - 提供 `POST /api/login/session`，接收客户端提交的 `account` 和 `token`，通过 cache 验证并消费 token，获得可信 uid。
-- 从 etcd 发现可用 gateway，按 `availableLoad` 最大优先选择；负载相同按 gateway key 字典序选择。
+- 从 etcd 发现可用 gateway，按本地 `availableLoad` 最大优先选择，选中后本地扣减 1；后续 etcd 更新会用权威 `availableLoad` 覆盖本地估算值。
 - 为客户端生成短期 `connectTicket`，票据内包含目标 gateway、uid、account、nonce 和过期时间。
 - 返回客户端连接 gateway 所需的 `uid`、`gatewayKey`、`gatewayAddr`、`connectTicket` 和票据过期时间。
 
@@ -52,7 +52,7 @@ Login 服务负责对外提供 HTTP 登录入口，完成一次性 token 的签�
 1. 校验 HTTP 方法、JSON 结构、`account` 和 `token`，并去除 `account` 首尾空白。
 2. 调用 cache `CacheUseAccountVerifyToken`，校验成功即消费 token。
 3. 从 cache 返回可信 uid。
-4. 从 gateway 注册表中选择 `availableLoad` 最大的 gateway。
+4. 从 gateway 注册表中选择本地 `availableLoad` 最大的 gateway，并立即本地扣减 1，后续 etcd 更新会覆盖本地估算值。
 5. 生成随机 nonce。
 6. 构造 `connectTicket` payload：
 

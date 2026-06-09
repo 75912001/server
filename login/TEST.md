@@ -37,3 +37,4 @@ go test ./login ./cache ./gateway ./online ./tool/robot/main ./proto/pb
 - session 响应包含 uid、connectTicket、ticketExpireAt、gateway key 和 gateway address
 - session 响应不暴露内部 session TTL
 - 返回 session 数据前不会调用 gateway prepare-login
+- 双 gateway 同 `availableLoad` 时，批量 session 分配不应全部集中到 `/gateway/1/`，选中实例的本地负载会先扣减，后续 etcd 更新再覆盖本地估算值
