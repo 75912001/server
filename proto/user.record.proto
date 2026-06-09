@@ -15,14 +15,14 @@ message UserRecord {
 
 // 用户扩展记录一级分组
 message RecordPrimary{
-  uint64 PrimaryID = 1; // 一级分组 ID
-  map<uint64, RecordSecondary> RecordElementMap= 2; // 二级记录表, key 为 secondary_id
+  uint64 primary_id = 1; // 一级分组 ID
+  map<uint64, RecordSecondary> secondary_record_map= 2; // 二级记录表, key 为 secondary_id
 }
 
 // 用户扩展记录二级记录
 message RecordSecondary{
-  uint64 SecondaryID = 1; // 二级记录 ID
-  int64 Timestamp = 2; // 记录时间戳
-  repeated uint64 Data = 3; // 数值数据, 具体含义由 primary_id/secondary_id 对应的业务定义
-  repeated string StrData = 4; // 字符串数据, 具体含义由 primary_id/secondary_id 对应的业务定义
+  uint64 secondary_id = 1; // 二级记录 ID
+  int64 timestamp = 2; // 记录时间戳
+  repeated uint64 data = 3; // 数值数据, 具体含义由 primary_id/secondary_id 对应的业务定义
+  repeated string str_data = 4; // 字符串数据, 具体含义由 primary_id/secondary_id 对应的业务定义
 }

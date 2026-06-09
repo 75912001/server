@@ -28,7 +28,7 @@ const (
 type GatewayServiceClient interface {
 	// 踢旧用户
 	// 调用方：新 Gateway 顶号时直连旧 Gateway 发起。
-	// 作用：旧 Gateway 断开匹配连接，通知 old online 下线，并按 expected 删除 cache session。
+	// 作用: 旧 Gateway 断开匹配连接, 通知旧 Online 下线, 并按 expected_user_session 删除 cache userSession。
 	GatewayKickUser(ctx context.Context, in *GatewayKickUserReq, opts ...grpc.CallOption) (*GatewayKickUserRes, error)
 }
 
@@ -56,7 +56,7 @@ func (c *gatewayServiceClient) GatewayKickUser(ctx context.Context, in *GatewayK
 type GatewayServiceServer interface {
 	// 踢旧用户
 	// 调用方：新 Gateway 顶号时直连旧 Gateway 发起。
-	// 作用：旧 Gateway 断开匹配连接，通知 old online 下线，并按 expected 删除 cache session。
+	// 作用: 旧 Gateway 断开匹配连接, 通知旧 Online 下线, 并按 expected_user_session 删除 cache userSession。
 	GatewayKickUser(context.Context, *GatewayKickUserReq) (*GatewayKickUserRes, error)
 	mustEmbedUnimplementedGatewayServiceServer()
 }

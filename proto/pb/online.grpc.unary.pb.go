@@ -26,11 +26,11 @@ type OnlineBindUserReq struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	GatewayKey  string `protobuf:"bytes,1,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`    // gateway 服务在 etcd 中注册的唯一 key
+	GatewayKey  string `protobuf:"bytes,1,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`    // gatewayKey, Gateway 服务在 etcd 中注册的唯一身份
 	ClientIp    string `protobuf:"bytes,2,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`          // 客户端连接 gateway 的 IP
-	Account     string `protobuf:"bytes,3,opt,name=account,proto3" json:"account,omitempty"`                            // 登录账号，由 gateway 校验 connectTicket 后传入
+	Account     string `protobuf:"bytes,3,opt,name=account,proto3" json:"account,omitempty"`                            // 登录账号, 由 Gateway 校验 connectTicket 后传入
 	Uid         uint64 `protobuf:"varint,4,opt,name=uid,proto3" json:"uid,omitempty"`                                   // 用户唯一 ID，由 login/cache 可信链路生成
-	UserSession string `protobuf:"bytes,6,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"` // 固定连接身份，一次登录生成，心跳不轮换。
+	UserSession string `protobuf:"bytes,6,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"` // userSession, 一次登录生成的固定连接身份, 心跳不轮换
 }
 
 func (x *OnlineBindUserReq) Reset() {
@@ -138,7 +138,7 @@ func (*OnlineBindUserRes) Descriptor() ([]byte, []int) {
 	return file_online_grpc_unary_proto_rawDescGZIP(), []int{1}
 }
 
-// 用户 actor 解绑请求 (Gateway -> Online)，网关在 TCP 断开、顶号、主动离线和回滚等场景下发出。
+// 用户 actor 解绑请求 (Gateway -> Online), Gateway 在 TCP 断开、顶号、主动离线和回滚等场景下发出。
 type OnlineUnbindUserReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -147,8 +147,8 @@ type OnlineUnbindUserReq struct {
 	Uid         uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                                   // 离线用户 uid
 	Reason      uint32 `protobuf:"varint,2,opt,name=reason,proto3" json:"reason,omitempty"`                             // 离线原因
 	Msg         string `protobuf:"bytes,3,opt,name=msg,proto3" json:"msg,omitempty"`                                    // 离线说明
-	GatewayKey  string `protobuf:"bytes,4,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`    // 发起离线的 gateway key
-	UserSession string `protobuf:"bytes,5,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"` // 固定连接身份，只清理匹配的在线态
+	GatewayKey  string `protobuf:"bytes,4,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`    // 发起离线的 gatewayKey
+	UserSession string `protobuf:"bytes,5,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"` // userSession, 一次登录生成的固定连接身份, 只清理匹配的在线态
 }
 
 func (x *OnlineUnbindUserReq) Reset() {

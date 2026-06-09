@@ -416,10 +416,10 @@ type CacheUserSession struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	GatewayKey  string `protobuf:"bytes,1,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`       // 用于定位当前 gateway
-	UserSession string `protobuf:"bytes,2,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"`    // 是 CAS 匹配的稳定身份字段
+	GatewayKey  string `protobuf:"bytes,1,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`       // gatewayKey, 用于定位当前 Gateway
+	UserSession string `protobuf:"bytes,2,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"`    // userSession, CAS 匹配的稳定身份字段
 	LoginTimeMs int64  `protobuf:"varint,3,opt,name=login_time_ms,json=loginTimeMs,proto3" json:"login_time_ms,omitempty"` // 毫秒
-	OnlineKey   string `protobuf:"bytes,4,opt,name=online_key,json=onlineKey,proto3" json:"online_key,omitempty"`          // 用于定位当前 online。
+	OnlineKey   string `protobuf:"bytes,4,opt,name=online_key,json=onlineKey,proto3" json:"online_key,omitempty"`          // onlineKey, 用于定位当前 Online
 }
 
 func (x *CacheUserSession) Reset() {
@@ -534,7 +534,7 @@ type CacheGetUserSessionRes struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Session *CacheUserSession `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"` // 成功时有效，包含 CacheUserSession 全部字段
+	Session *CacheUserSession `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"` // 成功时有效, 包含 cache userSession 全部字段
 }
 
 func (x *CacheGetUserSessionRes) Reset() {
@@ -583,19 +583,19 @@ type CacheBeginUserSessionCASReq struct {
 
 	Uid uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
 	// expected_user_session == ""
-	// -> 期望当前 Redis 里没有 user:{uid}:session
+	// -> 期望当前 Redis 里没有 user:{uid}:session 对应的 cache userSession
 	// -> 如果 key 已存在, 返回 0, 不写入
-	// -> 如果 key 不存在, 写入新 session, 设置 TTL, 返回 1
+	// -> 如果 key 不存在, 写入新 userSession, 设置 TTL, 返回 1
 	//
 	// expected_user_session != ""
 	// -> 期望当前 Redis hash 里的 userSession 字段等于 expectedUserSession
 	// -> 如果不存在或不匹配, 返回 0, 不写入
 	// -> 如果匹配, 删除旧 hash, 写入新 records, 设置 TTL, 返回 1
 	ExpectedUserSession string `protobuf:"bytes,2,opt,name=expected_user_session,json=expectedUserSession,proto3" json:"expected_user_session,omitempty"` // 表示预期当前 user_session 必须匹配
-	GatewayKey          string `protobuf:"bytes,3,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`                              // 用于定位当前 gateway
+	GatewayKey          string `protobuf:"bytes,3,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`                              // gatewayKey, 用于定位当前 Gateway
 	UserSession         string `protobuf:"bytes,4,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"`                           // 是新在线会话的稳定身份字段
 	LoginTimeMs         int64  `protobuf:"varint,5,opt,name=login_time_ms,json=loginTimeMs,proto3" json:"login_time_ms,omitempty"`                        // 毫秒
-	OnlineKey           string `protobuf:"bytes,6,opt,name=online_key,json=onlineKey,proto3" json:"online_key,omitempty"`                                 // 用于定位当前 online
+	OnlineKey           string `protobuf:"bytes,6,opt,name=online_key,json=onlineKey,proto3" json:"online_key,omitempty"`                                 // onlineKey, 用于定位当前 Online
 	ExpireSecond        uint64 `protobuf:"varint,7,opt,name=expire_second,json=expireSecond,proto3" json:"expire_second,omitempty"`                       // 单位为秒
 }
 
@@ -724,7 +724,7 @@ type CacheEndUserSessionCASReq struct {
 	unknownFields protoimpl.UnknownFields
 
 	Uid                 uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	ExpectedUserSession string `protobuf:"bytes,2,opt,name=expected_user_session,json=expectedUserSession,proto3" json:"expected_user_session,omitempty"` // 用于 CAS 删除前匹配当前 session
+	ExpectedUserSession string `protobuf:"bytes,2,opt,name=expected_user_session,json=expectedUserSession,proto3" json:"expected_user_session,omitempty"` // 用于 CAS 删除前匹配当前 userSession
 }
 
 func (x *CacheEndUserSessionCASReq) Reset() {
@@ -817,7 +817,7 @@ type CacheRefreshUserSessionCASReq struct {
 	unknownFields protoimpl.UnknownFields
 
 	Uid                 uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	ExpectedUserSession string `protobuf:"bytes,2,opt,name=expected_user_session,json=expectedUserSession,proto3" json:"expected_user_session,omitempty"` // 用于 CAS 续期前匹配当前 session
+	ExpectedUserSession string `protobuf:"bytes,2,opt,name=expected_user_session,json=expectedUserSession,proto3" json:"expected_user_session,omitempty"` // 用于 CAS 续期前匹配当前 userSession
 	ExpireSecond        uint64 `protobuf:"varint,3,opt,name=expire_second,json=expireSecond,proto3" json:"expire_second,omitempty"`                       // 单位为秒
 }
 

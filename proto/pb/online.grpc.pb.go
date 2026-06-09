@@ -27,7 +27,7 @@ type OnlineStreamTunnelReq struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// gateway_key 用于 stream 建立后向 online 注册 gateway 身份
+	// gateway_key 用于 stream 建立后向 Online 注册 gatewayKey
 	GatewayKey string `protobuf:"bytes,1,opt,name=gateway_key,json=gatewayKey,proto3" json:"gateway_key,omitempty"`
 	// 将多个用户的小帧打包在一起发送，避免单包发送带来的 HTTP/2 帧头与系统调用开销
 	Frames []*OnlineTunnelFrame `protobuf:"bytes,2,rep,name=frames,proto3" json:"frames,omitempty"`
@@ -199,7 +199,7 @@ type isOnlineTunnelFrame_Payload interface {
 }
 
 type OnlineTunnelFrame_ClientPacket struct {
-	// [类型 1] 业务数据-上下行：网关不关心内容的纯游戏数据包
+	// [类型 1] 业务数据-上下行: Gateway 不关心内容的业务数据包
 	ClientPacket *OnlineClientPacket `protobuf:"bytes,4,opt,name=client_packet,json=clientPacket,proto3,oneof"`
 }
 
@@ -211,12 +211,12 @@ type OnlineClientPacket struct {
 	unknownFields protoimpl.UnknownFields
 
 	// 这 4 个字段由 Gateway 从 TCP 的 24 字节 Header 中精准切出并赋值
-	MessageId uint32 `protobuf:"varint,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"` // 业务指令号 (极其重要，Online 服据此路由到对应 Handler)
+	MessageId uint32 `protobuf:"varint,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"` // 业务指令号, Online 据此路由到对应 Handler
 	SessionId uint32 `protobuf:"varint,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"` // TCP 包会话 ID, 由 Gateway 从客户端 Header.SessionID 透传
 	ResultId  uint32 `protobuf:"varint,3,opt,name=result_id,json=resultId,proto3" json:"result_id,omitempty"`    // 结果 ID
 	Key       uint64 `protobuf:"varint,4,opt,name=key,proto3" json:"key,omitempty"`                              // 校验/路由 Key
 	// 剔除 24 字节包头后，剩下的客户端 Protobuf 二进制流。
-	// Gateway 直接原封不动塞进来；Online 服收到后，根据 message_id 将此 body 反序列化为具体的游戏结构体。
+	// Gateway 直接原封不动塞进来; Online 收到后, 根据 message_id 将 body 反序列化为具体业务消息。
 	Body []byte `protobuf:"bytes,5,opt,name=body,proto3" json:"body,omitempty"`
 }
 

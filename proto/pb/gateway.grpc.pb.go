@@ -26,10 +26,10 @@ type GatewayKickUserReq struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid         uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                                   // 已登录用户 uid；gateway 先从 byUID 查找，再校验 userSession
+	Uid         uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                                   // 已登录用户 uid; Gateway 先从 byUID 查找, 再校验 userSession
 	Reason      uint32 `protobuf:"varint,2,opt,name=reason,proto3" json:"reason,omitempty"`                             // 离线原因码
 	Msg         string `protobuf:"bytes,3,opt,name=msg,proto3" json:"msg,omitempty"`                                    // 离线说明
-	UserSession string `protobuf:"bytes,4,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"` // 固定连接身份，只断开匹配的连接
+	UserSession string `protobuf:"bytes,4,opt,name=user_session,json=userSession,proto3" json:"user_session,omitempty"` // userSession, 一次登录生成的固定连接身份, 只断开匹配的连接
 }
 
 func (x *GatewayKickUserReq) Reset() {

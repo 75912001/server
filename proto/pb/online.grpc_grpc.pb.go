@@ -29,14 +29,14 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OnlineServiceClient interface {
 	// 控制面：绑定用户 actor (Unary RPC)
-	// 作用：Gateway 完成票据校验和 session 抢占后，通过此接口通知 Online 建立用户 actor。
-	// 特性：Online 只负责绑定用户 actor，不读写在线 session。
+	// 作用: Gateway 完成 connectTicket 校验和 userSession 抢占后, 通过此接口通知 Online 建立用户 actor。
+	// 特性: Online 只负责绑定用户 actor, 不读写 cache userSession。
 	OnlineBindUser(ctx context.Context, in *OnlineBindUserReq, opts ...grpc.CallOption) (*OnlineBindUserRes, error)
 	// 控制面：解绑用户 actor (Unary RPC)
-	// 作用：网关在 TCP 断开、顶号、主动离线和回滚等场景下，同步通知 Online 解绑用户 actor。
+	// 作用: Gateway 在 TCP 断开、顶号、主动离线和回滚等场景下, 同步通知 Online 解绑用户 actor。
 	OnlineUnbindUser(ctx context.Context, in *OnlineUnbindUserReq, opts ...grpc.CallOption) (*OnlineUnbindUserRes, error)
 	// 数据面：全互联双向流隧道 (Bidirectional Stream)
-	// 作用：承载网关与该 Online 节点之间所有用户的上下行数据。
+	// 作用: 承载 Gateway 与该 Online 节点之间所有用户的上下行数据。
 	// 特性：支持批量打包 (Batching)，极其高效。
 	OnlineStreamTunnel(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[OnlineStreamTunnelReq, OnlineStreamTunnelRes], error)
 }
@@ -87,14 +87,14 @@ type OnlineService_OnlineStreamTunnelClient = grpc.BidiStreamingClient[OnlineStr
 // for forward compatibility.
 type OnlineServiceServer interface {
 	// 控制面：绑定用户 actor (Unary RPC)
-	// 作用：Gateway 完成票据校验和 session 抢占后，通过此接口通知 Online 建立用户 actor。
-	// 特性：Online 只负责绑定用户 actor，不读写在线 session。
+	// 作用: Gateway 完成 connectTicket 校验和 userSession 抢占后, 通过此接口通知 Online 建立用户 actor。
+	// 特性: Online 只负责绑定用户 actor, 不读写 cache userSession。
 	OnlineBindUser(context.Context, *OnlineBindUserReq) (*OnlineBindUserRes, error)
 	// 控制面：解绑用户 actor (Unary RPC)
-	// 作用：网关在 TCP 断开、顶号、主动离线和回滚等场景下，同步通知 Online 解绑用户 actor。
+	// 作用: Gateway 在 TCP 断开、顶号、主动离线和回滚等场景下, 同步通知 Online 解绑用户 actor。
 	OnlineUnbindUser(context.Context, *OnlineUnbindUserReq) (*OnlineUnbindUserRes, error)
 	// 数据面：全互联双向流隧道 (Bidirectional Stream)
-	// 作用：承载网关与该 Online 节点之间所有用户的上下行数据。
+	// 作用: 承载 Gateway 与该 Online 节点之间所有用户的上下行数据。
 	// 特性：支持批量打包 (Batching)，极其高效。
 	OnlineStreamTunnel(grpc.BidiStreamingServer[OnlineStreamTunnelReq, OnlineStreamTunnelRes]) error
 	mustEmbedUnimplementedOnlineServiceServer()

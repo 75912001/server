@@ -12,7 +12,7 @@ service GatewayService {
 
   // 踢旧用户
   // 调用方：新 Gateway 顶号时直连旧 Gateway 发起。
-  // 作用：旧 Gateway 断开匹配连接，通知 old online 下线，并按 expected 删除 cache session。
+  // 作用: 旧 Gateway 断开匹配连接, 通知旧 Online 下线, 并按 expected_user_session 删除 cache userSession。
   rpc GatewayKickUser(GatewayKickUserReq) returns (GatewayKickUserRes) {
     option (proto.methodOpt) = {
       timeout: "10s"
@@ -22,10 +22,10 @@ service GatewayService {
 }
 
 message GatewayKickUserReq {
-  uint64 uid = 1;                                    // 已登录用户 uid；gateway 先从 byUID 查找，再校验 userSession
+  uint64 uid = 1;                                    // 已登录用户 uid; Gateway 先从 byUID 查找, 再校验 userSession
   uint32 reason = 2;                                  // 离线原因码
   string msg = 3;                                     // 离线说明
-  string user_session = 4;                            // 固定连接身份，只断开匹配的连接
+  string user_session = 4;                            // userSession, 一次登录生成的固定连接身份, 只断开匹配的连接
 }
 
 message GatewayKickUserRes {
