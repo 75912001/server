@@ -10,19 +10,19 @@ message UserRecord {
   int64 account_create_time_ms = 4; // 账号创建时间戳，单位毫秒
   int64 user_create_time_ms = 5; // 用户创建时间戳，单位毫秒；0 表示账号已创建但用户未创建
   map<uint64, uint64> asset_map = 10; // 资产表 key: AssetID value: 数值
-  map<uint64, RecordPrimary> record_map = 1000; // 记录表 key: 主要ID
+  map<uint64, RecordPrimary> record_map = 1000; // 用户扩展记录表, key 为 primary_id
 }
 
-// 记录-主要
+// 用户扩展记录一级分组
 message RecordPrimary{
-  uint64 PrimaryID = 1; // 记录-主要ID
-  map<uint64, RecordSecondary> RecordElementMap= 2; // 记录表 key: 记录-次要ID
+  uint64 PrimaryID = 1; // 一级分组 ID
+  map<uint64, RecordSecondary> RecordElementMap= 2; // 二级记录表, key 为 secondary_id
 }
 
-// 记录-次要
+// 用户扩展记录二级记录
 message RecordSecondary{
-  uint64 SecondaryID = 1; // 记录-副ID
-  int64 Timestamp = 2; // 记录-时间戳
-  repeated uint64 Data = 3; // 数据-根据记录 PrimaryID/SecondaryID 不同-含义不同
-  repeated string StrData = 4; // 记录字符串数据-根据记录 PrimaryID/SecondaryID 不同-含义不同
+  uint64 SecondaryID = 1; // 二级记录 ID
+  int64 Timestamp = 2; // 记录时间戳
+  repeated uint64 Data = 3; // 数值数据, 具体含义由 primary_id/secondary_id 对应的业务定义
+  repeated string StrData = 4; // 字符串数据, 具体含义由 primary_id/secondary_id 对应的业务定义
 }

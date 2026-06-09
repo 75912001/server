@@ -30,7 +30,7 @@ service OnlineService {
     };
   }
   // 数据面：全互联双向流隧道 (Bidirectional Stream)
-  // 作用：承载网关与该 Online 节点之间【所有玩家】的上下行数据。
+  // 作用：承载网关与该 Online 节点之间所有用户的上下行数据。
   // 特性：支持批量打包 (Batching)，极其高效。
   rpc OnlineStreamTunnel (stream OnlineStreamTunnelReq) returns (stream OnlineStreamTunnelRes);
 }
@@ -41,9 +41,9 @@ service OnlineService {
 
 // 上行请求包装器 (Gateway -> Online)
 message OnlineStreamTunnelReq {
-  // gateway_id 用于 stream 建立后向 online 注册 gateway 身份
-  string gateway_id = 1;
-  // 将多个玩家的小帧打包在一起发送，避免单包发送带来的 HTTP/2 帧头与系统调用开销
+  // gateway_key 用于 stream 建立后向 online 注册 gateway 身份
+  string gateway_key = 1;
+  // 将多个用户的小帧打包在一起发送，避免单包发送带来的 HTTP/2 帧头与系统调用开销
   repeated OnlineTunnelFrame frames = 2;
 }
 
@@ -57,7 +57,7 @@ message OnlineStreamTunnelRes {
 // ===================================================================
 
 message OnlineTunnelFrame {
-  uint64 uid = 1;              // 定位具体的玩家 Actor 或 TCP Socket
+  uint64 uid = 1;              // 定位具体的用户 Actor 或 TCP Socket
 
   // payload 强互斥：一个 Frame 只能是下面类型之一
   oneof payload {

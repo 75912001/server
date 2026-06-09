@@ -36,7 +36,7 @@ type OnlineServiceClient interface {
 	// 作用：网关在 TCP 断开、顶号、主动离线和回滚等场景下，同步通知 Online 解绑用户 actor。
 	OnlineUnbindUser(ctx context.Context, in *OnlineUnbindUserReq, opts ...grpc.CallOption) (*OnlineUnbindUserRes, error)
 	// 数据面：全互联双向流隧道 (Bidirectional Stream)
-	// 作用：承载网关与该 Online 节点之间【所有玩家】的上下行数据。
+	// 作用：承载网关与该 Online 节点之间所有用户的上下行数据。
 	// 特性：支持批量打包 (Batching)，极其高效。
 	OnlineStreamTunnel(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[OnlineStreamTunnelReq, OnlineStreamTunnelRes], error)
 }
@@ -94,7 +94,7 @@ type OnlineServiceServer interface {
 	// 作用：网关在 TCP 断开、顶号、主动离线和回滚等场景下，同步通知 Online 解绑用户 actor。
 	OnlineUnbindUser(context.Context, *OnlineUnbindUserReq) (*OnlineUnbindUserRes, error)
 	// 数据面：全互联双向流隧道 (Bidirectional Stream)
-	// 作用：承载网关与该 Online 节点之间【所有玩家】的上下行数据。
+	// 作用：承载网关与该 Online 节点之间所有用户的上下行数据。
 	// 特性：支持批量打包 (Batching)，极其高效。
 	OnlineStreamTunnel(grpc.BidiStreamingServer[OnlineStreamTunnelReq, OnlineStreamTunnelRes]) error
 	mustEmbedUnimplementedOnlineServiceServer()
