@@ -30,16 +30,29 @@ func resetTestOnlineUserMgr(t *testing.T) {
 	})
 }
 
-func newTestOnlineGRPCServer() *onlineGRPCServer {
-	return &onlineGRPCServer{
-		cacheGetUserRecord: func(uid uint64) (*pb.UserRecord, error) {
-			return &pb.UserRecord{
-				Uid:                 uid,
-				Account:             fmt.Sprintf("robot.%d", uid),
-				AccountCreateTimeMs: 111,
-			}, nil
-		},
-	}
+func setupTestOnlineGRPCServer(t *testing.T) *onlineGRPCServer {
+	t.Helper()
+
+	setupFakeCacheGetUserRecord(t, func(uid uint64) (*pb.UserRecord, error) {
+		return &pb.UserRecord{
+			Uid:                 uid,
+			Account:             fmt.Sprintf("robot.%d", uid),
+			AccountCreateTimeMs: 111,
+		}, nil
+	})
+	return &onlineGRPCServer{}
+}
+
+func setupFakeCacheGetUserRecord(t *testing.T, getUserRecord func(uid uint64) (*pb.UserRecord, error)) *fakeCacheService {
+	t.Helper()
+
+	return setupFakeCacheServer(t, func(cache *fakeCacheService) {
+		cache.getUserRecord = getUserRecord
+	})
+}
+
+func setFakeCacheGetUserRecord(cache *fakeCacheService, getUserRecord func(uid uint64) (*pb.UserRecord, error)) {
+	cache.getUserRecord = getUserRecord
 }
 
 func requireStatusCode(t *testing.T, err error, want grpccodes.Code) {

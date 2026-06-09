@@ -18,8 +18,10 @@ import (
 	xgrpcselector "github.com/75912001/xlib/grpc/selector"
 	xlog "github.com/75912001/xlib/log"
 	"google.golang.org/grpc"
+	grpccodes "google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+	grpcstatus "google.golang.org/grpc/status"
 	"google.golang.org/grpc/test/bufconn"
 	"google.golang.org/protobuf/proto"
 )
@@ -119,6 +121,7 @@ type fakeCacheService struct {
 	pb.UnimplementedCacheServiceServer
 
 	setUserRecordCalls chan *pb.CacheSetUserRecordReq
+	getUserRecord      func(uid uint64) (*pb.UserRecord, error)
 }
 
 func (p *fakeCacheService) CacheSetUserRecord(_ context.Context, req *pb.CacheSetUserRecordReq) (*pb.CacheSetUserRecordRes, error) {
@@ -126,7 +129,20 @@ func (p *fakeCacheService) CacheSetUserRecord(_ context.Context, req *pb.CacheSe
 	return &pb.CacheSetUserRecordRes{}, nil
 }
 
-func setupFakeCacheServer(t *testing.T) *fakeCacheService {
+func (p *fakeCacheService) CacheGetUserRecord(_ context.Context, req *pb.CacheGetUserRecordReq) (*pb.CacheGetUserRecordRes, error) {
+	if p.getUserRecord == nil {
+		return nil, grpcstatus.Error(grpccodes.NotFound, "user record not found")
+	}
+	userRecord, err := p.getUserRecord(req.GetUid())
+	if err != nil {
+		return nil, err
+	}
+	return &pb.CacheGetUserRecordRes{
+		UserRecord: userRecord,
+	}, nil
+}
+
+func setupFakeCacheServer(t *testing.T, configure ...func(*fakeCacheService)) *fakeCacheService {
 	t.Helper()
 
 	ensureTestLog(t)
@@ -139,6 +155,9 @@ func setupFakeCacheServer(t *testing.T) *fakeCacheService {
 	server := grpc.NewServer()
 	cache := &fakeCacheService{
 		setUserRecordCalls: make(chan *pb.CacheSetUserRecordReq, 1),
+	}
+	for _, fn := range configure {
+		fn(cache)
 	}
 	pb.RegisterCacheServiceServer(server, cache)
 	go func() {

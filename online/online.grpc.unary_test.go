@@ -12,7 +12,14 @@ import (
 func TestOnlineBindUserValidation(t *testing.T) {
 	resetTestOnlineUserMgr(t)
 
-	srv := newTestOnlineGRPCServer()
+	cache := setupFakeCacheGetUserRecord(t, func(uid uint64) (*pb.UserRecord, error) {
+		return &pb.UserRecord{
+			Uid:                 uid,
+			Account:             "robot.other",
+			AccountCreateTimeMs: 111,
+		}, nil
+	})
+	srv := &onlineGRPCServer{}
 	ctx := context.Background()
 
 	_, err := srv.OnlineBindUser(ctx, &pb.OnlineBindUserReq{})
@@ -25,15 +32,6 @@ func TestOnlineBindUserValidation(t *testing.T) {
 	})
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 
-	srv = &onlineGRPCServer{
-		cacheGetUserRecord: func(uid uint64) (*pb.UserRecord, error) {
-			return &pb.UserRecord{
-				Uid:                 uid,
-				Account:             "robot.other",
-				AccountCreateTimeMs: 111,
-			}, nil
-		},
-	}
 	_, err = srv.OnlineBindUser(ctx, &pb.OnlineBindUserReq{
 		Uid:         1001,
 		Account:     "robot.1001",
@@ -45,14 +43,12 @@ func TestOnlineBindUserValidation(t *testing.T) {
 		t.Fatalf("bind mismatch left user actor: %#v", user)
 	}
 
-	srv = &onlineGRPCServer{
-		cacheGetUserRecord: func(uid uint64) (*pb.UserRecord, error) {
-			return &pb.UserRecord{
-				Uid:     uid,
-				Account: "robot.1001",
-			}, nil
-		},
-	}
+	setFakeCacheGetUserRecord(cache, func(uid uint64) (*pb.UserRecord, error) {
+		return &pb.UserRecord{
+			Uid:     uid,
+			Account: "robot.1001",
+		}, nil
+	})
 	_, err = srv.OnlineBindUser(ctx, &pb.OnlineBindUserReq{
 		Uid:         1001,
 		Account:     "robot.1001",
@@ -68,7 +64,7 @@ func TestOnlineBindUserValidation(t *testing.T) {
 func TestOnlineBindUserSuccess(t *testing.T) {
 	resetTestOnlineUserMgr(t)
 
-	_, err := newTestOnlineGRPCServer().OnlineBindUser(context.Background(), validOnlineBindReq(1001, "robot.1001", "gateway-1", "session-1"))
+	_, err := setupTestOnlineGRPCServer(t).OnlineBindUser(context.Background(), validOnlineBindReq(1001, "robot.1001", "gateway-1", "session-1"))
 	if err != nil {
 		t.Fatalf("OnlineBindUser failed: %v", err)
 	}
@@ -111,7 +107,7 @@ func TestOnlineUnbindUserMissingActorSuccess(t *testing.T) {
 func TestOnlineUnbindUserSessionMismatchKeepsActor(t *testing.T) {
 	resetTestOnlineUserMgr(t)
 
-	srv := newTestOnlineGRPCServer()
+	srv := setupTestOnlineGRPCServer(t)
 	_, err := srv.OnlineBindUser(context.Background(), validOnlineBindReq(1001, "robot.1001", "gateway-1", "new-session"))
 	if err != nil {
 		t.Fatalf("OnlineBindUser failed: %v", err)
@@ -140,7 +136,7 @@ func TestOnlineUnbindUserSessionMismatchKeepsActor(t *testing.T) {
 func TestOnlineUnbindUserMatchStopsActor(t *testing.T) {
 	resetTestOnlineUserMgr(t)
 
-	srv := newTestOnlineGRPCServer()
+	srv := setupTestOnlineGRPCServer(t)
 	_, err := srv.OnlineBindUser(context.Background(), validOnlineBindReq(1001, "robot.1001", "gateway-1", "session-1"))
 	if err != nil {
 		t.Fatalf("OnlineBindUser failed: %v", err)
