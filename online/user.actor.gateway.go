@@ -24,7 +24,7 @@ func (p *User) onBind(req *pb.OnlineBindUserReq, userRecord *pb.UserRecord) (*pb
 		return nil, grpcstatus.Error(grpccodes.Internal, "invalid user record")
 	}
 
-	p.gatewayID = gatewayKey
+	p.gatewayKey = gatewayKey
 	p.userSession = userSession
 	p.account = userRecord.GetAccount()
 	p.clientIP = req.GetClientIp()

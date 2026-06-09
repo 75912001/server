@@ -10,7 +10,7 @@ import (
 type User struct {
 	uid         uint64
 	account     string
-	gatewayID   string
+	gatewayKey  string
 	userSession string
 	clientIP    string
 	userRecord  *pb.UserRecord

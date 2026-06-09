@@ -16,9 +16,9 @@ func init() {
 
 type onlineStreamHandler struct{}
 
-// OnlineStreamTunnelPre 流建立时发送 gateway_id 注册包，让 online 绑定该 gateway stream。
+// OnlineStreamTunnelPre 流建立时发送 gateway_key 注册包, 让 online 绑定该 gateway stream。
 func (p *onlineStreamHandler) OnlineStreamTunnelPre(stream pb.OnlineService_OnlineStreamTunnelClient) error {
-	return stream.Send(&pb.OnlineStreamTunnelReq{GatewayId: xetcd.GEtcd.GetKey()})
+	return stream.Send(&pb.OnlineStreamTunnelReq{GatewayKey: xetcd.GEtcd.GetKey()})
 }
 
 // OnlineStreamTunnel 处理 online → gateway 下行流。

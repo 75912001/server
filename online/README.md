@@ -44,7 +44,7 @@ userSession
 
 gateway 在调用 `OnlineBindUser` 前已经完成 connectTicket 验签、旧连接顶号和 Redis session CAS；OnlineBindUser 内部读取并校验 UserRecord。
 因此 online 不判断用户是否允许上线，也不创建抢占失败请求的 actor；只有已经抢到 Redis session 的 gateway 请求会进入 `OnlineBindUser`。
-gateway 调用 `OnlineBindUser` 的默认超时时间为 `60s`。
+gateway 调用 `OnlineBindUser` 的默认超时时间以 `proto/online.grpc.proto` 中的 `methodOpt.timeout` 为准。
 
 ## OnlineUnbindUser
 
@@ -68,7 +68,7 @@ msg
 6. 不匹配时忽略该解绑请求，防止旧请求误停新 actor。
 
 Redis session 是否删除由 gateway 调用 `CacheEndUserSessionCAS` 决定。
-gateway 调用 `OnlineUnbindUser` 的默认超时时间为 `60s`。
+gateway 调用 `OnlineUnbindUser` 的默认超时时间以 `proto/online.grpc.proto` 中的 `methodOpt.timeout` 为准。
 
 ## 业务数据流
 

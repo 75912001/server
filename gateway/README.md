@@ -12,7 +12,7 @@ Gateway 服务负责客户端 TCP 接入、首次登录验票、单登录顶号�
 - 选择本地 `availableLoad` 最大的可用 online，选中后本地扣减 1，再调用 `OnlineBindUser` 绑定 user actor；后续 etcd 更新会用权威 `availableLoad` 覆盖本地估算值。
 - 维护本地 `heartbeatSession`，处理心跳轮换和 `CacheRefreshUserSessionCAS`。
 - 在 TCP 断开、主动离线、心跳超时、顶号等场景调用 `OnlineUnbindUser` 和 `CacheEndUserSessionCAS`。
-- gateway 到 cache、online 和旧 gateway 的 unary 超时统一由 proto `methodOpt.timeout` 控制；当前 cache 为 `3s`，online bind/unbind 和旧 gateway kick 为 `60s`。
+- gateway 到 cache、online 和旧 gateway 的 unary 超时统一由 proto `methodOpt.timeout` 控制；具体数值以 `proto/cache.grpc.proto`、`proto/online.grpc.proto` 和 `proto/gateway.grpc.proto` 为准。
 
 ## TCP 登录验证
 
@@ -147,6 +147,6 @@ client TCP
 
 - 收口 gateway gRPC 控制面暴露风险：`GatewayKickUser` 会断开用户连接并清理 session，当前部署示例会发布 `20101/20102` gRPC 端口且接口本身未做服务间鉴权。后续需要限制端口只对可信内网服务开放，并增加 mTLS 或 metadata token/HMAC 校验调用方身份。
 - 增加顶号测试：旧 gateway 不存在、旧 gateway NotFound、kick 成功后 begin 成功、begin 失败回滚。
-- 按压测结果继续调短 `online.grpc.proto` / `gateway.grpc.proto` 中 60 秒 `methodOpt.timeout`，避免异常场景连接长时间占用。
+- 按压测结果继续评估 `online.grpc.proto` / `gateway.grpc.proto` 中 `methodOpt.timeout` 是否需要调短，避免异常场景连接长时间占用。
 - CacheMgr 使用 xlib `MapMutexMgr` 缓存 cache 服务发现结果，由 etcd add/del 回调维护，并同步注册或摘除 gRPC resolve。
 - User 心跳超时直接使用 `xtimer.Second` 维护；`heartbeatSession` 只负责客户端心跳凭证校验，不再使用 xlib `HeartBeat.WaitID`。

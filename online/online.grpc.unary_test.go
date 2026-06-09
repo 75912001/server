@@ -73,8 +73,8 @@ func TestOnlineBindUserSuccess(t *testing.T) {
 	if user == nil {
 		t.Fatal("bound user not found")
 	}
-	if user.gatewayID != "gateway-1" || user.userSession != "session-1" || user.account != "robot.1001" {
-		t.Fatalf("bound user state = gateway:%q session:%q account:%q", user.gatewayID, user.userSession, user.account)
+	if user.gatewayKey != "gateway-1" || user.userSession != "session-1" || user.account != "robot.1001" {
+		t.Fatalf("bound user state = gateway:%q session:%q account:%q", user.gatewayKey, user.userSession, user.account)
 	}
 }
 

@@ -92,7 +92,7 @@ cd /d/src/github.com/server/tool/robot/bin
 - 输入业务命令时，gateway 通过当前用户绑定的 online 透传上行包。
 - 双 online 同 `availableLoad` 时，批量登录不应全部集中到 `/online/1/`，选中实例的本地负载会先扣减，后续 etcd 更新再覆盖本地估算值。
 - 输入 `UserOfflineReq` 或由新 gateway 调用旧 gateway `GatewayKickUser` 时，gateway 清理本地 user，并通知绑定的 online 下线，同时按 CAS 删除 cache session。
-- gateway stream 建立后，online 能识别 `gateway_id` 并绑定下行 stream。
+- gateway stream 建立后，online 能识别 `gateway_key` 并绑定下行 stream。
 
 ## 7. 常见失败定位
 

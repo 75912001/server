@@ -90,7 +90,7 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if currentUser, ok := GUserMgr.users.Find(p.uid); ok && currentUser == p {
 				GUserMgr.users.Del(p.uid)
 			}
-			p.gatewayID = ""
+			p.gatewayKey = ""
 			p.userSession = ""
 			resp = true
 		case OnlineUserActorCmdClientPacket:
@@ -109,7 +109,7 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 }
 
 func (p *User) offlineUserSessionMatch(gatewayKey string, userSession string) bool {
-	if gatewayKey == "" || userSession == "" || p.gatewayID != gatewayKey {
+	if gatewayKey == "" || userSession == "" || p.gatewayKey != gatewayKey {
 		return false
 	}
 	return p.userSession == userSession
