@@ -201,6 +201,6 @@ online 收到后直接回显：
 
 - 当前 Windows 动态 TCP 端口范围通常约 16384 个端口，10000 个连接理论上够，但刚退出后立刻重启可能受 `TIME_WAIT` 影响。
 - 不要对 10000 个 robot 开启逐包成功日志，默认只输出汇总和失败明细。
-- `cacheTokenExpireSecond` 要大于批量启动和登录耗时，避免 token 在登录前过期。
+- `cacheAccountVerifyTokenExpireSecond` 要大于批量启动和登录耗时, 避免 accountVerifyToken 在登录前过期。
 - 建议按 `100 -> 1000 -> 5000 -> 10000` 逐步加压。
 - 压测时同时观察 gateway、online、cache、Redis 和 Docker 资源。

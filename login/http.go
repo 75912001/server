@@ -10,10 +10,10 @@ import (
 	xlog "github.com/75912001/xlib/log"
 )
 
-// newHTTPServer 创建 login HTTP 服务，并按配置注册 token/session 两个接口。
+// newHTTPServer 创建 login HTTP 服务, 并按配置注册 accountVerifyToken/session 两个接口。
 func newHTTPServer() *http.Server {
 	mux := http.NewServeMux()
-	mux.HandleFunc(GCfgCustomTokenPath, handleLoginToken)
+	mux.HandleFunc(GCfgCustomAccountVerifyTokenPath, handleLoginAccountVerifyToken)
 	mux.HandleFunc(GCfgCustomSessionPath, handleLoginSession)
 	return &http.Server{
 		Addr:              GCfgCustomHTTPAddr,
@@ -22,12 +22,12 @@ func newHTTPServer() *http.Server {
 	}
 }
 
-// decodeTokenReq 读取并校验账号 token 请求，拒绝未知字段和空 account/token。
-func decodeTokenReq(w http.ResponseWriter, r *http.Request) (*tokenReq, bool) {
+// decodeAccountVerifyTokenReq 读取并校验 accountVerifyToken 请求, 拒绝未知字段和空 account/accountVerifyToken。
+func decodeAccountVerifyTokenReq(w http.ResponseWriter, r *http.Request) (*accountVerifyTokenReq, bool) {
 	r.Body = http.MaxBytesReader(w, r.Body, GCfgCustomMaxBodyBytes)
 	defer r.Body.Close()
 
-	var req tokenReq
+	var req accountVerifyTokenReq
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&req); err != nil {
@@ -40,8 +40,8 @@ func decodeTokenReq(w http.ResponseWriter, r *http.Request) (*tokenReq, bool) {
 	}
 
 	req.Account = strings.TrimSpace(req.Account)
-	if req.Account == "" || req.Token == "" {
-		writeError(w, http.StatusBadRequest, "invalid account or token")
+	if req.Account == "" || req.AccountVerifyToken == "" {
+		writeError(w, http.StatusBadRequest, "invalid account or accountVerifyToken")
 		return nil, false
 	}
 	return &req, true

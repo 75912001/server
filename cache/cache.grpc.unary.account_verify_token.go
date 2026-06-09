@@ -12,33 +12,33 @@ import (
 
 func (s *cacheGRPCServer) CacheSetAccountVerifyToken(ctx context.Context, req *pb.CacheSetAccountVerifyTokenReq) (*pb.CacheSetAccountVerifyTokenRes, error) {
 	account := req.GetAccount()
-	token := req.GetToken()
+	accountVerifyToken := req.GetAccountVerifyToken()
 	expireSecond := req.GetExpireSecond()
-	if account == "" || token == "" || expireSecond == 0 {
+	if account == "" || accountVerifyToken == "" || expireSecond == 0 {
 		return &pb.CacheSetAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
 	}
-	ok, err := GRedis.SetAccountVerifyToken(ctx, account, token, time.Duration(expireSecond)*time.Second)
+	ok, err := GRedis.SetAccountVerifyToken(ctx, account, accountVerifyToken, time.Duration(expireSecond)*time.Second)
 	if err != nil {
 		return &pb.CacheSetAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	if !ok {
-		return &pb.CacheSetAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.AlreadyExists, "token already exists")
+		return &pb.CacheSetAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.AlreadyExists, "accountVerifyToken already exists")
 	}
 	return &pb.CacheSetAccountVerifyTokenRes{}, nil
 }
 
 func (s *cacheGRPCServer) CacheUseAccountVerifyToken(ctx context.Context, req *pb.CacheUseAccountVerifyTokenReq) (*pb.CacheUseAccountVerifyTokenRes, error) {
 	account := req.GetAccount()
-	token := req.GetToken()
-	if account == "" || token == "" {
+	accountVerifyToken := req.GetAccountVerifyToken()
+	if account == "" || accountVerifyToken == "" {
 		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
 	}
-	ok, err := GRedis.UseAccountVerifyToken(ctx, account, token)
+	ok, err := GRedis.UseAccountVerifyToken(ctx, account, accountVerifyToken)
 	if err != nil {
 		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	if !ok {
-		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.NotFound, "token not found or used")
+		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.NotFound, "accountVerifyToken not found or used")
 	}
 	userRecord, _, err := GRedis.EnsureAccount(ctx, account)
 	if err != nil {

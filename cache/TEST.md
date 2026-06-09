@@ -8,7 +8,7 @@ cache 测试重点不是单纯追求覆盖率，而是稳定覆盖服务契约�
 
 - gRPC status 返回语义。
 - Redis key 格式。
-- 账号 token 设置、消费和删除。
+- accountVerifyToken 设置、消费和删除。
 - uid 按 `base.groupID` 分段生成。
 - `UserRecord` protobuf 读写。
 - 用户在线 session 的批量读写、CAS 替换、续期、删除和迟到请求保护。
@@ -87,7 +87,7 @@ GOCACHE="$PWD/../.gocache" go test -tags=integration .
 
 覆盖内容：
 
-- token 首次设置、重复设置、错误 token、消费后删除。
+- accountVerifyToken 首次设置、重复设置、错误 accountVerifyToken、消费后删除。
 - 新账号创建、重复读取、UserRecord 缺失或关键字段不一致时报错。
 - 同账号并发创建只生成一个 uid。
 - session HSET/HMGET。
@@ -149,7 +149,7 @@ rmdir ../.coverage 2>/dev/null || true
 
 典型检查项：
 
-- account token 设置和消费流程。
+- accountVerifyToken 设置和消费流程。
 - user record 读写。
 - user session set/get/replace/delete/expire。
 - 参数错误返回 `InvalidArgument`。

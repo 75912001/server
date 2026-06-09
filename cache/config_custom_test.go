@@ -12,7 +12,7 @@ func TestRedisKeyFunctions(t *testing.T) {
 	}{
 		{name: "user record", got: RedisKeyUserRecord(1001), want: "user:{1001}:record"},
 		{name: "user session", got: RedisKeyUserSession(1001), want: "user:{1001}:session"},
-		{name: "account token", got: RedisKeyAccountToken("alice"), want: "account:{alice}:token"},
+		{name: "accountVerifyToken", got: RedisKeyAccountVerifyToken("alice"), want: "account:{alice}:accountVerifyToken"},
 		{name: "account uid", got: RedisKeyAccountUID("alice"), want: "account:{alice}:uid"},
 		{name: "account lock", got: RedisKeyAccountLock("alice"), want: "account:{alice}:lock"},
 		{name: "group uid sequence", got: RedisKeyUserUIDSequence(2), want: "user:uid:sequence:{2}"},

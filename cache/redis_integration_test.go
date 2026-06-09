@@ -86,47 +86,47 @@ func cleanupRedisKeys(t *testing.T, r *Redis, ctx context.Context, keys ...strin
 	}
 }
 
-func TestIntegrationAccountToken(t *testing.T) {
+func TestIntegrationAccountVerifyToken(t *testing.T) {
 	r, ctx := newIntegrationRedis(t)
 
-	account := "it-token-" + integrationSuffix()
-	token := "token-" + integrationSuffix()
-	tokenKey := RedisKeyAccountToken(account)
+	account := "it-accountVerifyToken-" + integrationSuffix()
+	accountVerifyToken := "accountVerifyToken-" + integrationSuffix()
+	accountVerifyTokenKey := RedisKeyAccountVerifyToken(account)
 	t.Cleanup(func() {
-		cleanupRedisKeys(t, r, ctx, tokenKey)
+		cleanupRedisKeys(t, r, ctx, accountVerifyTokenKey)
 	})
 
-	ok, err := r.SetAccountVerifyToken(ctx, account, token, time.Minute)
+	ok, err := r.SetAccountVerifyToken(ctx, account, accountVerifyToken, time.Minute)
 	if err != nil || !ok {
 		t.Fatalf("SetAccountVerifyToken first = %v, %v; want true, nil", ok, err)
 	}
 
-	ok, err = r.SetAccountVerifyToken(ctx, account, token, time.Minute)
+	ok, err = r.SetAccountVerifyToken(ctx, account, accountVerifyToken, time.Minute)
 	if err != nil || ok {
 		t.Fatalf("SetAccountVerifyToken duplicate = %v, %v; want false, nil", ok, err)
 	}
 
-	ok, err = r.UseAccountVerifyToken(ctx, account, "bad-token")
+	ok, err = r.UseAccountVerifyToken(ctx, account, "bad-accountVerifyToken")
 	if err != nil || ok {
-		t.Fatalf("UseAccountVerifyToken wrong token = %v, %v; want false, nil", ok, err)
+		t.Fatalf("UseAccountVerifyToken wrong accountVerifyToken = %v, %v; want false, nil", ok, err)
 	}
 
-	ok, err = r.UseAccountVerifyToken(ctx, account, token)
+	ok, err = r.UseAccountVerifyToken(ctx, account, accountVerifyToken)
 	if err != nil || !ok {
-		t.Fatalf("UseAccountVerifyToken correct token = %v, %v; want true, nil", ok, err)
+		t.Fatalf("UseAccountVerifyToken correct accountVerifyToken = %v, %v; want true, nil", ok, err)
 	}
 
-	exists, err := r.client.Exists(ctx, tokenKey).Result()
+	exists, err := r.client.Exists(ctx, accountVerifyTokenKey).Result()
 	if err != nil {
-		t.Fatalf("exists token key failed: %v", err)
+		t.Fatalf("exists accountVerifyToken key failed: %v", err)
 	}
 	if exists != 0 {
-		t.Fatalf("token key exists = %d, want 0", exists)
+		t.Fatalf("accountVerifyToken key exists = %d, want 0", exists)
 	}
 
-	ok, err = r.UseAccountVerifyToken(ctx, account, token)
+	ok, err = r.UseAccountVerifyToken(ctx, account, accountVerifyToken)
 	if err != nil || ok {
-		t.Fatalf("UseAccountVerifyToken consumed token = %v, %v; want false, nil", ok, err)
+		t.Fatalf("UseAccountVerifyToken consumed accountVerifyToken = %v, %v; want false, nil", ok, err)
 	}
 }
 

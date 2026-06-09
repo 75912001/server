@@ -9,7 +9,7 @@ import (
 	pb "server/proto/pb"
 )
 
-func TestAccountTokenHandlerInvalidArguments(t *testing.T) {
+func TestAccountVerifyTokenHandlerInvalidArguments(t *testing.T) {
 	s := &cacheGRPCServer{}
 	ctx := context.Background()
 

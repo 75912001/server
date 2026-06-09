@@ -19,14 +19,14 @@ type sessionRes struct {
 	GatewayAddr    string `json:"gatewayAddr"`    // 客户端连接目标 gateway 的 TCP 地址
 }
 
-// handleLoginSession 供客户端消费账号 token，换取 uid、connectTicket 和目标 gateway。
+// handleLoginSession 供客户端消费 accountVerifyToken, 换取 uid、connectTicket 和目标 gateway。
 func handleLoginSession(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
 
-	req, ok := decodeTokenReq(w, r)
+	req, ok := decodeAccountVerifyTokenReq(w, r)
 	if !ok {
 		return
 	}
@@ -35,8 +35,8 @@ func handleLoginSession(w http.ResponseWriter, r *http.Request) {
 	defer cacheCancel()
 
 	cacheRes, err := pb.GXCacheServiceService.CacheUseAccountVerifyToken(cacheCtx, &pb.CacheUseAccountVerifyTokenReq{
-		Account: req.Account,
-		Token:   req.Token,
+		Account:            req.Account,
+		AccountVerifyToken: req.AccountVerifyToken,
 	})
 	if err != nil {
 		statusCode, message := cacheErrorToHTTP(err)

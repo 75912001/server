@@ -41,10 +41,10 @@ type CacheServiceClient interface {
 	// 读取用户档案。
 	// 以 uid 做 RingHash 分片，返回当前 uid 对应的 UserRecord。
 	CacheGetUserRecord(ctx context.Context, in *CacheGetUserRecordReq, opts ...grpc.CallOption) (*CacheGetUserRecordRes, error)
-	// 写入账号级登录 token。
-	// 以 account 做 RingHash 分片，token 使用一次性 SETNX 语义，未消费前不覆盖。
+	// 写入 accountVerifyToken。
+	// 以 account 做 RingHash 分片，accountVerifyToken 使用一次性 SETNX 语义，未消费前不覆盖。
 	CacheSetAccountVerifyToken(ctx context.Context, in *CacheSetAccountVerifyTokenReq, opts ...grpc.CallOption) (*CacheSetAccountVerifyTokenRes, error)
-	// 验证并消费账号级登录 token。
+	// 验证并消费 accountVerifyToken。
 	// 以 account 做 RingHash 分片，消费成功后确保账号存在并返回可信 uid。
 	CacheUseAccountVerifyToken(ctx context.Context, in *CacheUseAccountVerifyTokenReq, opts ...grpc.CallOption) (*CacheUseAccountVerifyTokenRes, error)
 	// 获取用户在线 session。
@@ -161,10 +161,10 @@ type CacheServiceServer interface {
 	// 读取用户档案。
 	// 以 uid 做 RingHash 分片，返回当前 uid 对应的 UserRecord。
 	CacheGetUserRecord(context.Context, *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error)
-	// 写入账号级登录 token。
-	// 以 account 做 RingHash 分片，token 使用一次性 SETNX 语义，未消费前不覆盖。
+	// 写入 accountVerifyToken。
+	// 以 account 做 RingHash 分片，accountVerifyToken 使用一次性 SETNX 语义，未消费前不覆盖。
 	CacheSetAccountVerifyToken(context.Context, *CacheSetAccountVerifyTokenReq) (*CacheSetAccountVerifyTokenRes, error)
-	// 验证并消费账号级登录 token。
+	// 验证并消费 accountVerifyToken。
 	// 以 account 做 RingHash 分片，消费成功后确保账号存在并返回可信 uid。
 	CacheUseAccountVerifyToken(context.Context, *CacheUseAccountVerifyTokenReq) (*CacheUseAccountVerifyTokenRes, error)
 	// 获取用户在线 session。

@@ -163,12 +163,12 @@ docker logs server.login.1
 docker logs server.login.2
 ```
 
-## 请求 login.1 token
+## 请求 login.1 accountVerifyToken
 
 ```bash
-curl -X POST http://192.168.71.123:30401/api/login/token \
+curl -X POST http://192.168.71.123:30401/api/login/accountVerifyToken \
   -H 'Content-Type: application/json' \
-  -d '{"account":"test-account","token":"test-token"}'
+  -d '{"account":"test-account","accountVerifyToken":"test-account-verify-token"}'
 ```
 
 ## 请求 login.1 session
@@ -176,15 +176,15 @@ curl -X POST http://192.168.71.123:30401/api/login/token \
 ```bash
 curl -X POST http://192.168.71.123:30401/api/login/session \
   -H 'Content-Type: application/json' \
-  -d '{"account":"test-account","token":"test-token"}'
+  -d '{"account":"test-account","accountVerifyToken":"test-account-verify-token"}'
 ```
 
-## 请求 login.2 token
+## 请求 login.2 accountVerifyToken
 
 ```bash
-curl -X POST http://192.168.71.123:30402/api/login/token \
+curl -X POST http://192.168.71.123:30402/api/login/accountVerifyToken \
   -H 'Content-Type: application/json' \
-  -d '{"account":"test-account","token":"test-token"}'
+  -d '{"account":"test-account","accountVerifyToken":"test-account-verify-token"}'
 ```
 
 ## 请求 login.2 session
@@ -192,5 +192,5 @@ curl -X POST http://192.168.71.123:30402/api/login/token \
 ```bash
 curl -X POST http://192.168.71.123:30402/api/login/session \
   -H 'Content-Type: application/json' \
-  -d '{"account":"test-account","token":"test-token"}'
+  -d '{"account":"test-account","accountVerifyToken":"test-account-verify-token"}'
 ```

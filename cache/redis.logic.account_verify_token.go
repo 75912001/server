@@ -12,15 +12,15 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// SetAccountVerifyToken 写入账号级一次性验证 token。
-// 使用 SETNX 保证未消费的 token 不会被覆盖，返回 false 表示 key 已存在。
-func (p *Redis) SetAccountVerifyToken(ctx context.Context, account string, token string, expire time.Duration) (bool, error) {
-	key := RedisKeyAccountToken(account)
-	return p.client.SetNX(ctx, key, token, expire).Result()
+// SetAccountVerifyToken 写入 accountVerifyToken。
+// 使用 SETNX 保证未消费的 accountVerifyToken 不会被覆盖, 返回 false 表示 key 已存在。
+func (p *Redis) SetAccountVerifyToken(ctx context.Context, account string, accountVerifyToken string, expire time.Duration) (bool, error) {
+	key := RedisKeyAccountVerifyToken(account)
+	return p.client.SetNX(ctx, key, accountVerifyToken, expire).Result()
 }
 
-// useAccountVerifyTokenScript 原子校验并消费 token。
-// 成功时删除 token key；key 不存在或 token 不匹配时返回 0。
+// useAccountVerifyTokenScript 原子校验并消费 accountVerifyToken。
+// 成功时删除 accountVerifyToken key; key 不存在或 accountVerifyToken 不匹配时返回 0。
 const useAccountVerifyTokenScript = `
 local current = redis.call("GET", KEYS[1])
 if current == false then
@@ -33,13 +33,13 @@ redis.call("DEL", KEYS[1])
 return 1
 `
 
-// UseAccountVerifyToken 验证并消费账号级 token。
-// 消费成功后删除 token key，避免同一 token 被重复使用。
-func (p *Redis) UseAccountVerifyToken(ctx context.Context, account string, token string) (bool, error) {
-	key := RedisKeyAccountToken(account)
-	result, err := p.client.Eval(ctx, useAccountVerifyTokenScript, []string{key}, token).Result()
+// UseAccountVerifyToken 验证并消费 accountVerifyToken。
+// 消费成功后删除 accountVerifyToken key, 避免同一 accountVerifyToken 被重复使用。
+func (p *Redis) UseAccountVerifyToken(ctx context.Context, account string, accountVerifyToken string) (bool, error) {
+	key := RedisKeyAccountVerifyToken(account)
+	result, err := p.client.Eval(ctx, useAccountVerifyTokenScript, []string{key}, accountVerifyToken).Result()
 	if err != nil {
-		return false, errors.WithMessagef(err, "use account verify token from redis failed, account: %s, token: %s %v", account, token, xruntime.Location())
+		return false, errors.WithMessagef(err, "use accountVerifyToken from redis failed, account: %s, accountVerifyToken: %s %v", account, accountVerifyToken, xruntime.Location())
 	}
 	return redisScriptResultIsOK(result), nil
 }

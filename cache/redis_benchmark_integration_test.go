@@ -12,11 +12,11 @@ func BenchmarkIntegrationSetAccountVerifyToken(b *testing.B) {
 	r, ctx := newIntegrationRedisForBenchmark(b)
 
 	for i := 0; i < b.N; i++ {
-		account := "bench-token-" + integrationSuffix()
-		if ok, err := r.SetAccountVerifyToken(ctx, account, "token", time.Minute); err != nil || !ok {
+		account := "bench-accountVerifyToken-" + integrationSuffix()
+		if ok, err := r.SetAccountVerifyToken(ctx, account, "accountVerifyToken", time.Minute); err != nil || !ok {
 			b.Fatalf("SetAccountVerifyToken = %v, %v", ok, err)
 		}
-		_ = r.client.Del(ctx, RedisKeyAccountToken(account)).Err()
+		_ = r.client.Del(ctx, RedisKeyAccountVerifyToken(account)).Err()
 	}
 }
 

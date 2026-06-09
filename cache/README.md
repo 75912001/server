@@ -1,20 +1,20 @@
 # Cache 服务
 
-Cache 服务负责统一访问 Redis Cluster，提供账号登录 token、账号到 uid 映射、用户档案和在线 session CAS gRPC 接口。部署、端口、容器启动和验证命令见 `deploy/cache/README.md`。
+Cache 服务负责统一访问 Redis Cluster, 提供 accountVerifyToken、账号到 uid 映射、用户档案和在线 session CAS gRPC 接口。部署、端口、容器启动和验证命令见 `deploy/cache/README.md`。
 
 ## 能力边界
 
-- 存储和消费账号级一次性登录 token。
+- 存储和消费 accountVerifyToken。
 - 确保账号存在，并为新账号分配 uid。
 - 存储 `UserRecord`，Redis 中以 protobuf 二进制保存。
 - 维护 `user:{uid}:session` 的读取、开始、结束和 TTL 刷新 CAS。
-- 通过 Redis Lua 脚本实现 token 消费和 session CAS 操作。
+- 通过 Redis Lua 脚本实现 accountVerifyToken 消费和 session CAS 操作。
 - cache 只保存和校验数据，不决定用户应该归属哪个 gateway 或 online。
 
 ## Redis Key
 
 ```text
-account:{account}:token       一次性登录 token
+account:{account}:accountVerifyToken accountVerifyToken
 account:{account}:uid         account 到 uid 的映射
 account:{account}:lock        account 首次创建锁
 user:uid:sequence:{groupID}   当前 group 的 uid 自增序列
@@ -22,7 +22,7 @@ user:{uid}:record             UserRecord protobuf 二进制
 user:{uid}:session            在线 session hash
 ```
 
-`{...}` 是 Redis Cluster hash tag。`user:{uid}:record` 和 `user:{uid}:session` 会按同一个 uid 分到同一 slot；`account:{account}:token`、`uid`、`lock` 会按同一个 account 分到同一 slot。
+`{...}` 是 Redis Cluster hash tag。`user:{uid}:record` 和 `user:{uid}:session` 会按同一个 uid 分到同一 slot; `account:{account}:accountVerifyToken`、`uid`、`lock` 会按同一个 account 分到同一 slot。
 
 ## UserSession
 
@@ -60,8 +60,8 @@ userSession
 
 | RPC | shard key | 作用 |
 | --- | --- | --- |
-| `CacheSetAccountVerifyToken` | `account` | 写入账号级一次性 token，Redis 使用 `SETNX`，未消费前不覆盖。 |
-| `CacheUseAccountVerifyToken` | `account` | 验证并消费 token，成功后确保账号存在并返回 uid。 |
+| `CacheSetAccountVerifyToken` | `account` | 写入 accountVerifyToken, Redis 使用 `SETNX`, 未消费前不覆盖。 |
+| `CacheUseAccountVerifyToken` | `account` | 验证并消费 accountVerifyToken, 成功后确保账号存在并返回 uid。 |
 | `CacheSetUserRecord` | `uid` | 写入 `UserRecord`，要求请求 `uid` 与 `UserRecord.uid` 一致。 |
 | `CacheGetUserRecord` | `uid` | 读取 `UserRecord`。 |
 | `CacheGetUserSession` | `uid` | 读取当前 `gatewayKey/userSession/loginTime/onlineKey`；`login_time_ms` 对外表示登录时间毫秒值，读取不到完整 session 时返回 `NotFound`。 |
@@ -84,24 +84,24 @@ Session CAS 请求字段：
 | --- | --- |
 | 参数为空、uid 为 0、写入 session 字段缺失、expire_second 为 0 | `InvalidArgument` |
 | Redis 执行错误、序列化失败、账号数据异常 | `Internal` |
-| token 已存在 | `AlreadyExists` |
-| token 不存在、已使用或读取数据不存在 | `NotFound` |
+| accountVerifyToken 已存在 | `AlreadyExists` |
+| accountVerifyToken 不存在、已使用或读取数据不存在 | `NotFound` |
 | session expected 不匹配 | `Aborted` |
 
-## Account Token
+## accountVerifyToken
 
 `CacheSetAccountVerifyToken`：
 
-1. 校验 `account`、`token`、`expire_second`。
-2. 对 `account:{account}:token` 执行 `SETNX token EX expire_second`。
-3. key 已存在时返回 `AlreadyExists`，不会覆盖旧 token。
+1. 校验 `account`、`account_verify_token`、`expire_second`。
+2. 对 `account:{account}:accountVerifyToken` 执行 `SETNX accountVerifyToken EX expire_second`。
+3. key 已存在时返回 `AlreadyExists`, 不会覆盖旧 accountVerifyToken。
 
 `CacheUseAccountVerifyToken`：
 
-1. 校验 `account`、`token`。
-2. 用 Lua 原子读取 `account:{account}:token`。
-3. token 不存在或不匹配时返回 `NotFound`。
-4. token 匹配时删除 token key，防止同一 token 被重复消费。
+1. 校验 `account`、`account_verify_token`。
+2. 用 Lua 原子读取 `account:{account}:accountVerifyToken`。
+3. accountVerifyToken 不存在或不匹配时返回 `NotFound`。
+4. accountVerifyToken 匹配时删除 accountVerifyToken key, 防止同一 accountVerifyToken 被重复消费。
 5. 调用 `EnsureAccount`，返回可信 uid。
 
 ## 账号创建
@@ -127,7 +127,7 @@ GroupUIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 
 - 账号创建跨多个 Redis key，不是单条 Redis 原子操作。
 - 没有锁时，并发请求可能生成多个 uid，只最终绑定其中一个，留下孤儿 `UserRecord`。
-- 即使 token 消费会降低并发概率，锁仍是账号唯一性的最终保护。
+- 即使 accountVerifyToken 消费会降低并发概率, 锁仍是账号唯一性的最终保护。
 
 ## UserRecord
 
@@ -139,22 +139,22 @@ GroupUIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 
 ## Redis 原子操作
 
-- token 消费使用 Lua：`GET`、比较 token、`DEL` 在 Redis 内一次完成。
+- accountVerifyToken 消费使用 Lua: `GET`、比较 accountVerifyToken、`DEL` 在 Redis 内一次完成。
 - session begin 使用 Lua：expected 为空时检查 key 不存在；expected 非空时校验 identity，再写入完整 session 并设置 TTL。
 - session end 使用 Lua：校验 expected identity 后执行 `DEL`。
 - session refresh 使用 Lua：校验 expected identity 后执行 `EXPIRE`。
-- Lua 脚本返回 `1` 表示成功，返回 `0` 表示 token 不匹配、session 不匹配或 key 不存在。
+- Lua 脚本返回 `1` 表示成功, 返回 `0` 表示 accountVerifyToken 不匹配、session 不匹配或 key 不存在。
 
 ## 数据流
 
 ```text
 login
   -> CacheSetAccountVerifyToken
-  -> Redis account:{account}:token
+  -> Redis account:{account}:accountVerifyToken
 
 login
   -> CacheUseAccountVerifyToken
-  -> Redis account:{account}:token
+  -> Redis account:{account}:accountVerifyToken
   -> EnsureAccount
   -> Redis account:{account}:uid
   -> Redis user:{uid}:record
@@ -172,8 +172,8 @@ online
 
 ## 排障
 
-- `token already exists`：同 account 已有未消费 token。
-- `token not found or used`：token 不存在、过期、已消费或值不匹配。
+- `accountVerifyToken already exists`: 同 account 已有未消费 accountVerifyToken。
+- `accountVerifyToken not found or used`: accountVerifyToken 不存在、过期、已消费或值不匹配。
 - `user session changed`：CAS expected 不匹配，说明在线态已被其他登录、离线或 TTL 变化接管。
 - `user session not found`：当前 uid 没有在线 session。
 - `redis: nil` 读取 `UserRecord`：用户档案缺失；如果账号映射已存在，`EnsureAccount` 会按账号数据不一致返回错误。
@@ -184,4 +184,4 @@ online
 
 - cache actor/worker 可按 shardKey 分发，让同 key 请求在 cache 进程内串行执行；这能减少锁竞争和乱序处理，但不能替代 Redis 锁和 CAS。
 - 如需移除 `account:{account}:lock`，必须把账号创建改为 Redis Lua 原子流程，覆盖查询账号、生成 uid、写账号映射和写 UserRecord。
-- 增加账号并发创建、token 重放、session CAS 冲突、旧删除迟到、新旧 session 乱序的自动化测试。
+- 增加账号并发创建、accountVerifyToken 重放、session CAS 冲突、旧删除迟到、新旧 session 乱序的自动化测试。
