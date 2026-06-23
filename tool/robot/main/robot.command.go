@@ -132,12 +132,11 @@ func (p *Robot) SendCommand(event *RobotCommand) error {
 			return nil
 		}
 		p.heartbeatWait = true
-		p.heartbeatSession = p.nextSession
 	}
 	err := p.sendCommandNow(event.Command, event.Verbose, event.Source)
 	if err != nil && event.Source == "heartbeat" {
 		p.heartbeatWait = false
-		p.heartbeatSession = 0
+		p.heartbeatPacketID = 0
 	}
 	return err
 }
@@ -192,10 +191,14 @@ func (p *Robot) sendCommandNow(command string, verbose bool, source string) erro
 		log.Infof("\n======send message======\nuid=%d\n%s\nmessageID: 0x%x\nMessage: %s", p.uid, command, messageID, marshalJSON(protoMsg))
 	}
 
+	sessionID := p.nextPacketSessionID()
+	if source == "heartbeat" {
+		p.heartbeatPacketID = sessionID
+	}
 	packet := &xpacket.Packet{
 		Header: &xpacket.Header{
 			MessageID: messageID,
-			SessionID: p.nextSession,
+			SessionID: sessionID,
 			ResultID:  0,
 			Key:       p.uid,
 		},
@@ -222,27 +225,32 @@ func (p *Robot) sendCommandNow(command string, verbose bool, source string) erro
 func (p *Robot) fillDynamicFields(msg any) error {
 	switch m := msg.(type) {
 	case *pb.UserVerifyReq:
-		token, err := cacheSetVerifyUserToken(p.uid)
-		if err != nil {
-			return err
-		}
 		m.Uid = p.uid
-		m.Token = token
-		p.token = token
+		if p.connectTicket != "" {
+			m.ConnectTicket = p.connectTicket
+		}
 	case *pb.UserHeartbeatReq:
-		if m.GetLastSession() == 0 {
-			m.LastSession = p.nextSession
+		if m.GetLastHeartbeatSession() == "" {
+			m.LastHeartbeatSession = p.heartbeatSession
 		}
 	case *pb.RobotPingReq:
 		if m.GetSeq() == 0 {
 			p.seq++
 			m.Seq = p.seq
 		}
-		if m.GetClientTime() == 0 {
-			m.ClientTime = time.Now().UnixMilli()
+		if m.GetClientTimestampMs() == 0 {
+			m.ClientTimestampMs = time.Now().UnixMilli()
 		}
 	}
 	return nil
+}
+
+func (p *Robot) nextPacketSessionID() uint32 {
+	p.packetSessionID++
+	if p.packetSessionID == 0 {
+		p.packetSessionID++
+	}
+	return p.packetSessionID
 }
 
 func (p *Robot) onCommandError(verbose bool, format string, a ...any) {

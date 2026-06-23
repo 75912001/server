@@ -33,14 +33,14 @@ type controlPanelOverview struct {
 }
 
 type robotView struct {
-	UID         uint64 `json:"uid"`
-	GatewayAddr string `json:"gatewayAddr"`
-	Connected   bool   `json:"connected"`
-	Verified    bool   `json:"verified"`
-	UserReady   bool   `json:"userReady"`
-	NextSession uint32 `json:"nextSession"`
-	Seq         uint64 `json:"seq"`
-	Pending     int    `json:"pending"`
+	UID              uint64 `json:"uid"`
+	GatewayAddr      string `json:"gatewayAddr"`
+	Connected        bool   `json:"connected"`
+	Verified         bool   `json:"verified"`
+	UserReady        bool   `json:"userReady"`
+	HeartbeatSession string `json:"heartbeatSession"`
+	Seq              uint64 `json:"seq"`
+	Pending          int    `json:"pending"`
 }
 
 type gatewayView struct {
@@ -180,8 +180,11 @@ func discoveredGatewayViews() []gatewayView {
 	discoveredGatewayMu.Lock()
 	defer discoveredGatewayMu.Unlock()
 	out := make([]gatewayView, 0, len(discoveredGatewayMap))
-	for key, addr := range discoveredGatewayMap {
-		out = append(out, gatewayView{Key: key, Addr: addr})
+	for key, gateway := range discoveredGatewayMap {
+		if gateway == nil {
+			continue
+		}
+		out = append(out, gatewayView{Key: key, Addr: gateway.tcpAddr})
 	}
 	sort.Slice(out, func(i, j int) bool {
 		return out[i].Key < out[j].Key
@@ -248,7 +251,7 @@ th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white
   <section class="split">
     <div>
       <table>
-        <thead><tr><th>UID</th><th>连接</th><th>登录</th><th>用户数据</th><th>Gateway</th><th>Session</th><th>Seq</th><th>队列</th></tr></thead>
+        <thead><tr><th>UID</th><th>连接</th><th>登录</th><th>用户档案</th><th>Gateway</th><th>HeartbeatSession</th><th>Seq</th><th>队列</th></tr></thead>
         <tbody id="robots"></tbody>
       </table>
     </div>
@@ -276,7 +279,7 @@ async function refresh(){
   const current=select.value;
   select.innerHTML=apiMessages.map(x=>` + "`" + `<option value="${x.name}">${x.name} ${x.id}</option>` + "`" + `).join('');
   if(current) select.value=current;
-  document.getElementById('robots').innerHTML=(data.robots||[]).map(r=>` + "`" + `<tr><td>${r.uid}</td><td>${status(r.connected)}</td><td>${status(r.verified)}</td><td>${status(r.userReady)}</td><td>${r.gatewayAddr||''}</td><td>${r.nextSession}</td><td>${r.seq}</td><td>${r.pending}</td></tr>` + "`" + `).join('');
+  document.getElementById('robots').innerHTML=(data.robots||[]).map(r=>` + "`" + `<tr><td>${r.uid}</td><td>${status(r.connected)}</td><td>${status(r.verified)}</td><td>${status(r.userReady)}</td><td>${r.gatewayAddr||''}</td><td>${r.heartbeatSession||''}</td><td>${r.seq}</td><td>${r.pending}</td></tr>` + "`" + `).join('');
   document.getElementById('gateways').innerHTML=(data.gateways||[]).map(g=>` + "`" + `<tr><td>${g.key}</td><td>${g.addr}</td></tr>` + "`" + `).join('');
 }
 async function send(scope,uid){

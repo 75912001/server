@@ -17,7 +17,7 @@ _Avoid_: account id, session id, connection id
 _Avoid_: account, connection, session
 
 **UserRecord**:
-某个 `uid` 对应的用户档案快照。`user_create_time_ms = 0` 表示账号已存在, 但用户资料尚未完成创建。
+某个 `uid` 对应的用户档案快照。`user_create_timestamp_ms = 0` 表示账号已存在, 但用户资料尚未完成创建。
 _Avoid_: session, cache entry, profile fragment
 
 **UserRecord extension record**:
@@ -51,3 +51,11 @@ _Avoid_: uid, heartbeatSession, connectTicket
 **heartbeatSession**:
 客户端与 gateway 之间的心跳认证凭证, 登录成功后下发并可随心跳轮换。它不标识用户连接身份, 也不由 login 签发。
 _Avoid_: userSession, connectTicket, accountVerifyToken
+
+**controlPlaneCaller**:
+被明确授权调用 `serviceControlPlane` 的内部调用方. 它不同于客户端、公网调用方或用户身份, 也不表示所有内部服务默认拥有全部控制面权限.
+_Avoid_: client, user, public caller, trusted service
+
+**serviceControlPlane**:
+login/gateway/online/cache 等服务之间用于控制连接、会话、绑定和踢下线等内部状态的调用边界. 它不属于客户端协议面, 不应直接暴露给客户端或公网调用方.
+_Avoid_: client API, public API, user protocol

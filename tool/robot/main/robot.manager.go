@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"sync"
 	"time"
@@ -100,6 +101,22 @@ func (p *RobotManager) Find(uid uint64) (*Robot, bool) {
 	defer p.mu.RUnlock()
 	robot, ok := p.robotsByUID[uid]
 	return robot, ok
+}
+
+func (p *RobotManager) UpdateRobotUID(robot *Robot, oldUID uint64, newUID uint64) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if existing := p.robotsByUID[newUID]; existing != nil && existing != robot {
+		if existing.Remote != nil || existing.verified {
+			return fmt.Errorf("login uid duplicated old=%d new=%d", oldUID, newUID)
+		}
+		delete(p.robotsByUID, newUID)
+	}
+	if p.robotsByUID[oldUID] == robot {
+		delete(p.robotsByUID, oldUID)
+	}
+	p.robotsByUID[newUID] = robot
+	return nil
 }
 
 func (p *RobotManager) Total() int {

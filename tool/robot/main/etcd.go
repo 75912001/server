@@ -35,15 +35,28 @@ type discoveredCache struct {
 
 func (p *discoveredCache) GetID() string { return p.key }
 
+type discoveredGateway struct {
+	*pb.XGatewayService
+	key           string
+	tcpAddr       string
+	grpcAddr      string
+	groupID       uint32
+	serverName    string
+	serverID      uint32
+	availableLoad uint32
+}
+
+func (p *discoveredGateway) GetID() string { return p.key }
+
 var GDiscoveredCacheMgr = &discoveredCacheMgr{
 	m: xmap.NewMapMutexMgr[string, *discoveredCache](),
 }
 
 var (
 	discoveredGatewayMu   sync.Mutex
-	discoveredGatewayMap  = make(map[string]string)
-	discoveredGatewayAddr string
-	discoveredGatewayChan = make(chan string, 1)
+	discoveredGatewayMap  = make(map[string]*discoveredGateway)
+	discoveredGatewayKey  string
+	discoveredGatewayChan = make(chan struct{}, 1)
 )
 
 type discoveredCacheMgr struct {
@@ -82,6 +95,7 @@ func stopServiceDiscovery() error {
 		err = xetcd.GEtcd.Stop()
 		xetcd.GEtcd = nil
 	}
+	closeDiscoveredGateways()
 	GDiscoveredCacheMgr.closeAll()
 	return err
 }
@@ -108,7 +122,18 @@ func onServiceEtcdAdd(args ...any) error {
 }
 
 func onServiceEtcdUpdate(args ...any) error {
-	return nil
+	key := args[0].(string)
+	valueJson := args[1].(*xetcd.ValueJson)
+	msgType, _, serverName, _ := xetcd.Parse(key)
+	if msgType != xetcdconstants.WatchMsgTypeServer {
+		return nil
+	}
+	switch serverName {
+	case common.GatewayServerName:
+		return updateDiscoveredGateway(key, valueJson)
+	default:
+		return nil
+	}
 }
 
 func onServiceEtcdDel(args ...any) error {
@@ -124,82 +149,103 @@ func onServiceEtcdDel(args ...any) error {
 }
 
 func updateDiscoveredGateway(key string, valueJson *xetcd.ValueJson) error {
-	addr := gatewayTCPAddr(valueJson)
-	if addr == "" {
+	gateway, err := newDiscoveredGateway(key, valueJson)
+	if err != nil {
+		return err
+	}
+	if gateway == nil {
 		return nil
 	}
 	discoveredGatewayMu.Lock()
-	if discoveredGatewayMap[key] == addr {
+	old := discoveredGatewayMap[key]
+	if old != nil && old.tcpAddr == gateway.tcpAddr && old.grpcAddr == gateway.grpcAddr {
+		old.availableLoad = gateway.availableLoad
 		discoveredGatewayMu.Unlock()
+		_ = gateway.Stop()
 		return nil
 	}
-	discoveredGatewayMap[key] = addr
-	discoveredGatewayAddr = addr
+	discoveredGatewayMap[key] = gateway
+	discoveredGatewayKey = key
 	discoveredGatewayMu.Unlock()
 	select {
-	case discoveredGatewayChan <- addr:
+	case discoveredGatewayChan <- struct{}{}:
 	default:
 	}
-	//	ColorPrintf(Cyan, "gateway discovered key=%s addr=%s\n", key, addr)
+	if old != nil {
+		_ = old.Stop()
+	}
+	ColorPrintf(Cyan, "gateway discovered key=%s tcp=%s grpc=%s\n", key, gateway.tcpAddr, gateway.grpcAddr)
 	return nil
 }
 
 func clearDiscoveredGateway(key string) {
 	discoveredGatewayMu.Lock()
+	old := discoveredGatewayMap[key]
 	delete(discoveredGatewayMap, key)
-	discoveredGatewayAddr = ""
-	for _, addr := range discoveredGatewayMap {
-		discoveredGatewayAddr = addr
+	discoveredGatewayKey = ""
+	for candidateKey := range discoveredGatewayMap {
+		discoveredGatewayKey = candidateKey
 		break
 	}
 	discoveredGatewayMu.Unlock()
+	if old != nil {
+		_ = old.Stop()
+	}
 	ColorPrintf(Yellow, "gateway removed key=%s\n", key)
 }
 
 func waitGatewayAddr(timeout time.Duration) (string, error) {
+	gateway, err := waitGateway(timeout)
+	if err != nil {
+		return "", err
+	}
+	return gateway.tcpAddr, nil
+}
+
+func waitGateway(timeout time.Duration) (*discoveredGateway, error) {
 	discoveredGatewayMu.Lock()
-	addr := selectDiscoveredGatewayAddrLocked()
+	gateway := selectDiscoveredGatewayLocked()
 	discoveredGatewayMu.Unlock()
-	if addr != "" {
-		return addr, nil
+	if gateway != nil {
+		return gateway, nil
 	}
 	timer := time.NewTimer(timeout)
 	defer timer.Stop()
 	select {
 	case <-discoveredGatewayChan:
 		discoveredGatewayMu.Lock()
-		addr = selectDiscoveredGatewayAddrLocked()
+		gateway = selectDiscoveredGatewayLocked()
 		discoveredGatewayMu.Unlock()
-		if addr == "" {
-			return "", errors.WithMessage(xerror.NotFound, "gateway addr is empty")
+		if gateway == nil {
+			return nil, errors.WithMessage(xerror.NotFound, "gateway addr is empty")
 		}
-		return addr, nil
+		return gateway, nil
 	case <-timer.C:
-		return "", errors.WithMessage(xerror.Timeout, "wait gateway addr timeout")
+		return nil, errors.WithMessage(xerror.Timeout, "wait gateway addr timeout")
 	}
 }
 
-func selectDiscoveredGatewayAddrLocked() string {
+func selectDiscoveredGatewayLocked() *discoveredGateway {
 	if len(discoveredGatewayMap) == 0 {
-		return ""
+		return nil
 	}
 	if xruntime.IsDebug() {
 		target := rand.Intn(len(discoveredGatewayMap))
 		index := 0
-		for _, addr := range discoveredGatewayMap {
+		for _, gateway := range discoveredGatewayMap {
 			if index == target {
-				return addr
+				return gateway
 			}
 			index++
 		}
 	}
-	if discoveredGatewayAddr != "" {
-		return discoveredGatewayAddr
+	if discoveredGatewayKey != "" {
+		return discoveredGatewayMap[discoveredGatewayKey]
 	}
-	for _, addr := range discoveredGatewayMap {
-		return addr
+	for _, gateway := range discoveredGatewayMap {
+		return gateway
 	}
-	return ""
+	return nil
 }
 
 func gatewayTCPAddr(valueJson *xetcd.ValueJson) string {
@@ -215,6 +261,49 @@ func gatewayTCPAddr(valueJson *xetcd.ValueJson) string {
 		}
 	}
 	return ""
+}
+
+func gatewayGRPCAddr(valueJson *xetcd.ValueJson) string {
+	if valueJson == nil || valueJson.GrpcService == nil || valueJson.GrpcService.Addr == nil {
+		return ""
+	}
+	return *valueJson.GrpcService.Addr
+}
+
+func newDiscoveredGateway(key string, valueJson *xetcd.ValueJson) (*discoveredGateway, error) {
+	tcpAddr := gatewayTCPAddr(valueJson)
+	grpcAddr := gatewayGRPCAddr(valueJson)
+	if tcpAddr == "" || grpcAddr == "" {
+		return nil, nil
+	}
+	xService, err := pb.NewXGatewayService(grpcAddr)
+	if err != nil {
+		return nil, errors.WithMessagef(err, "new gateway service key:%s addr:%s", key, grpcAddr)
+	}
+	_, groupID, serverName, serverID := xetcd.Parse(key)
+	return &discoveredGateway{
+		XGatewayService: xService,
+		key:             key,
+		tcpAddr:         tcpAddr,
+		grpcAddr:        grpcAddr,
+		groupID:         groupID,
+		serverName:      serverName,
+		serverID:        serverID,
+		availableLoad:   valueJson.AvailableLoad,
+	}, nil
+}
+
+func closeDiscoveredGateways() {
+	discoveredGatewayMu.Lock()
+	gateways := discoveredGatewayMap
+	discoveredGatewayMap = make(map[string]*discoveredGateway)
+	discoveredGatewayKey = ""
+	discoveredGatewayMu.Unlock()
+	for _, gateway := range gateways {
+		if gateway != nil {
+			_ = gateway.Stop()
+		}
+	}
 }
 
 func (p *discoveredCacheMgr) add(key string, valueJson *xetcd.ValueJson) error {

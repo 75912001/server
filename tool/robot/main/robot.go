@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
-	"time"
 
 	common "server/common"
 	pb "server/proto/pb"
@@ -26,13 +25,14 @@ type Robot struct {
 	manager *RobotManager
 
 	uid               uint64
-	token             string
 	gatewayAddr       string
-	nextSession       uint32
+	heartbeatSession  string
+	connectTicket     string
+	packetSessionID   uint32
 	verified          bool
 	userReady         bool
 	heartbeatWait     bool
-	heartbeatSession  uint32
+	heartbeatPacketID uint32
 	heartbeatTimerSeq uint64
 	seq               uint64
 	heartbeatTimer    *xtimer.Millisecond
@@ -59,18 +59,16 @@ func NewRobot(manager *RobotManager, uid uint64) *Robot {
 }
 
 func (p *Robot) Start(ctx context.Context) error {
-	gatewayAddr, err := waitGatewayAddr(5 * time.Second)
-	if err != nil {
+	if err := p.prepareLoginSession(ctx); err != nil {
 		return err
 	}
-	p.gatewayAddr = gatewayAddr
 	p.TCP = xnettcp.NewClient(p)
 	opts := xnettcp.NewConnectOptions().
-		WithAddress(gatewayAddr).
+		WithAddress(p.gatewayAddr).
 		WithSendChanCapacity(uint32(GConfigYaml.Robot.SendChanCapacity)).
 		WithHeaderStrategy(&common.DefaultHeaderStrategy{}).
 		WithIOut(p.manager.iEventMgr)
-	if err = p.TCP.Connect(ctx, opts); err != nil {
+	if err := p.TCP.Connect(ctx, opts); err != nil {
 		return err
 	}
 	p.Remote = p.TCP.IRemote
@@ -82,12 +80,46 @@ func (p *Robot) Start(ctx context.Context) error {
 	return nil
 }
 
+func (p *Robot) prepareLoginSession(ctx context.Context) error {
+	account := robotAccount(p.uid)
+	accountVerifyToken := newAccountVerifyToken(account)
+	if err := loginCreateAccountVerifyToken(ctx, account, accountVerifyToken); err != nil {
+		return err
+	}
+	session, err := loginUseAccountVerifyToken(ctx, account, accountVerifyToken)
+	if err != nil {
+		return err
+	}
+	if session.Uid == 0 || session.GatewayAddr == "" || session.ConnectTicket == "" {
+		return fmt.Errorf("login session invalid uid=%d gatewayAddr=%q connectTicket=%t", session.Uid, session.GatewayAddr, session.ConnectTicket != "")
+	}
+	if session.Uid != p.uid {
+		if err = p.manager.UpdateRobotUID(p, p.uid, session.Uid); err != nil {
+			return err
+		}
+		p.uid = session.Uid
+	}
+	p.gatewayAddr = session.GatewayAddr
+	p.connectTicket = session.ConnectTicket
+	p.heartbeatSession = ""
+	return nil
+}
+
 func (p *Robot) Close() {
 	p.closeOnce.Do(func() {
 		p.verified = false
+		p.userReady = false
+		p.heartbeatWait = false
+		p.heartbeatPacketID = 0
+		p.gatewayAddr = ""
+		p.heartbeatSession = ""
+		p.connectTicket = ""
+		p.pending = nil
 		if p.Remote != nil && p.Remote.IsConnect() {
 			p.Remote.Stop()
 		}
+		p.Remote = nil
+		p.TCP = nil
 		if xtimer.GTimer != nil && p.heartbeatTimer != nil {
 			xtimer.GTimer.DelMillisecond(p.heartbeatTimer)
 			p.heartbeatTimer = nil
@@ -210,6 +242,7 @@ func (p *Robot) applyPacketState(packet *xpacket.Packet) {
 	switch msg := packet.PBMessage.(type) {
 	case *pb.UserVerifyRes:
 		if packet.Header.ResultID == 0 {
+			p.heartbeatSession = msg.GetHeartbeatSession()
 			if !p.verified {
 				p.manager.stats.verifyOK.Add(1)
 			}
@@ -222,7 +255,7 @@ func (p *Robot) applyPacketState(packet *xpacket.Packet) {
 	case *pb.UserRecordRes:
 		if packet.Header.ResultID == 0 {
 			userRecord := msg.GetUserRecord()
-			if userRecord != nil && userRecord.GetUid() != 0 {
+			if userRecord != nil && userRecord.GetUid() != 0 && userRecord.GetUserCreateTimestampMs() != 0 {
 				p.markUserReady()
 				return
 			}
@@ -237,13 +270,13 @@ func (p *Robot) applyPacketState(packet *xpacket.Packet) {
 			p.markUserReady()
 		}
 	case *pb.UserHeartbeatRes:
-		if !p.heartbeatWait || packet.Header.SessionID != p.heartbeatSession {
+		if !p.heartbeatWait || packet.Header.SessionID != p.heartbeatPacketID {
 			return
 		}
 		p.heartbeatWait = false
-		p.heartbeatSession = 0
+		p.heartbeatPacketID = 0
 		if packet.Header.ResultID == 0 {
-			p.nextSession = msg.GetNextSession()
+			p.heartbeatSession = msg.GetNextHeartbeatSession()
 			p.startHeartBeatTimer()
 		}
 	}
@@ -298,13 +331,13 @@ func (p *Robot) flushPendingCommands() {
 func (p *Robot) View() robotView {
 	connected := p.Remote != nil && p.Remote.IsConnect()
 	return robotView{
-		UID:         p.uid,
-		GatewayAddr: p.gatewayAddr,
-		Connected:   connected,
-		Verified:    p.verified,
-		UserReady:   p.userReady,
-		NextSession: p.nextSession,
-		Seq:         p.seq,
-		Pending:     len(p.pending),
+		UID:              p.uid,
+		GatewayAddr:      p.gatewayAddr,
+		Connected:        connected,
+		Verified:         p.verified,
+		UserReady:        p.userReady,
+		HeartbeatSession: p.heartbeatSession,
+		Seq:              p.seq,
+		Pending:          len(p.pending),
 	}
 }

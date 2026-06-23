@@ -34,7 +34,7 @@ cd D:/src/github.com/server/tool/robot/bin
 ./robot.exe
 ```
 
-客户端启动后会读取 `config.yaml`，发现 gateway/cache 服务，按 robot 配置分批连接 gateway，并自动发送 `UserVerifyReq` 登录。登录成功后会先发送 `UserRecordReq` 获取用户数据；如果用户数据为空才发送 `UserCreateReq` 创建用户。用户数据就绪后才会启动随机业务发包。
+客户端启动后会读取 `config.yaml`，发现 gateway/cache 服务，按 robot 配置分批连接 gateway，并自动发送 `UserVerifyReq` 登录。登录成功后会先发送 `UserRecordReq` 获取用户档案；如果用户档案为空才发送 `UserCreateReq` 创建用户。用户档案就绪后才会启动随机业务发包。
 
 如果开启控制面板，启动日志会输出面板地址：
 
@@ -161,7 +161,7 @@ http://127.0.0.1:18080/
 面板支持：
 
 - 查看 robot 总数、在线数、登录成功数、发送/接收/失败统计。
-- 查看最多前 200 个 robot 的 UID、连接、登录、用户数据、gateway、heartbeatSession、seq、队列。
+- 查看最多前 200 个 robot 的 UID、连接、登录、用户档案、gateway、heartbeatSession、seq、队列。
 - 查看当前发现的 gateway 列表。
 - 从 `api.yaml` 读取消息列表。
 - 点击 `all` 给所有 robot 发送当前选择的消息。
@@ -172,7 +172,7 @@ http://127.0.0.1:18080/
 - `GET /api/overview`：返回统计、robot 快照、gateway、api 消息。
 - `POST /api/send`：发送消息，body 示例：`{"scope":"uid","uid":10001,"message":"RobotPingReq"}`。
 
-如果指定 UID 的 robot 正在登录，业务命令会先进入待发送队列。`RobotPingReq` 必须等用户数据创建或确认存在后才会发送。如果已经登录但第一次心跳还没返回，业务消息仍可发送，包头 `SessionID` 使用 robot 本地递增值。
+如果指定 UID 的 robot 正在登录，业务命令会先进入待发送队列。`RobotPingReq` 必须等用户档案创建或确认存在后才会发送。如果已经登录但第一次心跳还没返回，业务消息仍可发送，包头 `SessionID` 使用 robot 本地递增值。
 
 ## RobotPing
 
@@ -189,13 +189,13 @@ online 收到后直接回显：
 - `serverTime`
 - `payload`
 
-该消息不写 Redis，不修改用户数据。
+该消息不写 Redis，不修改用户档案。
 
 调用要求：
 
-- `RobotPingReq` 只能在用户数据已经创建后调用。
-- robot 登录成功后会先发送 `UserRecordReq`，用户数据为空时才发送 `UserCreateReq`。
-- 如果 `UserCreateReq` 返回用户已存在，robot 也会认为用户数据已经就绪。
+- `RobotPingReq` 只能在用户档案已经创建后调用。
+- robot 登录成功后会先发送 `UserRecordReq`，用户档案为空时才发送 `UserCreateReq`。
+- 如果 `UserCreateReq` 返回用户已存在，robot 也会认为用户档案已经就绪。
 
 ## 压测注意事项
 
