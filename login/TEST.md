@@ -6,6 +6,7 @@
 
 - login HTTP handler、请求解析和错误码映射。
 - accountVerifyToken 写入、验证和消费流程。
+- email/password 登录配置读取和校验流程。
 - etcd 发现 cache/gateway 的逻辑。
 - gateway 选择规则。
 - `connectTicket` payload、签名、过期时间或共享密钥。
@@ -22,7 +23,7 @@ GOCACHE="$PWD/.gocache" go build -buildvcs=false ./login
 
 ## 依赖检查
 
-修改 accountVerifyToken、cache RPC、gateway 验票、online 登录链路或 robot 自动登录时，运行：
+修改 accountVerifyToken、email/password、cache RPC、gateway 验票、online 登录链路或 robot 自动登录时，运行：
 
 ```bash
 go test ./login ./cache ./gateway ./online ./tool/robot/main ./common ./proto/pb
@@ -60,7 +61,7 @@ rg -n "GatewayPrepareLogin|gatewaySession|gatewayNonce" login proto gateway
 - gateway：注册到 etcd，并暴露客户端 TCP 地址。
 - login：读取 `bin/login.yaml` 或部署目录中的 login yaml。
 
-`bin/login.yaml` 当前只必须显式配置 `custom.httpAddr`；`accountVerifyTokenPath/sessionPath/accountVerifyTokenExpireSecond/ticketExpireSecond/ticketSecret/readHeaderTimeout/shutdownTimeout/cacheRPCTimeout/maxBodyBytes` 都有代码默认值。
+`bin/login.yaml` 当前只必须显式配置 `custom.httpAddr`；`accountVerifyTokenPath/sessionPath/emailSessionPath/accountVerifyTokenExpireSecond/ticketExpireSecond/ticketSecret/readHeaderTimeout/shutdownTimeout/cacheRPCTimeout/maxBodyBytes` 都有代码默认值。email/password 登录账号来自当前运行配置文件中的 `custom.emailPasswordUsers`。
 
 ## HTTP 手动验证
 
@@ -95,6 +96,21 @@ curl -i -X POST "http://127.0.0.1:30401/api/login/session" \
 - `connectTicket` 只可用于响应中的目标 gateway。
 - 同一个 `account/accountVerifyToken` 再次调用 `/api/login/session` 应失败。
 
+使用 email/password 换取连接票据：
+
+```bash
+curl -i -X POST "http://127.0.0.1:30401/api/login/emailSession" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"plain-password"}'
+```
+
+期望：
+
+- HTTP `200`。
+- 响应包含 `account/uid/connectTicket/ticketExpireTimestampMs/gatewayKey/gatewayAddr`。
+- `account` 等于 trim 后转小写的 email。
+- email 登录会在 login 内部生成 accountVerifyToken，并立即通过 cache 写入和消费。
+
 ## 登录链路验证
 
 使用 `/api/login/session` 返回的数据连接 gateway：
@@ -123,6 +139,8 @@ curl -i -X POST "http://127.0.0.1:30401/api/login/session" \
 - 没有可用 cache 时，accountVerifyToken/session 接口返回 cache 不可用或超时。
 - 没有可用 gateway 时，`/api/login/session` 返回 `503`。
 - login 和 gateway 的 `ticketSecret` 不一致时，`/api/login/session` 成功但 gateway 登录失败。
+- `/api/login/emailSession` 使用错误密码时返回 `401`。
+- `/api/login/emailSession` 配置重复 email、空 email 或空 password 时返回 `500`。
 - gateway `availableLoad` 变化后，login 选择新的最大可用负载 gateway。
 - 双 gateway 同 `availableLoad` 时，批量 session 分配不应全部集中到同一个实例；选中实例的本地负载会先扣减，后续 etcd update 再覆盖本地估算值。
 

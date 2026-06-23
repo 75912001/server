@@ -11,6 +11,7 @@ import (
 var GCfgCustomHTTPAddr string                       // HTTP 监听地址
 var GCfgCustomAccountVerifyTokenPath string         // 外部程序写 accountVerifyToken 的 HTTP 路径
 var GCfgCustomSessionPath string                    // 客户端换取 gateway 登录信息的 HTTP 路径
+var GCfgCustomEmailSessionPath string               // 客户端使用 email/password 换取 gateway 登录信息的 HTTP 路径
 var GCfgCustomAccountVerifyTokenExpireSecond uint64 // accountVerifyToken 有效秒数
 var GCfgCustomTicketExpireSecond uint64             // connectTicket 有效秒数
 var GCfgCustomTicketSecret string                   // connectTicket HMAC 签名密钥
@@ -24,6 +25,7 @@ func initCustomConfig() {
 	GCfgCustomHTTPAddr = xconfig.GConfigMgr.GetCustomString("httpAddr")
 	GCfgCustomAccountVerifyTokenPath = xconfig.GConfigMgr.GetCustomString("accountVerifyTokenPath", "/api/login/accountVerifyToken")
 	GCfgCustomSessionPath = xconfig.GConfigMgr.GetCustomString("sessionPath", "/api/login/session")
+	GCfgCustomEmailSessionPath = xconfig.GConfigMgr.GetCustomString("emailSessionPath", "/api/login/emailSession")
 	GCfgCustomAccountVerifyTokenExpireSecond = uint64(xconfig.GConfigMgr.GetCustomDuration("accountVerifyTokenExpireSecond", 10*time.Second) / time.Second)
 	GCfgCustomTicketExpireSecond = uint64(xconfig.GConfigMgr.GetCustomDuration("ticketExpireSecond", 10*time.Second) / time.Second)
 	GCfgCustomTicketSecret = xconfig.GConfigMgr.GetCustomString("ticketSecret", common.ConnectTicketSecretDefault)

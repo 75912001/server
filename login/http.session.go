@@ -44,6 +44,11 @@ func handleLoginSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	uid := cacheRes.GetUid()
+	writeLoginSession(w, req.Account, uid)
+}
+
+// writeLoginSession 根据可信 uid 选择 gateway, 签发 connectTicket 并写入 session 响应。
+func writeLoginSession(w http.ResponseWriter, account string, uid uint64) {
 	if uid == 0 {
 		writeError(w, http.StatusBadGateway, "cache account uid is empty")
 		return
@@ -58,7 +63,7 @@ func handleLoginSession(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 	payload, err := common.NewConnectTicketPayload(
 		uid,
-		req.Account,
+		account,
 		gateway.Key,
 		time.Duration(GCfgCustomTicketExpireSecond)*time.Second,
 		now,
@@ -74,7 +79,7 @@ func handleLoginSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, &sessionRes{
-		Account:                 req.Account,
+		Account:                 account,
 		Uid:                     uid,
 		ConnectTicket:           connectTicket,
 		TicketExpireTimestampMs: payload.ExpireTimestampMs,

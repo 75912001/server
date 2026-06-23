@@ -159,6 +159,15 @@ login
   -> Redis account:{account}:uid
   -> Redis user:{uid}:record
 
+login email/password
+  -> CacheSetAccountVerifyToken
+  -> Redis account:{account}:accountVerifyToken
+  -> CacheUseAccountVerifyToken
+  -> Redis account:{account}:accountVerifyToken
+  -> EnsureAccount
+  -> Redis account:{account}:uid
+  -> Redis user:{uid}:record
+
 gateway
   -> CacheGetUserRecord
   -> CacheGetUserSession
