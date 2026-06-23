@@ -6,7 +6,7 @@ etcd:
   ttlDuration: 3000000000s
   projectName: project
 
-cacheTokenExpireSecond: 10
+cacheAccountVerifyTokenExpireSecond: 10
 
 # proto 路径，用于记录协议来源。
 protoPath: ../../../proto

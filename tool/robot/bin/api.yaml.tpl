@@ -5,15 +5,15 @@ UserVerifyReq:
   id: 0x000001
   msg:
     uid: 10001
-    token: "token.10001"
+    connectTicket: ""
 
 #0x00000A#client->gateway#心跳-请求
 UserHeartbeatReq:
   id: 0x00000A
   msg:
-    lastSession: 0
+    lastHeartbeatSession: ""
 
-#0x00000C#client->gateway#请求用户数据-请求
+#0x00000C#client->gateway#请求用户档案-请求
 UserRecordReq:
   id: 0x00000C
   msg:
