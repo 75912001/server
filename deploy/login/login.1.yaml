@@ -19,3 +19,8 @@ log: # 日志配置
 
 custom: # login 自定义配置
   httpAddr: 0.0.0.0:30401 # HTTP 监听地址
+  emailPasswordUsers: # 邮箱密码用户列表，用户登录时每次重新读取
+    - email: 75912001@qq.com # 登录邮箱，login 会 trim 后转小写
+      password: "111111" # 明文密码
+    - email: 19426792@qq.com
+      password: "111111"
