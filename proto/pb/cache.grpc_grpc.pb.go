@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CacheService_CacheSetUserRecord_FullMethodName         = "/cache.CacheService/CacheSetUserRecord"
-	CacheService_CacheGetUserRecord_FullMethodName         = "/cache.CacheService/CacheGetUserRecord"
+	CacheService_CacheSetAccountRecord_FullMethodName      = "/cache.CacheService/CacheSetAccountRecord"
+	CacheService_CacheGetAccountRecord_FullMethodName      = "/cache.CacheService/CacheGetAccountRecord"
 	CacheService_CacheSetAccountVerifyToken_FullMethodName = "/cache.CacheService/CacheSetAccountVerifyToken"
 	CacheService_CacheUseAccountVerifyToken_FullMethodName = "/cache.CacheService/CacheUseAccountVerifyToken"
 	CacheService_CacheGetUserSession_FullMethodName        = "/cache.CacheService/CacheGetUserSession"
@@ -34,13 +34,13 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CacheServiceClient interface {
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
-	// 写入用户档案。
-	// 以 uid 做 RingHash 分片, 用户创建完成和用户档案更新都会走这个接口。
-	CacheSetUserRecord(ctx context.Context, in *CacheSetUserRecordReq, opts ...grpc.CallOption) (*CacheSetUserRecordRes, error)
+	// 写入账号档案。
+	// 以 uid 做 RingHash 分片, 账号档案创建完成和账号档案更新都会走这个接口。
+	CacheSetAccountRecord(ctx context.Context, in *CacheSetAccountRecordReq, opts ...grpc.CallOption) (*CacheSetAccountRecordRes, error)
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
-	// 读取用户档案。
-	// 以 uid 做 RingHash 分片，返回当前 uid 对应的 UserRecord。
-	CacheGetUserRecord(ctx context.Context, in *CacheGetUserRecordReq, opts ...grpc.CallOption) (*CacheGetUserRecordRes, error)
+	// 读取账号档案。
+	// 以 uid 做 RingHash 分片，返回当前 uid 对应的 AccountRecord。
+	CacheGetAccountRecord(ctx context.Context, in *CacheGetAccountRecordReq, opts ...grpc.CallOption) (*CacheGetAccountRecordRes, error)
 	// 写入 accountVerifyToken。
 	// 以 account 做 RingHash 分片，accountVerifyToken 使用一次性 SETNX 语义，未消费前不覆盖。
 	CacheSetAccountVerifyToken(ctx context.Context, in *CacheSetAccountVerifyTokenReq, opts ...grpc.CallOption) (*CacheSetAccountVerifyTokenRes, error)
@@ -69,20 +69,20 @@ func NewCacheServiceClient(cc grpc.ClientConnInterface) CacheServiceClient {
 	return &cacheServiceClient{cc}
 }
 
-func (c *cacheServiceClient) CacheSetUserRecord(ctx context.Context, in *CacheSetUserRecordReq, opts ...grpc.CallOption) (*CacheSetUserRecordRes, error) {
+func (c *cacheServiceClient) CacheSetAccountRecord(ctx context.Context, in *CacheSetAccountRecordReq, opts ...grpc.CallOption) (*CacheSetAccountRecordRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CacheSetUserRecordRes)
-	err := c.cc.Invoke(ctx, CacheService_CacheSetUserRecord_FullMethodName, in, out, cOpts...)
+	out := new(CacheSetAccountRecordRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheSetAccountRecord_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *cacheServiceClient) CacheGetUserRecord(ctx context.Context, in *CacheGetUserRecordReq, opts ...grpc.CallOption) (*CacheGetUserRecordRes, error) {
+func (c *cacheServiceClient) CacheGetAccountRecord(ctx context.Context, in *CacheGetAccountRecordReq, opts ...grpc.CallOption) (*CacheGetAccountRecordRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CacheGetUserRecordRes)
-	err := c.cc.Invoke(ctx, CacheService_CacheGetUserRecord_FullMethodName, in, out, cOpts...)
+	out := new(CacheGetAccountRecordRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheGetAccountRecord_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -154,13 +154,13 @@ func (c *cacheServiceClient) CacheRefreshUserSessionCAS(ctx context.Context, in 
 // for forward compatibility.
 type CacheServiceServer interface {
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
-	// 写入用户档案。
-	// 以 uid 做 RingHash 分片, 用户创建完成和用户档案更新都会走这个接口。
-	CacheSetUserRecord(context.Context, *CacheSetUserRecordReq) (*CacheSetUserRecordRes, error)
+	// 写入账号档案。
+	// 以 uid 做 RingHash 分片, 账号档案创建完成和账号档案更新都会走这个接口。
+	CacheSetAccountRecord(context.Context, *CacheSetAccountRecordReq) (*CacheSetAccountRecordRes, error)
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
-	// 读取用户档案。
-	// 以 uid 做 RingHash 分片，返回当前 uid 对应的 UserRecord。
-	CacheGetUserRecord(context.Context, *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error)
+	// 读取账号档案。
+	// 以 uid 做 RingHash 分片，返回当前 uid 对应的 AccountRecord。
+	CacheGetAccountRecord(context.Context, *CacheGetAccountRecordReq) (*CacheGetAccountRecordRes, error)
 	// 写入 accountVerifyToken。
 	// 以 account 做 RingHash 分片，accountVerifyToken 使用一次性 SETNX 语义，未消费前不覆盖。
 	CacheSetAccountVerifyToken(context.Context, *CacheSetAccountVerifyTokenReq) (*CacheSetAccountVerifyTokenRes, error)
@@ -189,11 +189,11 @@ type CacheServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCacheServiceServer struct{}
 
-func (UnimplementedCacheServiceServer) CacheSetUserRecord(context.Context, *CacheSetUserRecordReq) (*CacheSetUserRecordRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method CacheSetUserRecord not implemented")
+func (UnimplementedCacheServiceServer) CacheSetAccountRecord(context.Context, *CacheSetAccountRecordReq) (*CacheSetAccountRecordRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheSetAccountRecord not implemented")
 }
-func (UnimplementedCacheServiceServer) CacheGetUserRecord(context.Context, *CacheGetUserRecordReq) (*CacheGetUserRecordRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method CacheGetUserRecord not implemented")
+func (UnimplementedCacheServiceServer) CacheGetAccountRecord(context.Context, *CacheGetAccountRecordReq) (*CacheGetAccountRecordRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheGetAccountRecord not implemented")
 }
 func (UnimplementedCacheServiceServer) CacheSetAccountVerifyToken(context.Context, *CacheSetAccountVerifyTokenReq) (*CacheSetAccountVerifyTokenRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method CacheSetAccountVerifyToken not implemented")
@@ -234,38 +234,38 @@ func RegisterCacheServiceServer(s grpc.ServiceRegistrar, srv CacheServiceServer)
 	s.RegisterService(&CacheService_ServiceDesc, srv)
 }
 
-func _CacheService_CacheSetUserRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CacheSetUserRecordReq)
+func _CacheService_CacheSetAccountRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheSetAccountRecordReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).CacheSetUserRecord(ctx, in)
+		return srv.(CacheServiceServer).CacheSetAccountRecord(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CacheService_CacheSetUserRecord_FullMethodName,
+		FullMethod: CacheService_CacheSetAccountRecord_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).CacheSetUserRecord(ctx, req.(*CacheSetUserRecordReq))
+		return srv.(CacheServiceServer).CacheSetAccountRecord(ctx, req.(*CacheSetAccountRecordReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CacheService_CacheGetUserRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CacheGetUserRecordReq)
+func _CacheService_CacheGetAccountRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheGetAccountRecordReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).CacheGetUserRecord(ctx, in)
+		return srv.(CacheServiceServer).CacheGetAccountRecord(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CacheService_CacheGetUserRecord_FullMethodName,
+		FullMethod: CacheService_CacheGetAccountRecord_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).CacheGetUserRecord(ctx, req.(*CacheGetUserRecordReq))
+		return srv.(CacheServiceServer).CacheGetAccountRecord(ctx, req.(*CacheGetAccountRecordReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -386,12 +386,12 @@ var CacheService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CacheServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CacheSetUserRecord",
-			Handler:    _CacheService_CacheSetUserRecord_Handler,
+			MethodName: "CacheSetAccountRecord",
+			Handler:    _CacheService_CacheSetAccountRecord_Handler,
 		},
 		{
-			MethodName: "CacheGetUserRecord",
-			Handler:    _CacheService_CacheGetUserRecord_Handler,
+			MethodName: "CacheGetAccountRecord",
+			Handler:    _CacheService_CacheGetAccountRecord_Handler,
 		},
 		{
 			MethodName: "CacheSetAccountVerifyToken",
