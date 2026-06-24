@@ -9,7 +9,7 @@ Gateway 服务负责客户端 TCP 接入、首次登录验票、单登录顶号�
 - 从 cache 读取 `user:{uid}:session`。
 - 发现并调用旧 gateway `GatewayKickUser` 完成严格顶号。
 - 通过 cache `CacheBeginUserSessionCAS` 抢占新 cache userSession。
-- 选择本地 `availableLoad` 最大的可用 online，选中后本地扣减 1，再调用 `OnlineBindUser` 绑定 user actor；后续 etcd 更新会用权威 `availableLoad` 覆盖本地估算值。
+- 选择本地 `availableLoad` 最大的可用 online，选中后本地扣减 1，再调用 `OnlineBindUser` 绑定 online Account actor；后续 etcd 更新会用权威 `availableLoad` 覆盖本地估算值。
 - 维护本地 `heartbeatSession`，处理心跳轮换和 `CacheRefreshUserSessionCAS`。
 - 在 TCP 断开、主动离线、心跳超时、顶号等场景调用 `OnlineUnbindUser` 和 `CacheEndUserSessionCAS`。
 - gateway 到 cache、online 和旧 gateway 的 unary 超时统一由 proto `methodOpt.timeout` 控制；具体数值以 `proto/cache.grpc.proto`、`proto/online.grpc.proto` 和 `proto/gateway.grpc.proto` 为准。
@@ -110,7 +110,7 @@ client TCP
   -> gateway UserHandlerTCP
   -> gateway User actor
   -> online stream OnlineStreamTunnel
-  -> online User actor
+  -> online Account actor
 ```
 
 非登录包必须在 User 绑定 online 后才允许转发。未验证或 online 缺失时，gateway 会断开连接或返回错误。
@@ -118,7 +118,7 @@ client TCP
 ## 一致性约定
 
 - `user:{uid}:session` 由 gateway 写入、删除和续期。
-- online 不再决定“谁能上线”，只管理 user actor。
+- online 不再决定“谁能上线”，只管理 Account actor。
 - `userSession` 是固定连接身份，一次登录生成，心跳不轮换。
 - `gatewayKey` 和 `onlineKey` 只作为 cache userSession 元数据，分别用于定位旧 gateway 和排障定位 online。
 - `heartbeatSession` 是客户端心跳凭证，可轮换，不进入 Redis。

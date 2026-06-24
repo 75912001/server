@@ -10,21 +10,21 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func (p *User) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
+func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	msgID := pb.MsgIDUser(pkt.GetMessageId())
 	switch msgID {
-	case pb.MsgIDUser_UserRecordReq_CMD:
-		p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_UserRecordRes_CMD), xerror.Success.Code(),
-			&pb.UserRecordRes{
-				UserRecord: p.userRecord,
+	case pb.MsgIDUser_AccountRecordReq_CMD:
+		p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_AccountRecordRes_CMD), xerror.Success.Code(),
+			&pb.AccountRecordRes{
+				AccountRecord: p.accountRecord,
 			},
 		)
 		return
-	case pb.MsgIDUser_UserCreateReq_CMD:
-		p.onUserCreateReq(gateway, pkt)
+	case pb.MsgIDUser_AccountCreateReq_CMD:
+		p.onAccountCreateReq(gateway, pkt)
 		return
 	default:
-		if p.userRecord == nil || p.userRecord.GetUserCreateTimestampMs() == 0 {
+		if p.accountRecord == nil || p.accountRecord.GetAccountRecordCreateTimestampMs() == 0 {
 			p.sendClientErr(gateway, pkt, uint32(msgID), common.ECOnlineUserNotCreated.Code())
 			return
 		}
@@ -40,7 +40,7 @@ func (p *User) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	}
 }
 
-func (p *User) onRobotPingReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
+func (p *Account) onRobotPingReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	var req pb.RobotPingReq
 	if err := proto.Unmarshal(pkt.GetBody(), &req); err != nil {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_RobotPingRes_CMD), xerror.InvalidArgument.Code())
@@ -56,36 +56,40 @@ func (p *User) onRobotPingReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	)
 }
 
-func (p *User) onUserCreateReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
-	var req pb.UserCreateReq
+func (p *Account) onAccountCreateReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
+	var req pb.AccountCreateReq
 	if err := proto.Unmarshal(pkt.GetBody(), &req); err != nil {
-		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.InvalidArgument.Code())
+		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_AccountCreateRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
 
-	if p.userRecord == nil {
-		xlog.GLog.Errorf("user record is nil uid:%d", p.uid)
-		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.Internal.Code())
+	if p.accountRecord == nil {
+		xlog.GLog.Errorf("account record is nil uid:%d", p.uid)
+		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_AccountCreateRes_CMD), xerror.Internal.Code())
 		return
 	}
 
-	if p.userRecord.GetUserCreateTimestampMs() != 0 {
-		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.AlreadyExists.Code())
+	if p.accountRecord.GetAccountRecordCreateTimestampMs() != 0 {
+		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_AccountCreateRes_CMD), xerror.AlreadyExists.Code())
 		return
 	}
 	now := time.Now().UnixMilli()
-	p.userRecord.UserCreateTimestampMs = now
-	if err := unaryCacheSetUserRecord(p.uid, p.userRecord); err != nil {
-		xlog.GLog.Errorf("set user record failed uid:%d err:%v", p.uid, err)
-		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.Internal.Code())
+	if err := initializeDefaultAccountRecord(p.accountRecord, now); err != nil {
+		xlog.GLog.Errorf("initialize account record failed uid:%d err:%v", p.uid, err)
+		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_AccountCreateRes_CMD), xerror.Internal.Code())
 		return
 	}
-	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_UserCreateRes_CMD), xerror.Success.Code(), &pb.UserCreateRes{
-		UserRecord: p.userRecord,
+	if err := unaryCacheSetAccountRecord(p.uid, p.accountRecord); err != nil {
+		xlog.GLog.Errorf("set account record failed uid:%d err:%v", p.uid, err)
+		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_AccountCreateRes_CMD), xerror.Internal.Code())
+		return
+	}
+	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDUser_AccountCreateRes_CMD), xerror.Success.Code(), &pb.AccountCreateRes{
+		AccountRecord: p.accountRecord,
 	})
 }
 
-func (p *User) sendClientRes(gateway *Gateway, pkt *pb.OnlineClientPacket, messageID uint32, resultID uint32, message proto.Message) {
+func (p *Account) sendClientRes(gateway *Gateway, pkt *pb.OnlineClientPacket, messageID uint32, resultID uint32, message proto.Message) {
 	body, err := proto.Marshal(message)
 	if err != nil {
 		xlog.GLog.Errorf("marshal client response failed uid:%d messageID:%d err:%v", p.uid, messageID, err)
@@ -105,7 +109,7 @@ func (p *User) sendClientRes(gateway *Gateway, pkt *pb.OnlineClientPacket, messa
 	})
 }
 
-func (p *User) sendClientErr(gateway *Gateway, pkt *pb.OnlineClientPacket, messageID uint32, resultID uint32) {
+func (p *Account) sendClientErr(gateway *Gateway, pkt *pb.OnlineClientPacket, messageID uint32, resultID uint32) {
 	gateway.Send(&pb.OnlineTunnelFrame{
 		Uid: p.uid,
 		Payload: &pb.OnlineTunnelFrame_ClientPacket{

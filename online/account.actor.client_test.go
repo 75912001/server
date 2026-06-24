@@ -33,78 +33,92 @@ var (
 	testCacheServerSeq    atomic.Uint32
 )
 
-func TestUserCreateReqUserRecordNilReturnsInternal(t *testing.T) {
+func TestAccountCreateReqAccountRecordNilReturnsInternal(t *testing.T) {
 	cache := setupFakeCacheServer(t)
 	gateway, stream := newGatewayWithStreamForTest(t)
-	user := &User{uid: 10001, account: "account-10001"}
+	account := &Account{uid: 10001, account: "account-10001"}
 
-	user.onUserCreateReq(gateway, newUserCreatePacket(t, user.uid))
+	account.onAccountCreateReq(gateway, newAccountCreatePacket(t, account.uid))
 
 	pkt := readClientPacket(t, stream)
 	if got, want := pkt.GetResultId(), xerror.Internal.Code(); got != want {
 		t.Fatalf("result id = %d, want %d", got, want)
 	}
-	assertNoCacheSetUserRecord(t, cache)
+	assertNoCacheSetAccountRecord(t, cache)
 }
 
-func TestUserCreateReqCreatedUserReturnsAlreadyExists(t *testing.T) {
+func TestAccountCreateReqCreatedAccountReturnsAlreadyExists(t *testing.T) {
 	cache := setupFakeCacheServer(t)
 	gateway, stream := newGatewayWithStreamForTest(t)
-	user := &User{
+	account := &Account{
 		uid:     10002,
 		account: "account-10002",
-		userRecord: &pb.UserRecord{
-			Uid:                      10002,
-			Account:                  "account-10002",
-			AccountCreateTimestampMs: 111,
-			UserCreateTimestampMs:    222,
+		accountRecord: &pb.AccountRecord{
+			Uid:                            10002,
+			Account:                        "account-10002",
+			AccountCreateTimestampMs:       111,
+			AccountRecordCreateTimestampMs: 222,
 		},
 	}
 
-	user.onUserCreateReq(gateway, newUserCreatePacket(t, user.uid))
+	account.onAccountCreateReq(gateway, newAccountCreatePacket(t, account.uid))
 
 	pkt := readClientPacket(t, stream)
 	if got, want := pkt.GetResultId(), xerror.AlreadyExists.Code(); got != want {
 		t.Fatalf("result id = %d, want %d", got, want)
 	}
-	assertNoCacheSetUserRecord(t, cache)
+	assertNoCacheSetAccountRecord(t, cache)
 }
 
-func TestUserCreateReqExistingRecordCreatesUser(t *testing.T) {
+func TestAccountCreateReqExistingRecordCreatesAccount(t *testing.T) {
 	cache := setupFakeCacheServer(t)
 	gateway, stream := newGatewayWithStreamForTest(t)
 	const accountCreateTimeMs int64 = 333
-	user := &User{
+	account := &Account{
 		uid:     10003,
 		account: "account-10003",
-		userRecord: &pb.UserRecord{
+		accountRecord: &pb.AccountRecord{
 			Uid:                      10003,
 			Account:                  "account-10003",
 			AccountCreateTimestampMs: accountCreateTimeMs,
 		},
 	}
 
-	user.onUserCreateReq(gateway, newUserCreatePacket(t, user.uid))
+	account.onAccountCreateReq(gateway, newAccountCreatePacket(t, account.uid))
 
-	cacheReq := readCacheSetUserRecordReq(t, cache)
-	record := cacheReq.GetUserRecord()
-	if got, want := cacheReq.GetUid(), user.uid; got != want {
+	cacheReq := readCacheSetAccountRecordReq(t, cache)
+	record := cacheReq.GetAccountRecord()
+	if got, want := cacheReq.GetUid(), account.uid; got != want {
 		t.Fatalf("cache set uid = %d, want %d", got, want)
 	}
-	if got, want := record.GetUid(), user.uid; got != want {
+	if got, want := record.GetUid(), account.uid; got != want {
 		t.Fatalf("record uid = %d, want %d", got, want)
 	}
-	if got, want := record.GetAccount(), user.account; got != want {
+	if got, want := record.GetAccount(), account.account; got != want {
 		t.Fatalf("record account = %q, want %q", got, want)
 	}
 	if got, want := record.GetAccountCreateTimestampMs(), accountCreateTimeMs; got != want {
 		t.Fatalf("record account create time = %d, want %d", got, want)
 	}
-	if record.GetUserCreateTimestampMs() == 0 {
-		t.Fatal("record user create time is zero")
+	if record.GetAccountRecordCreateTimestampMs() == 0 {
+		t.Fatal("record account create time is zero")
 	}
 	if got := len(record.GetCharacterRecordMap()); got == 0 {
 		t.Fatalf("record character count = %d, want > 0", got)
+	}
+	for uuid, character := range record.GetCharacterRecordMap() {
+		if character == nil {
+			t.Fatalf("record character uuid %d is nil", uuid)
+		}
+		if got := character.GetUuid(); got != uuid {
+			t.Fatalf("record character map key = %d, character uuid = %d", uuid, got)
+		}
+		if got, want := character.GetAssetId(), uint64(defaultCharacterID); got != want {
+			t.Fatalf("record character asset id = %d, want %d", got, want)
+		}
+		if got := len(character.GetPetRecordMap()); got == 0 {
+			t.Fatalf("record character pet count = %d, want > 0", got)
+		}
 	}
 	if record.GetUsedUuid() == 0 {
 		t.Fatal("record used uuid is zero")
@@ -114,37 +128,37 @@ func TestUserCreateReqExistingRecordCreatesUser(t *testing.T) {
 	if got, want := pkt.GetResultId(), xerror.Success.Code(); got != want {
 		t.Fatalf("result id = %d, want %d", got, want)
 	}
-	var res pb.UserCreateRes
+	var res pb.AccountCreateRes
 	if err := proto.Unmarshal(pkt.GetBody(), &res); err != nil {
-		t.Fatalf("unmarshal user create res: %v", err)
+		t.Fatalf("unmarshal account create res: %v", err)
 	}
-	if got, want := res.GetUserRecord().GetUserCreateTimestampMs(), record.GetUserCreateTimestampMs(); got != want {
-		t.Fatalf("response user create time = %d, want %d", got, want)
+	if got, want := res.GetAccountRecord().GetAccountRecordCreateTimestampMs(), record.GetAccountRecordCreateTimestampMs(); got != want {
+		t.Fatalf("response account create time = %d, want %d", got, want)
 	}
 }
 
 type fakeCacheService struct {
 	pb.UnimplementedCacheServiceServer
 
-	setUserRecordCalls chan *pb.CacheSetUserRecordReq
-	getUserRecord      func(uid uint64) (*pb.UserRecord, error)
+	setAccountRecordCalls chan *pb.CacheSetAccountRecordReq
+	getAccountRecord      func(uid uint64) (*pb.AccountRecord, error)
 }
 
-func (p *fakeCacheService) CacheSetUserRecord(_ context.Context, req *pb.CacheSetUserRecordReq) (*pb.CacheSetUserRecordRes, error) {
-	p.setUserRecordCalls <- req
-	return &pb.CacheSetUserRecordRes{}, nil
+func (p *fakeCacheService) CacheSetAccountRecord(_ context.Context, req *pb.CacheSetAccountRecordReq) (*pb.CacheSetAccountRecordRes, error) {
+	p.setAccountRecordCalls <- req
+	return &pb.CacheSetAccountRecordRes{}, nil
 }
 
-func (p *fakeCacheService) CacheGetUserRecord(_ context.Context, req *pb.CacheGetUserRecordReq) (*pb.CacheGetUserRecordRes, error) {
-	if p.getUserRecord == nil {
-		return nil, grpcstatus.Error(grpccodes.NotFound, "user record not found")
+func (p *fakeCacheService) CacheGetAccountRecord(_ context.Context, req *pb.CacheGetAccountRecordReq) (*pb.CacheGetAccountRecordRes, error) {
+	if p.getAccountRecord == nil {
+		return nil, grpcstatus.Error(grpccodes.NotFound, "account record not found")
 	}
-	userRecord, err := p.getUserRecord(req.GetUid())
+	accountRecord, err := p.getAccountRecord(req.GetUid())
 	if err != nil {
 		return nil, err
 	}
-	return &pb.CacheGetUserRecordRes{
-		UserRecord: userRecord,
+	return &pb.CacheGetAccountRecordRes{
+		AccountRecord: accountRecord,
 	}, nil
 }
 
@@ -160,7 +174,7 @@ func setupFakeCacheServer(t *testing.T, configure ...func(*fakeCacheService)) *f
 	listener := bufconn.Listen(1024 * 1024)
 	server := grpc.NewServer()
 	cache := &fakeCacheService{
-		setUserRecordCalls: make(chan *pb.CacheSetUserRecordReq, 1),
+		setAccountRecordCalls: make(chan *pb.CacheSetAccountRecordReq, 1),
 	}
 	for _, fn := range configure {
 		fn(cache)
@@ -266,15 +280,15 @@ func ensureTestLog(t *testing.T) {
 	}
 }
 
-func newUserCreatePacket(t *testing.T, uid uint64) *pb.OnlineClientPacket {
+func newAccountCreatePacket(t *testing.T, uid uint64) *pb.OnlineClientPacket {
 	t.Helper()
 
-	body, err := proto.Marshal(&pb.UserCreateReq{})
+	body, err := proto.Marshal(&pb.AccountCreateReq{})
 	if err != nil {
-		t.Fatalf("marshal user create req: %v", err)
+		t.Fatalf("marshal account create req: %v", err)
 	}
 	return &pb.OnlineClientPacket{
-		MessageId: uint32(pb.MsgIDUser_UserCreateReq_CMD),
+		MessageId: uint32(pb.MsgIDUser_AccountCreateReq_CMD),
 		SessionId: 123,
 		Key:       uid,
 		Body:      body,
@@ -294,7 +308,7 @@ func readClientPacket(t *testing.T, stream *fakeOnlineTunnelStream) *pb.OnlineCl
 		if pkt == nil {
 			t.Fatal("client packet is nil")
 		}
-		if got, want := pkt.GetMessageId(), uint32(pb.MsgIDUser_UserCreateRes_CMD); got != want {
+		if got, want := pkt.GetMessageId(), uint32(pb.MsgIDUser_AccountCreateRes_CMD); got != want {
 			t.Fatalf("message id = %d, want %d", got, want)
 		}
 		return pkt
@@ -304,24 +318,24 @@ func readClientPacket(t *testing.T, stream *fakeOnlineTunnelStream) *pb.OnlineCl
 	}
 }
 
-func readCacheSetUserRecordReq(t *testing.T, cache *fakeCacheService) *pb.CacheSetUserRecordReq {
+func readCacheSetAccountRecordReq(t *testing.T, cache *fakeCacheService) *pb.CacheSetAccountRecordReq {
 	t.Helper()
 
 	select {
-	case req := <-cache.setUserRecordCalls:
+	case req := <-cache.setAccountRecordCalls:
 		return req
 	case <-time.After(time.Second):
-		t.Fatal("timeout waiting CacheSetUserRecord")
+		t.Fatal("timeout waiting CacheSetAccountRecord")
 		return nil
 	}
 }
 
-func assertNoCacheSetUserRecord(t *testing.T, cache *fakeCacheService) {
+func assertNoCacheSetAccountRecord(t *testing.T, cache *fakeCacheService) {
 	t.Helper()
 
 	select {
-	case req := <-cache.setUserRecordCalls:
-		t.Fatalf("unexpected CacheSetUserRecord uid=%d", req.GetUid())
+	case req := <-cache.setAccountRecordCalls:
+		t.Fatalf("unexpected CacheSetAccountRecord uid=%d", req.GetUid())
 	default:
 	}
 }

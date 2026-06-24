@@ -11,13 +11,13 @@ import (
 )
 
 const (
-	OnlineUserActorCmdBind         xactor.CMD = 101
-	OnlineUserActorCmdUnbind       xactor.CMD = 102
-	OnlineUserActorCmdClientPacket xactor.CMD = 103
+	OnlineAccountActorCmdBind         xactor.CMD = 101
+	OnlineAccountActorCmdUnbind       xactor.CMD = 102
+	OnlineAccountActorCmdClientPacket xactor.CMD = 103
 )
 
-func (p *User) PostBind(req *pb.OnlineBindUserReq, userRecord *pb.UserRecord) (*pb.OnlineBindUserRes, error) {
-	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineUserActorCmdBind, req, userRecord))
+func (p *Account) PostBind(req *pb.OnlineBindUserReq, accountRecord *pb.AccountRecord) (*pb.OnlineBindUserRes, error) {
+	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineAccountActorCmdBind, req, accountRecord))
 	if err != nil {
 		return nil, err
 	}
@@ -25,10 +25,10 @@ func (p *User) PostBind(req *pb.OnlineBindUserReq, userRecord *pb.UserRecord) (*
 	return res, nil
 }
 
-func (p *User) PostUnbind(gatewayKey string, userSession string) {
-	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineUserActorCmdUnbind, gatewayKey, userSession))
+func (p *Account) PostUnbind(gatewayKey string, userSession string) {
+	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineAccountActorCmdUnbind, gatewayKey, userSession))
 	if err != nil {
-		xlog.GLog.Errorf("user unbind sync failed uid=%d err=%v", p.uid, err)
+		xlog.GLog.Errorf("account unbind sync failed uid=%d err=%v", p.uid, err)
 		return
 	}
 	stopped, _ := resp.(bool)
@@ -37,18 +37,18 @@ func (p *User) PostUnbind(gatewayKey string, userSession string) {
 	}
 }
 
-func (p *User) PostClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
-	p.actor.SendMsg(xactor.NewMsg(context.Background(), OnlineUserActorCmdClientPacket, gateway, pkt))
+func (p *Account) PostClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
+	p.actor.SendMsg(xactor.NewMsg(context.Background(), OnlineAccountActorCmdClientPacket, gateway, pkt))
 }
 
-func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
+func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 	var resp any
 	var err error
 	for _, raw := range messages {
 		if event, ok := raw.(*xcontrol.Event); ok {
 			if event.ISwitch.IsOn() {
 				if errTmp := event.ICallBack.Execute(); errTmp != nil {
-					xlog.GLog.Warnf("user event callback failed uid=%d err=%v", p.uid, errTmp)
+					xlog.GLog.Warnf("account event callback failed uid=%d err=%v", p.uid, errTmp)
 				}
 			}
 			continue
@@ -58,7 +58,7 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			continue
 		}
 		switch msg.Cmd {
-		case OnlineUserActorCmdBind:
+		case OnlineAccountActorCmdBind:
 			if len(msg.Args) < 2 {
 				continue
 			}
@@ -66,15 +66,15 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if !ok {
 				continue
 			}
-			userRecord, ok := msg.Args[1].(*pb.UserRecord)
+			accountRecord, ok := msg.Args[1].(*pb.AccountRecord)
 			if !ok {
 				continue
 			}
-			resp, err = p.onBind(req, userRecord)
+			resp, err = p.onBind(req, accountRecord)
 			if err != nil {
 				return p.behavior, resp, err
 			}
-		case OnlineUserActorCmdUnbind:
+		case OnlineAccountActorCmdUnbind:
 			gatewayKey, ok := msg.Args[0].(string)
 			if !ok {
 				continue
@@ -87,13 +87,13 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 				resp = false
 				continue
 			}
-			if currentUser, ok := GUserMgr.users.Find(p.uid); ok && currentUser == p {
-				GUserMgr.users.Del(p.uid)
+			if currentAccount, ok := GAccountMgr.accounts.Find(p.uid); ok && currentAccount == p {
+				GAccountMgr.accounts.Del(p.uid)
 			}
 			p.gatewayKey = ""
 			p.userSession = ""
 			resp = true
-		case OnlineUserActorCmdClientPacket:
+		case OnlineAccountActorCmdClientPacket:
 			gateway, ok := msg.Args[0].(*Gateway)
 			if !ok {
 				continue
@@ -108,7 +108,7 @@ func (p *User) behavior(messages ...any) (xactor.Behavior, any, error) {
 	return p.behavior, resp, nil
 }
 
-func (p *User) offlineUserSessionMatch(gatewayKey string, userSession string) bool {
+func (p *Account) offlineUserSessionMatch(gatewayKey string, userSession string) bool {
 	if gatewayKey == "" || userSession == "" || p.gatewayKey != gatewayKey {
 		return false
 	}
