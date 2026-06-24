@@ -2,7 +2,7 @@
 
 ## 适用范围
 
-修改 online actor 绑定/解绑流程、用户 actor 状态、gateway stream 路由、`UserRecordReq/UserCreateReq` 业务 handler 或 online gRPC handler 时，使用本文档。
+修改 online actor 绑定/解绑流程、Account actor 状态、gateway stream 路由、`AccountRecordReq/AccountCreateReq` 业务 handler 或 online gRPC handler 时，使用本文档。
 
 ## 快速检查
 
@@ -32,10 +32,11 @@ go test ./online ./gateway ./cache ./login ./tool/robot/main ./proto/pb
 
 典型检查项：
 
-- `OnlineBindUser` 会从 cache 读取 user record；登录票据校验和 cache userSession 编排由 gateway 负责
-- `UserCreateReq` 会在 cache 账号壳档案上初始化 `user_create_timestamp_ms/used_uuid/character_record_map`，并写回 cache
-- 新账号首次登录后通过 `UserCreateReq` 能拿到默认角色和宠物；重启或重登后通过 `UserRecordReq` 能读回同一份 `UserRecord`
-- online 只绑定 user actor，不写入 cache userSession 到 cache
+- `OnlineBindUser` 会从 cache 读取 account record；登录票据校验和 cache userSession 编排由 gateway 负责
+- `AccountCreateReq` 会在 cache 账号壳档案上初始化 `account_record_create_timestamp_ms/used_uuid/character_record_map`, 并写回 cache
+- 新账号首次登录后通过 `AccountCreateReq` 能拿到默认角色和宠物; 重启或重登后通过 `AccountRecordReq` 能读回同一份 `AccountRecord`
+- 新建 `AccountRecord.uid > 0`, `character_record_map` 非空, map key 等于 `CharacterRecord.uuid`, 默认 `CharacterRecord.asset_id == 1000011`, 宠物记录仍挂在角色下
+- online 只绑定 Account actor，不写入 cache userSession 到 cache
 - 重复登录会正确删除或替换旧 cache userSession
 - gateway stream 能接收下行 frame
 - 解绑只在 `gatewayKey + userSession` 匹配时清理 actor，不写 cache userSession

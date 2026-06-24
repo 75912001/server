@@ -35,12 +35,12 @@ func (p *onlineGRPCServer) OnlineStreamTunnel(stream pb.OnlineService_OnlineStre
 				}
 			}
 			if pkt := frame.GetClientPacket(); pkt != nil {
-				user := GUserMgr.GetByUID(frame.GetUid())
-				if user == nil {
-					xlog.GLog.Warnf("OnlineStreamTunnel user not found uid:%d messageID:%d", frame.GetUid(), pkt.GetMessageId())
+				account := GAccountMgr.GetByUID(frame.GetUid())
+				if account == nil {
+					xlog.GLog.Warnf("OnlineStreamTunnel account not found uid:%d messageID:%d", frame.GetUid(), pkt.GetMessageId())
 					continue
 				}
-				user.PostClientPacket(gateway, pkt)
+				account.PostClientPacket(gateway, pkt)
 				continue
 			}
 			xlog.GLog.Warnf("OnlineStreamTunnel unknown frame payload uid:%d", frame.GetUid())

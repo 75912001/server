@@ -78,7 +78,7 @@ func TestOnlineBindUserSuccess(t *testing.T) {
 	}
 }
 
-func TestUserBindRejectsInvalidAccountCreateTime(t *testing.T) {
+func TestAccountBindRejectsInvalidAccountCreateTime(t *testing.T) {
 	resetTestOnlineAccountMgr(t)
 
 	_, err := GAccountMgr.Bind(1001, validOnlineBindReq(1001, "robot.1001", "gateway-1", "session-1"), &pb.AccountRecord{

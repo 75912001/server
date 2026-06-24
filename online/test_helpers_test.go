@@ -11,30 +11,30 @@ import (
 	grpcstatus "google.golang.org/grpc/status"
 )
 
-func resetTestOnlineUserMgr(t *testing.T) {
+func resetTestOnlineAccountMgr(t *testing.T) {
 	t.Helper()
 
-	old := GUserMgr
-	GUserMgr = &UserMgr{
-		users: xmap.NewMapMutexMgr[uint64, *User](),
+	old := GAccountMgr
+	GAccountMgr = &AccountMgr{
+		accounts: xmap.NewMapMutexMgr[uint64, *Account](),
 	}
 
 	t.Cleanup(func() {
-		GUserMgr.users.Foreach(func(uid uint64, user *User) bool {
-			if user != nil {
-				user.Stop()
+		GAccountMgr.accounts.Foreach(func(uid uint64, account *Account) bool {
+			if account != nil {
+				account.Stop()
 			}
 			return true
 		})
-		GUserMgr = old
+		GAccountMgr = old
 	})
 }
 
 func setupTestOnlineGRPCServer(t *testing.T) *onlineGRPCServer {
 	t.Helper()
 
-	setupFakeCacheGetUserRecord(t, func(uid uint64) (*pb.UserRecord, error) {
-		return &pb.UserRecord{
+	setupFakeCacheGetAccountRecord(t, func(uid uint64) (*pb.AccountRecord, error) {
+		return &pb.AccountRecord{
 			Uid:                      uid,
 			Account:                  fmt.Sprintf("robot.%d", uid),
 			AccountCreateTimestampMs: 111,
@@ -43,16 +43,16 @@ func setupTestOnlineGRPCServer(t *testing.T) *onlineGRPCServer {
 	return &onlineGRPCServer{}
 }
 
-func setupFakeCacheGetUserRecord(t *testing.T, getUserRecord func(uid uint64) (*pb.UserRecord, error)) *fakeCacheService {
+func setupFakeCacheGetAccountRecord(t *testing.T, getAccountRecord func(uid uint64) (*pb.AccountRecord, error)) *fakeCacheService {
 	t.Helper()
 
 	return setupFakeCacheServer(t, func(cache *fakeCacheService) {
-		cache.getUserRecord = getUserRecord
+		cache.getAccountRecord = getAccountRecord
 	})
 }
 
-func setFakeCacheGetUserRecord(cache *fakeCacheService, getUserRecord func(uid uint64) (*pb.UserRecord, error)) {
-	cache.getUserRecord = getUserRecord
+func setFakeCacheGetAccountRecord(cache *fakeCacheService, getAccountRecord func(uid uint64) (*pb.AccountRecord, error)) {
+	cache.getAccountRecord = getAccountRecord
 }
 
 func requireStatusCode(t *testing.T, err error, want grpccodes.Code) {
