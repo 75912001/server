@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package user;
+option go_package = "server/proto/pb;pb";
+
+enum AssetType {
+  AssetType_Record = 0;
+  AssetType_Character = 1;
+  AssetType_Map = 2;
+  AssetType_Item = 3;
+  AssetType_Pet = 4;
+  AssetType_NPC = 5;
+  AssetType_Decoration = 6;
+  AssetType_Building = 7;
+  AssetType_Plant = 8;
+  AssetType_Pet_Skill = 9;
+}
+
+enum AssetIDRange {
+  AssetIDRange_Unknow = 0;
+  AssetIDRange_Record_Start = 1;
+  AssetIDRange_Record_End = 1000000;
+  AssetIDRange_Character_Start = 1000001;
+  AssetIDRange_Character_End = 1999999;
+  AssetIDRange_Map_Start = 2000001;
+  AssetIDRange_Map_End = 2999999;
+  AssetIDRange_Item_Start = 3000001;
+  AssetIDRange_Item_End = 3999999;
+  AssetIDRange_Pet_Start = 4000001;
+  AssetIDRange_Pet_End = 4999999;
+  AssetIDRange_NPC_Start = 5000001;
+  AssetIDRange_NPC_End = 5999999;
+  AssetIDRange_Decoration_Start = 6000001;
+  AssetIDRange_Decoration_End = 6999999;
+  AssetIDRange_Building_Start = 7000001;
+  AssetIDRange_Building_End = 7999999;
+  AssetIDRange_Plant_Start = 8000001;
+  AssetIDRange_Plant_End = 8999999;
+  AssetIDRange_Pet_Skill_Start = 9000001;
+  AssetIDRange_Pet_Skill_End = 9999999;
+}
+
+enum AssetIDRecord {
+  AssetIDRecord_Unknow = 0;
+  AssetIDRecord_AssetID = 1;
+  AssetIDRecord_Exp = 2;
+  AssetIDRecord_HP = 3;
+  AssetIDRecord_MP = 4;
+  AssetIDRecord_CreateTimestamp = 5;
+  AssetIDRecord_MapID = 7;
+  AssetIDRecord_Direction = 10;
+  AssetIDRecord_Action = 11;
+  AssetIDRecord_RebirthCount = 13;
+  AssetIDRecord_ElementalEarth = 101;
+  AssetIDRecord_ElementalWater = 102;
+  AssetIDRecord_ElementalFire = 103;
+  AssetIDRecord_ElementalWind = 104;
+  AssetIDRecord_Character_LastLoginTimestamp = 1001;
+  AssetIDRecord_Character_LastLogoutTimestamp = 1002;
+  AssetIDRecord_Character_Available_Point = 1101;
+  AssetIDRecord_Character_Attributes_Vitality = 1102;
+  AssetIDRecord_Character_Attributes_Strength = 1103;
+  AssetIDRecord_Character_Attributes_Toughness = 1104;
+  AssetIDRecord_Character_Attributes_Dexterity = 1105;
+  AssetIDRecord_Pet_Loyalty = 2001;
+  AssetIDRecord_Pet_SavedBase_Vitality = 2101;
+  AssetIDRecord_Pet_SavedBase_Strength = 2102;
+  AssetIDRecord_Pet_SavedBase_Toughness = 2103;
+  AssetIDRecord_Pet_SavedBase_Dexterity = 2104;
+  AssetIDRecord_Pet_Raw_Vitality = 2201;
+  AssetIDRecord_Pet_Raw_Strength = 2202;
+  AssetIDRecord_Pet_Raw_Toughness = 2203;
+  AssetIDRecord_Pet_Raw_Dexterity = 2204;
+}
+
+enum AssetElemental {
+  AssetElemental_Unknow = 0;
+  AssetElemental_Earth = 1;
+  AssetElemental_Water = 2;
+  AssetElemental_Fire = 3;
+  AssetElemental_Wind = 4;
+  AssetElemental_Max = 5;
+}
+
+enum AssetDirection {
+  AssetDirection_Unknow = 0;
+  AssetDirection_Up = 1;
+  AssetDirection_UpRight = 2;
+  AssetDirection_Right = 3;
+  AssetDirection_DownRight = 4;
+  AssetDirection_Down = 5;
+  AssetDirection_DownLeft = 6;
+  AssetDirection_Left = 7;
+  AssetDirection_UpLeft = 8;
+  AssetDirection_Max = 9;
+}
