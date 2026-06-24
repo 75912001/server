@@ -153,7 +153,8 @@ def gen_cmd_protos(proto_dir):
             f.write(f"  {zero_name} = 0; // proto3 首值必须为 0\n")
             for hex_val, direction, desc, msg_name in entries:
                 comment = f"//{hex_val}#{direction}#{desc}"
-                f.write(f"  {msg_name}_CMD = {hex_val}; {comment}\n")
+                decimal_val = int(hex_val, 16)
+                f.write(f"  {msg_name}_CMD = {decimal_val}; {comment}\n")
             f.write("}\n")
 
         print_ok(f"生成 {base}.cmd.proto  ({len(entries)} 条 CMD)")

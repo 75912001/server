@@ -120,6 +120,7 @@ curl -i -X POST "http://127.0.0.1:30401/api/login/emailSession" \
 3. gateway 使用本机 `gatewayKey`、配置中的 `ticketSecret` 和客户端 uid 校验 `connectTicket`。
 4. 验签成功后 gateway 选择 online，执行在线登录和顶号流程。
 5. gateway 返回 `UserVerifyRes`，其中包含后续心跳使用的 `heartbeatSession`。
+6. 客户端发送 `UserRecordReq` 拉取服务端 `UserRecord`; 新账号 `user_create_timestamp_ms == 0` 时继续发送 `UserCreateReq`，由 online 初始化默认角色/宠物后返回完整 `UserRecord`。
 
 期望：
 

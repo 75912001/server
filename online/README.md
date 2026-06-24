@@ -85,7 +85,7 @@ client TCP
 当前已实现业务：
 
 - `UserRecordReq`：返回 online 本地缓存的 `UserRecord`。
-- `UserCreateReq`：只设置 `user_create_time` 并调用 `CacheSetUserRecord`，`uid/account/account_create_timestamp_ms` 必须来自 `OnlineBindUser` 绑定阶段已校验的 cache 档案。
+- `UserCreateReq`：在已绑定的 cache 档案上初始化服务端权威用户数据，设置 `user_create_timestamp_ms`，按 `used_uuid` 生成默认角色 `1000011 / 吉米` 和默认宠物记录，再调用 `CacheSetUserRecord` 写回; `uid/account/account_create_timestamp_ms` 必须来自 `OnlineBindUser` 绑定阶段已校验的 cache 档案。
 - `RobotPingReq`：返回 seq、clientTime、serverTime 和 payload。
 
 ## 一致性约定
@@ -93,13 +93,14 @@ client TCP
 - 同 uid 的 online 业务处理通过 User actor 串行执行。
 - online actor 只接受匹配 `gatewayKey + userSession` 的解绑请求。
 - online 不写 cache userSession, 因此不能作为“是否允许上线”的权威。
-- `UserRecord` 由 online 登录绑定时从 cache 读取，online 业务更新时再写回 cache。
+- `UserRecord` 由 online 登录绑定时从 cache 读取，online 业务更新时再写回 cache。cache 只创建账号壳数据, 角色、宠物和后续业务数据由 online 初始化和维护。
 
 ## 排障
 
 - `user record mismatch`：online 从 cache 读取的 `UserRecord` 与 uid/account 不一致。
 - `user not online` 不再作为解绑失败条件，本地 User 不存在会返回成功。
 - 业务包无响应：检查 gateway stream 是否注册、online 是否有对应 uid actor。
+- `UserRecord` 缺少角色记录：检查客户端是否完成 `UserCreateReq`, 以及 online 写回 cache 是否成功。
 - `DeadlineExceeded`：gateway 调用 online 超时，检查 gateway `onlineRPCTimeout`、online 日志和 actor 是否阻塞。
 
 ## 后续建议

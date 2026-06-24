@@ -2,11 +2,15 @@
 
 ## Generate protobuf code (Including standard stubs & Go-gRPC-X extensions)
 
+`./proto` 是服务端和 sa.desktop 共享协议的唯一源头。客户端仓库只在生成前从这里单向同步 `.proto` 文件, 不反向维护独立协议定义。
+
 To generate all files in `./proto/pb` (including `*.pb.go`, `*_grpc.pb.go`, and `*_grpc.x.pb.go`):
 
 ```bash
-python ./gen.py
+python gen.py
 ```
+
+`gen.py` 会先根据源 proto 中的 `//0xHEX#...` 注释生成 `*.cmd.proto`。生成的 cmd 枚举值使用十进制数字, 注释保留原始十六进制命令号, 以同时兼容 `protoc` 和 sa.desktop 使用的 Godobuf 解析器。
 
 ```bash
 go get github.com/75912001/xlib@latest

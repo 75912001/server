@@ -119,7 +119,7 @@ GroupUIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 3. 不存在时获取 `account:{account}:lock`。
 4. 拿到锁后再次查询账号映射，避免重复创建。
 5. 初始化 `user:uid:sequence:{groupID}` 为 `GroupUIDStart(groupID)-1`，并通过 `INCR` 生成 uid。
-6. 写入 `user:{uid}:record`，设置 `uid`、`account`、`account_create_time`，`user_create_time` 初始为 0。
+6. 写入 `user:{uid}:record`，设置 `uid`、`account`、`account_create_timestamp_ms`，`user_create_timestamp_ms` 初始为 0；角色、宠物和其它游戏数据不在 cache 创建。
 7. 写入 `account:{account}:uid`。
 8. 释放 `account:{account}:lock`。
 
@@ -134,6 +134,7 @@ GroupUIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 - `user:{uid}:record` 使用 protobuf marshal 后的二进制保存。
 - `CacheSetUserRecord` 要求请求 `uid` 与 `UserRecord.uid` 完全一致。
 - `CacheGetUserRecord` 对 Redis `nil` 返回 `NotFound`，其它 Redis 或反序列化错误返回 `Internal`。
+- `EnsureAccount` 只创建账号壳 `UserRecord`; `used_uuid` 和 `character_record_map` 等游戏数据由 online 的 `UserCreateReq` 初始化后再通过 `CacheSetUserRecord` 写回。
 - 直接在 Redis CLI 中看到 `\x08...` 属于正常现象。
 - 读取时必须通过 `CacheGetUserRecord` 或 protobuf 反序列化解析。
 

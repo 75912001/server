@@ -103,6 +103,12 @@ func TestUserCreateReqExistingRecordCreatesUser(t *testing.T) {
 	if record.GetUserCreateTimestampMs() == 0 {
 		t.Fatal("record user create time is zero")
 	}
+	if got := len(record.GetCharacterRecordMap()); got == 0 {
+		t.Fatalf("record character count = %d, want > 0", got)
+	}
+	if record.GetUsedUuid() == 0 {
+		t.Fatal("record used uuid is zero")
+	}
 
 	pkt := readClientPacket(t, stream)
 	if got, want := pkt.GetResultId(), xerror.Success.Code(); got != want {
