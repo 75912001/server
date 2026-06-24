@@ -40,14 +40,14 @@ func (s *cacheGRPCServer) CacheUseAccountVerifyToken(ctx context.Context, req *p
 	if !ok {
 		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.NotFound, "accountVerifyToken not found or used")
 	}
-	userRecord, _, err := GRedis.EnsureAccount(ctx, account)
+	accountRecord, _, err := GRedis.EnsureAccount(ctx, account)
 	if err != nil {
 		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
-	if userRecord == nil || userRecord.GetUid() == 0 {
+	if accountRecord == nil || accountRecord.GetUid() == 0 {
 		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.Internal, "account uid is empty")
 	}
 	return &pb.CacheUseAccountVerifyTokenRes{
-		Uid: userRecord.GetUid(),
+		Uid: accountRecord.GetUid(),
 	}, nil
 }

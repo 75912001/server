@@ -44,13 +44,13 @@ func (p *Redis) UseAccountVerifyToken(ctx context.Context, account string, accou
 	return redisScriptResultIsOK(result), nil
 }
 
-// EnsureAccount 确保 account 有唯一 uid 和 UserRecord。
+// EnsureAccount 确保 account 有唯一 uid 和 AccountRecord。
 // 返回值 created 表示本次调用是否新建了账号。
-func (p *Redis) EnsureAccount(ctx context.Context, account string) (*pb.UserRecord, bool, error) {
+func (p *Redis) EnsureAccount(ctx context.Context, account string) (*pb.AccountRecord, bool, error) {
 	for {
-		userRecord, found, err := p.GetAccountUserRecord(ctx, account)
+		accountRecord, found, err := p.GetAccountRecordByAccount(ctx, account)
 		if err != nil || found {
-			return userRecord, false, err
+			return accountRecord, false, err
 		}
 
 		locked, err := p.client.SetNX(ctx, RedisKeyAccountLock(account), "1", GCfgCustomRedisAccountCreateLockDuration).Result()
@@ -64,20 +64,20 @@ func (p *Redis) EnsureAccount(ctx context.Context, account string) (*pb.UserReco
 			continue
 		}
 
-		userRecord, created, err := p.createAccountAfterLock(ctx, account)
+		accountRecord, created, err := p.createAccountAfterLock(ctx, account)
 		if _, unlockErr := p.client.Del(ctx, RedisKeyAccountLock(account)).Result(); unlockErr != nil && err == nil {
 			err = errors.WithMessagef(unlockErr, "unlock account create failed, account: %s %v", account, xruntime.Location())
 		}
-		return userRecord, created, err
+		return accountRecord, created, err
 	}
 }
 
 // createAccountAfterLock 在持有账号创建锁后创建账号数据。
 // 创建前会再次查询账号映射，避免等待锁期间其他请求已经完成创建。
-func (p *Redis) createAccountAfterLock(ctx context.Context, account string) (*pb.UserRecord, bool, error) {
-	userRecord, found, err := p.GetAccountUserRecord(ctx, account)
+func (p *Redis) createAccountAfterLock(ctx context.Context, account string) (*pb.AccountRecord, bool, error) {
+	accountRecord, found, err := p.GetAccountRecordByAccount(ctx, account)
 	if err != nil || found {
-		return userRecord, false, err
+		return accountRecord, false, err
 	}
 
 	groupID := GCfgBaseGroupID
@@ -92,48 +92,48 @@ func (p *Redis) createAccountAfterLock(ctx context.Context, account string) (*pb
 	}
 
 	now := time.Now().UnixMilli()
-	userRecord = &pb.UserRecord{
-		Uid:                      uid,
-		Account:                  account,
-		AccountCreateTimestampMs: now,
-		UserCreateTimestampMs:    0,
+	accountRecord = &pb.AccountRecord{
+		Uid:                            uid,
+		Account:                        account,
+		AccountCreateTimestampMs:       now,
+		AccountRecordCreateTimestampMs: 0,
 	}
-	if err = p.SetUserRecord(ctx, uid, userRecord); err != nil {
+	if err = p.SetAccountRecord(ctx, uid, accountRecord); err != nil {
 		return nil, false, err
 	}
 	if err = p.client.Set(ctx, RedisKeyAccountUID(account), strconv.FormatUint(uid, 10), 0).Err(); err != nil {
 		return nil, false, errors.WithMessagef(err, "set account uid failed, account: %s uid: %d %v", account, uid, xruntime.Location())
 	}
-	return userRecord, true, nil
+	return accountRecord, true, nil
 }
 
-// GetAccountUserRecord 通过 account 读取 uid 和 UserRecord。
-// 如果账号映射存在但 UserRecord 缺失或关键字段不一致，直接返回错误。
-func (p *Redis) GetAccountUserRecord(ctx context.Context, account string) (*pb.UserRecord, bool, error) {
+// GetAccountRecordByAccount 通过 account 读取 uid 和 AccountRecord。
+// 如果账号映射存在但 AccountRecord 缺失或关键字段不一致，直接返回错误。
+func (p *Redis) GetAccountRecordByAccount(ctx context.Context, account string) (*pb.AccountRecord, bool, error) {
 	uid, found, err := p.GetAccountUID(ctx, account)
 	if err != nil || !found {
 		return nil, found, err
 	}
-	userRecord, err := p.GetUserRecord(ctx, uid)
+	accountRecord, err := p.GetAccountRecord(ctx, uid)
 	if errors.Is(err, redis.Nil) {
-		return nil, true, errors.Errorf("account user record missing, account: %s uid: %d %v", account, uid, xruntime.Location())
+		return nil, true, errors.Errorf("account record missing, account: %s uid: %d %v", account, uid, xruntime.Location())
 	}
 	if err != nil {
 		return nil, true, err
 	}
-	if userRecord == nil {
-		return nil, true, errors.Errorf("account user record is nil, account: %s uid: %d %v", account, uid, xruntime.Location())
+	if accountRecord == nil {
+		return nil, true, errors.Errorf("account record is nil, account: %s uid: %d %v", account, uid, xruntime.Location())
 	}
-	if userRecord.GetUid() != uid {
-		return nil, true, errors.Errorf("account user record uid mismatch, account: %s uid: %d record_uid: %d %v", account, uid, userRecord.GetUid(), xruntime.Location())
+	if accountRecord.GetUid() != uid {
+		return nil, true, errors.Errorf("account record uid mismatch, account: %s uid: %d record_uid: %d %v", account, uid, accountRecord.GetUid(), xruntime.Location())
 	}
-	if userRecord.GetAccount() != account {
-		return nil, true, errors.Errorf("account user record account mismatch, account: %s uid: %d record_account: %s %v", account, uid, userRecord.GetAccount(), xruntime.Location())
+	if accountRecord.GetAccount() != account {
+		return nil, true, errors.Errorf("account record account mismatch, account: %s uid: %d record_account: %s %v", account, uid, accountRecord.GetAccount(), xruntime.Location())
 	}
-	if userRecord.GetAccountCreateTimestampMs() == 0 {
-		return nil, true, errors.Errorf("account user record create time is empty, account: %s uid: %d %v", account, uid, xruntime.Location())
+	if accountRecord.GetAccountCreateTimestampMs() == 0 {
+		return nil, true, errors.Errorf("account record create time is empty, account: %s uid: %d %v", account, uid, xruntime.Location())
 	}
-	return userRecord, true, nil
+	return accountRecord, true, nil
 }
 
 // GetAccountUID 读取 account 到 uid 的映射。

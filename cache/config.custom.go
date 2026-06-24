@@ -7,7 +7,7 @@ import (
 	xconfig "github.com/75912001/xlib/config"
 )
 
-var GCfgCustomRedisKeyFormatUserRecord string
+var GCfgCustomRedisKeyFormatAccountRecord string
 var GCfgCustomRedisKeyFormatUserSession string
 var GCfgCustomRedisKeyFormatAccountVerifyToken string
 var GCfgCustomRedisKeyFormatAccountUID string
@@ -17,7 +17,7 @@ var GCfgBaseGroupID uint32
 
 func initCustomConfig() {
 	GCfgBaseGroupID = *xconfig.GConfigMgr.Base.GroupID
-	GCfgCustomRedisKeyFormatUserRecord = xconfig.GConfigMgr.GetCustomString("redisKeyFormatUserRecord", "user:{%v}:record")
+	GCfgCustomRedisKeyFormatAccountRecord = xconfig.GConfigMgr.GetCustomString("redisKeyFormatAccountRecord", "account:{%v}:record")
 	GCfgCustomRedisKeyFormatUserSession = xconfig.GConfigMgr.GetCustomString("redisKeyFormatUserSession", "user:{%v}:session")
 	GCfgCustomRedisKeyFormatAccountVerifyToken = xconfig.GConfigMgr.GetCustomString("redisKeyFormatAccountVerifyToken", "account:{%v}:accountVerifyToken")
 	GCfgCustomRedisKeyFormatAccountUID = xconfig.GConfigMgr.GetCustomString("redisKeyFormatAccountUID", "account:{%v}:uid")
@@ -25,8 +25,8 @@ func initCustomConfig() {
 	GCfgCustomRedisAccountCreateLockDuration = xconfig.GConfigMgr.GetCustomDuration("redisAccountCreateLockDuration", 5*time.Second)
 }
 
-func RedisKeyUserRecord(uid uint64) string {
-	return fmt.Sprintf(GCfgCustomRedisKeyFormatUserRecord, uid)
+func RedisKeyAccountRecord(uid uint64) string {
+	return fmt.Sprintf(GCfgCustomRedisKeyFormatAccountRecord, uid)
 }
 
 func RedisKeyUserSession(uid uint64) string {

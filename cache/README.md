@@ -6,7 +6,7 @@ Cache 服务负责统一访问 Redis Cluster, 提供 accountVerifyToken、账号
 
 - 存储和消费 accountVerifyToken。
 - 确保账号存在，并为新账号分配 uid。
-- 存储 `UserRecord`，Redis 中以 protobuf 二进制保存。
+- 存储 `AccountRecord`，Redis 中以 protobuf 二进制保存。
 - 维护 `user:{uid}:session` 对应 cache userSession 的读取、开始、结束和 TTL 刷新 CAS。
 - 通过 Redis Lua 脚本实现 accountVerifyToken 消费和 cache userSession CAS 操作。
 - cache 只保存和校验数据，不决定用户应该归属哪个 gateway 或 online。
@@ -18,11 +18,11 @@ account:{account}:accountVerifyToken accountVerifyToken
 account:{account}:uid         account 到 uid 的映射
 account:{account}:lock        account 首次创建锁
 user:uid:sequence:{groupID}   当前 group 的 uid 自增序列
-user:{uid}:record             UserRecord protobuf 二进制
+account:{uid}:record          AccountRecord protobuf 二进制
 user:{uid}:session            cache userSession hash
 ```
 
-`{...}` 是 Redis Cluster hash tag。`user:{uid}:record` 和 `user:{uid}:session` 会按同一个 uid 分到同一 slot; `account:{account}:accountVerifyToken`、`uid`、`lock` 会按同一个 account 分到同一 slot。
+`{...}` 是 Redis Cluster hash tag。`account:{uid}:record` 和 `user:{uid}:session` 会按同一个 uid 分到同一 slot; `account:{account}:accountVerifyToken`、`uid`、`lock` 会按同一个 account 分到同一 slot。
 
 ## cache userSession
 
@@ -62,8 +62,8 @@ userSession
 | --- | --- | --- |
 | `CacheSetAccountVerifyToken` | `account` | 写入 accountVerifyToken, Redis 使用 `SETNX`, 未消费前不覆盖。 |
 | `CacheUseAccountVerifyToken` | `account` | 验证并消费 accountVerifyToken, 成功后确保账号存在并返回 uid。 |
-| `CacheSetUserRecord` | `uid` | 写入 `UserRecord`，要求请求 `uid` 与 `UserRecord.uid` 一致。 |
-| `CacheGetUserRecord` | `uid` | 读取 `UserRecord`。 |
+| `CacheSetAccountRecord` | `uid` | 写入 `AccountRecord`，要求请求 `uid` 与 `AccountRecord.uid` 一致。 |
+| `CacheGetAccountRecord` | `uid` | 读取 `AccountRecord`。 |
 | `CacheGetUserSession` | `uid` | 读取当前 `gatewayKey/userSession/loginTimestampMs/onlineKey`；`login_timestamp_ms` 对外表示登录时间毫秒值，读取不到完整 cache userSession 时返回 `NotFound`。 |
 | `CacheBeginUserSessionCAS` | `uid` | `expected_user_session` 为空时要求当前 cache userSession 不存在; 非空时要求当前 `userSession` 匹配后替换为新 cache userSession。 |
 | `CacheEndUserSessionCAS` | `uid` | `expected_user_session` 匹配时删除 cache userSession。 |
@@ -115,28 +115,31 @@ GroupUIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 `EnsureAccount` 处理顺序：
 
 1. 查询 `account:{account}:uid`。
-2. 已存在时读取 `user:{uid}:record` 并返回。
+2. 已存在时读取 `account:{uid}:record` 并返回。
 3. 不存在时获取 `account:{account}:lock`。
 4. 拿到锁后再次查询账号映射，避免重复创建。
 5. 初始化 `user:uid:sequence:{groupID}` 为 `GroupUIDStart(groupID)-1`，并通过 `INCR` 生成 uid。
-6. 写入 `user:{uid}:record`，设置 `uid`、`account`、`account_create_timestamp_ms`，`user_create_timestamp_ms` 初始为 0；角色、宠物和其它游戏数据不在 cache 创建。
+6. 写入 `account:{uid}:record`，设置 `uid`、`account`、`account_create_timestamp_ms`，`account_record_create_timestamp_ms` 初始为 0；角色、宠物和其它游戏数据不在 cache 创建。
 7. 写入 `account:{account}:uid`。
 8. 释放 `account:{account}:lock`。
 
 保留 `account:{account}:lock` 的原因：
 
 - 账号创建跨多个 Redis key，不是单条 Redis 原子操作。
-- 没有锁时，并发请求可能生成多个 uid，只最终绑定其中一个，留下孤儿 `UserRecord`。
+- 没有锁时，并发请求可能生成多个 uid，只最终绑定其中一个，留下孤儿 `AccountRecord`。
 - 即使 accountVerifyToken 消费会降低并发概率, 锁仍是账号唯一性的最终保护。
 
-## UserRecord
+## AccountRecord
 
-- `user:{uid}:record` 使用 protobuf marshal 后的二进制保存。
-- `CacheSetUserRecord` 要求请求 `uid` 与 `UserRecord.uid` 完全一致。
-- `CacheGetUserRecord` 对 Redis `nil` 返回 `NotFound`，其它 Redis 或反序列化错误返回 `Internal`。
-- `EnsureAccount` 只创建账号壳 `UserRecord`; `used_uuid` 和 `character_record_map` 等游戏数据由 online 的 `UserCreateReq` 初始化后再通过 `CacheSetUserRecord` 写回。
+- `account:{uid}:record` 使用 protobuf marshal 后的二进制保存。
+- `AccountRecord` 是账号级档案聚合根, `uid/account` 下管理多个角色; `character_record_map` 的 key 是角色 `uuid`, 完整角色业务 key 是 `uid + uuid`。
+- `CharacterRecord.asset_id` 是角色资源 ID/角色 ID 的权威字段; `asset_id_record_map` 只保存 HP、属性、创建时间等数值记录。
+- `CacheSetAccountRecord` 要求请求 `uid` 与 `AccountRecord.uid` 完全一致。
+- `CacheGetAccountRecord` 对 Redis `nil` 返回 `NotFound`，其它 Redis 或反序列化错误返回 `Internal`。
+- `EnsureAccount` 只创建账号壳 `AccountRecord`; `used_uuid` 和 `character_record_map` 等游戏数据由 online 的 `AccountCreateReq` 初始化后再通过 `CacheSetAccountRecord` 写回。
+- 本轮不迁移旧 cache `AccountRecord`; 已存在但缺少 `CharacterRecord.asset_id` 的档案视为旧格式, 开发环境需要清理 cache 或重新创建账号。
 - 直接在 Redis CLI 中看到 `\x08...` 属于正常现象。
-- 读取时必须通过 `CacheGetUserRecord` 或 protobuf 反序列化解析。
+- 读取时必须通过 `CacheGetAccountRecord` 或 protobuf 反序列化解析。
 
 ## Redis 原子操作
 
@@ -158,7 +161,7 @@ login
   -> Redis account:{account}:accountVerifyToken
   -> EnsureAccount
   -> Redis account:{account}:uid
-  -> Redis user:{uid}:record
+  -> Redis account:{uid}:record
 
 login email/password
   -> CacheSetAccountVerifyToken
@@ -167,17 +170,17 @@ login email/password
   -> Redis account:{account}:accountVerifyToken
   -> EnsureAccount
   -> Redis account:{account}:uid
-  -> Redis user:{uid}:record
+  -> Redis account:{uid}:record
 
 gateway
-  -> CacheGetUserRecord
+  -> CacheGetAccountRecord
   -> CacheGetUserSession
   -> CacheBeginUserSessionCAS
   -> CacheRefreshUserSessionCAS
   -> CacheEndUserSessionCAS
 
 online
-  -> CacheSetUserRecord
+  -> CacheSetAccountRecord
 ```
 
 ## 排障
@@ -186,12 +189,12 @@ online
 - `accountVerifyToken not found or used`: accountVerifyToken 不存在、过期、已消费或值不匹配。
 - `user session changed`：CAS expected 不匹配，说明 cache userSession 已被其他登录、离线或 TTL 变化接管。
 - `user session not found`：当前 uid 没有 cache userSession。
-- `redis: nil` 读取 `UserRecord`：用户档案缺失；如果账号映射已存在，`EnsureAccount` 会按账号数据不一致返回错误。
+- `redis: nil` 读取 `AccountRecord`：用户档案缺失；如果账号映射已存在，`EnsureAccount` 会按账号数据不一致返回错误。
 - `redis addrs is empty`：`redis` 配置存在空地址列表。
 - `redis config not found`：未配置 `redis` 项。
 
 ## 后续建议
 
 - cache actor/worker 可按 shardKey 分发，让同 key 请求在 cache 进程内串行执行；这能减少锁竞争和乱序处理，但不能替代 Redis 锁和 CAS。
-- 如需移除 `account:{account}:lock`，必须把账号创建改为 Redis Lua 原子流程，覆盖查询账号、生成 uid、写账号映射和写 UserRecord。
+- 如需移除 `account:{account}:lock`，必须把账号创建改为 Redis Lua 原子流程，覆盖查询账号、生成 uid、写账号映射和写 AccountRecord。
 - 增加账号并发创建、accountVerifyToken 重放、cache userSession CAS 冲突、旧删除迟到、新旧 cache userSession 乱序的自动化测试。

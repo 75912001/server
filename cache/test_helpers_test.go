@@ -16,7 +16,7 @@ type testCleanup interface {
 func setTestCacheConfig(t testCleanup) {
 	t.Helper()
 
-	oldUserRecord := GCfgCustomRedisKeyFormatUserRecord
+	oldAccountRecord := GCfgCustomRedisKeyFormatAccountRecord
 	oldUserSession := GCfgCustomRedisKeyFormatUserSession
 	oldAccountVerifyToken := GCfgCustomRedisKeyFormatAccountVerifyToken
 	oldAccountUID := GCfgCustomRedisKeyFormatAccountUID
@@ -24,7 +24,7 @@ func setTestCacheConfig(t testCleanup) {
 	oldLockDuration := GCfgCustomRedisAccountCreateLockDuration
 	oldGroupID := GCfgBaseGroupID
 
-	GCfgCustomRedisKeyFormatUserRecord = "user:{%v}:record"
+	GCfgCustomRedisKeyFormatAccountRecord = "user:{%v}:record"
 	GCfgCustomRedisKeyFormatUserSession = "user:{%v}:session"
 	GCfgCustomRedisKeyFormatAccountVerifyToken = "account:{%v}:accountVerifyToken"
 	GCfgCustomRedisKeyFormatAccountUID = "account:{%v}:uid"
@@ -33,7 +33,7 @@ func setTestCacheConfig(t testCleanup) {
 	GCfgBaseGroupID = 1
 
 	t.Cleanup(func() {
-		GCfgCustomRedisKeyFormatUserRecord = oldUserRecord
+		GCfgCustomRedisKeyFormatAccountRecord = oldAccountRecord
 		GCfgCustomRedisKeyFormatUserSession = oldUserSession
 		GCfgCustomRedisKeyFormatAccountVerifyToken = oldAccountVerifyToken
 		GCfgCustomRedisKeyFormatAccountUID = oldAccountUID

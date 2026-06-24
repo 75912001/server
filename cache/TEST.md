@@ -10,7 +10,7 @@ cache 测试重点不是单纯追求覆盖率，而是稳定覆盖服务契约�
 - Redis key 格式。
 - accountVerifyToken 设置、消费和删除。
 - uid 按 `base.groupID` 分段生成。
-- `UserRecord` protobuf 读写。
+- `AccountRecord` protobuf 读写。
 - cache userSession 的批量读写、CAS 替换、续期、删除和迟到请求保护。
 
 ## 快速单元测试
@@ -88,7 +88,7 @@ GOCACHE="$PWD/../.gocache" go test -tags=integration .
 覆盖内容：
 
 - accountVerifyToken 首次设置、重复设置、错误 accountVerifyToken、消费后删除。
-- 新账号创建、重复读取、UserRecord 缺失或关键字段不一致时报错。
+- 新账号创建、重复读取、AccountRecord 缺失或关键字段不一致时报错。
 - 同账号并发创建只生成一个 uid。
 - cache userSession HSET/HMGET。
 - cache userSession CAS replace、expire、delete。
@@ -150,7 +150,7 @@ rmdir ../.coverage 2>/dev/null || true
 典型检查项：
 
 - accountVerifyToken 设置和消费流程。
-- user record 读写。
+- account record 读写。
 - cache userSession set/get/replace/delete/expire。
 - 参数错误返回 `InvalidArgument`。
 - 记录不存在返回 `NotFound`。

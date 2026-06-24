@@ -10,7 +10,7 @@ func TestRedisKeyFunctions(t *testing.T) {
 		got  string
 		want string
 	}{
-		{name: "user record", got: RedisKeyUserRecord(1001), want: "user:{1001}:record"},
+		{name: "account record", got: RedisKeyAccountRecord(1001), want: "user:{1001}:record"},
 		{name: "user session", got: RedisKeyUserSession(1001), want: "user:{1001}:session"},
 		{name: "accountVerifyToken", got: RedisKeyAccountVerifyToken("alice"), want: "account:{alice}:accountVerifyToken"},
 		{name: "account uid", got: RedisKeyAccountUID("alice"), want: "account:{alice}:uid"},

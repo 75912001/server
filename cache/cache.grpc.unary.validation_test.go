@@ -20,19 +20,19 @@ func TestAccountVerifyTokenHandlerInvalidArguments(t *testing.T) {
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 }
 
-func TestUserRecordHandlerInvalidArguments(t *testing.T) {
+func TestAccountRecordHandlerInvalidArguments(t *testing.T) {
 	s := &cacheGRPCServer{}
 	ctx := context.Background()
 
-	_, err := s.CacheGetUserRecord(ctx, &pb.CacheGetUserRecordReq{})
+	_, err := s.CacheGetAccountRecord(ctx, &pb.CacheGetAccountRecordReq{})
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 
-	_, err = s.CacheSetUserRecord(ctx, &pb.CacheSetUserRecordReq{Uid: 1})
+	_, err = s.CacheSetAccountRecord(ctx, &pb.CacheSetAccountRecordReq{Uid: 1})
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 
-	_, err = s.CacheSetUserRecord(ctx, &pb.CacheSetUserRecordReq{
-		Uid:        1,
-		UserRecord: &pb.UserRecord{Uid: 2},
+	_, err = s.CacheSetAccountRecord(ctx, &pb.CacheSetAccountRecordReq{
+		Uid:           1,
+		AccountRecord: &pb.AccountRecord{Uid: 2},
 	})
 	requireStatusCode(t, err, grpccodes.InvalidArgument)
 }

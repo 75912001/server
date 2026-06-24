@@ -139,7 +139,7 @@ func TestIntegrationEnsureAccount(t *testing.T) {
 	accountLockKey := RedisKeyAccountLock(account)
 	cleanupRedisKeys(t, r, ctx, sequenceKey, accountUIDKey, accountLockKey)
 
-	userRecord, created, err := r.EnsureAccount(ctx, account)
+	accountRecord, created, err := r.EnsureAccount(ctx, account)
 	if err != nil {
 		t.Fatalf("EnsureAccount create failed: %v", err)
 	}
@@ -147,58 +147,58 @@ func TestIntegrationEnsureAccount(t *testing.T) {
 		t.Fatal("EnsureAccount created = false, want true")
 	}
 	wantUID := common.GroupUIDStart(GCfgBaseGroupID)
-	if userRecord.GetUid() != wantUID {
-		t.Fatalf("uid = %d, want %d", userRecord.GetUid(), wantUID)
+	if accountRecord.GetUid() != wantUID {
+		t.Fatalf("uid = %d, want %d", accountRecord.GetUid(), wantUID)
 	}
 
-	userRecordAgain, createdAgain, err := r.EnsureAccount(ctx, account)
+	accountRecordAgain, createdAgain, err := r.EnsureAccount(ctx, account)
 	if err != nil {
 		t.Fatalf("EnsureAccount existing failed: %v", err)
 	}
 	if createdAgain {
 		t.Fatal("EnsureAccount existing created = true, want false")
 	}
-	if userRecordAgain.GetUid() != wantUID {
-		t.Fatalf("existing uid = %d, want %d", userRecordAgain.GetUid(), wantUID)
+	if accountRecordAgain.GetUid() != wantUID {
+		t.Fatalf("existing uid = %d, want %d", accountRecordAgain.GetUid(), wantUID)
 	}
 
-	userRecordKey := RedisKeyUserRecord(wantUID)
-	cleanupRedisKeys(t, r, ctx, userRecordKey)
-	if _, found, err := r.GetAccountUserRecord(ctx, account); err == nil || !found {
-		t.Fatalf("GetAccountUserRecord missing record err = %v, found = %v; want error and found", err, found)
+	accountRecordKey := RedisKeyAccountRecord(wantUID)
+	cleanupRedisKeys(t, r, ctx, accountRecordKey)
+	if _, found, err := r.GetAccountRecordByAccount(ctx, account); err == nil || !found {
+		t.Fatalf("GetAccountRecordByAccount missing record err = %v, found = %v; want error and found", err, found)
 	}
 
 	now := time.Now().UnixMilli()
-	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID + 1, Account: account, AccountCreateTimestampMs: now}); err != nil {
-		t.Fatalf("set mismatched uid user record failed: %v", err)
+	if err := r.SetAccountRecord(ctx, wantUID, &pb.AccountRecord{Uid: wantUID + 1, Account: account, AccountCreateTimestampMs: now}); err != nil {
+		t.Fatalf("set mismatched uid account record failed: %v", err)
 	}
-	if _, found, err := r.GetAccountUserRecord(ctx, account); err == nil || !found {
-		t.Fatalf("GetAccountUserRecord mismatched uid err = %v, found = %v; want error and found", err, found)
-	}
-
-	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID, Account: account + "-other", AccountCreateTimestampMs: now}); err != nil {
-		t.Fatalf("set mismatched account user record failed: %v", err)
-	}
-	if _, found, err := r.GetAccountUserRecord(ctx, account); err == nil || !found {
-		t.Fatalf("GetAccountUserRecord mismatched account err = %v, found = %v; want error and found", err, found)
+	if _, found, err := r.GetAccountRecordByAccount(ctx, account); err == nil || !found {
+		t.Fatalf("GetAccountRecordByAccount mismatched uid err = %v, found = %v; want error and found", err, found)
 	}
 
-	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID, Account: account}); err != nil {
-		t.Fatalf("set empty account create time user record failed: %v", err)
+	if err := r.SetAccountRecord(ctx, wantUID, &pb.AccountRecord{Uid: wantUID, Account: account + "-other", AccountCreateTimestampMs: now}); err != nil {
+		t.Fatalf("set mismatched account account record failed: %v", err)
 	}
-	if _, found, err := r.GetAccountUserRecord(ctx, account); err == nil || !found {
-		t.Fatalf("GetAccountUserRecord empty account create time err = %v, found = %v; want error and found", err, found)
+	if _, found, err := r.GetAccountRecordByAccount(ctx, account); err == nil || !found {
+		t.Fatalf("GetAccountRecordByAccount mismatched account err = %v, found = %v; want error and found", err, found)
 	}
 
-	if err := r.SetUserRecord(ctx, wantUID, &pb.UserRecord{Uid: wantUID, Account: account, AccountCreateTimestampMs: now, UserCreateTimestampMs: 0}); err != nil {
-		t.Fatalf("set valid user record with empty user create time failed: %v", err)
+	if err := r.SetAccountRecord(ctx, wantUID, &pb.AccountRecord{Uid: wantUID, Account: account}); err != nil {
+		t.Fatalf("set empty account create time account record failed: %v", err)
 	}
-	validRecord, found, err := r.GetAccountUserRecord(ctx, account)
+	if _, found, err := r.GetAccountRecordByAccount(ctx, account); err == nil || !found {
+		t.Fatalf("GetAccountRecordByAccount empty account create time err = %v, found = %v; want error and found", err, found)
+	}
+
+	if err := r.SetAccountRecord(ctx, wantUID, &pb.AccountRecord{Uid: wantUID, Account: account, AccountCreateTimestampMs: now, AccountRecordCreateTimestampMs: 0}); err != nil {
+		t.Fatalf("set valid account record with empty user create time failed: %v", err)
+	}
+	validRecord, found, err := r.GetAccountRecordByAccount(ctx, account)
 	if err != nil || !found {
-		t.Fatalf("GetAccountUserRecord valid empty user create time = %#v, %v, %v; want record, true, nil", validRecord, found, err)
+		t.Fatalf("GetAccountRecordByAccount valid empty user create time = %#v, %v, %v; want record, true, nil", validRecord, found, err)
 	}
 
-	cleanupRedisKeys(t, r, ctx, sequenceKey, accountUIDKey, accountLockKey, userRecordKey)
+	cleanupRedisKeys(t, r, ctx, sequenceKey, accountUIDKey, accountLockKey, accountRecordKey)
 }
 
 func TestIntegrationEnsureAccountConcurrent(t *testing.T) {
@@ -244,7 +244,7 @@ func TestIntegrationEnsureAccountConcurrent(t *testing.T) {
 		}
 	}
 
-	cleanupRedisKeys(t, r, ctx, sequenceKey, accountUIDKey, accountLockKey, RedisKeyUserRecord(firstUID))
+	cleanupRedisKeys(t, r, ctx, sequenceKey, accountUIDKey, accountLockKey, RedisKeyAccountRecord(firstUID))
 }
 
 func TestIntegrationUserSessionCAS(t *testing.T) {
