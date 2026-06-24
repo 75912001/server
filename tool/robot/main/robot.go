@@ -248,24 +248,24 @@ func (p *Robot) applyPacketState(packet *xpacket.Packet) {
 			}
 			p.verified = true
 			p.StartHeartBeat()
-			p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "UserRecordReq", Source: "auto"})
+			p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "AccountRecordReq", Source: "auto"})
 		} else {
 			p.manager.stats.verifyFail.Add(1)
 		}
-	case *pb.UserRecordRes:
+	case *pb.AccountRecordRes:
 		if packet.Header.ResultID == 0 {
-			userRecord := msg.GetUserRecord()
-			if userRecord != nil && userRecord.GetUid() != 0 && userRecord.GetUserCreateTimestampMs() != 0 {
+			accountRecord := msg.GetAccountRecord()
+			if accountRecord != nil && accountRecord.GetUid() != 0 && accountRecord.GetAccountRecordCreateTimestampMs() != 0 {
 				p.markUserReady()
 				return
 			}
-			p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "UserCreateReq", Source: "auto"})
+			p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "AccountCreateReq", Source: "auto"})
 			return
 		}
 		if packet.Header.ResultID == common.ECOnlineUserNotCreated.Code() {
-			p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "UserCreateReq", Source: "auto"})
+			p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "AccountCreateReq", Source: "auto"})
 		}
-	case *pb.UserCreateRes:
+	case *pb.AccountCreateRes:
 		if packet.Header.ResultID == 0 || packet.Header.ResultID == xerror.AlreadyExists.Code() {
 			p.markUserReady()
 		}
@@ -283,7 +283,7 @@ func (p *Robot) applyPacketState(packet *xpacket.Packet) {
 }
 
 func (p *Robot) isExpectedNonZeroResult(packet *xpacket.Packet) bool {
-	return packet.Header.MessageID == uint32(pb.MsgIDUser_UserCreateRes_CMD) &&
+	return packet.Header.MessageID == uint32(pb.MsgIDUser_AccountCreateRes_CMD) &&
 		packet.Header.ResultID == xerror.AlreadyExists.Code()
 }
 

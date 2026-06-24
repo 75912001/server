@@ -61,43 +61,43 @@ func waitCache(timeout time.Duration) error {
 	}
 }
 
-func cacheEnsureRobotUserRecord(uid uint64) error {
+func cacheEnsureRobotAccountRecord(uid uint64) error {
 	account := robotAccount(uid)
-	res, err := pb.GXCacheServiceService.CacheGetUserRecord(context.Background(), &pb.CacheGetUserRecordReq{
+	res, err := pb.GXCacheServiceService.CacheGetAccountRecord(context.Background(), &pb.CacheGetAccountRecordReq{
 		Uid: uid,
 	})
 	if err == nil {
-		userRecord := res.GetUserRecord()
-		if userRecord == nil {
-			return errors.Errorf("CacheGetUserRecord uid:%d user record is nil", uid)
+		accountRecord := res.GetAccountRecord()
+		if accountRecord == nil {
+			return errors.Errorf("CacheGetAccountRecord uid:%d account record is nil", uid)
 		}
-		if userRecord.GetAccount() != account {
-			return errors.Errorf("CacheGetUserRecord uid:%d account mismatch current:%s expect:%s", uid, userRecord.GetAccount(), account)
+		if accountRecord.GetAccount() != account {
+			return errors.Errorf("CacheGetAccountRecord uid:%d account mismatch current:%s expect:%s", uid, accountRecord.GetAccount(), account)
 		}
 		return nil
 	}
 	s, ok := grpcstatus.FromError(err)
 	if !ok || s.Code() != codes.NotFound {
 		if ok {
-			return errors.WithMessagef(err, "CacheGetUserRecord uid:%d code:%v message:%s", uid, s.Code(), s.Message())
+			return errors.WithMessagef(err, "CacheGetAccountRecord uid:%d code:%v message:%s", uid, s.Code(), s.Message())
 		}
-		return errors.WithMessagef(err, "CacheGetUserRecord uid:%d", uid)
+		return errors.WithMessagef(err, "CacheGetAccountRecord uid:%d", uid)
 	}
-	_, err = pb.GXCacheServiceService.CacheSetUserRecord(context.Background(), &pb.CacheSetUserRecordReq{
+	_, err = pb.GXCacheServiceService.CacheSetAccountRecord(context.Background(), &pb.CacheSetAccountRecordReq{
 		Uid: uid,
-		UserRecord: &pb.UserRecord{
-			Uid:                      uid,
-			Account:                  account,
-			AccountCreateTimestampMs: time.Now().UnixMilli(),
-			UserCreateTimestampMs:    0,
+		AccountRecord: &pb.AccountRecord{
+			Uid:                            uid,
+			Account:                        account,
+			AccountCreateTimestampMs:       time.Now().UnixMilli(),
+			AccountRecordCreateTimestampMs: 0,
 		},
 	})
 	if err != nil {
 		s, ok = grpcstatus.FromError(err)
 		if ok {
-			return errors.WithMessagef(err, "CacheSetUserRecord uid:%d account:%s code:%v message:%s", uid, account, s.Code(), s.Message())
+			return errors.WithMessagef(err, "CacheSetAccountRecord uid:%d account:%s code:%v message:%s", uid, account, s.Code(), s.Message())
 		}
-		return errors.WithMessagef(err, "CacheSetUserRecord uid:%d account:%s", uid, account)
+		return errors.WithMessagef(err, "CacheSetAccountRecord uid:%d account:%s", uid, account)
 	}
 	return nil
 }
