@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package user;
+option go_package = "server/proto/pb;pb";
+
+enum CharacterWeaponType {
+  CharacterWeaponType_Unknow = 0;
+  CharacterWeaponType_Unarmed = 1;
+  CharacterWeaponType_Axe = 2;
+  CharacterWeaponType_Bow = 3;
+  CharacterWeaponType_Spear = 4;
+  CharacterWeaponType_Stick = 5;
+  CharacterWeaponType_Max = 6;
+}
