@@ -37,7 +37,7 @@ UserVerifyReq {
 8. 如果旧 cache userSession 存在，调用旧 gateway `GatewayKickUser(uid, oldUserSession)`；旧 gateway 不存在、找不到本地连接、`userSession` 不匹配或 cleanup 失败时，本次登录失败。
 9. 选择本地 `availableLoad` 最大的 online，并立即本地扣减 1，后续 etcd 更新会覆盖本地估算值。
 10. 调用 `CacheBeginUserSessionCAS(expected_user_session="")` 写入带 `gatewayKey/userSession/login_timestamp_ms/onlineKey` 的新 cache userSession；如果返回 `Aborted`，说明旧 cache userSession 仍存在或并发登录已抢占，本次登录失败。
-11. 调用 `OnlineBindUser`，由 online 读取并校验 `UserRecord` 后绑定 actor。
+11. 调用 `OnlineBindUser`，由 online 读取并校验 `AccountRecord` 后绑定 actor。
 12. 生成随机 `heartbeatSession`，绑定本地 User 到 uid、account、online、`userSession` 和 `heartbeatSession`。
 13. 返回 `UserVerifyRes.server_timestamp_ms` 和 `UserVerifyRes.heartbeat_session`。
 

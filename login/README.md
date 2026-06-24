@@ -114,7 +114,7 @@ login 只做登录凭证校验和 gateway 入口分配，不维护用户在线�
 2. 解析 JSON，请求只允许 `account` 和 `accountVerifyToken`。
 3. 对 `account` 去除首尾空格，空 `account/accountVerifyToken` 返回 `400`。
 4. 调用 cache `CacheUseAccountVerifyToken(account, accountVerifyToken)`，由 cache 原子验证并消费 accountVerifyToken。
-5. cache 消费成功后确保账号存在，必要时创建 `account -> uid` 映射和占位 `UserRecord`，并返回可信 uid。
+5. cache 消费成功后确保账号存在，必要时创建 `account -> uid` 映射和占位 `AccountRecord`，并返回可信 uid。
 6. login 从 gateway 管理器中选择本地 `availableLoad` 最大的可用 gateway，并先本地扣减 1 个可用负载。
 7. login 构造 `ConnectTicketPayload`，payload 包含 `version/uid/account/gatewayKey/nonce/issuedTimestampMs/expireTimestampMs`。
 8. login 使用 `ticketSecret` 对 payload 做 HMAC-SHA256 签名，返回 `connectTicket` 和目标 gateway 信息。

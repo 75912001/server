@@ -88,7 +88,7 @@ cd /d/src/github.com/server/tool/robot/bin
 重点验证：
 
 - 输入 `UserVerifyReq` 后，客户端收到 `UserVerifyRes`，并且 `ResultID == 0`。
-- 登录成功后发送 `UserRecordReq`; 新账号收到 `user_create_timestamp_ms == 0` 时发送 `UserCreateReq`, 应收到包含默认角色/宠物的服务端 `UserRecord`。
+- 登录成功后发送 `AccountRecordReq`; 新账号收到 `account_record_create_timestamp_ms == 0` 时发送 `AccountCreateReq`, 应收到包含默认角色/宠物的服务端 `AccountRecord`。
 - 登录成功后，客户端按配置自动发送 `UserHeartbeatReq`，服务端返回 `UserHeartbeatRes.next_heartbeat_session`。
 - 输入业务命令时，gateway 通过当前用户绑定的 online 透传上行包。
 - 双 online 同 `availableLoad` 时，批量登录不应全部集中到 `/online/1/`，选中实例的本地负载会先扣减，后续 etcd 更新再覆盖本地估算值。
