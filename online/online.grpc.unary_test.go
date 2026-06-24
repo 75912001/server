@@ -10,10 +10,10 @@ import (
 )
 
 func TestOnlineBindUserValidation(t *testing.T) {
-	resetTestOnlineUserMgr(t)
+	resetTestOnlineAccountMgr(t)
 
-	cache := setupFakeCacheGetUserRecord(t, func(uid uint64) (*pb.UserRecord, error) {
-		return &pb.UserRecord{
+	cache := setupFakeCacheGetAccountRecord(t, func(uid uint64) (*pb.AccountRecord, error) {
+		return &pb.AccountRecord{
 			Uid:                      uid,
 			Account:                  "robot.other",
 			AccountCreateTimestampMs: 111,
@@ -39,12 +39,12 @@ func TestOnlineBindUserValidation(t *testing.T) {
 		UserSession: "session-1",
 	})
 	requireStatusCode(t, err, grpccodes.Unauthenticated)
-	if user := GUserMgr.GetByUID(1001); user != nil {
-		t.Fatalf("bind mismatch left user actor: %#v", user)
+	if account := GAccountMgr.GetByUID(1001); account != nil {
+		t.Fatalf("bind mismatch left account actor: %#v", account)
 	}
 
-	setFakeCacheGetUserRecord(cache, func(uid uint64) (*pb.UserRecord, error) {
-		return &pb.UserRecord{
+	setFakeCacheGetAccountRecord(cache, func(uid uint64) (*pb.AccountRecord, error) {
+		return &pb.AccountRecord{
 			Uid:     uid,
 			Account: "robot.1001",
 		}, nil
@@ -56,43 +56,43 @@ func TestOnlineBindUserValidation(t *testing.T) {
 		UserSession: "session-1",
 	})
 	requireStatusCode(t, err, grpccodes.Internal)
-	if user := GUserMgr.GetByUID(1001); user != nil {
-		t.Fatalf("invalid record left user actor: %#v", user)
+	if account := GAccountMgr.GetByUID(1001); account != nil {
+		t.Fatalf("invalid record left account actor: %#v", account)
 	}
 }
 
 func TestOnlineBindUserSuccess(t *testing.T) {
-	resetTestOnlineUserMgr(t)
+	resetTestOnlineAccountMgr(t)
 
 	_, err := setupTestOnlineGRPCServer(t).OnlineBindUser(context.Background(), validOnlineBindReq(1001, "robot.1001", "gateway-1", "session-1"))
 	if err != nil {
 		t.Fatalf("OnlineBindUser failed: %v", err)
 	}
 
-	user := GUserMgr.GetByUID(1001)
-	if user == nil {
-		t.Fatal("bound user not found")
+	account := GAccountMgr.GetByUID(1001)
+	if account == nil {
+		t.Fatal("bound account not found")
 	}
-	if user.gatewayKey != "gateway-1" || user.userSession != "session-1" || user.account != "robot.1001" {
-		t.Fatalf("bound user state = gateway:%q session:%q account:%q", user.gatewayKey, user.userSession, user.account)
+	if account.gatewayKey != "gateway-1" || account.userSession != "session-1" || account.account != "robot.1001" {
+		t.Fatalf("bound account state = gateway:%q session:%q account:%q", account.gatewayKey, account.userSession, account.account)
 	}
 }
 
 func TestUserBindRejectsInvalidAccountCreateTime(t *testing.T) {
-	resetTestOnlineUserMgr(t)
+	resetTestOnlineAccountMgr(t)
 
-	_, err := GUserMgr.Bind(1001, validOnlineBindReq(1001, "robot.1001", "gateway-1", "session-1"), &pb.UserRecord{
+	_, err := GAccountMgr.Bind(1001, validOnlineBindReq(1001, "robot.1001", "gateway-1", "session-1"), &pb.AccountRecord{
 		Uid:     1001,
 		Account: "robot.1001",
 	})
 	requireStatusCode(t, err, grpccodes.Internal)
-	if user := GUserMgr.GetByUID(1001); user != nil {
-		t.Fatalf("invalid record left user actor: %#v", user)
+	if account := GAccountMgr.GetByUID(1001); account != nil {
+		t.Fatalf("invalid record left account actor: %#v", account)
 	}
 }
 
 func TestOnlineUnbindUserMissingActorSuccess(t *testing.T) {
-	resetTestOnlineUserMgr(t)
+	resetTestOnlineAccountMgr(t)
 
 	_, err := (&onlineGRPCServer{}).OnlineUnbindUser(context.Background(), &pb.OnlineUnbindUserReq{
 		Uid:         1001,
@@ -105,16 +105,16 @@ func TestOnlineUnbindUserMissingActorSuccess(t *testing.T) {
 }
 
 func TestOnlineUnbindUserSessionMismatchKeepsActor(t *testing.T) {
-	resetTestOnlineUserMgr(t)
+	resetTestOnlineAccountMgr(t)
 
 	srv := setupTestOnlineGRPCServer(t)
 	_, err := srv.OnlineBindUser(context.Background(), validOnlineBindReq(1001, "robot.1001", "gateway-1", "new-session"))
 	if err != nil {
 		t.Fatalf("OnlineBindUser failed: %v", err)
 	}
-	user := GUserMgr.GetByUID(1001)
-	if user == nil {
-		t.Fatal("bound user not found")
+	account := GAccountMgr.GetByUID(1001)
+	if account == nil {
+		t.Fatal("bound account not found")
 	}
 
 	_, err = srv.OnlineUnbindUser(context.Background(), &pb.OnlineUnbindUserReq{
@@ -125,16 +125,16 @@ func TestOnlineUnbindUserSessionMismatchKeepsActor(t *testing.T) {
 	if err != nil {
 		t.Fatalf("OnlineUnbindUser mismatch failed: %v", err)
 	}
-	if got := GUserMgr.GetByUID(1001); got != user {
-		t.Fatalf("mismatch unbind changed actor: got=%p want=%p", got, user)
+	if got := GAccountMgr.GetByUID(1001); got != account {
+		t.Fatalf("mismatch unbind changed actor: got=%p want=%p", got, account)
 	}
-	if user.userSession != "new-session" {
-		t.Fatalf("mismatch unbind changed userSession: %q", user.userSession)
+	if account.userSession != "new-session" {
+		t.Fatalf("mismatch unbind changed userSession: %q", account.userSession)
 	}
 }
 
 func TestOnlineUnbindUserMatchStopsActor(t *testing.T) {
-	resetTestOnlineUserMgr(t)
+	resetTestOnlineAccountMgr(t)
 
 	srv := setupTestOnlineGRPCServer(t)
 	_, err := srv.OnlineBindUser(context.Background(), validOnlineBindReq(1001, "robot.1001", "gateway-1", "session-1"))
@@ -150,8 +150,8 @@ func TestOnlineUnbindUserMatchStopsActor(t *testing.T) {
 	if err != nil {
 		t.Fatalf("OnlineUnbindUser failed: %v", err)
 	}
-	if user := GUserMgr.GetByUID(1001); user != nil {
-		t.Fatalf("unbound user still exists: %#v", user)
+	if account := GAccountMgr.GetByUID(1001); account != nil {
+		t.Fatalf("unbound account still exists: %#v", account)
 	}
 }
 

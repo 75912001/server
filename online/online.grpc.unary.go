@@ -14,21 +14,21 @@ func (p *onlineGRPCServer) OnlineBindUser(_ context.Context, req *pb.OnlineBindU
 	if uid == 0 || account == "" || req.GetGatewayKey() == "" || req.GetUserSession() == "" {
 		return nil, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	userRecord, err := unaryCacheGetUserRecord(uid)
+	accountRecord, err := unaryCacheGetAccountRecord(uid)
 	if err != nil {
 		if s, ok := grpcstatus.FromError(err); ok {
 			return nil, grpcstatus.Error(s.Code(), s.Message())
 		}
 		return nil, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
-	if userRecord == nil || userRecord.GetUid() != uid || userRecord.GetAccount() != account {
-		return nil, grpcstatus.Error(grpccodes.Unauthenticated, "user record mismatch")
+	if accountRecord == nil || accountRecord.GetUid() != uid || accountRecord.GetAccount() != account {
+		return nil, grpcstatus.Error(grpccodes.Unauthenticated, "account record mismatch")
 	}
-	if userRecord.GetAccountCreateTimestampMs() == 0 {
-		return nil, grpcstatus.Error(grpccodes.Internal, "invalid user record")
+	if accountRecord.GetAccountCreateTimestampMs() == 0 {
+		return nil, grpcstatus.Error(grpccodes.Internal, "invalid account record")
 	}
 	req.Account = account
-	res, err := GUserMgr.Bind(uid, req, userRecord)
+	res, err := GAccountMgr.Bind(uid, req, accountRecord)
 	if err != nil {
 		return nil, err
 	}
@@ -42,10 +42,10 @@ func (p *onlineGRPCServer) OnlineUnbindUser(_ context.Context, req *pb.OnlineUnb
 	if req.GetUid() == 0 || req.GetGatewayKey() == "" || req.GetUserSession() == "" {
 		return &pb.OnlineUnbindUserRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	user, ok := GUserMgr.users.Find(req.GetUid())
+	account, ok := GAccountMgr.accounts.Find(req.GetUid())
 	if !ok {
 		return &pb.OnlineUnbindUserRes{}, nil
 	}
-	user.PostUnbind(req.GetGatewayKey(), req.GetUserSession())
+	account.PostUnbind(req.GetGatewayKey(), req.GetUserSession())
 	return &pb.OnlineUnbindUserRes{}, nil
 }
