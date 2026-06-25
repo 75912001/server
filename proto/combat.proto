@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package user;
+option go_package = "server/proto/pb;pb";
+
+enum CombatEnemyGroupEnemyCountRange {
+  CombatEnemyGroupEnemyCountRange_Unknow = 0;
+  CombatEnemyGroupEnemyCountRange_Min = 1;
+  CombatEnemyGroupEnemyCountRange_Max = 10;
+}
+
+enum CombatEnemyGroupBabyRate {
+  CombatEnemyGroupBabyRate_Min = 0;
+  CombatEnemyGroupBabyRate_Max = 100000;
+}
+
+enum CombatCamp {
+  CombatCamp_Initiator = 0;
+  CombatCamp_Defender = 1;
+}
+
+enum CombatCampPosition {
+  CombatCampPosition_Unknow = 0;
+  CombatCampPosition_Count = 10;
+}
+
+message CombatUnitKey {
+  uint64 account_uid = 1; // 账号 uid; 玩家单位为 AccountRecord.uid, 怪物/NPC 为 0
+  uint64 character_uuid = 2; // 角色 UUID; 玩家单位为所属角色 UUID, 怪物/NPC 为 0
+  uint64 pet_uuid = 3; // 宠物 UUID; 玩家宠物单位为宠物 UUID, 角色单位为 0, 怪物/NPC 为本场战斗临时唯一 ID
+}
+
+message CombatUnitAttribute {
+  uint64 exp = 1; // 当前经验值, 客户端按配置规则推导等级
+  uint64 hp = 2; // 当前生命值
+  uint64 attack = 3; // 攻击力
+  uint64 defense = 4; // 防御力
+  uint64 agility = 5; // 敏捷
+  uint64 loyalty = 6; // 忠诚度, 非宠物单位为 0
+}
+
+message CombatEquipmentBind {
+  uint32 equipment_id = 1; // 装备资源 ID
+}
+
+message CombatUnit {
+  CombatCamp camp = 1; // 所属阵营
+  uint32 position = 2; // 阵营内站位槽位, 只表示阵型/显示位置, 不参与单位身份
+  CombatUnitKey key = 3; // 战斗单位身份 key; 玩家单位由 account_uid + character_uuid + pet_uuid 唯一确定
+  uint32 character_id = 10; // 角色资源 ID; 怪物/NPC 为 0
+  uint32 pet_id = 11; // 宠物或怪物资源 ID; 纯角色单位为 0
+  uint32 mount_pet_id = 13; // 骑宠资源 ID; 没有骑宠时为 0
+  CombatUnitAttribute attribute = 20; // 开战时可见战斗属性快照
+  repeated CombatEquipmentBind equipment_list = 30; // 开战时可见装备绑定列表
+}
+
+message CombatBattleStart {
+  uint64 battle_id = 1; // 战斗唯一 ID
+  repeated CombatUnit unit_list = 10; // 开战时场上可见单位列表
+}
