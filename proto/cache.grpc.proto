@@ -3,7 +3,7 @@ syntax = "proto3";
 package cache;
 option go_package = "server/proto/pb;pb";
 import "options.proto";
-import "user.record.proto";
+import "account.record.proto";
 
 service CacheService {
   option (proto.serviceOpt) = {
@@ -12,9 +12,9 @@ service CacheService {
   };
 
   // todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
-  // 写入用户档案。
-  // 以 uid 做 RingHash 分片, 用户创建完成和用户档案更新都会走这个接口。
-  rpc CacheSetUserRecord(CacheSetUserRecordReq) returns (CacheSetUserRecordRes) {
+  // 写入账号档案。
+  // 以 uid 做 RingHash 分片, 账号档案创建完成和账号档案更新都会走这个接口。
+  rpc CacheSetAccountRecord(CacheSetAccountRecordReq) returns (CacheSetAccountRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
       shardKeyFieldType: ShardKeyFieldType_UINT64
@@ -22,9 +22,9 @@ service CacheService {
   }
 
   // todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
-  // 读取用户档案。
-  // 以 uid 做 RingHash 分片，返回当前 uid 对应的 UserRecord。
-  rpc CacheGetUserRecord(CacheGetUserRecordReq) returns (CacheGetUserRecordRes) {
+  // 读取账号档案。
+  // 以 uid 做 RingHash 分片，返回当前 uid 对应的 AccountRecord。
+  rpc CacheGetAccountRecord(CacheGetAccountRecordReq) returns (CacheGetAccountRecordRes) {
     option (proto.methodOpt) = {
       timeout : "3s"
       shardKeyFieldType: ShardKeyFieldType_UINT64
@@ -86,20 +86,20 @@ service CacheService {
   }
 }
 
-message CacheSetUserRecordReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
-  user.UserRecord user_record = 2; // 用户档案
+message CacheSetAccountRecordReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // uid, 账号唯一标识, 必须与 account_record.uid 一致
+  user.AccountRecord account_record = 2; // 账号档案
 }
 
-message CacheSetUserRecordRes {
+message CacheSetAccountRecordRes {
 }
 
-message CacheGetUserRecordReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+message CacheGetAccountRecordReq {
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // uid, 账号唯一标识
 }
 
-message CacheGetUserRecordRes {
-  user.UserRecord user_record = 1; // 用户档案, 成功时有效, 表示 uid 对应的 UserRecord。
+message CacheGetAccountRecordRes {
+  user.AccountRecord account_record = 1; // 账号档案, 成功时有效, 表示 uid 对应的 AccountRecord。
 }
 
 message CacheSetAccountVerifyTokenReq {
@@ -113,7 +113,7 @@ message CacheSetAccountVerifyTokenRes {
 
 message CacheUseAccountVerifyTokenReq {
   string account = 1 [(proto.fieldOpt).shardKey = true]; // 账号
-  string account_verify_token = 2;
+  string account_verify_token = 2; // accountVerifyToken, login 签发后由 cache 原子校验并消费
 }
 
 message CacheUseAccountVerifyTokenRes {
@@ -128,7 +128,7 @@ message CacheUserSession {
 }
 
 message CacheGetUserSessionReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // uid, 账号唯一标识
 }
 
 message CacheGetUserSessionRes {
@@ -136,7 +136,7 @@ message CacheGetUserSessionRes {
 }
 
 message CacheBeginUserSessionCASReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // uid, 账号唯一标识
   /*
 expected_user_session == ""
   -> 期望当前 Redis 里没有 user:{uid}:session 对应的 cache userSession
@@ -160,7 +160,7 @@ message CacheBeginUserSessionCASRes {
 }
 
 message CacheEndUserSessionCASReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // uid, 账号唯一标识
   string expected_user_session = 2; // 用于 CAS 删除前匹配当前 userSession
 }
 
@@ -168,7 +168,7 @@ message CacheEndUserSessionCASRes {
 }
 
 message CacheRefreshUserSessionCASReq {
-  uint64 uid = 1 [(proto.fieldOpt).shardKey = true];
+  uint64 uid = 1 [(proto.fieldOpt).shardKey = true]; // uid, 账号唯一标识
   string expected_user_session = 2; // 用于 CAS 续期前匹配当前 userSession
   uint64 expire_second = 3; // 单位为秒
 }

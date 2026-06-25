@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package user;
+option go_package = "server/proto/pb;pb";
+
+import "record.proto";
+
+enum EquipmentType {
+  EquipmentType_Unknow = 0;
+  EquipmentType_Necklace = 1;
+  EquipmentType_Helmet = 2;
+  EquipmentType_Ring = 3;
+  EquipmentType_Weapon = 4;
+  EquipmentType_Chest = 5;
+  EquipmentType_Shield = 6;
+  EquipmentType_Gloves = 7;
+  EquipmentType_Belt = 8;
+  EquipmentType_Boots = 9;
+  EquipmentType_Max = 10;
+}
+
+message EquipmentRecord {
+  uint64 uuid = 1;
+  map<int32, uint64> record_base_map = 10;
+  map<int32, RecordPrimary> record_map = 1000;
+}
+
+enum EquipmentRecordBase {
+  EquipmentRecordBase_Unknow = 0;
+  EquipmentRecordBase_DamagePercent = 10000;
+  EquipmentRecordBase_CritRate = 10001;
+  EquipmentRecordBase_CritDamageBonusRate = 10002;
+}
+
+enum EquipmentRecordPrimary {
+  EquipmentRecordPrimary_Unknow = 0;
+  EquipmentRecordPrimary_Slot = 1;
+}
+
+enum EquipmentRecordSecondary {
+  EquipmentRecordSecondary_Unknow = 0;
+  EquipmentRecordSecondary_Slot_Data = 1;
+}

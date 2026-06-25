@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package user;
+option go_package = "server/proto/pb;pb";
+
+import "record.proto";
+import "pet.proto";
+
+enum CharacterAction {
+  CharacterAction_Unknow = 0;
+  CharacterAction_Attack = 1;
+  CharacterAction_Wave = 2;
+  CharacterAction_Faint = 3;
+  CharacterAction_Hurt = 4;
+  CharacterAction_Defense = 5;
+  CharacterAction_Sad = 6;
+  CharacterAction_Angry = 7;
+  CharacterAction_Sit = 8;
+  CharacterAction_Stand = 9;
+  CharacterAction_Throw = 10;
+  CharacterAction_Nod = 11;
+  CharacterAction_Walk = 12;
+  CharacterAction_Happy = 13;
+  CharacterAction_Max = 14;
+}
+
+message CharacterRecord {
+  uint64 uuid = 1; // 角色 UUID, 在所属 AccountRecord.uid 作用域内唯一
+  string nick = 2; // 角色昵称
+  uint64 asset_id = 3; // 角色资源 ID; 完整角色 key 为 AccountRecord.uid + uuid
+  map<uint32, uint64> asset_id_record_map = 10; // 角色数值记录, 不再承载角色资源 ID
+  map<uint64, RecordPrimary> record_map = 1000; // 角色扩展记录表, 背包等临时角色数据先归入这里
+  map<uint64, PetRecord> pet_record_map = 2000; // 角色拥有的宠物记录表, key 为宠物 UUID
+}

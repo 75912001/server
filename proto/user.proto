@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package user;
 option go_package = "server/proto/pb;pb";
-import "user.record.proto";
+import "account.record.proto";
 
 // ===================================================================
 // 消息体定义 — 客户端 ↔ Gateway TCP 协议层
@@ -39,24 +39,25 @@ message UserHeartbeatRes {
   string next_heartbeat_session = 2;   // 客户端下次心跳必须使用的 heartbeatSession
 }
 
-//0x00000C#client->gateway#请求用户档案-请求
-message UserRecordReq {
+//0x00000C#client->gateway#请求账号档案-请求
+message AccountRecordReq {
 }
 
-//0x00000D#gateway->client#请求用户档案-回复
-message UserRecordRes {
-  UserRecord user_record = 1; // 用户档案
+//0x00000D#gateway->client#请求账号档案-回复
+message AccountRecordRes {
+  AccountRecord account_record = 1; // 账号档案
 }
 
-//0x00000E#client->gateway#完成用户创建-请求
-message UserCreateReq
+//0x00000E#client->gateway#完成账号档案创建-请求
+message AccountCreateReq
 {
+  uint32 character_slot_index = 1; // 角色创建槽位索引, 从 0 开始; 该槽位已有有效角色时创建失败
 }
 
-//0x00000F#gateway->client#完成用户创建-回复
-message UserCreateRes
+//0x00000F#gateway->client#完成账号档案创建-回复
+message AccountCreateRes
 {
-  UserRecord user_record = 1; // 完成用户创建后的用户档案
+  AccountRecord account_record = 1; // 完成账号档案创建后的账号档案
 }
 
 //0x000010#client->gateway#机器人压测-请求
