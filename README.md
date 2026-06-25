@@ -4,7 +4,7 @@
 
 `./proto` 是服务端和 sa.desktop 共享协议的唯一源头。客户端仓库只在生成前从这里单向同步 `.proto` 文件, 不反向维护独立协议定义。
 
-账号档案统一使用 `AccountRecord` 作为聚合根: `uid/account` 管理多个 `CharacterRecord`, `character_record_map` 的 map key 是角色 `uuid`, 完整角色业务 key 是 `AccountRecord.uid + CharacterRecord.uuid`。账号不保存昵称, 角色昵称保存在 `CharacterRecord.nick`; `CharacterRecord.asset_id` 是角色资源 ID/角色 ID 的权威字段, `asset_id_record_map` 只保存 HP、属性、创建时间等数值记录。协议不再维护重复的 `account.proto/AccountRecord` 或旧 `UserRecord`; 已写入 Redis 的旧账号档案本轮不做迁移, 开发环境需要清理旧 cache 或重新创建账号。
+账号档案统一使用 `AccountRecord` 作为聚合根: `uid/account` 管理多个 `CharacterRecord`, `character_record_list` 的数组下标是角色槽位, 空槽使用 `uuid == 0` 的 `CharacterRecord` 占位, 每个账号最多可用角色槽位数量由 proto 常量 `AccountRecordLimit_MaxCharacterSlotCount` 定义, 完整角色业务 key 是 `AccountRecord.uid + CharacterRecord.uuid`。账号不保存昵称, 角色昵称保存在 `CharacterRecord.nick`; `CharacterRecord.asset_id` 是角色资源 ID/角色 ID 的权威字段, `asset_id_record_map` 只保存 HP、属性、创建时间等数值记录。协议不再维护重复的 `account.proto/AccountRecord` 或旧 `UserRecord`; 已写入 Redis 的旧账号档案本轮不做迁移, 开发环境需要清理旧 cache 或重新创建账号。
 
 To generate all files in `./proto/pb` (including `*.pb.go`, `*_grpc.pb.go`, and `*_grpc.x.pb.go`):
 
