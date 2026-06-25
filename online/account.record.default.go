@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	pb "server/proto/pb"
@@ -9,10 +10,16 @@ import (
 const (
 	defaultCharacterID             uint32 = 1000011
 	defaultCharacterName                  = "吉米"
+	maxCharacterSlotCount          uint32 = uint32(pb.AccountRecordLimit_AccountRecordLimit_MaxCharacterSlotCount)
 	defaultHP                      uint64 = 10
 	defaultCharacterAttribute      uint64 = 10
 	defaultCharacterAvailablePoint uint64 = 0
 	defaultPetLoyalty              uint64 = 100
+)
+
+var (
+	errCharacterSlotIndexInvalid = errors.New("character slot index invalid")
+	errCharacterSlotOccupied     = errors.New("character slot occupied")
 )
 
 var defaultPetRecords = []struct {
@@ -24,22 +31,30 @@ var defaultPetRecords = []struct {
 	{assetID: 4000102, nick: "扬奇洛斯", exp: 0},
 }
 
-func initializeDefaultAccountRecord(record *pb.AccountRecord, now int64) error {
+func initializeDefaultAccountRecord(record *pb.AccountRecord, characterSlotIndex uint32, now int64) error {
 	if record == nil {
 		return fmt.Errorf("account record is nil")
 	}
 	if record.GetUid() == 0 || record.GetAccount() == "" || record.GetAccountCreateTimestampMs() == 0 {
 		return fmt.Errorf("account record identity is invalid")
 	}
+	if characterSlotIndex >= maxCharacterSlotCount {
+		return errCharacterSlotIndexInvalid
+	}
 
-	record.AccountRecordCreateTimestampMs = now
-	if record.CharacterRecordMap == nil {
-		record.CharacterRecordMap = make(map[uint64]*pb.CharacterRecord)
+	slotIndex := int(characterSlotIndex)
+	for len(record.CharacterRecordList) <= slotIndex {
+		record.CharacterRecordList = append(record.CharacterRecordList, &pb.CharacterRecord{})
 	}
-	if len(record.CharacterRecordMap) == 0 {
-		character := newDefaultCharacterRecord(record, now)
-		record.CharacterRecordMap[character.GetUuid()] = character
+
+	if character := record.CharacterRecordList[slotIndex]; character != nil && character.GetUuid() != 0 {
+		return errCharacterSlotOccupied
 	}
+
+	if record.GetAccountRecordCreateTimestampMs() == 0 {
+		record.AccountRecordCreateTimestampMs = now
+	}
+	record.CharacterRecordList[slotIndex] = newDefaultCharacterRecord(record, now)
 	return nil
 }
 

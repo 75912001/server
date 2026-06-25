@@ -33,9 +33,9 @@ go test ./online ./gateway ./cache ./login ./tool/robot/main ./proto/pb
 典型检查项：
 
 - `OnlineBindUser` 会从 cache 读取 account record；登录票据校验和 cache userSession 编排由 gateway 负责
-- `AccountCreateReq` 会在 cache 账号壳档案上初始化 `account_record_create_timestamp_ms/used_uuid/character_record_map`, 并写回 cache
+- `AccountCreateReq` 会按客户端传入的 `character_slot_index` 在 cache 账号壳档案上初始化 `account_record_create_timestamp_ms/used_uuid/character_record_list`, 并写回 cache
 - 新账号首次登录后通过 `AccountCreateReq` 能拿到默认角色和宠物; 重启或重登后通过 `AccountRecordReq` 能读回同一份 `AccountRecord`
-- 新建 `AccountRecord.uid > 0`, `character_record_map` 非空, map key 等于 `CharacterRecord.uuid`, 默认 `CharacterRecord.asset_id == 1000011`, 宠物记录仍挂在角色下
+- 新建 `AccountRecord.uid > 0`, `character_record_list` 非空, 至少一个角色 `uuid > 0`, 默认 `CharacterRecord.asset_id == 1000011`, 宠物记录仍挂在角色下
 - online 只绑定 Account actor，不写入 cache userSession 到 cache
 - 重复登录会正确删除或替换旧 cache userSession
 - gateway stream 能接收下行 frame

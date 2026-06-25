@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"server/common"
 	pb "server/proto/pb"
 	"time"
@@ -69,12 +70,16 @@ func (p *Account) onAccountCreateReq(gateway *Gateway, pkt *pb.OnlineClientPacke
 		return
 	}
 
-	if p.accountRecord.GetAccountRecordCreateTimestampMs() != 0 {
-		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_AccountCreateRes_CMD), xerror.AlreadyExists.Code())
-		return
-	}
 	now := time.Now().UnixMilli()
-	if err := initializeDefaultAccountRecord(p.accountRecord, now); err != nil {
+	if err := initializeDefaultAccountRecord(p.accountRecord, req.GetCharacterSlotIndex(), now); err != nil {
+		if errors.Is(err, errCharacterSlotIndexInvalid) {
+			p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_AccountCreateRes_CMD), xerror.InvalidArgument.Code())
+			return
+		}
+		if errors.Is(err, errCharacterSlotOccupied) {
+			p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_AccountCreateRes_CMD), xerror.AlreadyExists.Code())
+			return
+		}
 		xlog.GLog.Errorf("initialize account record failed uid:%d err:%v", p.uid, err)
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDUser_AccountCreateRes_CMD), xerror.Internal.Code())
 		return

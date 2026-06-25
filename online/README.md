@@ -85,7 +85,7 @@ client TCP
 当前已实现业务：
 
 - `AccountRecordReq`：返回 online 本地缓存的 `AccountRecord`。
-- `AccountCreateReq`：在已绑定的 cache 档案上初始化服务端权威账号档案数据, 设置 `account_record_create_timestamp_ms`, 按 `used_uuid` 生成默认角色 `uuid/nick/asset_id=1000011` 和默认宠物记录, 再调用 `CacheSetAccountRecord` 写回; `uid/account/account_create_timestamp_ms` 必须来自 `OnlineBindUser` 绑定阶段已校验的 cache 档案。
+- `AccountCreateReq`：由客户端发起角色创建, 请求携带 `character_slot_index`; online 在指定角色槽位为空时初始化服务端权威账号档案数据, 设置 `account_record_create_timestamp_ms`, 按 `used_uuid` 生成默认角色 `uuid/nick/asset_id=1000011` 和默认宠物记录, 写入 `character_record_list[character_slot_index]`, 再调用 `CacheSetAccountRecord` 写回; `uid/account/account_create_timestamp_ms` 必须来自 `OnlineBindUser` 绑定阶段已校验的 cache 档案。
 - `RobotPingReq`：返回 seq、clientTime、serverTime 和 payload。
 
 ## 一致性约定
@@ -93,7 +93,7 @@ client TCP
 - 同 uid 的 online 业务处理通过 Account actor 串行执行。
 - online actor 只接受匹配 `gatewayKey + userSession` 的解绑请求。
 - online 不写 cache userSession, 因此不能作为“是否允许上线”的权威。
-- `AccountRecord` 是账号级档案聚合根, `uid/account` 下管理多个角色; `character_record_map` 的 key 是角色 `uuid`, 完整角色业务 key 是 `uid + uuid`。
+- `AccountRecord` 是账号级档案聚合根, `uid/account` 下管理多个角色; `character_record_list` 的数组下标是角色槽位, 空槽使用 `uuid == 0` 的 `CharacterRecord` 占位, 每个账号最多可用角色槽位数量由 proto 常量 `AccountRecordLimit_MaxCharacterSlotCount` 定义, 完整角色业务 key 是 `uid + uuid`。
 - `CharacterRecord.asset_id` 是角色资源 ID/角色 ID 的权威字段; `asset_id_record_map` 只保存 HP、属性、创建时间等数值记录。
 - `AccountRecord` 由 online 登录绑定时从 cache 读取, online 业务更新时再写回 cache。cache 只创建账号壳数据, 角色、宠物和后续业务数据由 online 初始化和维护。
 - 本轮不迁移旧 cache `AccountRecord`; 已存在但缺少 `CharacterRecord.asset_id` 的档案视为旧格式, 开发环境需要清理 cache 或重新创建账号。

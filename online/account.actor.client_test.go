@@ -58,6 +58,13 @@ func TestAccountCreateReqCreatedAccountReturnsAlreadyExists(t *testing.T) {
 			Account:                        "account-10002",
 			AccountCreateTimestampMs:       111,
 			AccountRecordCreateTimestampMs: 222,
+			CharacterRecordList: []*pb.CharacterRecord{
+				{
+					Uuid:    1,
+					Nick:    defaultCharacterName,
+					AssetId: uint64(defaultCharacterID),
+				},
+			},
 		},
 	}
 
@@ -103,15 +110,15 @@ func TestAccountCreateReqExistingRecordCreatesAccount(t *testing.T) {
 	if record.GetAccountRecordCreateTimestampMs() == 0 {
 		t.Fatal("record account create time is zero")
 	}
-	if got := len(record.GetCharacterRecordMap()); got == 0 {
+	if got := len(record.GetCharacterRecordList()); got == 0 {
 		t.Fatalf("record character count = %d, want > 0", got)
 	}
-	for uuid, character := range record.GetCharacterRecordMap() {
+	for slot, character := range record.GetCharacterRecordList() {
 		if character == nil {
-			t.Fatalf("record character uuid %d is nil", uuid)
+			t.Fatalf("record character slot %d is nil", slot)
 		}
-		if got := character.GetUuid(); got != uuid {
-			t.Fatalf("record character map key = %d, character uuid = %d", uuid, got)
+		if got := character.GetUuid(); got == 0 {
+			t.Fatalf("record character slot %d uuid is zero", slot)
 		}
 		if got, want := character.GetAssetId(), uint64(defaultCharacterID); got != want {
 			t.Fatalf("record character asset id = %d, want %d", got, want)
@@ -134,6 +141,42 @@ func TestAccountCreateReqExistingRecordCreatesAccount(t *testing.T) {
 	}
 	if got, want := res.GetAccountRecord().GetAccountRecordCreateTimestampMs(), record.GetAccountRecordCreateTimestampMs(); got != want {
 		t.Fatalf("response account create time = %d, want %d", got, want)
+	}
+}
+
+func TestAccountCreateReqCreatesCharacterAtRequestedSlot(t *testing.T) {
+	cache := setupFakeCacheServer(t)
+	gateway, stream := newGatewayWithStreamForTest(t)
+	account := &Account{
+		uid:     10004,
+		account: "account-10004",
+		accountRecord: &pb.AccountRecord{
+			Uid:                      10004,
+			Account:                  "account-10004",
+			AccountCreateTimestampMs: 444,
+		},
+	}
+
+	account.onAccountCreateReq(gateway, newAccountCreatePacketWithSlot(t, account.uid, 2))
+
+	cacheReq := readCacheSetAccountRecordReq(t, cache)
+	record := cacheReq.GetAccountRecord()
+	if got, want := len(record.GetCharacterRecordList()), 3; got != want {
+		t.Fatalf("character slot count = %d, want %d", got, want)
+	}
+	for _, slot := range []int{0, 1} {
+		if got := record.GetCharacterRecordList()[slot].GetUuid(); got != 0 {
+			t.Fatalf("character slot %d uuid = %d, want 0", slot, got)
+		}
+	}
+	character := record.GetCharacterRecordList()[2]
+	if character == nil || character.GetUuid() == 0 {
+		t.Fatalf("character slot 2 = %#v, want active character", character)
+	}
+
+	pkt := readClientPacket(t, stream)
+	if got, want := pkt.GetResultId(), xerror.Success.Code(); got != want {
+		t.Fatalf("result id = %d, want %d", got, want)
 	}
 }
 
@@ -282,8 +325,15 @@ func ensureTestLog(t *testing.T) {
 
 func newAccountCreatePacket(t *testing.T, uid uint64) *pb.OnlineClientPacket {
 	t.Helper()
+	return newAccountCreatePacketWithSlot(t, uid, 0)
+}
 
-	body, err := proto.Marshal(&pb.AccountCreateReq{})
+func newAccountCreatePacketWithSlot(t *testing.T, uid uint64, characterSlotIndex uint32) *pb.OnlineClientPacket {
+	t.Helper()
+
+	body, err := proto.Marshal(&pb.AccountCreateReq{
+		CharacterSlotIndex: characterSlotIndex,
+	})
 	if err != nil {
 		t.Fatalf("marshal account create req: %v", err)
 	}
