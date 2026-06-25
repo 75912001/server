@@ -34,12 +34,6 @@ docker build -f deploy/login/Dockerfile -t server.login:dev .
 docker images | grep server.login
 ```
 
-## 删除本地镜像
-
-```bash
-docker rmi server.login:dev
-```
-
 ## 启动 login.1
 
 ```bash
@@ -146,6 +140,12 @@ docker rm server.login.1
 
 ```bash
 docker rm server.login.2
+```
+
+## 删除本地镜像
+
+```bash
+docker rmi server.login:dev
 ```
 
 # 验证

@@ -35,12 +35,6 @@ docker build -f deploy/cache/Dockerfile -t server.cache:dev .
 docker images | grep server.cache
 ```
 
-## 删除本地镜像
-
-```bash
-docker rmi server.cache:dev
-```
-
 ## 启动 cache.1
 
 ```bash
@@ -147,6 +141,12 @@ docker rm server.cache.1
 
 ```bash
 docker rm server.cache.2
+```
+
+## 删除本地镜像
+
+```bash
+docker rmi server.cache:dev
 ```
 
 # 验证

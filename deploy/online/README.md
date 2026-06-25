@@ -35,12 +35,6 @@ docker build -f deploy/online/Dockerfile -t server.online:dev .
 docker images | grep server.online
 ```
 
-## 删除本地镜像
-
-```bash
-docker rmi server.online:dev
-```
-
 ## 启动 online.1
 
 ```bash
@@ -147,6 +141,12 @@ docker rm server.online.1
 
 ```bash
 docker rm server.online.2
+```
+
+## 删除本地镜像
+
+```bash
+docker rmi server.online:dev
 ```
 
 # 验证

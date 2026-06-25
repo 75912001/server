@@ -35,12 +35,6 @@ docker build -f deploy/gateway/Dockerfile -t server.gateway:dev .
 docker images | grep server.gateway
 ```
 
-## 删除本地镜像
-
-```bash
-docker rmi server.gateway:dev
-```
-
 ## 启动 gateway.1
 
 ```bash
@@ -151,6 +145,12 @@ docker rm server.gateway.1
 
 ```bash
 docker rm server.gateway.2
+```
+
+## 删除本地镜像
+
+```bash
+docker rmi server.gateway:dev
 ```
 
 # 验证
