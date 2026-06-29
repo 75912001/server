@@ -21,6 +21,7 @@ Online 服务负责 Account actor, 业务逻辑入口和 gateway stream 下行. 
 - 不处理 `heartbeatSession` 轮换。
 - 不维护 cache userSession 中的 `onlineKey`; 该字段由 gateway 写入, 仅用于排障定位。
 - 不校验角色名称, 描述, 颜色, sprite, 客户端 PNG, `.tpsheet` 或 frame 资源是否存在; 客户端资源完整性由 sa.desktop 校验.
+- 不校验宠物名称, 栖息地, 出生地, 描述, sprite, 客户端 PNG, `.tpsheet` 或 frame 资源是否存在; 客户端展示和资源完整性由 sa.desktop 校验.
 
 ## 共享游戏配置
 
@@ -36,7 +37,7 @@ pet.skill.yaml
 pet.yaml
 ```
 
-配置加载顺序和 sa.desktop 保持一致: 先分别执行单表 `load` 校验, 再执行跨表 `check`, 最后保留 `assemble` 生命周期. `character.yaml` 在 server 侧只消费 `id` 和 `isRole`; server 侧 `assemble` 不检查客户端资源帧, 只保证服务端需要的 YAML 数据和跨表引用有效.
+配置加载顺序和 sa.desktop 保持一致: 先分别执行单表 `load` 校验, 再执行跨表 `check`, 最后保留 `assemble` 生命周期. `character.yaml` 在 server 侧只消费 `id` 和 `isRole`; `pet.yaml` 在 server 侧只消费 `id`, `rarity`, `elemental`, `attribute`, `growth`, `skill`, 并在 `check` 阶段校验非 0 技能槽位必须存在于 `pet.skill.yaml`. server 侧 `assemble` 不检查客户端资源帧, 只保证服务端需要的 YAML 数据和跨表引用有效.
 
 Docker 镜像会把仓库 `config/` 复制到 `/app/config`, `deploy/online/*.yaml` 使用 `custom.gameConfigDir: /app/config`。
 
@@ -126,7 +127,7 @@ client TCP
 - `AccountRecord` 缺少角色记录：检查客户端是否完成 `AccountCreateReq`, 以及 online 写回 cache 是否成功。
 - `CharacterRecord.asset_id` 为 0 或非法：这是旧 cache 档案或服务端初始化异常, 开发环境清理 cache 后重新创建账号。
 - `DeadlineExceeded`：gateway 调用 online 超时，检查 gateway `onlineRPCTimeout`、online 日志和 actor 是否阻塞。
-- `load game config failed`: `custom.gameConfigDir` 缺失, 目录下共享 YAML 不完整, 或 YAML 结构, 枚举, 数值范围, 跨表引用校验失败.
+- `load game config failed`: `custom.gameConfigDir` 缺失, 目录下共享 YAML 不完整, 或 YAML 结构, 服务端消费字段, 枚举, 数值范围, 跨表引用校验失败. 角色和宠物展示字段或客户端资源完整性由 sa.desktop 校验, 不属于 online 启动失败原因.
 
 ## 后续建议
 
