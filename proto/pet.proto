@@ -37,9 +37,24 @@ enum PetGrade {
   PetGrade_Max = 6;
 }
 
+enum PetRecordLimit {
+  PetRecordLimit_Unspecified = 0; // 未指定宠物档案限制, proto3 enum 默认值
+  PetRecordLimit_MaxCarryCount = 5; // 单个角色最多可随身携带宠物数量
+}
+
+enum PetCarryStatus {
+  PetCarryStatus_Unknow = 0; // 未指定携带状态, 旧档案或非法默认值
+  PetCarryStatus_Rest = 1; // 休息, 不可参与战斗; 仓库内宠物固定为该状态
+  PetCarryStatus_Battle = 2; // 战斗, 角色战斗首发宠物; 单个角色最多一只
+  PetCarryStatus_Wait = 3; // 等待, 战斗中可以替换上场
+  PetCarryStatus_Mount = 4; // 骑乘, 角色当前骑乘宠物; 单个角色最多一只, 需要骑乘权限且忠诚度 100%
+  PetCarryStatus_Max = 5;
+}
+
 message PetRecord {
-  uint64 uuid = 1;
-  string nick = 2;
-  map<uint32, uint64> asset_record_base_map = 10;
-  map<uint64, RecordPrimary> record_map = 1000;
+  uint64 uuid = 1; // 宠物 UUID, 在所属 AccountRecord.uid 作用域内唯一
+  string nick = 2; // 宠物昵称
+  PetCarryStatus carry_status = 3; // 宠物携带状态; 只有角色随身携带时参与战斗/骑乘语义, 仓库内宠物固定为 Rest
+  map<uint32, uint64> asset_record_base_map = 10; // 宠物基础数值记录, 包含宠物资源 ID、经验、创建时间、忠诚度和成长基础值
+  map<uint64, RecordPrimary> record_map = 1000; // 宠物扩展记录表
 }

@@ -127,6 +127,7 @@ func TestAccountCreateReqExistingRecordCreatesAccount(t *testing.T) {
 			t.Fatalf("record character pet count = %d, want > 0", got)
 		}
 	}
+	assertDefaultPetDistribution(t, record, record.GetCharacterRecordList()[0])
 	if record.GetUsedUuid() == 0 {
 		t.Fatal("record used uuid is zero")
 	}
@@ -173,10 +174,81 @@ func TestAccountCreateReqCreatesCharacterAtRequestedSlot(t *testing.T) {
 	if character == nil || character.GetUuid() == 0 {
 		t.Fatalf("character slot 2 = %#v, want active character", character)
 	}
+	assertDefaultPetDistribution(t, record, character)
 
 	pkt := readClientPacket(t, stream)
 	if got, want := pkt.GetResultId(), xerror.Success.Code(); got != want {
 		t.Fatalf("result id = %d, want %d", got, want)
+	}
+}
+
+func assertDefaultPetDistribution(t *testing.T, record *pb.AccountRecord, character *pb.CharacterRecord) {
+	t.Helper()
+
+	if character == nil {
+		t.Fatal("default character is nil")
+	}
+	if got, want := len(character.GetPetRecordMap()), 1; got != want {
+		t.Fatalf("default carried pet count = %d, want %d", got, want)
+	}
+	if got := len(character.GetPetRecordMap()); got > maxPetCarryCount {
+		t.Fatalf("default carried pet count = %d, max %d", got, maxPetCarryCount)
+	}
+	if got, want := len(record.GetPetWarehouseRecordMap()), len(defaultPetRecords)-1; got != want {
+		t.Fatalf("default pet warehouse count = %d, want %d", got, want)
+	}
+	if got := len(record.GetPetWarehouseRecordMap()); got > maxPetWarehouseCount {
+		t.Fatalf("default pet warehouse count = %d, max %d", got, maxPetWarehouseCount)
+	}
+
+	seen := map[uint64]struct{}{}
+	battleCount := 0
+	mountCount := 0
+	for key, pet := range character.GetPetRecordMap() {
+		if pet == nil {
+			t.Fatalf("carried pet %d is nil", key)
+		}
+		if key != pet.GetUuid() {
+			t.Fatalf("carried pet key = %d, uuid = %d", key, pet.GetUuid())
+		}
+		if _, ok := seen[key]; ok {
+			t.Fatalf("duplicate pet uuid in carried pets: %d", key)
+		}
+		seen[key] = struct{}{}
+		switch pet.GetCarryStatus() {
+		case pb.PetCarryStatus_PetCarryStatus_Battle:
+			battleCount++
+		case pb.PetCarryStatus_PetCarryStatus_Mount:
+			mountCount++
+		case pb.PetCarryStatus_PetCarryStatus_Rest, pb.PetCarryStatus_PetCarryStatus_Wait:
+		default:
+			t.Fatalf("carried pet %d carry status = %s", key, pet.GetCarryStatus())
+		}
+	}
+	if battleCount != 1 {
+		t.Fatalf("battle carried pet count = %d, want 1", battleCount)
+	}
+	if mountCount > 1 {
+		t.Fatalf("mount carried pet count = %d, want <= 1", mountCount)
+	}
+
+	for key, pet := range record.GetPetWarehouseRecordMap() {
+		if pet == nil {
+			t.Fatalf("warehouse pet %d is nil", key)
+		}
+		if key != pet.GetUuid() {
+			t.Fatalf("warehouse pet key = %d, uuid = %d", key, pet.GetUuid())
+		}
+		if _, ok := seen[key]; ok {
+			t.Fatalf("pet uuid exists in carried pets and warehouse: %d", key)
+		}
+		seen[key] = struct{}{}
+		if got, want := pet.GetCarryStatus(), pb.PetCarryStatus_PetCarryStatus_Rest; got != want {
+			t.Fatalf("warehouse pet %d carry status = %s, want %s", key, got, want)
+		}
+	}
+	if got, want := len(seen), len(defaultPetRecords); got != want {
+		t.Fatalf("default pet total count = %d, want %d", got, want)
 	}
 }
 

@@ -4,10 +4,12 @@ package user;
 option go_package = "server/proto/pb;pb";
 
 import "character.proto";
+import "pet.proto";
 
 enum AccountRecordLimit {
   AccountRecordLimit_Unspecified = 0; // 未指定账号档案限制, proto3 enum 默认值
   AccountRecordLimit_MaxCharacterSlotCount = 5; // 每个账号最多可用角色槽位数量
+  AccountRecordLimit_MaxPetWarehouseCount = 100; // 每个账号宠物仓库最多可存放宠物数量
 }
 
 message AccountRecord {
@@ -18,4 +20,5 @@ message AccountRecord {
   uint64 used_uuid = 6; // 当前账号内角色和宠物 UUID 递增游标
   map<uint64, uint64> asset_map = 10; // 账号资产表, key 为 asset_id, value 为数值
   repeated CharacterRecord character_record_list = 20; // 角色槽位列表, 数组下标为角色槽位; 空槽使用 uuid 为 0 的 CharacterRecord 占位, 完整角色 key 为 uid + 角色 UUID
+  map<uint64, PetRecord> pet_warehouse_record_map = 30; // 账号宠物仓库, key 为宠物 UUID; 同账号下所有角色可从仓库取出宠物携带, 也可将随身宠物放回仓库存放
 }

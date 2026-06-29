@@ -10,7 +10,7 @@ cache 测试重点不是单纯追求覆盖率，而是稳定覆盖服务契约�
 - Redis key 格式。
 - accountVerifyToken 设置、消费和删除。
 - uid 按 `base.groupID` 分段生成。
-- `AccountRecord` protobuf 读写。
+- `AccountRecord` protobuf 读写, 包括角色随身携带宠物和账号宠物仓库字段透传。
 - cache userSession 的批量读写、CAS 替换、续期、删除和迟到请求保护。
 
 ## 快速单元测试
@@ -150,7 +150,7 @@ rmdir ../.coverage 2>/dev/null || true
 典型检查项：
 
 - accountVerifyToken 设置和消费流程。
-- account record 读写。
+- account record 读写; cache 不校验宠物仓库和角色随身携带宠物之间的业务不变量。
 - cache userSession set/get/replace/delete/expire。
 - 参数错误返回 `InvalidArgument`。
 - 记录不存在返回 `NotFound`。

@@ -134,6 +134,8 @@ GroupUIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 - `account:{uid}:record` 使用 protobuf marshal 后的二进制保存。
 - `AccountRecord` 是账号级档案聚合根, `uid/account` 下管理多个角色; `character_record_list` 的数组下标是角色槽位, 空槽使用 `uuid == 0` 的 `CharacterRecord` 占位, 每个账号最多可用角色槽位数量由 proto 常量 `AccountRecordLimit_MaxCharacterSlotCount` 定义, 完整角色业务 key 是 `uid + uuid`。
 - `CharacterRecord.asset_id` 是角色资源 ID/角色 ID 的权威字段; `asset_id_record_map` 只保存 HP、属性、创建时间等数值记录。
+- `CharacterRecord.pet_record_map` 只保存角色当前随身携带宠物, 单角色最多携带 `PetRecordLimit_MaxCarryCount` 只; `AccountRecord.pet_warehouse_record_map` 是账号宠物仓库, 同账号下所有角色共享, 最多存放 `AccountRecordLimit_MaxPetWarehouseCount` 只.
+- cache 只按 protobuf 透传存储 `AccountRecord`, 不校验宠物是否同时存在于角色随身携带列表和账号宠物仓库, 也不校验 `PetRecord.carry_status` 业务规则.
 - `CacheSetAccountRecord` 要求请求 `uid` 与 `AccountRecord.uid` 完全一致。
 - `CacheGetAccountRecord` 对 Redis `nil` 返回 `NotFound`，其它 Redis 或反序列化错误返回 `Internal`。
 - `EnsureAccount` 只创建账号壳 `AccountRecord`; `used_uuid` 和 `character_record_list` 等游戏数据由 online 的 `AccountCreateReq` 初始化后再通过 `CacheSetAccountRecord` 写回。

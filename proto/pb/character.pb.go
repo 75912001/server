@@ -115,7 +115,7 @@ type CharacterRecord struct {
 	AssetId          uint64                    `protobuf:"varint,3,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`                                                                                                                          // 角色资源 ID; 完整角色 key 为 AccountRecord.uid + uuid
 	AssetIdRecordMap map[uint32]uint64         `protobuf:"bytes,10,rep,name=asset_id_record_map,json=assetIdRecordMap,proto3" json:"asset_id_record_map,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"` // 角色数值记录, 不再承载角色资源 ID
 	RecordMap        map[uint64]*RecordPrimary `protobuf:"bytes,1000,rep,name=record_map,json=recordMap,proto3" json:"record_map,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`                         // 角色扩展记录表, 背包等临时角色数据先归入这里
-	PetRecordMap     map[uint64]*PetRecord     `protobuf:"bytes,2000,rep,name=pet_record_map,json=petRecordMap,proto3" json:"pet_record_map,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`              // 角色拥有的宠物记录表, key 为宠物 UUID
+	PetRecordMap     map[uint64]*PetRecord     `protobuf:"bytes,2000,rep,name=pet_record_map,json=petRecordMap,proto3" json:"pet_record_map,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`              // 角色当前随身携带宠物记录表, key 为宠物 UUID, 数量不超过 PetRecordLimit_MaxCarryCount
 }
 
 func (x *CharacterRecord) Reset() {

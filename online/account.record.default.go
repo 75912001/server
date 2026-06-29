@@ -11,6 +11,8 @@ const (
 	defaultCharacterID             uint32 = 1000011
 	defaultCharacterName                  = "吉米"
 	maxCharacterSlotCount          uint32 = uint32(pb.AccountRecordLimit_AccountRecordLimit_MaxCharacterSlotCount)
+	maxPetCarryCount               int    = int(pb.PetRecordLimit_PetRecordLimit_MaxCarryCount)
+	maxPetWarehouseCount           int    = int(pb.AccountRecordLimit_AccountRecordLimit_MaxPetWarehouseCount)
 	defaultHP                      uint64 = 10
 	defaultCharacterAttribute      uint64 = 10
 	defaultCharacterAvailablePoint uint64 = 0
@@ -54,6 +56,9 @@ func initializeDefaultAccountRecord(record *pb.AccountRecord, characterSlotIndex
 	if record.GetAccountRecordCreateTimestampMs() == 0 {
 		record.AccountRecordCreateTimestampMs = now
 	}
+	if record.PetWarehouseRecordMap == nil {
+		record.PetWarehouseRecordMap = make(map[uint64]*pb.PetRecord)
+	}
 	record.CharacterRecordList[slotIndex] = newDefaultCharacterRecord(record, now)
 	return nil
 }
@@ -81,18 +86,24 @@ func newDefaultCharacterRecord(record *pb.AccountRecord, now int64) *pb.Characte
 		PetRecordMap: make(map[uint64]*pb.PetRecord),
 	}
 
-	for _, pet := range defaultPetRecords {
-		petRecord := newDefaultPetRecord(record, pet.assetID, pet.nick, pet.exp, now)
-		character.PetRecordMap[petRecord.GetUuid()] = petRecord
+	for index, pet := range defaultPetRecords {
+		if index == 0 {
+			petRecord := newDefaultPetRecord(record, pet.assetID, pet.nick, pet.exp, pb.PetCarryStatus_PetCarryStatus_Battle, now)
+			character.PetRecordMap[petRecord.GetUuid()] = petRecord
+			continue
+		}
+		petRecord := newDefaultPetRecord(record, pet.assetID, pet.nick, pet.exp, pb.PetCarryStatus_PetCarryStatus_Rest, now)
+		record.PetWarehouseRecordMap[petRecord.GetUuid()] = petRecord
 	}
 	return character
 }
 
-func newDefaultPetRecord(record *pb.AccountRecord, assetID uint32, nick string, exp uint64, now int64) *pb.PetRecord {
+func newDefaultPetRecord(record *pb.AccountRecord, assetID uint32, nick string, exp uint64, carryStatus pb.PetCarryStatus, now int64) *pb.PetRecord {
 	petUUID := nextAccountRecordUUID(record)
 	return &pb.PetRecord{
-		Uuid: petUUID,
-		Nick: nick,
+		Uuid:        petUUID,
+		Nick:        nick,
+		CarryStatus: carryStatus,
 		AssetRecordBaseMap: map[uint32]uint64{
 			uint32(pb.AssetIDRecord_AssetIDRecord_AssetID):         uint64(assetID),
 			uint32(pb.AssetIDRecord_AssetIDRecord_Exp):             exp,

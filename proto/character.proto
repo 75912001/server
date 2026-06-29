@@ -30,5 +30,5 @@ message CharacterRecord {
   uint64 asset_id = 3; // 角色资源 ID; 完整角色 key 为 AccountRecord.uid + uuid
   map<uint32, uint64> asset_id_record_map = 10; // 角色数值记录, 不再承载角色资源 ID
   map<uint64, RecordPrimary> record_map = 1000; // 角色扩展记录表, 背包等临时角色数据先归入这里
-  map<uint64, PetRecord> pet_record_map = 2000; // 角色拥有的宠物记录表, key 为宠物 UUID
+  map<uint64, PetRecord> pet_record_map = 2000; // 角色当前随身携带宠物记录表, key 为宠物 UUID, 数量不超过 PetRecordLimit_MaxCarryCount
 }
