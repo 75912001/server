@@ -1,6 +1,6 @@
 # Online 服务
 
-Online 服务负责 Account actor、业务逻辑入口和 gateway stream 下行。当前 cache userSession 的写入、删除、续期和顶号编排已经迁到 gateway。部署、端口、容器启动和验证命令见 `deploy/online/README.md`。
+Online 服务负责 Account actor, 业务逻辑入口和 gateway stream 下行. 启动时会先加载并校验 `custom.gameConfigDir` 指向的共享游戏配置, 再初始化 gRPC selector, etcd 和服务注册. 当前 cache userSession 的写入, 删除, 续期和顶号编排已经迁到 gateway. 部署, 端口, 容器启动和验证命令见 `deploy/online/README.md`.
 
 ## 能力边界
 
@@ -11,6 +11,7 @@ Online 服务负责 Account actor、业务逻辑入口和 gateway stream 下行�
 - 处理用户业务数据，例如 `AccountRecordReq`、`AccountCreateReq`、`RobotPingReq`。
 - 绑定用户时从 cache 读取并校验 `AccountRecord`。
 - 更新 `AccountRecord` 时调用 cache `CacheSetAccountRecord`。
+- 启动阶段加载 `character.yaml`, `enemy.group.yaml`, `exp.yaml`, `pet.skill.yaml` 和 `pet.yaml`, 校验 YAML 结构, 服务端消费字段, 枚举, 数值范围和跨表引用.
 
 不再承担：
 
@@ -19,6 +20,25 @@ Online 服务负责 Account actor、业务逻辑入口和 gateway stream 下行�
 - 不维护 cache userSession TTL。
 - 不处理 `heartbeatSession` 轮换。
 - 不维护 cache userSession 中的 `onlineKey`; 该字段由 gateway 写入, 仅用于排障定位。
+- 不校验角色名称, 描述, 颜色, sprite, 客户端 PNG, `.tpsheet` 或 frame 资源是否存在; 客户端资源完整性由 sa.desktop 校验.
+
+## 共享游戏配置
+
+`custom.gameConfigDir` 指向共享游戏配置目录. 未配置时默认读取当前工作目录下的 `config`.
+
+需要存在的文件：
+
+```text
+character.yaml
+enemy.group.yaml
+exp.yaml
+pet.skill.yaml
+pet.yaml
+```
+
+配置加载顺序和 sa.desktop 保持一致: 先分别执行单表 `load` 校验, 再执行跨表 `check`, 最后保留 `assemble` 生命周期. `character.yaml` 在 server 侧只消费 `id` 和 `isRole`; server 侧 `assemble` 不检查客户端资源帧, 只保证服务端需要的 YAML 数据和跨表引用有效.
+
+Docker 镜像会把仓库 `config/` 复制到 `/app/config`, `deploy/online/*.yaml` 使用 `custom.gameConfigDir: /app/config`。
 
 ## OnlineBindUser
 
@@ -106,6 +126,7 @@ client TCP
 - `AccountRecord` 缺少角色记录：检查客户端是否完成 `AccountCreateReq`, 以及 online 写回 cache 是否成功。
 - `CharacterRecord.asset_id` 为 0 或非法：这是旧 cache 档案或服务端初始化异常, 开发环境清理 cache 后重新创建账号。
 - `DeadlineExceeded`：gateway 调用 online 超时，检查 gateway `onlineRPCTimeout`、online 日志和 actor 是否阻塞。
+- `load game config failed`: `custom.gameConfigDir` 缺失, 目录下共享 YAML 不完整, 或 YAML 结构, 枚举, 数值范围, 跨表引用校验失败.
 
 ## 后续建议
 

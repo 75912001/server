@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 
+	"server/common/gameconfig"
 	pb "server/proto/pb"
 
 	xcontrol "github.com/75912001/xlib/control"
@@ -11,6 +12,7 @@ import (
 	xgrpcselector "github.com/75912001/xlib/grpc/selector"
 	xruntime "github.com/75912001/xlib/runtime"
 	xserver "github.com/75912001/xlib/server"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -25,11 +27,18 @@ func NewOnlineServer(args []string) *OnlineServer {
 	if srv == nil {
 		return nil
 	}
+	initCustomConfig()
 	return &OnlineServer{Server: srv}
 }
 
 // PreStart 配置 gRPC selector / etcd 回调，再调用 xlib server 完成日志/actor/timer 初始化，并注册 OnlineService。
 func (p *OnlineServer) PreStart(ctx context.Context) error {
+	var err error
+	GGameConfig, err = gameconfig.Load(GCfgCustomGameConfigDir)
+	if err != nil {
+		return errors.WithMessagef(err, "load game config failed, dir:%s %v", GCfgCustomGameConfigDir, xruntime.Location())
+	}
+
 	xgrpcprotoregistry.Init()
 	xgrpcselector.Init()
 

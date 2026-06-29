@@ -17,6 +17,7 @@ RUN apk add --no-cache tzdata
 ENV TZ=Asia/Shanghai
 
 COPY --from=builder /out/online /app/online
+COPY --from=builder /src/config /app/config
 
 EXPOSE 20201
 

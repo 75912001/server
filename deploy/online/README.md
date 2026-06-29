@@ -4,6 +4,8 @@
 
 镜像内时区为 `Asia/Shanghai`，容器日志时间与宿主机本地时间保持一致。
 
+online 启动时会先加载共享游戏配置. 镜像构建会把仓库 `config/` 复制到 `/app/config`, `deploy/online/*.yaml` 使用 `custom.gameConfigDir: /app/config`. server 只校验服务端消费字段和跨表引用; 角色展示字段, 客户端 PNG, `.tpsheet` 和 frame 资源仍由 sa.desktop 校验.
+
 ## 准备目录
 
 ```bash
@@ -49,6 +51,8 @@ MSYS_NO_PATHCONV=1 docker run -d --name server.online.1 \
   server.online:dev
 ```
 
+`/app/config` 中的共享游戏配置来自镜像内置文件. 只挂载 `online.yaml` 和日志目录即可.
+
 ## 启动 online.2
 
 ```bash
@@ -62,6 +66,8 @@ MSYS_NO_PATHCONV=1 docker run -d --name server.online.2 \
   -v "$PROJECT_ROOT/deploy/online/log:/app/log" \
   server.online:dev
 ```
+
+`/app/config` 中的共享游戏配置来自镜像内置文件. 只挂载 `online.yaml` 和日志目录即可.
 
 # 方式二：从 GHCR 获取镜像
 
@@ -163,6 +169,8 @@ docker ps --filter name=server.online
 docker logs server.online.1
 docker logs server.online.2
 ```
+
+如果日志出现 `load game config failed`, 先检查镜像是否按当前仓库构建, 以及 `deploy/online/*.yaml` 中的 `custom.gameConfigDir` 是否指向 `/app/config`。
 
 ## 查看 online.1 gRPC 服务
 

@@ -29,4 +29,7 @@ grpc:
   listenAddr: 0.0.0.0:20201
   externalAddr: 192.168.71.123:20201
 
+# online 自定义配置
+custom:
+  gameConfigDir: ../config # 共享游戏配置目录, 本地 bin 启动时相对 bin/online.yaml 解析到项目根目录 config
 

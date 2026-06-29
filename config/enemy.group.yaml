@@ -1,0 +1,72 @@
+# 敌人组配置
+# 任何修改此文件的行为都需要通知客户端和服务端开发人员
+
+# 关于出现的位置
+## 在回合制战斗中,位置规则当前固定:
+### 发起方
+###  1(560,420), 2(480,480), 3(640,360), 4(400,540), 5(720,300), 6(480,360), 7(400,420), 8(560,300), 9(320,480), 10(640,240)
+###  1-5 是角色位, 6-10 是对应角色携带宠物位
+### 接受方
+###  1(240,180), 2(160,240), 3(320,120), 4(80,300), 5(400,60), 6(320,240), 7(240,300), 8(400,180), 9(160,360), 10(480,120)
+###  如果 1-5 是角色位, 6-10 是对应角色携带宠物位; 如果接受方全是宠物, 则从 1,2,3... 顺延放置
+### 先从必须出的怪物(weight=0)开始,按照配置顺序
+### 然后从剩余位置中,按照权重随机选择
+
+# isBoss: true/false 是否是Boss组[默认false]
+## 如果是 boss 组, 那么按照固定顺序,将怪物放置到指定位置.
+## 出现的怪物, 必须全部配置在enemies中, countRange 无效
+## 必须指定等级(enemies[].level), levelRange/roleLevelOffset 无效
+## captured 无效(不可捕获)
+## babyRate 无效(不可出现宝宝)
+## weight 无效
+
+# countRange: [2, 5]              # 敌人数量范围, [1, 10] 之内
+# levelRange: [最小等级, 最大等级] # 敌人等级范围, [1, 140] 之内
+# roleLevelOffset: [最小偏移, 最大偏移] # 角色等级偏移
+# captured: true/false 是否允许捕获 [默认:true]
+# babyRate: [0, 100000] 每只敌人成为宠物宝宝(1级)的概率(十万分率) [默认:0]
+# enemies[].id: 引用 pet.yaml 中的宠物ID (作为敌人模板)
+# enemies[].weight: 权重(加权池), 用于随机选择敌人 [默认:0]:0:必定出现
+# enemies[].level: 指定敌人等级 [1, 140] 之内
+
+enemyGroups:
+  - id: 1
+    name: 利則諾頓巡逻队
+    countRange: [10, 10]
+    levelRange: [1, 5]
+    captured: true
+    babyRate: 50000
+    enemies:
+      - id: 4000101
+      - id: 4000101
+        weight: 100
+
+  - id: 2
+    name: 揚奇洛斯精锐
+    countRange: [10, 10]
+    roleLevelOffset: [-1, 2]
+    captured: true
+    babyRate: 50000
+    enemies:
+      - id: 4000102
+        weight: 50
+      - id: 4000102
+        weight: 50
+
+  - id: 3
+    name: 邦浦洛斯守护者
+    isBoss: true
+    enemies:
+      - id: 4000103
+        level: 10
+
+  - id: 4
+    name: 邦奇諾长老会
+    isBoss: true
+    enemies:
+      - id: 4000104
+        level: 15
+      - id: 4000104
+        level: 12
+      - id: 4000104
+        level: 12
