@@ -22,11 +22,7 @@ custom: # login 自定义配置
   accountVerifyTokenPath: /api/login/accountVerifyToken # 外部程序写入 accountVerifyToken 的 HTTP 路径 [默认 /api/login/accountVerifyToken]
   sessionPath: /api/login/session # 客户端使用 account/accountVerifyToken 换取 gateway 登录信息的 HTTP 路径 [默认 /api/login/session]
   emailSessionPath: /api/login/emailSession # 客户端使用 email/password 换取 gateway 登录信息的 HTTP 路径 [默认 /api/login/emailSession]
-  emailPasswordUsers: # 邮箱密码用户列表，注册系统向 login 运行配置追加 {email,password} 后，用户登录时每次重新读取
-    - email: 75912001@qq.com # 登录邮箱，login 会 trim 后转小写
-      password: "111111" # 明文密码
-    - email: 19426792@qq.com
-      password: "111111"
+
   accountVerifyTokenExpireSecond: 10s # accountVerifyToken 有效时间，支持 Go duration 格式 [默认 10s]
   ticketExpireSecond: 10s # connectTicket 有效时间，支持 Go duration 格式 [默认 10s]
   ticketSecret: server-dev-connect-ticket-secret # connectTicket 签名密钥，login 和 gateway 必须配置一致 [默认 ***]
@@ -34,3 +30,9 @@ custom: # login 自定义配置
   shutdownTimeout: 10s # 服务退出时 HTTP 优雅关闭等待时间，支持 Go duration 格式 [默认 10s]
   cacheRPCTimeout: 3s # 调用 Cache gRPC 接口超时时间，支持 Go duration 格式 [默认 3s]
   maxBodyBytes: 4096 # HTTP 请求体最大字节数 [默认 4096]
+
+  emailPasswordUsers: # 邮箱密码用户列表，用户登录时每次重新读取
+    - email: 75912001@qq.com # 登录邮箱，login 会 trim 后转小写
+      password: "111111" # 明文密码
+    - email: 19426792@qq.com
+      password: "111111"
