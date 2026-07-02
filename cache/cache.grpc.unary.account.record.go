@@ -13,12 +13,12 @@ import (
 )
 
 func (s *cacheGRPCServer) CacheGetAccountRecord(ctx context.Context, req *pb.CacheGetAccountRecordReq) (*pb.CacheGetAccountRecordRes, error) {
-	uid := req.GetUid()
-	if uid == 0 {
-		return &pb.CacheGetAccountRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid uid:0")
+	aid := req.GetAid()
+	if aid == 0 {
+		return &pb.CacheGetAccountRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid aid:0")
 	}
 
-	accountRecord, err := GRedis.GetAccountRecord(ctx, uid)
+	accountRecord, err := GRedis.GetAccountRecord(ctx, aid)
 	if errors.Is(err, redis.Nil) {
 		return &pb.CacheGetAccountRecordRes{}, grpcstatus.Error(grpccodes.NotFound, err.Error())
 	}
@@ -32,16 +32,16 @@ func (s *cacheGRPCServer) CacheGetAccountRecord(ctx context.Context, req *pb.Cac
 }
 
 func (s *cacheGRPCServer) CacheSetAccountRecord(ctx context.Context, req *pb.CacheSetAccountRecordReq) (*pb.CacheSetAccountRecordRes, error) {
-	uid := req.GetUid()
+	aid := req.GetAid()
 	accountRecord := req.GetAccountRecord()
-	if uid == 0 || accountRecord == nil {
+	if aid == 0 || accountRecord == nil {
 		return &pb.CacheSetAccountRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid param")
 	}
-	if accountRecord.GetUid() != uid {
-		return &pb.CacheSetAccountRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "uid mismatch")
+	if accountRecord.GetAid() != aid {
+		return &pb.CacheSetAccountRecordRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "aid mismatch")
 	}
 
-	if err := GRedis.SetAccountRecord(ctx, uid, accountRecord); err != nil {
+	if err := GRedis.SetAccountRecord(ctx, aid, accountRecord); err != nil {
 		return &pb.CacheSetAccountRecordRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
 	return &pb.CacheSetAccountRecordRes{}, nil
