@@ -31,7 +31,7 @@ custom: # login 自定义配置
   cacheRPCTimeout: 3s # 调用 Cache gRPC 接口超时时间，支持 Go duration 格式 [默认 3s]
   maxBodyBytes: 4096 # HTTP 请求体最大字节数 [默认 4096]
 
-  emailPasswordUsers: # 邮箱密码用户列表，用户登录时每次重新读取
+  emailPasswordAccounts: # 邮箱密码账号列表，账号登录时每次重新读取
     - email: 75912001@qq.com # 登录邮箱，login 会 trim 后转小写
       password: "111111" # 明文密码
     - email: 19426792@qq.com
