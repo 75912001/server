@@ -23,8 +23,8 @@ var (
 	ErrConnectTicketExpired = errors.New("connect ticket expired")
 	// ErrConnectTicketKeyMismatch 表示票据绑定的 gateway 与当前 gateway 不一致。
 	ErrConnectTicketKeyMismatch = errors.New("connect ticket key mismatch")
-	// ErrConnectTicketUIDMismatch 表示票据绑定的 uid 与客户端提交的 uid 不一致。
-	ErrConnectTicketUIDMismatch = errors.New("connect ticket uid mismatch")
+	// ErrConnectTicketAIDMismatch 表示票据绑定的 aid 与客户端提交的 aid 不一致。
+	ErrConnectTicketAIDMismatch = errors.New("connect ticket aid mismatch")
 	// ErrConnectTicketSignMismatch 表示 HMAC 签名校验失败。
 	ErrConnectTicketSignMismatch = errors.New("connect ticket signature mismatch")
 )
@@ -32,7 +32,7 @@ var (
 // ConnectTicketPayload 是 login 签发给客户端、gateway 验签后信任的登录票据内容。
 type ConnectTicketPayload struct {
 	Version           uint32 `json:"version"`           // 票据协议版本
-	UID               uint64 `json:"uid"`               // Cache 解析账号后得到的可信 uid
+	AID               uint64 `json:"aid"`               // Cache 解析账号后得到的可信 aid
 	Account           string `json:"account"`           // 登录账号
 	GatewayKey        string `json:"gatewayKey"`        // 票据绑定的目标 gateway etcd key
 	Nonce             string `json:"nonce"`             // 每次签发生成的随机数，避免同用户同 gateway 票据重复
@@ -44,12 +44,12 @@ type ConnectTicketPayload struct {
 type ConnectTicketVerifyOptions struct {
 	Secret     string    // HMAC 签名密钥，login 和 gateway 必须一致
 	GatewayKey string    // 当前 gateway key，非空时要求与票据 gatewayKey 一致
-	UID        uint64    // 客户端提交的 uid，非 0 时要求与票据 uid 一致
+	AID        uint64    // 客户端提交的 aid，非 0 时要求与票据 aid 一致
 	Now        time.Time // 校验时间；为空时使用当前时间
 }
 
 // NewConnectTicketPayload 创建 connectTicket payload，不做签名。
-func NewConnectTicketPayload(uid uint64, account string, gatewayKey string, ttl time.Duration, now time.Time) (*ConnectTicketPayload, error) {
+func NewConnectTicketPayload(aid uint64, account string, gatewayKey string, ttl time.Duration, now time.Time) (*ConnectTicketPayload, error) {
 	if now.IsZero() {
 		now = time.Now()
 	}
@@ -59,7 +59,7 @@ func NewConnectTicketPayload(uid uint64, account string, gatewayKey string, ttl 
 	}
 	return &ConnectTicketPayload{
 		Version:           ConnectTicketVersion,
-		UID:               uid,
+		AID:               aid,
 		Account:           account,
 		GatewayKey:        gatewayKey,
 		Nonce:             nonce,
@@ -70,7 +70,7 @@ func NewConnectTicketPayload(uid uint64, account string, gatewayKey string, ttl 
 
 // SignConnectTicket 将 payload 序列化后用 HMAC-SHA256 签名，返回 payload.signature 格式的票据。
 func SignConnectTicket(payload *ConnectTicketPayload, secret string) (string, error) {
-	if payload == nil || secret == "" || payload.Version != ConnectTicketVersion || payload.UID == 0 ||
+	if payload == nil || secret == "" || payload.Version != ConnectTicketVersion || payload.AID == 0 ||
 		payload.Account == "" || payload.GatewayKey == "" || payload.Nonce == "" ||
 		payload.IssuedTimestampMs == 0 || payload.ExpireTimestampMs == 0 {
 		return "", ErrConnectTicketInvalid
@@ -84,7 +84,7 @@ func SignConnectTicket(payload *ConnectTicketPayload, secret string) (string, er
 	return payloadPart + "." + signPart, nil
 }
 
-// VerifyConnectTicket 校验 connectTicket 签名、字段、目标 gateway、uid 和过期时间。
+// VerifyConnectTicket 校验 connectTicket 签名、字段、目标 gateway、aid 和过期时间。
 func VerifyConnectTicket(ticket string, opts ConnectTicketVerifyOptions) (*ConnectTicketPayload, error) {
 	if opts.Now.IsZero() {
 		opts.Now = time.Now()
@@ -105,7 +105,7 @@ func VerifyConnectTicket(ticket string, opts ConnectTicketVerifyOptions) (*Conne
 	if err = json.Unmarshal(data, &payload); err != nil {
 		return nil, ErrConnectTicketInvalid
 	}
-	if payload.Version != ConnectTicketVersion || payload.UID == 0 || payload.Account == "" ||
+	if payload.Version != ConnectTicketVersion || payload.AID == 0 || payload.Account == "" ||
 		payload.GatewayKey == "" || payload.Nonce == "" || payload.IssuedTimestampMs == 0 ||
 		payload.ExpireTimestampMs == 0 {
 		return nil, ErrConnectTicketInvalid
@@ -113,8 +113,8 @@ func VerifyConnectTicket(ticket string, opts ConnectTicketVerifyOptions) (*Conne
 	if opts.GatewayKey != "" && payload.GatewayKey != opts.GatewayKey {
 		return nil, ErrConnectTicketKeyMismatch
 	}
-	if opts.UID != 0 && payload.UID != opts.UID {
-		return nil, ErrConnectTicketUIDMismatch
+	if opts.AID != 0 && payload.AID != opts.AID {
+		return nil, ErrConnectTicketAIDMismatch
 	}
 	if opts.Now.UnixMilli() > payload.ExpireTimestampMs {
 		return nil, ErrConnectTicketExpired

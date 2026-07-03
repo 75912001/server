@@ -10,7 +10,7 @@ var (
 	ECGatewayOnlineNotFound = xerror.NewError(0x10000).WithName("ECGatewayOnlineNotFound").WithDesc("gateway-online-not-found-gateway未找到online服务")
 
 	// online
-	ECOnlineUserNotCreated = xerror.NewError(0x20000).WithName("ECOnlineUserNotCreated").WithDesc("online-user-not-created-用户未创建")
+	ECOnlineAccountNotCreated = xerror.NewError(0x20000).WithName("ECOnlineAccountNotCreated").WithDesc("online-account-not-created-用户未创建")
 
 	// cache
 	ECCacheInvalidArgument = xerror.NewError(0x30000).WithName("ECCacheInvalidArgument").WithDesc("cache-invalid-argument-参数无效")
