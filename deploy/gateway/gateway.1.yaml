@@ -30,11 +30,11 @@ net: # 网络配置
     externalAddr: 192.168.71.123:10101 # TCP 对外地址，返回给客户端连接
     type: tcp # 网络类型
 
-custom: # 用户自定义配置
-  verifyExpireTimeDuration: 864000s # 用户登录验证过期时间，支持 Go duration 格式，例如 300s、5m、24h
-  heartBeatExpireTimeDuration: 864000s # 用户心跳过期时间，支持 Go duration 格式，例如 300s、5m、24h
+custom: # 自定义配置
+  verifyExpireTimeDuration: 864000s # 账号登录验证过期时间，支持 Go duration 格式，例如 300s、5m、24h
+  heartBeatExpireTimeDuration: 864000s # 账号心跳过期时间，支持 Go duration 格式，例如 300s、5m、24h
 
   cmdMapping: # 服务消息 ID 映射
-    user: [0x000001, 0x0fffff] # 用户服务命令范围
+    account: [0x000001, 0x0fffff] # 账号服务命令范围
     gateway: [0x100000, 0x1fffff] # 网关服务命令范围
     online: [0x200000, 0x2fffff] # 在线服务命令范围
