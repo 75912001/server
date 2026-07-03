@@ -36,12 +36,12 @@ func NewGatewayServer(args []string) *GatewayServer {
 // PreStart 配置 TCPHandler / HeaderStrategy / etcd 回调，再调用 xlib server 完成日志/actor/timer 初始化
 func (p *GatewayServer) PreStart(ctx context.Context) error {
 	// 初始化 gRPC selector：扫描 protoregistry 中所有服务/方法选项，建立负载均衡策略表
-	// 必须在第一次调用 selector.Sel（即 XOnlineServiceClient.OnlineBindUser）之前完成
+	// 必须在第一次调用 selector.Sel（即 XOnlineServiceClient.OnlineBindAccount）之前完成
 	xgrpcprotoregistry.Init()
 	xgrpcselector.Init()
 
 	opts := xserver.NewServerOptions().
-		WithTCPHandler(GUserHandlerTCP).
+		WithTCPHandler(GAccountHandlerTCP).
 		WithHeaderStrategy(&common.DefaultHeaderStrategy{}).
 		WithLogCallbackFunc(xcontrol.NewCallBack(func(args ...any) error { return nil })).
 		WithEtcd(xetcd.NewOptions().

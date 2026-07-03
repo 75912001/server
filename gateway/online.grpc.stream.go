@@ -22,20 +22,20 @@ func (p *onlineStreamHandler) OnlineStreamTunnelPre(stream pb.OnlineService_Onli
 }
 
 // OnlineStreamTunnel 处理 online → gateway 下行流。
-// 每条 OnlineStreamTunnelRes 含若干 OnlineTunnelFrame，按 uid 投递到对应用户 actor。
+// 每条 OnlineStreamTunnelRes 含若干 OnlineTunnelFrame，按 aid 投递到对应用户 actor。
 func (p *onlineStreamHandler) OnlineStreamTunnel(
 	_ *pb.XStreamOnlineServiceOnlineStreamTunnelClient,
 	msg *pb.OnlineStreamTunnelRes,
 	_ pb.OnlineService_OnlineStreamTunnelClient,
 ) error {
 	for _, frame := range msg.GetFrames() {
-		uid := frame.GetUid()
-		user := GUserMgr.GetByUID(uid)
-		if user == nil {
-			xlog.GLog.Warnf("online frame uid:%d not found", uid)
+		aid := frame.GetAid()
+		account := GAccountMgr.GetByAID(aid)
+		if account == nil {
+			xlog.GLog.Warnf("online frame aid:%d not found", aid)
 			continue
 		}
-		user.PostFrame(frame)
+		account.PostFrame(frame)
 	}
 	return nil
 }
