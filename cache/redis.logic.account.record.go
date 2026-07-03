@@ -9,26 +9,26 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func (p *Redis) SetAccountRecord(ctx context.Context, uid uint64, record *pb.AccountRecord) error {
+func (p *Redis) SetAccountRecord(ctx context.Context, aid uint64, record *pb.AccountRecord) error {
 	data, err := proto.Marshal(record)
 	if err != nil {
-		return errors.WithMessagef(err, "marshal account record failed, uid: %d %v", uid, xruntime.Location())
+		return errors.WithMessagef(err, "marshal account record failed, aid: %d %v", aid, xruntime.Location())
 	}
-	key := RedisKeyAccountRecord(uid)
+	key := RedisKeyAccountRecord(aid)
 	if err := p.client.Set(ctx, key, data, 0).Err(); err != nil {
-		return errors.WithMessagef(err, "set account record to redis failed, uid: %d %v", uid, xruntime.Location())
+		return errors.WithMessagef(err, "set account record to redis failed, aid: %d %v", aid, xruntime.Location())
 	}
 	return nil
 }
 
-func (p *Redis) GetAccountRecord(ctx context.Context, uid uint64) (record *pb.AccountRecord, err error) {
-	str, err := p.Get(ctx, RedisKeyAccountRecord(uid))
+func (p *Redis) GetAccountRecord(ctx context.Context, aid uint64) (record *pb.AccountRecord, err error) {
+	str, err := p.Get(ctx, RedisKeyAccountRecord(aid))
 	if err != nil {
-		return nil, errors.WithMessagef(err, "get account record from redis failed, uid: %d %v", uid, xruntime.Location())
+		return nil, errors.WithMessagef(err, "get account record from redis failed, aid: %d %v", aid, xruntime.Location())
 	}
 	record = &pb.AccountRecord{}
 	if err := proto.Unmarshal([]byte(str), record); err != nil {
-		return nil, errors.WithMessagef(err, "unmarshal account record failed, uid: %d %v", uid, xruntime.Location())
+		return nil, errors.WithMessagef(err, "unmarshal account record failed, aid: %d %v", aid, xruntime.Location())
 	}
 	return record, nil
 }
