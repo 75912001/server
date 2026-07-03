@@ -19,24 +19,24 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	OnlineService_OnlineBindUser_FullMethodName     = "/online.OnlineService/OnlineBindUser"
-	OnlineService_OnlineUnbindUser_FullMethodName   = "/online.OnlineService/OnlineUnbindUser"
-	OnlineService_OnlineStreamTunnel_FullMethodName = "/online.OnlineService/OnlineStreamTunnel"
+	OnlineService_OnlineBindAccount_FullMethodName   = "/online.OnlineService/OnlineBindAccount"
+	OnlineService_OnlineUnbindAccount_FullMethodName = "/online.OnlineService/OnlineUnbindAccount"
+	OnlineService_OnlineStreamTunnel_FullMethodName  = "/online.OnlineService/OnlineStreamTunnel"
 )
 
 // OnlineServiceClient is the client API for OnlineService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OnlineServiceClient interface {
-	// 控制面：绑定用户 actor (Unary RPC)
-	// 作用: Gateway 完成 connectTicket 校验和 userSession 抢占后, 通过此接口通知 Online 建立用户 actor。
-	// 特性: Online 只负责绑定用户 actor, 不读写 cache userSession。
-	OnlineBindUser(ctx context.Context, in *OnlineBindUserReq, opts ...grpc.CallOption) (*OnlineBindUserRes, error)
-	// 控制面：解绑用户 actor (Unary RPC)
-	// 作用: Gateway 在 TCP 断开、顶号、主动离线和回滚等场景下, 同步通知 Online 解绑用户 actor。
-	OnlineUnbindUser(ctx context.Context, in *OnlineUnbindUserReq, opts ...grpc.CallOption) (*OnlineUnbindUserRes, error)
+	// 控制面：绑定 Account actor (Unary RPC)
+	// 作用: Gateway 完成 connectTicket 校验和 accountSession 抢占后, 通过此接口通知 Online 建立 Account actor。
+	// 特性: Online 只负责绑定 Account actor, 不读写 cache accountSession。
+	OnlineBindAccount(ctx context.Context, in *OnlineBindAccountReq, opts ...grpc.CallOption) (*OnlineBindAccountRes, error)
+	// 控制面：解绑 Account actor (Unary RPC)
+	// 作用: Gateway 在 TCP 断开、顶号、主动离线和回滚等场景下, 同步通知 Online 解绑 Account actor。
+	OnlineUnbindAccount(ctx context.Context, in *OnlineUnbindAccountReq, opts ...grpc.CallOption) (*OnlineUnbindAccountRes, error)
 	// 数据面：全互联双向流隧道 (Bidirectional Stream)
-	// 作用: 承载 Gateway 与该 Online 节点之间所有用户的上下行数据。
+	// 作用: 承载 Gateway 与该 Online 节点之间所有账号的上下行数据。
 	// 特性：支持批量打包 (Batching)，极其高效。
 	OnlineStreamTunnel(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[OnlineStreamTunnelReq, OnlineStreamTunnelRes], error)
 }
@@ -49,20 +49,20 @@ func NewOnlineServiceClient(cc grpc.ClientConnInterface) OnlineServiceClient {
 	return &onlineServiceClient{cc}
 }
 
-func (c *onlineServiceClient) OnlineBindUser(ctx context.Context, in *OnlineBindUserReq, opts ...grpc.CallOption) (*OnlineBindUserRes, error) {
+func (c *onlineServiceClient) OnlineBindAccount(ctx context.Context, in *OnlineBindAccountReq, opts ...grpc.CallOption) (*OnlineBindAccountRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OnlineBindUserRes)
-	err := c.cc.Invoke(ctx, OnlineService_OnlineBindUser_FullMethodName, in, out, cOpts...)
+	out := new(OnlineBindAccountRes)
+	err := c.cc.Invoke(ctx, OnlineService_OnlineBindAccount_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *onlineServiceClient) OnlineUnbindUser(ctx context.Context, in *OnlineUnbindUserReq, opts ...grpc.CallOption) (*OnlineUnbindUserRes, error) {
+func (c *onlineServiceClient) OnlineUnbindAccount(ctx context.Context, in *OnlineUnbindAccountReq, opts ...grpc.CallOption) (*OnlineUnbindAccountRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OnlineUnbindUserRes)
-	err := c.cc.Invoke(ctx, OnlineService_OnlineUnbindUser_FullMethodName, in, out, cOpts...)
+	out := new(OnlineUnbindAccountRes)
+	err := c.cc.Invoke(ctx, OnlineService_OnlineUnbindAccount_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -86,15 +86,15 @@ type OnlineService_OnlineStreamTunnelClient = grpc.BidiStreamingClient[OnlineStr
 // All implementations must embed UnimplementedOnlineServiceServer
 // for forward compatibility.
 type OnlineServiceServer interface {
-	// 控制面：绑定用户 actor (Unary RPC)
-	// 作用: Gateway 完成 connectTicket 校验和 userSession 抢占后, 通过此接口通知 Online 建立用户 actor。
-	// 特性: Online 只负责绑定用户 actor, 不读写 cache userSession。
-	OnlineBindUser(context.Context, *OnlineBindUserReq) (*OnlineBindUserRes, error)
-	// 控制面：解绑用户 actor (Unary RPC)
-	// 作用: Gateway 在 TCP 断开、顶号、主动离线和回滚等场景下, 同步通知 Online 解绑用户 actor。
-	OnlineUnbindUser(context.Context, *OnlineUnbindUserReq) (*OnlineUnbindUserRes, error)
+	// 控制面：绑定 Account actor (Unary RPC)
+	// 作用: Gateway 完成 connectTicket 校验和 accountSession 抢占后, 通过此接口通知 Online 建立 Account actor。
+	// 特性: Online 只负责绑定 Account actor, 不读写 cache accountSession。
+	OnlineBindAccount(context.Context, *OnlineBindAccountReq) (*OnlineBindAccountRes, error)
+	// 控制面：解绑 Account actor (Unary RPC)
+	// 作用: Gateway 在 TCP 断开、顶号、主动离线和回滚等场景下, 同步通知 Online 解绑 Account actor。
+	OnlineUnbindAccount(context.Context, *OnlineUnbindAccountReq) (*OnlineUnbindAccountRes, error)
 	// 数据面：全互联双向流隧道 (Bidirectional Stream)
-	// 作用: 承载 Gateway 与该 Online 节点之间所有用户的上下行数据。
+	// 作用: 承载 Gateway 与该 Online 节点之间所有账号的上下行数据。
 	// 特性：支持批量打包 (Batching)，极其高效。
 	OnlineStreamTunnel(grpc.BidiStreamingServer[OnlineStreamTunnelReq, OnlineStreamTunnelRes]) error
 	mustEmbedUnimplementedOnlineServiceServer()
@@ -107,11 +107,11 @@ type OnlineServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedOnlineServiceServer struct{}
 
-func (UnimplementedOnlineServiceServer) OnlineBindUser(context.Context, *OnlineBindUserReq) (*OnlineBindUserRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method OnlineBindUser not implemented")
+func (UnimplementedOnlineServiceServer) OnlineBindAccount(context.Context, *OnlineBindAccountReq) (*OnlineBindAccountRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method OnlineBindAccount not implemented")
 }
-func (UnimplementedOnlineServiceServer) OnlineUnbindUser(context.Context, *OnlineUnbindUserReq) (*OnlineUnbindUserRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method OnlineUnbindUser not implemented")
+func (UnimplementedOnlineServiceServer) OnlineUnbindAccount(context.Context, *OnlineUnbindAccountReq) (*OnlineUnbindAccountRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method OnlineUnbindAccount not implemented")
 }
 func (UnimplementedOnlineServiceServer) OnlineStreamTunnel(grpc.BidiStreamingServer[OnlineStreamTunnelReq, OnlineStreamTunnelRes]) error {
 	return status.Error(codes.Unimplemented, "method OnlineStreamTunnel not implemented")
@@ -137,38 +137,38 @@ func RegisterOnlineServiceServer(s grpc.ServiceRegistrar, srv OnlineServiceServe
 	s.RegisterService(&OnlineService_ServiceDesc, srv)
 }
 
-func _OnlineService_OnlineBindUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(OnlineBindUserReq)
+func _OnlineService_OnlineBindAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OnlineBindAccountReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OnlineServiceServer).OnlineBindUser(ctx, in)
+		return srv.(OnlineServiceServer).OnlineBindAccount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: OnlineService_OnlineBindUser_FullMethodName,
+		FullMethod: OnlineService_OnlineBindAccount_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OnlineServiceServer).OnlineBindUser(ctx, req.(*OnlineBindUserReq))
+		return srv.(OnlineServiceServer).OnlineBindAccount(ctx, req.(*OnlineBindAccountReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OnlineService_OnlineUnbindUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(OnlineUnbindUserReq)
+func _OnlineService_OnlineUnbindAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OnlineUnbindAccountReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OnlineServiceServer).OnlineUnbindUser(ctx, in)
+		return srv.(OnlineServiceServer).OnlineUnbindAccount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: OnlineService_OnlineUnbindUser_FullMethodName,
+		FullMethod: OnlineService_OnlineUnbindAccount_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OnlineServiceServer).OnlineUnbindUser(ctx, req.(*OnlineUnbindUserReq))
+		return srv.(OnlineServiceServer).OnlineUnbindAccount(ctx, req.(*OnlineUnbindAccountReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -188,12 +188,12 @@ var OnlineService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*OnlineServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "OnlineBindUser",
-			Handler:    _OnlineService_OnlineBindUser_Handler,
+			MethodName: "OnlineBindAccount",
+			Handler:    _OnlineService_OnlineBindAccount_Handler,
 		},
 		{
-			MethodName: "OnlineUnbindUser",
-			Handler:    _OnlineService_OnlineUnbindUser_Handler,
+			MethodName: "OnlineUnbindAccount",
+			Handler:    _OnlineService_OnlineUnbindAccount_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

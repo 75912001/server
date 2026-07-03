@@ -101,8 +101,8 @@ func NewXGatewayServiceClient(clientConn *grpc.ClientConn) *XGatewayServiceClien
 // //////////////////////////////////////////////////////////////////////////////
 // GatewayService 客户端-Stream
 // //////////////////////////////////////////////////////////////////////////////
-func (p *XGatewayServiceClient) GatewayKickUser(ctx context.Context, in *GatewayKickUserReq, opts ...grpc.CallOption) (*GatewayKickUserRes, error) {
-	return p.Client.GatewayKickUser(ctx, in, opts...)
+func (p *XGatewayServiceClient) GatewayKickAccountSession(ctx context.Context, in *GatewayKickAccountSessionReq, opts ...grpc.CallOption) (*GatewayKickAccountSessionRes, error) {
+	return p.Client.GatewayKickAccountSession(ctx, in, opts...)
 }
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,7 +146,7 @@ func SetIStreamGatewayServiceServer(streamServer IStreamGatewayServiceServer) {
 //
 // //////////////////////////////////////////////////////////////////////////////
 type IUnaryGatewayServiceServer interface {
-	GatewayKickUser(ctx context.Context, req *GatewayKickUserReq) (*GatewayKickUserRes, error)
+	GatewayKickAccountSession(ctx context.Context, req *GatewayKickAccountSessionReq) (*GatewayKickAccountSessionRes, error)
 }
 
 var iUnaryGatewayServiceServer IUnaryGatewayServiceServer
@@ -155,6 +155,6 @@ func SetIUnaryGatewayServiceServer(unaryServer IUnaryGatewayServiceServer) {
 	iUnaryGatewayServiceServer = unaryServer
 }
 
-func (p *XGatewayServiceServer) GatewayKickUser(ctx context.Context, req *GatewayKickUserReq) (*GatewayKickUserRes, error) {
-	return iUnaryGatewayServiceServer.GatewayKickUser(ctx, req)
+func (p *XGatewayServiceServer) GatewayKickAccountSession(ctx context.Context, req *GatewayKickAccountSessionReq) (*GatewayKickAccountSessionRes, error) {
+	return iUnaryGatewayServiceServer.GatewayKickAccountSession(ctx, req)
 }

@@ -186,11 +186,11 @@ func (p *XOnlineServiceClient) OnlineStreamTunnel(ctx context.Context, opts ...g
 	return p.Client.OnlineStreamTunnel(ctx, opts...)
 }
 
-func (p *XOnlineServiceClient) OnlineBindUser(ctx context.Context, in *OnlineBindUserReq, opts ...grpc.CallOption) (*OnlineBindUserRes, error) {
-	return p.Client.OnlineBindUser(ctx, in, opts...)
+func (p *XOnlineServiceClient) OnlineBindAccount(ctx context.Context, in *OnlineBindAccountReq, opts ...grpc.CallOption) (*OnlineBindAccountRes, error) {
+	return p.Client.OnlineBindAccount(ctx, in, opts...)
 }
-func (p *XOnlineServiceClient) OnlineUnbindUser(ctx context.Context, in *OnlineUnbindUserReq, opts ...grpc.CallOption) (*OnlineUnbindUserRes, error) {
-	return p.Client.OnlineUnbindUser(ctx, in, opts...)
+func (p *XOnlineServiceClient) OnlineUnbindAccount(ctx context.Context, in *OnlineUnbindAccountReq, opts ...grpc.CallOption) (*OnlineUnbindAccountRes, error) {
+	return p.Client.OnlineUnbindAccount(ctx, in, opts...)
 }
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -274,8 +274,8 @@ func (p *XOnlineServiceServer) OnlineStreamTunnel(stream OnlineService_OnlineStr
 //
 // //////////////////////////////////////////////////////////////////////////////
 type IUnaryOnlineServiceServer interface {
-	OnlineBindUser(ctx context.Context, req *OnlineBindUserReq) (*OnlineBindUserRes, error)
-	OnlineUnbindUser(ctx context.Context, req *OnlineUnbindUserReq) (*OnlineUnbindUserRes, error)
+	OnlineBindAccount(ctx context.Context, req *OnlineBindAccountReq) (*OnlineBindAccountRes, error)
+	OnlineUnbindAccount(ctx context.Context, req *OnlineUnbindAccountReq) (*OnlineUnbindAccountRes, error)
 }
 
 var iUnaryOnlineServiceServer IUnaryOnlineServiceServer
@@ -284,10 +284,10 @@ func SetIUnaryOnlineServiceServer(unaryServer IUnaryOnlineServiceServer) {
 	iUnaryOnlineServiceServer = unaryServer
 }
 
-func (p *XOnlineServiceServer) OnlineBindUser(ctx context.Context, req *OnlineBindUserReq) (*OnlineBindUserRes, error) {
-	return iUnaryOnlineServiceServer.OnlineBindUser(ctx, req)
+func (p *XOnlineServiceServer) OnlineBindAccount(ctx context.Context, req *OnlineBindAccountReq) (*OnlineBindAccountRes, error) {
+	return iUnaryOnlineServiceServer.OnlineBindAccount(ctx, req)
 }
 
-func (p *XOnlineServiceServer) OnlineUnbindUser(ctx context.Context, req *OnlineUnbindUserReq) (*OnlineUnbindUserRes, error) {
-	return iUnaryOnlineServiceServer.OnlineUnbindUser(ctx, req)
+func (p *XOnlineServiceServer) OnlineUnbindAccount(ctx context.Context, req *OnlineUnbindAccountReq) (*OnlineUnbindAccountRes, error) {
+	return iUnaryOnlineServiceServer.OnlineUnbindAccount(ctx, req)
 }

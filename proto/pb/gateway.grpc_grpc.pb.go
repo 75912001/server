@@ -19,17 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	GatewayService_GatewayKickUser_FullMethodName = "/gateway.GatewayService/GatewayKickUser"
+	GatewayService_GatewayKickAccountSession_FullMethodName = "/gateway.GatewayService/GatewayKickAccountSession"
 )
 
 // GatewayServiceClient is the client API for GatewayService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GatewayServiceClient interface {
-	// 踢旧用户
+	// 踢旧账号会话。
 	// 调用方：新 Gateway 顶号时直连旧 Gateway 发起。
-	// 作用: 旧 Gateway 断开匹配连接, 通知旧 Online 下线, 并按 expected_user_session 删除 cache userSession。
-	GatewayKickUser(ctx context.Context, in *GatewayKickUserReq, opts ...grpc.CallOption) (*GatewayKickUserRes, error)
+	// 作用: 旧 Gateway 断开匹配连接, 通知旧 Online 下线, 并按 expected_account_session 删除 cache accountSession。
+	GatewayKickAccountSession(ctx context.Context, in *GatewayKickAccountSessionReq, opts ...grpc.CallOption) (*GatewayKickAccountSessionRes, error)
 }
 
 type gatewayServiceClient struct {
@@ -40,10 +40,10 @@ func NewGatewayServiceClient(cc grpc.ClientConnInterface) GatewayServiceClient {
 	return &gatewayServiceClient{cc}
 }
 
-func (c *gatewayServiceClient) GatewayKickUser(ctx context.Context, in *GatewayKickUserReq, opts ...grpc.CallOption) (*GatewayKickUserRes, error) {
+func (c *gatewayServiceClient) GatewayKickAccountSession(ctx context.Context, in *GatewayKickAccountSessionReq, opts ...grpc.CallOption) (*GatewayKickAccountSessionRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GatewayKickUserRes)
-	err := c.cc.Invoke(ctx, GatewayService_GatewayKickUser_FullMethodName, in, out, cOpts...)
+	out := new(GatewayKickAccountSessionRes)
+	err := c.cc.Invoke(ctx, GatewayService_GatewayKickAccountSession_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -54,10 +54,10 @@ func (c *gatewayServiceClient) GatewayKickUser(ctx context.Context, in *GatewayK
 // All implementations must embed UnimplementedGatewayServiceServer
 // for forward compatibility.
 type GatewayServiceServer interface {
-	// 踢旧用户
+	// 踢旧账号会话。
 	// 调用方：新 Gateway 顶号时直连旧 Gateway 发起。
-	// 作用: 旧 Gateway 断开匹配连接, 通知旧 Online 下线, 并按 expected_user_session 删除 cache userSession。
-	GatewayKickUser(context.Context, *GatewayKickUserReq) (*GatewayKickUserRes, error)
+	// 作用: 旧 Gateway 断开匹配连接, 通知旧 Online 下线, 并按 expected_account_session 删除 cache accountSession。
+	GatewayKickAccountSession(context.Context, *GatewayKickAccountSessionReq) (*GatewayKickAccountSessionRes, error)
 	mustEmbedUnimplementedGatewayServiceServer()
 }
 
@@ -68,8 +68,8 @@ type GatewayServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedGatewayServiceServer struct{}
 
-func (UnimplementedGatewayServiceServer) GatewayKickUser(context.Context, *GatewayKickUserReq) (*GatewayKickUserRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method GatewayKickUser not implemented")
+func (UnimplementedGatewayServiceServer) GatewayKickAccountSession(context.Context, *GatewayKickAccountSessionReq) (*GatewayKickAccountSessionRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method GatewayKickAccountSession not implemented")
 }
 func (UnimplementedGatewayServiceServer) mustEmbedUnimplementedGatewayServiceServer() {}
 func (UnimplementedGatewayServiceServer) testEmbeddedByValue()                        {}
@@ -92,20 +92,20 @@ func RegisterGatewayServiceServer(s grpc.ServiceRegistrar, srv GatewayServiceSer
 	s.RegisterService(&GatewayService_ServiceDesc, srv)
 }
 
-func _GatewayService_GatewayKickUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GatewayKickUserReq)
+func _GatewayService_GatewayKickAccountSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatewayKickAccountSessionReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GatewayServiceServer).GatewayKickUser(ctx, in)
+		return srv.(GatewayServiceServer).GatewayKickAccountSession(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GatewayService_GatewayKickUser_FullMethodName,
+		FullMethod: GatewayService_GatewayKickAccountSession_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GatewayServiceServer).GatewayKickUser(ctx, req.(*GatewayKickUserReq))
+		return srv.(GatewayServiceServer).GatewayKickAccountSession(ctx, req.(*GatewayKickAccountSessionReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -118,8 +118,8 @@ var GatewayService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GatewayServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GatewayKickUser",
-			Handler:    _GatewayService_GatewayKickUser_Handler,
+			MethodName: "GatewayKickAccountSession",
+			Handler:    _GatewayService_GatewayKickAccountSession_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

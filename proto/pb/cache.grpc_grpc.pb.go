@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CacheService_CacheSetAccountRecord_FullMethodName      = "/cache.CacheService/CacheSetAccountRecord"
-	CacheService_CacheGetAccountRecord_FullMethodName      = "/cache.CacheService/CacheGetAccountRecord"
-	CacheService_CacheSetAccountVerifyToken_FullMethodName = "/cache.CacheService/CacheSetAccountVerifyToken"
-	CacheService_CacheUseAccountVerifyToken_FullMethodName = "/cache.CacheService/CacheUseAccountVerifyToken"
-	CacheService_CacheGetUserSession_FullMethodName        = "/cache.CacheService/CacheGetUserSession"
-	CacheService_CacheBeginUserSessionCAS_FullMethodName   = "/cache.CacheService/CacheBeginUserSessionCAS"
-	CacheService_CacheEndUserSessionCAS_FullMethodName     = "/cache.CacheService/CacheEndUserSessionCAS"
-	CacheService_CacheRefreshUserSessionCAS_FullMethodName = "/cache.CacheService/CacheRefreshUserSessionCAS"
+	CacheService_CacheSetAccountRecord_FullMethodName         = "/cache.CacheService/CacheSetAccountRecord"
+	CacheService_CacheGetAccountRecord_FullMethodName         = "/cache.CacheService/CacheGetAccountRecord"
+	CacheService_CacheSetAccountVerifyToken_FullMethodName    = "/cache.CacheService/CacheSetAccountVerifyToken"
+	CacheService_CacheUseAccountVerifyToken_FullMethodName    = "/cache.CacheService/CacheUseAccountVerifyToken"
+	CacheService_CacheGetAccountSession_FullMethodName        = "/cache.CacheService/CacheGetAccountSession"
+	CacheService_CacheBeginAccountSessionCAS_FullMethodName   = "/cache.CacheService/CacheBeginAccountSessionCAS"
+	CacheService_CacheEndAccountSessionCAS_FullMethodName     = "/cache.CacheService/CacheEndAccountSessionCAS"
+	CacheService_CacheRefreshAccountSessionCAS_FullMethodName = "/cache.CacheService/CacheRefreshAccountSessionCAS"
 )
 
 // CacheServiceClient is the client API for CacheService service.
@@ -35,30 +35,30 @@ const (
 type CacheServiceClient interface {
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 写入账号档案。
-	// 以 uid 做 RingHash 分片, 账号档案创建完成和账号档案更新都会走这个接口。
+	// 以 aid 做 RingHash 分片, 账号档案创建完成和账号档案更新都会走这个接口。
 	CacheSetAccountRecord(ctx context.Context, in *CacheSetAccountRecordReq, opts ...grpc.CallOption) (*CacheSetAccountRecordRes, error)
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 读取账号档案。
-	// 以 uid 做 RingHash 分片，返回当前 uid 对应的 AccountRecord。
+	// 以 aid 做 RingHash 分片，返回当前 aid 对应的 AccountRecord。
 	CacheGetAccountRecord(ctx context.Context, in *CacheGetAccountRecordReq, opts ...grpc.CallOption) (*CacheGetAccountRecordRes, error)
 	// 写入 accountVerifyToken。
 	// 以 account 做 RingHash 分片，accountVerifyToken 使用一次性 SETNX 语义，未消费前不覆盖。
 	CacheSetAccountVerifyToken(ctx context.Context, in *CacheSetAccountVerifyTokenReq, opts ...grpc.CallOption) (*CacheSetAccountVerifyTokenRes, error)
 	// 验证并消费 accountVerifyToken。
-	// 以 account 做 RingHash 分片，消费成功后确保账号存在并返回可信 uid。
+	// 以 account 做 RingHash 分片，消费成功后确保账号存在并返回可信 aid。
 	CacheUseAccountVerifyToken(ctx context.Context, in *CacheUseAccountVerifyTokenReq, opts ...grpc.CallOption) (*CacheUseAccountVerifyTokenRes, error)
-	// 获取用户 cache userSession。
-	// 以 uid 做 RingHash 分片, 返回当前 cache userSession 中的 gatewayKey/userSession/loginTimestampMs/onlineKey。
-	CacheGetUserSession(ctx context.Context, in *CacheGetUserSessionReq, opts ...grpc.CallOption) (*CacheGetUserSessionRes, error)
-	// 按 expected_user_session 创建用户 cache userSession。
-	// 以 uid 做 RingHash 分片, expected_user_session 为空时要求当前 userSession 不存在。
-	CacheBeginUserSessionCAS(ctx context.Context, in *CacheBeginUserSessionCASReq, opts ...grpc.CallOption) (*CacheBeginUserSessionCASRes, error)
-	// 按 expected_user_session 结束用户 cache userSession。
-	// 以 uid 做 RingHash 分片，仅在 expected_user_session 匹配时删除。
-	CacheEndUserSessionCAS(ctx context.Context, in *CacheEndUserSessionCASReq, opts ...grpc.CallOption) (*CacheEndUserSessionCASRes, error)
-	// 按 expected_user_session 刷新用户 cache userSession TTL。
-	// 以 uid 做 RingHash 分片，仅在 expected_user_session 匹配时刷新 TTL。
-	CacheRefreshUserSessionCAS(ctx context.Context, in *CacheRefreshUserSessionCASReq, opts ...grpc.CallOption) (*CacheRefreshUserSessionCASRes, error)
+	// 获取账号 cache accountSession。
+	// 以 aid 做 RingHash 分片, 返回当前 cache accountSession 中的 gatewayKey/accountSession/loginTimestampMs/onlineKey。
+	CacheGetAccountSession(ctx context.Context, in *CacheGetAccountSessionReq, opts ...grpc.CallOption) (*CacheGetAccountSessionRes, error)
+	// 按 expected_account_session 创建账号 cache accountSession。
+	// 以 aid 做 RingHash 分片, expected_account_session 为空时要求当前 accountSession 不存在。
+	CacheBeginAccountSessionCAS(ctx context.Context, in *CacheBeginAccountSessionCASReq, opts ...grpc.CallOption) (*CacheBeginAccountSessionCASRes, error)
+	// 按 expected_account_session 结束账号 cache accountSession。
+	// 以 aid 做 RingHash 分片，仅在 expected_account_session 匹配时删除。
+	CacheEndAccountSessionCAS(ctx context.Context, in *CacheEndAccountSessionCASReq, opts ...grpc.CallOption) (*CacheEndAccountSessionCASRes, error)
+	// 按 expected_account_session 刷新账号 cache accountSession TTL。
+	// 以 aid 做 RingHash 分片，仅在 expected_account_session 匹配时刷新 TTL。
+	CacheRefreshAccountSessionCAS(ctx context.Context, in *CacheRefreshAccountSessionCASReq, opts ...grpc.CallOption) (*CacheRefreshAccountSessionCASRes, error)
 }
 
 type cacheServiceClient struct {
@@ -109,40 +109,40 @@ func (c *cacheServiceClient) CacheUseAccountVerifyToken(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *cacheServiceClient) CacheGetUserSession(ctx context.Context, in *CacheGetUserSessionReq, opts ...grpc.CallOption) (*CacheGetUserSessionRes, error) {
+func (c *cacheServiceClient) CacheGetAccountSession(ctx context.Context, in *CacheGetAccountSessionReq, opts ...grpc.CallOption) (*CacheGetAccountSessionRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CacheGetUserSessionRes)
-	err := c.cc.Invoke(ctx, CacheService_CacheGetUserSession_FullMethodName, in, out, cOpts...)
+	out := new(CacheGetAccountSessionRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheGetAccountSession_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *cacheServiceClient) CacheBeginUserSessionCAS(ctx context.Context, in *CacheBeginUserSessionCASReq, opts ...grpc.CallOption) (*CacheBeginUserSessionCASRes, error) {
+func (c *cacheServiceClient) CacheBeginAccountSessionCAS(ctx context.Context, in *CacheBeginAccountSessionCASReq, opts ...grpc.CallOption) (*CacheBeginAccountSessionCASRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CacheBeginUserSessionCASRes)
-	err := c.cc.Invoke(ctx, CacheService_CacheBeginUserSessionCAS_FullMethodName, in, out, cOpts...)
+	out := new(CacheBeginAccountSessionCASRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheBeginAccountSessionCAS_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *cacheServiceClient) CacheEndUserSessionCAS(ctx context.Context, in *CacheEndUserSessionCASReq, opts ...grpc.CallOption) (*CacheEndUserSessionCASRes, error) {
+func (c *cacheServiceClient) CacheEndAccountSessionCAS(ctx context.Context, in *CacheEndAccountSessionCASReq, opts ...grpc.CallOption) (*CacheEndAccountSessionCASRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CacheEndUserSessionCASRes)
-	err := c.cc.Invoke(ctx, CacheService_CacheEndUserSessionCAS_FullMethodName, in, out, cOpts...)
+	out := new(CacheEndAccountSessionCASRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheEndAccountSessionCAS_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *cacheServiceClient) CacheRefreshUserSessionCAS(ctx context.Context, in *CacheRefreshUserSessionCASReq, opts ...grpc.CallOption) (*CacheRefreshUserSessionCASRes, error) {
+func (c *cacheServiceClient) CacheRefreshAccountSessionCAS(ctx context.Context, in *CacheRefreshAccountSessionCASReq, opts ...grpc.CallOption) (*CacheRefreshAccountSessionCASRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CacheRefreshUserSessionCASRes)
-	err := c.cc.Invoke(ctx, CacheService_CacheRefreshUserSessionCAS_FullMethodName, in, out, cOpts...)
+	out := new(CacheRefreshAccountSessionCASRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheRefreshAccountSessionCAS_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -155,30 +155,30 @@ func (c *cacheServiceClient) CacheRefreshUserSessionCAS(ctx context.Context, in 
 type CacheServiceServer interface {
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 写入账号档案。
-	// 以 uid 做 RingHash 分片, 账号档案创建完成和账号档案更新都会走这个接口。
+	// 以 aid 做 RingHash 分片, 账号档案创建完成和账号档案更新都会走这个接口。
 	CacheSetAccountRecord(context.Context, *CacheSetAccountRecordReq) (*CacheSetAccountRecordRes, error)
 	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 读取账号档案。
-	// 以 uid 做 RingHash 分片，返回当前 uid 对应的 AccountRecord。
+	// 以 aid 做 RingHash 分片，返回当前 aid 对应的 AccountRecord。
 	CacheGetAccountRecord(context.Context, *CacheGetAccountRecordReq) (*CacheGetAccountRecordRes, error)
 	// 写入 accountVerifyToken。
 	// 以 account 做 RingHash 分片，accountVerifyToken 使用一次性 SETNX 语义，未消费前不覆盖。
 	CacheSetAccountVerifyToken(context.Context, *CacheSetAccountVerifyTokenReq) (*CacheSetAccountVerifyTokenRes, error)
 	// 验证并消费 accountVerifyToken。
-	// 以 account 做 RingHash 分片，消费成功后确保账号存在并返回可信 uid。
+	// 以 account 做 RingHash 分片，消费成功后确保账号存在并返回可信 aid。
 	CacheUseAccountVerifyToken(context.Context, *CacheUseAccountVerifyTokenReq) (*CacheUseAccountVerifyTokenRes, error)
-	// 获取用户 cache userSession。
-	// 以 uid 做 RingHash 分片, 返回当前 cache userSession 中的 gatewayKey/userSession/loginTimestampMs/onlineKey。
-	CacheGetUserSession(context.Context, *CacheGetUserSessionReq) (*CacheGetUserSessionRes, error)
-	// 按 expected_user_session 创建用户 cache userSession。
-	// 以 uid 做 RingHash 分片, expected_user_session 为空时要求当前 userSession 不存在。
-	CacheBeginUserSessionCAS(context.Context, *CacheBeginUserSessionCASReq) (*CacheBeginUserSessionCASRes, error)
-	// 按 expected_user_session 结束用户 cache userSession。
-	// 以 uid 做 RingHash 分片，仅在 expected_user_session 匹配时删除。
-	CacheEndUserSessionCAS(context.Context, *CacheEndUserSessionCASReq) (*CacheEndUserSessionCASRes, error)
-	// 按 expected_user_session 刷新用户 cache userSession TTL。
-	// 以 uid 做 RingHash 分片，仅在 expected_user_session 匹配时刷新 TTL。
-	CacheRefreshUserSessionCAS(context.Context, *CacheRefreshUserSessionCASReq) (*CacheRefreshUserSessionCASRes, error)
+	// 获取账号 cache accountSession。
+	// 以 aid 做 RingHash 分片, 返回当前 cache accountSession 中的 gatewayKey/accountSession/loginTimestampMs/onlineKey。
+	CacheGetAccountSession(context.Context, *CacheGetAccountSessionReq) (*CacheGetAccountSessionRes, error)
+	// 按 expected_account_session 创建账号 cache accountSession。
+	// 以 aid 做 RingHash 分片, expected_account_session 为空时要求当前 accountSession 不存在。
+	CacheBeginAccountSessionCAS(context.Context, *CacheBeginAccountSessionCASReq) (*CacheBeginAccountSessionCASRes, error)
+	// 按 expected_account_session 结束账号 cache accountSession。
+	// 以 aid 做 RingHash 分片，仅在 expected_account_session 匹配时删除。
+	CacheEndAccountSessionCAS(context.Context, *CacheEndAccountSessionCASReq) (*CacheEndAccountSessionCASRes, error)
+	// 按 expected_account_session 刷新账号 cache accountSession TTL。
+	// 以 aid 做 RingHash 分片，仅在 expected_account_session 匹配时刷新 TTL。
+	CacheRefreshAccountSessionCAS(context.Context, *CacheRefreshAccountSessionCASReq) (*CacheRefreshAccountSessionCASRes, error)
 	mustEmbedUnimplementedCacheServiceServer()
 }
 
@@ -201,17 +201,17 @@ func (UnimplementedCacheServiceServer) CacheSetAccountVerifyToken(context.Contex
 func (UnimplementedCacheServiceServer) CacheUseAccountVerifyToken(context.Context, *CacheUseAccountVerifyTokenReq) (*CacheUseAccountVerifyTokenRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method CacheUseAccountVerifyToken not implemented")
 }
-func (UnimplementedCacheServiceServer) CacheGetUserSession(context.Context, *CacheGetUserSessionReq) (*CacheGetUserSessionRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method CacheGetUserSession not implemented")
+func (UnimplementedCacheServiceServer) CacheGetAccountSession(context.Context, *CacheGetAccountSessionReq) (*CacheGetAccountSessionRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheGetAccountSession not implemented")
 }
-func (UnimplementedCacheServiceServer) CacheBeginUserSessionCAS(context.Context, *CacheBeginUserSessionCASReq) (*CacheBeginUserSessionCASRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method CacheBeginUserSessionCAS not implemented")
+func (UnimplementedCacheServiceServer) CacheBeginAccountSessionCAS(context.Context, *CacheBeginAccountSessionCASReq) (*CacheBeginAccountSessionCASRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheBeginAccountSessionCAS not implemented")
 }
-func (UnimplementedCacheServiceServer) CacheEndUserSessionCAS(context.Context, *CacheEndUserSessionCASReq) (*CacheEndUserSessionCASRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method CacheEndUserSessionCAS not implemented")
+func (UnimplementedCacheServiceServer) CacheEndAccountSessionCAS(context.Context, *CacheEndAccountSessionCASReq) (*CacheEndAccountSessionCASRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheEndAccountSessionCAS not implemented")
 }
-func (UnimplementedCacheServiceServer) CacheRefreshUserSessionCAS(context.Context, *CacheRefreshUserSessionCASReq) (*CacheRefreshUserSessionCASRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method CacheRefreshUserSessionCAS not implemented")
+func (UnimplementedCacheServiceServer) CacheRefreshAccountSessionCAS(context.Context, *CacheRefreshAccountSessionCASReq) (*CacheRefreshAccountSessionCASRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheRefreshAccountSessionCAS not implemented")
 }
 func (UnimplementedCacheServiceServer) mustEmbedUnimplementedCacheServiceServer() {}
 func (UnimplementedCacheServiceServer) testEmbeddedByValue()                      {}
@@ -306,74 +306,74 @@ func _CacheService_CacheUseAccountVerifyToken_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CacheService_CacheGetUserSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CacheGetUserSessionReq)
+func _CacheService_CacheGetAccountSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheGetAccountSessionReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).CacheGetUserSession(ctx, in)
+		return srv.(CacheServiceServer).CacheGetAccountSession(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CacheService_CacheGetUserSession_FullMethodName,
+		FullMethod: CacheService_CacheGetAccountSession_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).CacheGetUserSession(ctx, req.(*CacheGetUserSessionReq))
+		return srv.(CacheServiceServer).CacheGetAccountSession(ctx, req.(*CacheGetAccountSessionReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CacheService_CacheBeginUserSessionCAS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CacheBeginUserSessionCASReq)
+func _CacheService_CacheBeginAccountSessionCAS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheBeginAccountSessionCASReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).CacheBeginUserSessionCAS(ctx, in)
+		return srv.(CacheServiceServer).CacheBeginAccountSessionCAS(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CacheService_CacheBeginUserSessionCAS_FullMethodName,
+		FullMethod: CacheService_CacheBeginAccountSessionCAS_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).CacheBeginUserSessionCAS(ctx, req.(*CacheBeginUserSessionCASReq))
+		return srv.(CacheServiceServer).CacheBeginAccountSessionCAS(ctx, req.(*CacheBeginAccountSessionCASReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CacheService_CacheEndUserSessionCAS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CacheEndUserSessionCASReq)
+func _CacheService_CacheEndAccountSessionCAS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheEndAccountSessionCASReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).CacheEndUserSessionCAS(ctx, in)
+		return srv.(CacheServiceServer).CacheEndAccountSessionCAS(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CacheService_CacheEndUserSessionCAS_FullMethodName,
+		FullMethod: CacheService_CacheEndAccountSessionCAS_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).CacheEndUserSessionCAS(ctx, req.(*CacheEndUserSessionCASReq))
+		return srv.(CacheServiceServer).CacheEndAccountSessionCAS(ctx, req.(*CacheEndAccountSessionCASReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CacheService_CacheRefreshUserSessionCAS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CacheRefreshUserSessionCASReq)
+func _CacheService_CacheRefreshAccountSessionCAS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheRefreshAccountSessionCASReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).CacheRefreshUserSessionCAS(ctx, in)
+		return srv.(CacheServiceServer).CacheRefreshAccountSessionCAS(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CacheService_CacheRefreshUserSessionCAS_FullMethodName,
+		FullMethod: CacheService_CacheRefreshAccountSessionCAS_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).CacheRefreshUserSessionCAS(ctx, req.(*CacheRefreshUserSessionCASReq))
+		return srv.(CacheServiceServer).CacheRefreshAccountSessionCAS(ctx, req.(*CacheRefreshAccountSessionCASReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -402,20 +402,20 @@ var CacheService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CacheService_CacheUseAccountVerifyToken_Handler,
 		},
 		{
-			MethodName: "CacheGetUserSession",
-			Handler:    _CacheService_CacheGetUserSession_Handler,
+			MethodName: "CacheGetAccountSession",
+			Handler:    _CacheService_CacheGetAccountSession_Handler,
 		},
 		{
-			MethodName: "CacheBeginUserSessionCAS",
-			Handler:    _CacheService_CacheBeginUserSessionCAS_Handler,
+			MethodName: "CacheBeginAccountSessionCAS",
+			Handler:    _CacheService_CacheBeginAccountSessionCAS_Handler,
 		},
 		{
-			MethodName: "CacheEndUserSessionCAS",
-			Handler:    _CacheService_CacheEndUserSessionCAS_Handler,
+			MethodName: "CacheEndAccountSessionCAS",
+			Handler:    _CacheService_CacheEndAccountSessionCAS_Handler,
 		},
 		{
-			MethodName: "CacheRefreshUserSessionCAS",
-			Handler:    _CacheService_CacheRefreshUserSessionCAS_Handler,
+			MethodName: "CacheRefreshAccountSessionCAS",
+			Handler:    _CacheService_CacheRefreshAccountSessionCAS_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
