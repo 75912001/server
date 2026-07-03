@@ -44,10 +44,10 @@ func (s *cacheGRPCServer) CacheUseAccountVerifyToken(ctx context.Context, req *p
 	if err != nil {
 		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
-	if accountRecord == nil || accountRecord.GetUid() == 0 {
-		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.Internal, "account uid is empty")
+	if accountRecord == nil || accountRecord.GetAid() == 0 {
+		return &pb.CacheUseAccountVerifyTokenRes{}, grpcstatus.Error(grpccodes.Internal, "account aid is empty")
 	}
 	return &pb.CacheUseAccountVerifyTokenRes{
-		Uid: accountRecord.GetUid(),
+		Aid: accountRecord.GetAid(),
 	}, nil
 }
