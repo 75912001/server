@@ -138,7 +138,7 @@ GroupAIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 - cache 只按 protobuf 透传存储 `AccountRecord`, 不校验宠物是否同时存在于角色随身携带列表和账号宠物仓库, 也不校验 `PetRecord.carry_status` 业务规则.
 - `CacheSetAccountRecord` 要求请求 `aid` 与 `AccountRecord.aid` 完全一致。
 - `CacheGetAccountRecord` 对 Redis `nil` 返回 `NotFound`，其它 Redis 或反序列化错误返回 `Internal`。
-- `EnsureAccount` 只创建账号壳 `AccountRecord`; `used_uuid` 和 `character_record_list` 等游戏数据由 online 的 `AccountCreateReq` 初始化后再通过 `CacheSetAccountRecord` 写回。
+- `EnsureAccount` 只创建账号壳 `AccountRecord`; `used_uuid` 和 `character_record_list` 等游戏数据由 online 的 `CharacterCreateReq` 初始化后再通过 `CacheSetAccountRecord` 写回。
 - 本轮不迁移旧 cache `AccountRecord`; 已存在但缺少 `CharacterRecord.asset_id` 的档案视为旧格式, 开发环境需要清理 cache 或重新创建账号。
 - 直接在 Redis CLI 中看到 `\x08...` 属于正常现象。
 - 读取时必须通过 `CacheGetAccountRecord` 或 protobuf 反序列化解析。

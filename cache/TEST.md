@@ -9,9 +9,9 @@ cache 测试重点不是单纯追求覆盖率，而是稳定覆盖服务契约�
 - gRPC status 返回语义。
 - Redis key 格式。
 - accountVerifyToken 设置、消费和删除。
-- uid 按 `base.groupID` 分段生成。
+- aid 按 `base.groupID` 分段生成。
 - `AccountRecord` protobuf 读写, 包括角色随身携带宠物和账号宠物仓库字段透传。
-- cache userSession 的批量读写、CAS 替换、续期、删除和迟到请求保护。
+- cache accountSession 的批量读写、CAS 替换、续期、删除和迟到请求保护。
 
 ## 快速单元测试
 
@@ -24,11 +24,11 @@ GOCACHE="$PWD/../.gocache" go test ../common . ../proto/pb
 
 覆盖内容：
 
-- `common.GroupUIDStart` 公式。
+- `common.GroupAIDStart` 公式。
 - cache Redis key 生成。
-- cache userSession enum 到 Redis hash field 的映射。
-- cache userSession identity/record 转换。
-- cache userSession response 组装。
+- cache accountSession enum 到 Redis hash field 的映射。
+- cache accountSession identity/record 转换。
+- cache accountSession response 组装。
 - handler 参数错误对应的 gRPC status。
 
 ## 依赖编译检查
@@ -82,17 +82,17 @@ GOCACHE="$PWD/../.gocache" go test -tags=integration .
 注意事项：
 
 - 只在测试 Redis Cluster 上运行，不要指向生产 Redis。
-- 测试会写入并清理 `account:*`、`user:*` 和 `user:uid:sequence:{groupID}` 相关 key。
+- 测试会写入并清理 `account:*`、`account:*` 和 `account:aid:sequence:{groupID}` 相关 key。
 - 默认测试 groupID 为 `9`，也可以通过 `CACHE_TEST_GROUP_ID` 指定。
 
 覆盖内容：
 
 - accountVerifyToken 首次设置、重复设置、错误 accountVerifyToken、消费后删除。
 - 新账号创建、重复读取、AccountRecord 缺失或关键字段不一致时报错。
-- 同账号并发创建只生成一个 uid。
-- cache userSession HSET/HMGET。
-- cache userSession CAS replace、expire、delete。
-- 旧 userSession 的迟到 expire/delete 不影响新 cache userSession。
+- 同账号并发创建只生成一个 aid。
+- cache accountSession HSET/HMGET。
+- cache accountSession CAS replace、expire、delete。
+- 旧 accountSession 的迟到 expire/delete 不影响新 cache accountSession。
 
 ## Benchmark
 
@@ -119,7 +119,7 @@ GOCACHE="$PWD/../.gocache" go test -tags=integration -bench=. -benchmem .
 - P95/P99。
 - Redis CPU/内存。
 - cache 进程 CPU/内存。
-- 并发账号创建时 uid 是否重复。
+- 并发账号创建时 aid 是否重复。
 
 ## 一键检查
 
@@ -151,7 +151,7 @@ rmdir ../.coverage 2>/dev/null || true
 
 - accountVerifyToken 设置和消费流程。
 - account record 读写; cache 不校验宠物仓库和角色随身携带宠物之间的业务不变量。
-- cache userSession set/get/replace/delete/expire。
+- cache accountSession set/get/replace/delete/expire。
 - 参数错误返回 `InvalidArgument`。
 - 记录不存在返回 `NotFound`。
-- expected userSession 过期或不匹配返回 `Aborted`。
+- expected accountSession 过期或不匹配返回 `Aborted`。
