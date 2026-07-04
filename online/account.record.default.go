@@ -22,8 +22,6 @@ const (
 	characterAttributeTotalPoint   uint32 = uint32(pb.CharacterAttributeLimit_CharacterAttributeLimit_TotalPoint)
 	defaultCharacterAvailablePoint uint32 = 0
 	defaultCharacterSceneID        uint32 = 2000001
-	defaultCharacterDirection      uint64 = uint64(pb.AssetDirection_AssetDirection_Down)
-	defaultCharacterAction         uint64 = uint64(pb.CharacterAction_CharacterAction_Stand)
 	defaultPetLoyalty              uint64 = 100
 	defaultPetGrade                       = pb.PetGrade_PetGrade_Mythic
 	unspecifiedPetGrade                   = pb.PetGrade_PetGrade_Epic
@@ -126,7 +124,6 @@ func newDefaultCharacterRecord(record *pb.AccountRecord, characterID uint32, cha
 		Attribute:         newCharacterAttributePoints(attribute),
 		CreateTimestampMs: now,
 		SceneId:           defaultCharacterSceneID,
-		AssetIdRecordMap:  defaultCharacterAssetIDRecordMap(),
 		RecordMap:         make(map[uint64]*pb.RecordPrimary),
 		PetRecordList:     make([]*pb.PetRecord, 0, maxPetCarryCount),
 	}
@@ -164,13 +161,6 @@ func newCharacterAttributePoints(attribute characterAttributePoints) *pb.Charact
 		Strength:  attribute.strength,
 		Toughness: attribute.toughness,
 		Dexterity: attribute.dexterity,
-	}
-}
-
-func defaultCharacterAssetIDRecordMap() map[uint32]uint64 {
-	return map[uint32]uint64{
-		uint32(pb.AssetIDRecord_AssetIDRecord_Direction): defaultCharacterDirection,
-		uint32(pb.AssetIDRecord_AssetIDRecord_Action):    defaultCharacterAction,
 	}
 }
 

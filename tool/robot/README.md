@@ -174,6 +174,8 @@ http://127.0.0.1:18080/
 
 如果指定 AID 的 robot 正在登录，业务命令会先进入待发送队列。`RobotPingReq` 必须等账号档案创建或确认存在后才会发送。如果已经登录但第一次心跳还没返回，业务消息仍可发送，包头 `SessionID` 使用 robot 本地递增值。
 
+robot 输出收发包 protobuf JSON 时, 枚举字段统一使用数值形式, 例如 `PetRecord.carryStatus=2`、`grade=5`。
+
 ## RobotPing
 
 `RobotPingReq/RobotPingRes` 是专门的压测消息，链路为：

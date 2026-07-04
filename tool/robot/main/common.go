@@ -18,6 +18,7 @@ func marshalJSON(msg proto.Message) string {
 		Multiline:       true,
 		Indent:          "  ",
 		EmitUnpopulated: true,
+		UseEnumNumbers:  true,
 	}.Marshal(msg)
 	if err != nil {
 		return fmt.Sprintf(`{"error":"%v"}`, err)

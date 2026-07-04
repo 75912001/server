@@ -73,16 +73,6 @@ func TestNormalizeCharacterAttribute(t *testing.T) {
 	}
 }
 
-func TestDefaultCharacterAssetIDRecordMapStoresRemainingRecordFields(t *testing.T) {
-	record := defaultCharacterAssetIDRecordMap()
-
-	assertRecordValue(t, record, pb.AssetIDRecord_AssetIDRecord_Direction, defaultCharacterDirection)
-	assertRecordValue(t, record, pb.AssetIDRecord_AssetIDRecord_Action, defaultCharacterAction)
-	if got := len(record); got != 2 {
-		t.Fatalf("len(record) = %d, want 2", got)
-	}
-}
-
 func TestInitializeDefaultAccountRecordCarriesFiveDefaultPets(t *testing.T) {
 	loadGameConfigForDefaultRecordTest(t)
 
@@ -131,6 +121,9 @@ func TestInitializeDefaultAccountRecordCarriesFiveDefaultPets(t *testing.T) {
 	}
 	if got := character.GetSceneId(); got != defaultCharacterSceneID {
 		t.Fatalf("character.SceneId = %d, want %d", got, defaultCharacterSceneID)
+	}
+	if got := len(character.GetAssetIdRecordMap()); got != 0 {
+		t.Fatalf("len(character.AssetIdRecordMap) = %d, want 0", got)
 	}
 	pets := character.GetPetRecordList()
 	wantAssetIDs := []uint64{4000101, 4000102, 4000103, 4000104, 4000105}
@@ -453,13 +446,6 @@ func assertRecordValue(t *testing.T, record map[uint32]uint64, key pb.AssetIDRec
 	t.Helper()
 	if got := record[uint32(key)]; got != want {
 		t.Fatalf("record[%s] = %d, want %d", key.String(), got, want)
-	}
-}
-
-func assertRecordMissing(t *testing.T, record map[uint32]uint64, key pb.AssetIDRecord) {
-	t.Helper()
-	if got, ok := record[uint32(key)]; ok {
-		t.Fatalf("record[%s] = %d, want missing", key.String(), got)
 	}
 }
 

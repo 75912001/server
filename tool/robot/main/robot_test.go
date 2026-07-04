@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -75,6 +76,23 @@ func TestRobotCreatedAccountRecordMarksReady(t *testing.T) {
 	assertNoRobotCommand(t, commands)
 	if !robot.accountReady {
 		t.Fatal("robot accountReady = false, want true")
+	}
+}
+
+func TestMarshalJSONUsesEnumNumbers(t *testing.T) {
+	data := marshalJSON(&pb.PetRecord{
+		CarryStatus: pb.PetCarryStatus_PetCarryStatus_Battle,
+		Grade:       pb.PetGrade_PetGrade_Mythic,
+	})
+
+	if strings.Contains(data, "PetCarryStatus_Battle") || strings.Contains(data, "PetGrade_Mythic") {
+		t.Fatalf("marshalJSON enum output = %s, want enum numbers", data)
+	}
+	if !strings.Contains(data, `"carryStatus": 2`) {
+		t.Fatalf("marshalJSON carryStatus output = %s, want carryStatus enum number", data)
+	}
+	if !strings.Contains(data, `"grade": 5`) {
+		t.Fatalf("marshalJSON grade output = %s, want grade enum number", data)
 	}
 }
 
