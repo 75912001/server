@@ -13,8 +13,8 @@ import (
 	grpcstatus "google.golang.org/grpc/status"
 )
 
-func robotAccount(uid uint64) string {
-	return fmt.Sprintf("robot.%d", uid)
+func robotAccount(aid uint64) string {
+	return fmt.Sprintf("robot.%d", aid)
 }
 
 func newAccountVerifyToken(account string) string {
@@ -61,32 +61,32 @@ func waitCache(timeout time.Duration) error {
 	}
 }
 
-func cacheEnsureRobotAccountRecord(uid uint64) error {
-	account := robotAccount(uid)
+func cacheEnsureRobotAccountRecord(aid uint64) error {
+	account := robotAccount(aid)
 	res, err := pb.GXCacheServiceService.CacheGetAccountRecord(context.Background(), &pb.CacheGetAccountRecordReq{
-		Uid: uid,
+		Aid: aid,
 	})
 	if err == nil {
 		accountRecord := res.GetAccountRecord()
 		if accountRecord == nil {
-			return errors.Errorf("CacheGetAccountRecord uid:%d account record is nil", uid)
+			return errors.Errorf("CacheGetAccountRecord aid:%d account record is nil", aid)
 		}
 		if accountRecord.GetAccount() != account {
-			return errors.Errorf("CacheGetAccountRecord uid:%d account mismatch current:%s expect:%s", uid, accountRecord.GetAccount(), account)
+			return errors.Errorf("CacheGetAccountRecord aid:%d account mismatch current:%s expect:%s", aid, accountRecord.GetAccount(), account)
 		}
 		return nil
 	}
 	s, ok := grpcstatus.FromError(err)
 	if !ok || s.Code() != codes.NotFound {
 		if ok {
-			return errors.WithMessagef(err, "CacheGetAccountRecord uid:%d code:%v message:%s", uid, s.Code(), s.Message())
+			return errors.WithMessagef(err, "CacheGetAccountRecord aid:%d code:%v message:%s", aid, s.Code(), s.Message())
 		}
-		return errors.WithMessagef(err, "CacheGetAccountRecord uid:%d", uid)
+		return errors.WithMessagef(err, "CacheGetAccountRecord aid:%d", aid)
 	}
 	_, err = pb.GXCacheServiceService.CacheSetAccountRecord(context.Background(), &pb.CacheSetAccountRecordReq{
-		Uid: uid,
+		Aid: aid,
 		AccountRecord: &pb.AccountRecord{
-			Uid:                            uid,
+			Aid:                            aid,
 			Account:                        account,
 			AccountCreateTimestampMs:       time.Now().UnixMilli(),
 			AccountRecordCreateTimestampMs: 0,
@@ -95,9 +95,9 @@ func cacheEnsureRobotAccountRecord(uid uint64) error {
 	if err != nil {
 		s, ok = grpcstatus.FromError(err)
 		if ok {
-			return errors.WithMessagef(err, "CacheSetAccountRecord uid:%d account:%s code:%v message:%s", uid, account, s.Code(), s.Message())
+			return errors.WithMessagef(err, "CacheSetAccountRecord aid:%d account:%s code:%v message:%s", aid, account, s.Code(), s.Message())
 		}
-		return errors.WithMessagef(err, "CacheSetAccountRecord uid:%d account:%s", uid, account)
+		return errors.WithMessagef(err, "CacheSetAccountRecord aid:%d account:%s", aid, account)
 	}
 	return nil
 }

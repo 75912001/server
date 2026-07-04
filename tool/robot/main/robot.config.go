@@ -4,8 +4,8 @@ import "time"
 
 type RobotConfig struct {
 	Count                int                  `yaml:"count"`
-	UIDStart             uint64               `yaml:"uidStart"`
-	UIDStep              uint64               `yaml:"uidStep"`
+	AIDStart             uint64               `yaml:"aidStart"`
+	AIDStep              uint64               `yaml:"aidStep"`
 	StartupBatchSize     int                  `yaml:"startupBatchSize"`
 	StartupBatchInterval time.Duration        `yaml:"startupBatchInterval"`
 	HeartbeatInterval    time.Duration        `yaml:"heartbeatInterval"`
@@ -31,11 +31,11 @@ func normalizeRobotConfig(cfg *ConfigYaml) {
 	if robot.Count <= 0 {
 		robot.Count = 1
 	}
-	if robot.UIDStart == 0 {
-		robot.UIDStart = 10001
+	if robot.AIDStart == 0 {
+		robot.AIDStart = 10001
 	}
-	if robot.UIDStep == 0 {
-		robot.UIDStep = 1
+	if robot.AIDStep == 0 {
+		robot.AIDStep = 1
 	}
 	if robot.StartupBatchSize <= 0 {
 		robot.StartupBatchSize = 100

@@ -14,26 +14,26 @@ type AccountMgr struct {
 	accounts *xmap.MapMutexMgr[uint64, *Account]
 }
 
-func (p *AccountMgr) GetByUID(uid uint64) *Account {
-	account, ok := p.accounts.Find(uid)
+func (p *AccountMgr) GetByAID(aid uint64) *Account {
+	account, ok := p.accounts.Find(aid)
 	if !ok {
 		return nil
 	}
 	return account
 }
 
-func (p *AccountMgr) Bind(uid uint64, req *pb.OnlineBindUserReq, accountRecord *pb.AccountRecord) (*pb.OnlineBindUserRes, error) {
-	account, existed := p.accounts.Find(uid)
+func (p *AccountMgr) Bind(aid uint64, req *pb.OnlineBindAccountReq, accountRecord *pb.AccountRecord) (*pb.OnlineBindAccountRes, error) {
+	account, existed := p.accounts.Find(aid)
 	if !existed {
-		account = newAccount(uid)
-		p.accounts.Add(uid, account)
+		account = newAccount(aid)
+		p.accounts.Add(aid, account)
 	}
 	res, err := account.PostBind(req, accountRecord)
 	if err != nil {
-		current, ok := p.accounts.Find(uid)
+		current, ok := p.accounts.Find(aid)
 		if !existed {
 			if !ok || current == account {
-				p.accounts.Del(uid)
+				p.accounts.Del(aid)
 			}
 			account.Stop()
 		} else if !ok {

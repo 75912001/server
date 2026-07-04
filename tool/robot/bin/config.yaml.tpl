@@ -25,8 +25,8 @@ controlPanel:
 
 robot:
   count: 1
-  uidStart: 10001
-  uidStep: 1
+  aidStart: 10001
+  aidStep: 1
   startupBatchSize: 100
   startupBatchInterval: 100ms
   heartbeatInterval: 10s
@@ -36,7 +36,7 @@ robot:
   messages:
     - name: RobotPingReq
       weight: 80
-    - name: UserRecordReq
+    - name: AccountRecordReq
       weight: 20
   logging:
     summaryInterval: 10s

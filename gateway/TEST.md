@@ -7,7 +7,7 @@
 在仓库根目录执行：
 
 ```bash
-cd /d/src/github.com/server
+cd /d/src/github.com/sa.project/server
 GOCACHE="$PWD/.gocache" go test ./gateway
 ```
 
@@ -23,21 +23,21 @@ GOCACHE="$PWD/.gocache" go test ./gateway
 修改 `gateway` 与协议、公共错误码、online 交互逻辑时，建议同时检查关联包：
 
 ```bash
-cd /d/src/github.com/server
+cd /d/src/github.com/sa.project/server
 GOCACHE="$PWD/.gocache" go test ./common ./proto/pb ./gateway ./online
 ```
 
 如果只需要确认 gateway 可独立编译：
 
 ```bash
-cd /d/src/github.com/server/gateway
+cd /d/src/github.com/sa.project/server/gateway
 GOCACHE="$PWD/../.gocache" go test .
 ```
 
 ## 3. 覆盖率
 
 ```bash
-cd /d/src/github.com/server
+cd /d/src/github.com/sa.project/server
 mkdir -p .coverage
 GOCACHE="$PWD/.gocache" go test -coverprofile=.coverage/gateway.out ./gateway
 go tool cover -func=.coverage/gateway.out
@@ -54,14 +54,14 @@ go tool cover -html=.coverage/gateway.out -o .coverage/gateway.html
 `gateway` 存在 actor、TCP 回调、stream 回调、timer 回调等并发路径。涉及账号生命周期、online stream、GatewayKickAccountSession、AccountMgr、CacheMgr 或 OnlineMgr 时，建议执行 race 检查：
 
 ```bash
-cd /d/src/github.com/server
+cd /d/src/github.com/sa.project/server
 GOCACHE="$PWD/.gocache" go test -race ./gateway
 ```
 
 ## 5. Benchmark
 
 ```bash
-cd /d/src/github.com/server
+cd /d/src/github.com/sa.project/server
 GOCACHE="$PWD/.gocache" go test -bench=. -benchmem ./gateway
 ```
 
@@ -74,14 +74,14 @@ GOCACHE="$PWD/.gocache" go test -bench=. -benchmem ./gateway
 推荐顺序：
 
 ```bash
-cd /d/src/github.com/server
+cd /d/src/github.com/sa.project/server
 docker ps
 ```
 
 确认依赖容器和服务运行后，使用客户端模拟器连接 gateway：
 
 ```bash
-cd /d/src/github.com/server/tool/robot/bin
+cd /d/src/github.com/sa.project/server/tool/robot/bin
 ./robot.exe
 ```
 

@@ -19,20 +19,20 @@ type emailSessionReq struct {
 	Password string `json:"password"` // 明文密码, 精确匹配配置文件
 }
 
-// emailPasswordUser 是 login 配置文件中的 email/password 登录账号。
-type emailPasswordUser struct {
+// emailPasswordAccount 是 login 配置文件中的 email/password 登录账号。
+type emailPasswordAccount struct {
 	Email    string `yaml:"email"`    // 邮箱账号, trim 后统一转小写
 	Password string `yaml:"password"` // 明文密码
 }
 
-// emailPasswordConfig 只解析 login 运行配置里的 custom.emailPasswordUsers。
+// emailPasswordConfig 只解析 login 运行配置里的 custom.emailPasswordAccounts。
 type emailPasswordConfig struct {
 	Custom struct {
-		EmailPasswordUsers []emailPasswordUser `yaml:"emailPasswordUsers"`
+		EmailPasswordAccounts []emailPasswordAccount `yaml:"emailPasswordAccounts"`
 	} `yaml:"custom"`
 }
 
-// handleLoginEmailSession 供客户端使用 email/password 换取 uid、connectTicket 和目标 gateway。
+// handleLoginEmailSession 供客户端使用 email/password 换取 aid、connectTicket 和目标 gateway。
 func handleLoginEmailSession(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
@@ -44,15 +44,15 @@ func handleLoginEmailSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, err := loadEmailPasswordUsers()
+	accounts, err := loadEmailPasswordAccounts()
 	if err != nil {
 		if xlog.GLog != nil {
-			xlog.GLog.Warnf("load email password users failed: %v", err)
+			xlog.GLog.Warnf("load email password accounts failed: %v", err)
 		}
 		writeError(w, http.StatusInternalServerError, errLoginCredentialConfigInvalid.Error())
 		return
 	}
-	password, ok := users[req.Email]
+	password, ok := accounts[req.Email]
 	if !ok || password != req.Password {
 		writeError(w, http.StatusUnauthorized, "invalid email or password")
 		return
@@ -87,5 +87,5 @@ func handleLoginEmailSession(w http.ResponseWriter, r *http.Request) {
 		writeError(w, statusCode, message)
 		return
 	}
-	writeLoginSession(w, req.Email, cacheRes.GetUid())
+	writeLoginSession(w, req.Email, cacheRes.GetAid())
 }

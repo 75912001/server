@@ -14,23 +14,23 @@ service OnlineService {
     timeout: "3s"
     loadBalancePolicy: LoadBalancePolicy_Direct
   };
-  // 控制面：绑定用户 actor (Unary RPC)
-  // 作用: Gateway 完成 connectTicket 校验和 userSession 抢占后, 通过此接口通知 Online 建立用户 actor。
-  // 特性: Online 只负责绑定用户 actor, 不读写 cache userSession。
-  rpc OnlineBindUser(OnlineBindUserReq) returns (OnlineBindUserRes){
+  // 控制面：绑定 Account actor (Unary RPC)
+  // 作用: Gateway 完成 connectTicket 校验和 accountSession 抢占后, 通过此接口通知 Online 建立 Account actor。
+  // 特性: Online 只负责绑定 Account actor, 不读写 cache accountSession。
+  rpc OnlineBindAccount(OnlineBindAccountReq) returns (OnlineBindAccountRes){
     option (proto.methodOpt) = {
       timeout : "10s"
     };
   }
-  // 控制面：解绑用户 actor (Unary RPC)
-  // 作用: Gateway 在 TCP 断开、顶号、主动离线和回滚等场景下, 同步通知 Online 解绑用户 actor。
-  rpc OnlineUnbindUser(OnlineUnbindUserReq) returns (OnlineUnbindUserRes) {
+  // 控制面：解绑 Account actor (Unary RPC)
+  // 作用: Gateway 在 TCP 断开、顶号、主动离线和回滚等场景下, 同步通知 Online 解绑 Account actor。
+  rpc OnlineUnbindAccount(OnlineUnbindAccountReq) returns (OnlineUnbindAccountRes) {
     option (proto.methodOpt) = {
       timeout : "10s"
     };
   }
   // 数据面：全互联双向流隧道 (Bidirectional Stream)
-  // 作用: 承载 Gateway 与该 Online 节点之间所有用户的上下行数据。
+  // 作用: 承载 Gateway 与该 Online 节点之间所有账号的上下行数据。
   // 特性：支持批量打包 (Batching)，极其高效。
   rpc OnlineStreamTunnel (stream OnlineStreamTunnelReq) returns (stream OnlineStreamTunnelRes);
 }
@@ -43,7 +43,7 @@ service OnlineService {
 message OnlineStreamTunnelReq {
   // gateway_key 用于 stream 建立后向 Online 注册 gatewayKey
   string gateway_key = 1;
-  // 将多个用户的小帧打包在一起发送，避免单包发送带来的 HTTP/2 帧头与系统调用开销
+  // 将多个账号的小帧打包在一起发送，避免单包发送带来的 HTTP/2 帧头与系统调用开销
   repeated OnlineTunnelFrame frames = 2;
 }
 
@@ -57,7 +57,7 @@ message OnlineStreamTunnelRes {
 // ===================================================================
 
 message OnlineTunnelFrame {
-  uint64 uid = 1;              // uid, 用于定位 Online 用户 actor 或 Gateway 用户连接
+  uint64 aid = 1;              // aid, 用于定位 Online Account actor 或 Gateway 账号连接
 
   // payload 强互斥：一个 Frame 只能是下面类型之一
   oneof payload {

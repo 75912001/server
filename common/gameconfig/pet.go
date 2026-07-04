@@ -241,8 +241,8 @@ func parsePetGrowth(data yamlMap, petID int, path string) (PetGrowthEntry, error
 		"baseTough": baseTough,
 		"baseDex":   baseDex,
 	} {
-		if value+petSavedBaseRandomMin <= 0 {
-			return PetGrowthEntry{}, configError("宠物 growth.%s 加随机最小偏移后必须大于0: ID:%d value:%d min:%d", key, petID, value, petSavedBaseRandomMin)
+		if value+petSavedBaseGradeOffsetMin <= 0 {
+			return PetGrowthEntry{}, configError("宠物 growth.%s 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d", key, petID, value, petSavedBaseGradeOffsetMin)
 		}
 	}
 	return PetGrowthEntry{

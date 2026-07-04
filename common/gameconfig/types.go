@@ -8,6 +8,7 @@ const (
 	FileExp        = "exp.yaml"
 	FilePetSkill   = "pet.skill.yaml"
 	FilePet        = "pet.yaml"
+	FileScene      = "scene.yaml"
 )
 
 type Manager struct {
@@ -19,6 +20,8 @@ type Manager struct {
 	Character *CharacterConfig
 	// Enemy 是 enemy.group.yaml 的敌人组配置, 用于生成战斗敌人模板和校验宠物模板引用.
 	Enemy *EnemyGroupConfig
+	// Scene 是 scene.yaml 的场景配置, 用于校验角色所在场景并按场景权重选择敌人组.
+	Scene *SceneConfig
 	// Exp 是 exp.yaml 的等级经验配置, 用于按累计经验推导等级和下一等级门槛.
 	Exp *ExpConfig
 }
@@ -81,13 +84,13 @@ type PetGrowthEntry struct {
 	InitNum int
 	// LvupPointSource 来自 growth.lvupPointSource, 表示原始升级成长点字段, 必须大于0.
 	LvupPointSource float64
-	// BaseVital 来自 growth.baseVital, 表示宠物模板固定基础体力值, 加随机最小偏移后必须仍大于0.
+	// BaseVital 来自 growth.baseVital, 表示宠物模板固定基础体力值, 加品阶最小偏移后必须仍大于0.
 	BaseVital int
-	// BaseStr 来自 growth.baseStr, 表示宠物模板固定基础腕力/攻击值, 加随机最小偏移后必须仍大于0.
+	// BaseStr 来自 growth.baseStr, 表示宠物模板固定基础腕力/攻击值, 加品阶最小偏移后必须仍大于0.
 	BaseStr int
-	// BaseTough 来自 growth.baseTough, 表示宠物模板固定基础耐力/防御值, 加随机最小偏移后必须仍大于0.
+	// BaseTough 来自 growth.baseTough, 表示宠物模板固定基础耐力/防御值, 加品阶最小偏移后必须仍大于0.
 	BaseTough int
-	// BaseDex 来自 growth.baseDex, 表示宠物模板固定基础速度/敏捷值, 加随机最小偏移后必须仍大于0.
+	// BaseDex 来自 growth.baseDex, 表示宠物模板固定基础速度/敏捷值, 加品阶最小偏移后必须仍大于0.
 	BaseDex int
 }
 
@@ -136,6 +139,27 @@ type EnemyEntry struct {
 	Weight int
 	// Level 来自 enemies[].level, 表示指定敌人等级; Boss 组必填, 普通组可选, 值必须处于协议等级范围.
 	Level int
+}
+
+type SceneConfig struct {
+	byID map[int]*SceneEntry
+	ids  []int
+}
+
+type SceneEntry struct {
+	// ID 来自 scenes[].id, 必须处于协议场景资源ID段内, 并且在 scene.yaml 内唯一.
+	ID int
+	// Name 来自 scenes[].name, 表示场景名称, 主要用于配置识别, 日志和排障.
+	Name string
+	// EnemyGroups 来自 scenes[].enemyGroups, 保存当前场景可遇敌敌人组和权重.
+	EnemyGroups []SceneEnemyGroupEntry
+}
+
+type SceneEnemyGroupEntry struct {
+	// ID 来自 enemyGroups[].id, 必须引用 enemy.group.yaml 中存在的敌人组ID.
+	ID int
+	// Weight 来自 enemyGroups[].weight, 表示当前场景选择该敌人组的权重, 必须大于0.
+	Weight int
 }
 
 type IntRange struct {
@@ -230,6 +254,20 @@ func (e *EnemyGroupConfig) IDs() []int {
 		return nil
 	}
 	return append([]int(nil), e.ids...)
+}
+
+func (s *SceneConfig) GetByID(id int) *SceneEntry {
+	if s == nil {
+		return nil
+	}
+	return s.byID[id]
+}
+
+func (s *SceneConfig) IDs() []int {
+	if s == nil {
+		return nil
+	}
+	return append([]int(nil), s.ids...)
 }
 
 func (e *ExpConfig) GetLevel(totalExp int) (int, error) {

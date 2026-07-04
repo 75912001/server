@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package user;
+package account;
 option go_package = "server/proto/pb;pb";
 
 import "record.proto";
@@ -17,24 +17,28 @@ enum PetAction {
   PetAction_Max = 8;
 }
 
+// PetRarity 表示宠物稀有度, 主要来自宠物资源配置 pet[].rarity.
+// 业务有效值为 Common 到 Mythic; Unknow 仅作为 proto3 默认值和非法/未初始化占位, Max 仅作为枚举边界占位.
 enum PetRarity {
-  PetRarity_Unknow = 0;
-  PetRarity_Common = 1;
-  PetRarity_Rare = 2;
-  PetRarity_Epic = 3;
-  PetRarity_Legendary = 4;
-  PetRarity_Mythic = 5;
-  PetRarity_Max = 6;
+  PetRarity_Unknow = 0; // 未知稀有度, proto3 默认值; 正常业务配置和已创建宠物不应使用
+  PetRarity_Common = 1; // 普通等级, 基础宠物资源分层
+  PetRarity_Rare = 2; // 稀有等级, 高于普通的宠物资源分层
+  PetRarity_Epic = 3; // 史诗等级, 高于稀有的宠物资源分层
+  PetRarity_Legendary = 4; // 传说等级, 高于史诗的宠物资源分层
+  PetRarity_Mythic = 5; // 神话等级, 当前最高业务稀有度
+  PetRarity_Max = 6; // 稀有度枚举边界, 用于范围判断或扩展占位; 不作为业务值存储
 }
 
+// PetGrade 表示宠物品阶, 用于描述宠物养成或评级体系中的等级分层.
+// 业务有效值为 Common 到 Mythic; Unknow 仅作为 proto3 默认值和非法/未初始化占位, Max 仅作为枚举边界占位.
 enum PetGrade {
-  PetGrade_Unknow = 0;
-  PetGrade_Common = 1;
-  PetGrade_Rare = 2;
-  PetGrade_Epic = 3;
-  PetGrade_Legendary = 4;
-  PetGrade_Mythic = 5;
-  PetGrade_Max = 6;
+  PetGrade_Unknow = 0; // 未知品阶, proto3 默认值; 正常业务配置和已创建宠物不应使用
+  PetGrade_Common = 1; // 普通品阶, 基础宠物品阶分层
+  PetGrade_Rare = 2; // 稀有品阶, 高于普通的宠物品阶分层
+  PetGrade_Epic = 3; // 史诗品阶, 高于稀有的宠物品阶分层
+  PetGrade_Legendary = 4; // 传说品阶, 高于史诗的宠物品阶分层
+  PetGrade_Mythic = 5; // 神话品阶, 当前最高业务品阶
+  PetGrade_Max = 6; // 品阶枚举边界, 用于范围判断或扩展占位; 不作为业务值存储
 }
 
 enum PetRecordLimit {
@@ -52,9 +56,22 @@ enum PetCarryStatus {
 }
 
 message PetRecord {
-  uint64 uuid = 1; // 宠物 UUID, 在所属 AccountRecord.uid 作用域内唯一
+  uint64 uuid = 1; // 宠物 UUID, 在所属 AccountRecord.aid 作用域内唯一
   string nick = 2; // 宠物昵称
   PetCarryStatus carry_status = 3; // 宠物携带状态; 只有角色随身携带时参与战斗/骑乘语义, 仓库内宠物固定为 Rest
-  map<uint32, uint64> asset_record_base_map = 10; // 宠物基础数值记录, 包含宠物资源 ID、经验、创建时间、忠诚度和成长基础值
+  PetGrade grade = 4; // 宠物品阶, 决定创建时 SavedBase 成长偏移; 默认赠送宠物由 online 指定为 Mythic
+  uint64 exp = 5; // 经验值, 用于升级或养成
+  uint64 loyalty = 6; // 宠物忠诚度; 创建默认值当前为 100
+  uint64 saved_base_vitality = 7; // 宠物保存基础体力成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
+  uint64 saved_base_strength = 8; // 宠物保存基础腕力成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
+  uint64 saved_base_toughness = 9; // 宠物保存基础耐力成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
+  uint64 saved_base_dexterity = 10; // 宠物保存基础速度成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
+  uint64 raw_vitality = 11; // 宠物当前原始体力值; 创建和升级时累加生成, 战斗运行期 HP 等派生属性由该值参与换算
+  uint64 raw_strength = 12; // 宠物当前原始腕力值; 创建和升级时累加生成, 战斗运行期攻击等派生属性由该值参与换算
+  uint64 raw_toughness = 13; // 宠物当前原始耐力值; 创建和升级时累加生成, 战斗运行期防御等派生属性由该值参与换算
+  uint64 raw_dexterity = 14; // 宠物当前原始速度值; 创建和升级时累加生成, 战斗运行期敏捷等派生属性由该值参与换算
+  int64 create_timestamp_ms = 15; // 宠物创建时间戳, 单位毫秒
+  uint64 rebirth_count = 16; // 宠物转生次数
+  map<uint32, uint64> asset_record_base_map = 20; // 宠物基础数值记录, 包含宠物资源 ID
   map<uint64, RecordPrimary> record_map = 1000; // 宠物扩展记录表
 }

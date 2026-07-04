@@ -1,0 +1,22 @@
+# 场景配置
+# enemyGroups[].id 引用 enemy.group.yaml 中的敌人组 ID.
+# enemyGroups[].weight 为自动遇敌选择敌人组的权重, 必须大于 0.
+
+scenes:
+  - id: 2000001
+    name: 场景一
+    enemyGroups:
+      - id: 1
+        weight: 100
+
+  - id: 2000002
+    name: 场景二
+    enemyGroups:
+      - id: 2
+        weight: 100
+
+  - id: 2000003
+    name: 场景三
+    enemyGroups:
+      - id: 3
+        weight: 100

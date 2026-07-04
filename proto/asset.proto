@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package user;
+package account;
 option go_package = "server/proto/pb;pb";
 
 enum AssetType {
   AssetType_Record = 0;
   AssetType_Character = 1;
-  AssetType_Map = 2;
+  AssetType_Scene = 2;
   AssetType_Item = 3;
   AssetType_Pet = 4;
   AssetType_NPC = 5;
@@ -22,8 +22,8 @@ enum AssetIDRange {
   AssetIDRange_Record_End = 1000000;
   AssetIDRange_Character_Start = 1000001;
   AssetIDRange_Character_End = 1999999;
-  AssetIDRange_Map_Start = 2000001;
-  AssetIDRange_Map_End = 2999999;
+  AssetIDRange_Scene_Start = 2000001;
+  AssetIDRange_Scene_End = 2999999;
   AssetIDRange_Item_Start = 3000001;
   AssetIDRange_Item_End = 3999999;
   AssetIDRange_Pet_Start = 4000001;
@@ -43,34 +43,9 @@ enum AssetIDRange {
 enum AssetIDRecord {
   AssetIDRecord_Unknow = 0;
   AssetIDRecord_AssetID = 1;
-  AssetIDRecord_Exp = 2;
-  AssetIDRecord_HP = 3;
-  AssetIDRecord_MP = 4;
-  AssetIDRecord_CreateTimestamp = 5;
-  AssetIDRecord_MapID = 7;
   AssetIDRecord_Direction = 10;
   AssetIDRecord_Action = 11;
-  AssetIDRecord_RebirthCount = 13;
-  AssetIDRecord_ElementalEarth = 101;
-  AssetIDRecord_ElementalWater = 102;
-  AssetIDRecord_ElementalFire = 103;
-  AssetIDRecord_ElementalWind = 104;
-  AssetIDRecord_Character_LastLoginTimestamp = 1001;
-  AssetIDRecord_Character_LastLogoutTimestamp = 1002;
-  AssetIDRecord_Character_Available_Point = 1101;
-  AssetIDRecord_Character_Attributes_Vitality = 1102;
-  AssetIDRecord_Character_Attributes_Strength = 1103;
-  AssetIDRecord_Character_Attributes_Toughness = 1104;
-  AssetIDRecord_Character_Attributes_Dexterity = 1105;
-  AssetIDRecord_Pet_Loyalty = 2001;
-  AssetIDRecord_Pet_SavedBase_Vitality = 2101;
-  AssetIDRecord_Pet_SavedBase_Strength = 2102;
-  AssetIDRecord_Pet_SavedBase_Toughness = 2103;
-  AssetIDRecord_Pet_SavedBase_Dexterity = 2104;
-  AssetIDRecord_Pet_Raw_Vitality = 2201;
-  AssetIDRecord_Pet_Raw_Strength = 2202;
-  AssetIDRecord_Pet_Raw_Toughness = 2203;
-  AssetIDRecord_Pet_Raw_Dexterity = 2204;
+
 }
 
 enum AssetElemental {

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package user;
+package account;
 option go_package = "server/proto/pb;pb";
 
 import "record.proto";
@@ -24,11 +24,47 @@ enum CharacterAction {
   CharacterAction_Max = 14;
 }
 
+message ElementalPoints
+{
+  uint32 earth = 1; // 地元素点数, 0-10
+  uint32 water = 2; // 水元素点数, 0-10
+  uint32 fire = 3; // 火元素点数, 0-10
+  uint32 wind = 4; // 风元素点数, 0-10
+}
+
+message CharacterAttributePoints
+{
+  uint32 vitality = 1; // 体力点数, 0-20
+  uint32 strength = 2; // 腕力点数, 0-20
+  uint32 toughness = 3; // 耐力点数, 0-20
+  uint32 dexterity = 4; // 速度点数, 0-20
+}
+
+enum ElementalLimit {
+  ElementalLimit_Unspecified = 0; // 未指定元素限制, proto3 enum 默认值
+  ElementalLimit_MaxActiveTypeCount = 2; // 最多允许同时分配的元素种类数量
+  ElementalLimit_TotalPoint = 10; // 地水火风元素总点数
+}
+
+enum CharacterAttributeLimit {
+  CharacterAttributeLimit_Unspecified = 0; // 未指定角色基础状态限制, proto3 enum 默认值
+  CharacterAttributeLimit_TotalPoint = 20; // 创建角色时体力腕力耐力速度总点数
+}
+
 message CharacterRecord {
-  uint64 uuid = 1; // 角色 UUID, 在所属 AccountRecord.uid 作用域内唯一
+  uint64 uuid = 1; // 角色 UUID, 在所属 AccountRecord.aid 作用域内唯一
   string nick = 2; // 角色昵称
-  uint64 asset_id = 3; // 角色资源 ID; 完整角色 key 为 AccountRecord.uid + uuid
-  map<uint32, uint64> asset_id_record_map = 10; // 角色数值记录, 不再承载角色资源 ID
+  uint64 asset_id = 3; // 角色资源 ID; 完整角色 key 为 AccountRecord.aid + uuid
+  uint64 exp = 4; // 经验值, 用于升级或养成
+  ElementalPoints elemental = 5; // 角色地水火风元素点数
+  uint32 available_point = 6; // 角色可分配属性点
+  CharacterAttributePoints attribute = 7; // 角色体力腕力耐力速度基础状态
+  int64 last_login_timestamp_ms = 8; // 角色最后登录时间戳, 单位毫秒
+  int64 last_logout_timestamp_ms = 9; // 角色最后登出时间戳, 单位毫秒
+  int64 create_timestamp_ms = 10; // 角色创建时间戳, 单位毫秒
+  uint64 rebirth_count = 11; // 角色转生次数
+  uint32 scene_id = 12; // 角色当前场景 ID
+  map<uint32, uint64> asset_id_record_map = 20; // 角色数值记录, 不再承载角色资源 ID、经验、元素、属性、场景、创建时间、转生次数和上下线时间戳
   map<uint64, RecordPrimary> record_map = 1000; // 角色扩展记录表, 背包等临时角色数据先归入这里
-  map<uint64, PetRecord> pet_record_map = 2000; // 角色当前随身携带宠物记录表, key 为宠物 UUID, 数量不超过 PetRecordLimit_MaxCarryCount
+  repeated PetRecord pet_record_list = 2000; // 角色当前随身携带宠物记录列表, 按携带顺序排列, 数量不超过 PetRecordLimit_MaxCarryCount
 }

@@ -48,7 +48,7 @@ rg -n "GatewayPrepareLogin|gatewaySession|gatewayNonce" login proto gateway
 期望：
 
 - login 中 `/api/login/session` 返回 `connectTicket`，不返回 `gatewaySession/gatewayNonce`。
-- `UserVerifyReq` 使用 `uid + connect_ticket`。
+- `AccountVerifyReq` 使用 `aid + connect_ticket`。
 - login 不调用 `GatewayPrepareLogin`。
 
 ## 运行时依赖
@@ -56,12 +56,12 @@ rg -n "GatewayPrepareLogin|gatewaySession|gatewayNonce" login proto gateway
 手动验证 login 需要启动：
 
 - etcd：login 用于发现 cache 和 gateway。
-- Redis：cache 保存 accountVerifyToken、账号 uid 映射、用户档案和在线态。
+- Redis：cache 保存 accountVerifyToken、账号 aid 映射、账号档案和在线态。
 - cache：提供 `CacheSetAccountVerifyToken` 和 `CacheUseAccountVerifyToken`。
 - gateway：注册到 etcd，并暴露客户端 TCP 地址。
 - login：读取 `bin/login.yaml` 或部署目录中的 login yaml。
 
-`bin/login.yaml` 当前只必须显式配置 `custom.httpAddr`；`accountVerifyTokenPath/sessionPath/emailSessionPath/accountVerifyTokenExpireSecond/ticketExpireSecond/ticketSecret/readHeaderTimeout/shutdownTimeout/cacheRPCTimeout/maxBodyBytes` 都有代码默认值。email/password 登录账号来自当前运行配置文件中的 `custom.emailPasswordUsers`。
+`bin/login.yaml` 当前只必须显式配置 `custom.httpAddr`；`accountVerifyTokenPath/sessionPath/emailSessionPath/accountVerifyTokenExpireSecond/ticketExpireSecond/ticketSecret/readHeaderTimeout/shutdownTimeout/cacheRPCTimeout/maxBodyBytes` 都有代码默认值。email/password 登录账号来自当前运行配置文件中的 `custom.emailPasswordAccounts`。
 
 ## HTTP 手动验证
 
@@ -77,7 +77,7 @@ curl -i -X POST "http://127.0.0.1:30401/api/login/accountVerifyToken" \
 
 - HTTP `200`。
 - 响应包含 `account/accountVerifyToken/expireSecond`。
-- 不返回 `uid/connectTicket/gatewayKey/gatewayAddr`。
+- 不返回 `aid/connectTicket/gatewayKey/gatewayAddr`。
 - cache 中只写 accountVerifyToken；此步骤不创建在线态。
 
 使用 accountVerifyToken 换取连接票据：
@@ -91,8 +91,8 @@ curl -i -X POST "http://127.0.0.1:30401/api/login/session" \
 期望：
 
 - HTTP `200`。
-- 响应包含 `account/uid/connectTicket/ticketExpireTimestampMs/gatewayKey/gatewayAddr`。
-- `uid` 由 cache 返回，客户端没有提交 uid。
+- 响应包含 `account/aid/connectTicket/ticketExpireTimestampMs/gatewayKey/gatewayAddr`。
+- `aid` 由 cache 返回，客户端没有提交 aid。
 - `connectTicket` 只可用于响应中的目标 gateway。
 - 同一个 `account/accountVerifyToken` 再次调用 `/api/login/session` 应失败。
 
@@ -101,13 +101,13 @@ curl -i -X POST "http://127.0.0.1:30401/api/login/session" \
 ```bash
 curl -i -X POST "http://127.0.0.1:30401/api/login/emailSession" \
   -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"plain-password"}'
+  -d '{"email":"account@example.com","password":"plain-password"}'
 ```
 
 期望：
 
 - HTTP `200`。
-- 响应包含 `account/uid/connectTicket/ticketExpireTimestampMs/gatewayKey/gatewayAddr`。
+- 响应包含 `account/aid/connectTicket/ticketExpireTimestampMs/gatewayKey/gatewayAddr`。
 - `account` 等于 trim 后转小写的 email。
 - email 登录会在 login 内部生成 accountVerifyToken，并立即通过 cache 写入和消费。
 
@@ -116,11 +116,11 @@ curl -i -X POST "http://127.0.0.1:30401/api/login/emailSession" \
 使用 `/api/login/session` 返回的数据连接 gateway：
 
 1. 客户端连接 `gatewayAddr`。
-2. 客户端发送 `UserVerifyReq`，字段为 `uid` 和 `connect_ticket`。
-3. gateway 使用本机 `gatewayKey`、配置中的 `ticketSecret` 和客户端 uid 校验 `connectTicket`。
+2. 客户端发送 `AccountVerifyReq`，字段为 `aid` 和 `connect_ticket`。
+3. gateway 使用本机 `gatewayKey`、配置中的 `ticketSecret` 和客户端 aid 校验 `connectTicket`。
 4. 验签成功后 gateway 选择 online，执行在线登录和顶号流程。
-5. gateway 返回 `UserVerifyRes`，其中包含后续心跳使用的 `heartbeatSession`。
-6. 客户端发送 `AccountRecordReq` 拉取服务端 `AccountRecord`; 新账号 `account_record_create_timestamp_ms == 0` 时继续发送 `AccountCreateReq`，由 online 初始化默认角色, 默认随身携带宠物和账号宠物仓库后返回完整 `AccountRecord`。
+5. gateway 返回 `AccountVerifyRes`，其中包含后续心跳使用的 `heartbeatSession`。
+6. 客户端发送 `AccountRecordReq` 拉取服务端 `AccountRecord`; 新账号 `account_record_create_timestamp_ms == 0` 时保持未创建状态, 只有玩家显式发送 `CharacterCreateReq` 才由 online 初始化角色, 默认随身携带宠物和账号宠物仓库后返回完整 `AccountRecord`。
 
 期望：
 

@@ -137,11 +137,11 @@ def gen_cmd_protos(proto_dir):
         if not entries:
             continue
 
-        # 枚举名 / zero-value 名：user.proto → MsgIDUser / UserMsgIDUnknown_CMD
-        base      = fname.replace(".proto", "")          # "user"
-        base_cap  = base.capitalize()                     # "User"
-        enum_name = f"MsgID{base_cap}"                   # "MsgIDUser"
-        zero_name = f"{base_cap}MsgIDUnknown_CMD"        # "UserMsgIDUnknown_CMD"
+        # 枚举名 / zero-value 名：account.proto → MsgIDAccount / AccountMsgIDUnknown_CMD
+        base      = fname.replace(".proto", "")          # "account"
+        base_cap  = base.capitalize()                     # "Account"
+        enum_name = f"MsgID{base_cap}"                   # "MsgIDAccount"
+        zero_name = f"{base_cap}MsgIDUnknown_CMD"        # "AccountMsgIDUnknown_CMD"
 
         out_path = os.path.join(proto_dir, f"{base}.cmd.proto")
         with open(out_path, "w", encoding="utf-8") as f:

@@ -24,13 +24,13 @@ type Robot struct {
 
 	manager *RobotManager
 
-	uid               uint64
+	aid               uint64
 	gatewayAddr       string
 	heartbeatSession  string
 	connectTicket     string
 	packetSessionID   uint32
 	verified          bool
-	userReady         bool
+	accountReady      bool
 	heartbeatWait     bool
 	heartbeatPacketID uint32
 	heartbeatTimerSeq uint64
@@ -49,10 +49,10 @@ type RobotPendingCommand struct {
 	Source  string
 }
 
-func NewRobot(manager *RobotManager, uid uint64) *Robot {
+func NewRobot(manager *RobotManager, aid uint64) *Robot {
 	return &Robot{
 		manager:     manager,
-		uid:         uid,
+		aid:         aid,
 		ignoreMsgID: buildIgnoreMsgID(GConfigYaml.IgnoreMsgID),
 		closed:      make(chan struct{}),
 	}
@@ -76,12 +76,12 @@ func (p *Robot) Start(ctx context.Context) error {
 		ISwitch:   xcontrol.NewSwitchButton(true),
 		ICallBack: xcontrol.NewCallBack(func(args ...any) error { return p.OnConnect(p.Remote) }),
 	})
-	p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "UserVerifyReq", Source: "auto"})
+	p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "AccountVerifyReq", Source: "auto"})
 	return nil
 }
 
 func (p *Robot) prepareLoginSession(ctx context.Context) error {
-	account := robotAccount(p.uid)
+	account := robotAccount(p.aid)
 	accountVerifyToken := newAccountVerifyToken(account)
 	if err := loginCreateAccountVerifyToken(ctx, account, accountVerifyToken); err != nil {
 		return err
@@ -90,14 +90,14 @@ func (p *Robot) prepareLoginSession(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if session.Uid == 0 || session.GatewayAddr == "" || session.ConnectTicket == "" {
-		return fmt.Errorf("login session invalid uid=%d gatewayAddr=%q connectTicket=%t", session.Uid, session.GatewayAddr, session.ConnectTicket != "")
+	if session.Aid == 0 || session.GatewayAddr == "" || session.ConnectTicket == "" {
+		return fmt.Errorf("login session invalid aid=%d gatewayAddr=%q connectTicket=%t", session.Aid, session.GatewayAddr, session.ConnectTicket != "")
 	}
-	if session.Uid != p.uid {
-		if err = p.manager.UpdateRobotUID(p, p.uid, session.Uid); err != nil {
+	if session.Aid != p.aid {
+		if err = p.manager.UpdateRobotAID(p, p.aid, session.Aid); err != nil {
 			return err
 		}
-		p.uid = session.Uid
+		p.aid = session.Aid
 	}
 	p.gatewayAddr = session.GatewayAddr
 	p.connectTicket = session.ConnectTicket
@@ -108,7 +108,7 @@ func (p *Robot) prepareLoginSession(ctx context.Context) error {
 func (p *Robot) Close() {
 	p.closeOnce.Do(func() {
 		p.verified = false
-		p.userReady = false
+		p.accountReady = false
 		p.heartbeatWait = false
 		p.heartbeatPacketID = 0
 		p.gatewayAddr = ""
@@ -145,7 +145,7 @@ func (p *Robot) isClosed() bool {
 func (p *Robot) OnConnect(remote xnetcommon.IRemote) error {
 	p.manager.stats.connectOK.Add(1)
 	if p.shouldPrintVerbose(false) {
-		ColorPrintf(Green, "uid=%d connected addr=%s\n", p.uid, p.gatewayAddr)
+		ColorPrintf(Green, "aid=%d connected addr=%s\n", p.aid, p.gatewayAddr)
 	}
 	return nil
 }
@@ -166,7 +166,7 @@ func (p *Robot) OnUnmarshalPacket(remote xnetcommon.IRemote, data []byte) (xpack
 	header.Unpack(data[:xpacket.HeaderSize])
 	message := GMessage.Find(header.MessageID)
 	if message == nil {
-		ColorPrintf(Red, "uid=%d can not find message:%v, 0x%X\n", p.uid, header.MessageID, header.MessageID)
+		ColorPrintf(Red, "aid=%d can not find message:%v, 0x%X\n", p.aid, header.MessageID, header.MessageID)
 		return &xpacket.PacketPassThrough{
 			Header:  header,
 			RawData: append([]byte(nil), data...),
@@ -174,7 +174,7 @@ func (p *Robot) OnUnmarshalPacket(remote xnetcommon.IRemote, data []byte) (xpack
 	}
 	pbMsg, err := message.Unmarshal(data[xpacket.HeaderSize:])
 	if err != nil {
-		ColorPrintf(Red, "uid=%d can not unmarshal:%v, 0x%X err:%v\n", p.uid, header.MessageID, header.MessageID, err)
+		ColorPrintf(Red, "aid=%d can not unmarshal:%v, 0x%X err:%v\n", p.aid, header.MessageID, header.MessageID, err)
 		return nil, err
 	}
 	return &xpacket.Packet{
@@ -192,8 +192,8 @@ func (p *Robot) OnPacket(remote xnetcommon.IRemote, packet xpacket.IPacket) erro
 		p.manager.stats.received.Add(1)
 		if pkt.Header.ResultID != 0 {
 			p.manager.stats.resultFail.Add(1)
-			ColorPrintf(Yellow, "uid=%d recv unknown messageID=0x%x resultID=%d len=%d\n", p.uid, pkt.Header.MessageID, pkt.Header.ResultID, len(pkt.RawData))
-			ColorPrintf(Yellow, "uid=%d ResultError: %s\n", p.uid, formatResultError(pkt.Header.ResultID))
+			ColorPrintf(Yellow, "aid=%d recv unknown messageID=0x%x resultID=%d len=%d\n", p.aid, pkt.Header.MessageID, pkt.Header.ResultID, len(pkt.RawData))
+			ColorPrintf(Yellow, "aid=%d ResultError: %s\n", p.aid, formatResultError(pkt.Header.ResultID))
 		}
 		return nil
 	default:
@@ -216,10 +216,10 @@ func (p *Robot) handleProtoPacket(packet *xpacket.Packet) error {
 		color = Yellow
 	}
 	fmt.Println()
-	ColorPrintf(color, "uid=%d MessageName: %s\n", p.uid, msgName)
+	ColorPrintf(color, "aid=%d MessageName: %s\n", p.aid, msgName)
 	headerJson, err := json.MarshalIndent(marshalHeaderMap(packet.Header), "", "  ")
 	if err != nil {
-		ColorPrintf(Red, "uid=%d json marshal header failed: %v\n", p.uid, err)
+		ColorPrintf(Red, "aid=%d json marshal header failed: %v\n", p.aid, err)
 		return err
 	}
 	ColorPrintf(color, "Header: %s\n", headerJson)
@@ -231,16 +231,16 @@ func (p *Robot) handleProtoPacket(packet *xpacket.Packet) error {
 	body := marshalJSON(packet.PBMessage)
 	ColorPrintf(color, "Message: %s\n", body)
 	if resultError != "" {
-		log.Infof("\n======recv message======\nuid=%d\n%s\nHeader: %s\nResultError: %s\nMessage: %s", p.uid, msgName, headerJson, resultError, body)
+		log.Infof("\n======recv message======\naid=%d\n%s\nHeader: %s\nResultError: %s\nMessage: %s", p.aid, msgName, headerJson, resultError, body)
 	} else {
-		log.Infof("\n======recv message======\nuid=%d\n%s\nHeader: %s\nMessage: %s", p.uid, msgName, headerJson, body)
+		log.Infof("\n======recv message======\naid=%d\n%s\nHeader: %s\nMessage: %s", p.aid, msgName, headerJson, body)
 	}
 	return nil
 }
 
 func (p *Robot) applyPacketState(packet *xpacket.Packet) {
 	switch msg := packet.PBMessage.(type) {
-	case *pb.UserVerifyRes:
+	case *pb.AccountVerifyRes:
 		if packet.Header.ResultID == 0 {
 			p.heartbeatSession = msg.GetHeartbeatSession()
 			if !p.verified {
@@ -255,21 +255,17 @@ func (p *Robot) applyPacketState(packet *xpacket.Packet) {
 	case *pb.AccountRecordRes:
 		if packet.Header.ResultID == 0 {
 			accountRecord := msg.GetAccountRecord()
-			if accountRecord != nil && accountRecord.GetUid() != 0 && accountRecord.GetAccountRecordCreateTimestampMs() != 0 {
-				p.markUserReady()
+			if accountRecordReady(accountRecord) {
+				p.markAccountReady()
 				return
 			}
-			p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "AccountCreateReq", Source: "auto"})
 			return
 		}
-		if packet.Header.ResultID == common.ECOnlineUserNotCreated.Code() {
-			p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "AccountCreateReq", Source: "auto"})
-		}
-	case *pb.AccountCreateRes:
+	case *pb.CharacterCreateRes:
 		if packet.Header.ResultID == 0 || packet.Header.ResultID == xerror.AlreadyExists.Code() {
-			p.markUserReady()
+			p.markAccountReady()
 		}
-	case *pb.UserHeartbeatRes:
+	case *pb.AccountHeartbeatRes:
 		if !p.heartbeatWait || packet.Header.SessionID != p.heartbeatPacketID {
 			return
 		}
@@ -282,16 +278,20 @@ func (p *Robot) applyPacketState(packet *xpacket.Packet) {
 	}
 }
 
+func accountRecordReady(accountRecord *pb.AccountRecord) bool {
+	return accountRecord != nil && accountRecord.GetAid() != 0 && accountRecord.GetAccountRecordCreateTimestampMs() != 0
+}
+
 func (p *Robot) isExpectedNonZeroResult(packet *xpacket.Packet) bool {
-	return packet.Header.MessageID == uint32(pb.MsgIDUser_AccountCreateRes_CMD) &&
+	return packet.Header.MessageID == uint32(pb.MsgIDAccount_CharacterCreateRes_CMD) &&
 		packet.Header.ResultID == xerror.AlreadyExists.Code()
 }
 
-func (p *Robot) markUserReady() {
-	if p.userReady {
+func (p *Robot) markAccountReady() {
+	if p.accountReady {
 		return
 	}
-	p.userReady = true
+	p.accountReady = true
 	p.StartAction()
 	p.flushPendingCommands()
 }
@@ -299,9 +299,9 @@ func (p *Robot) markUserReady() {
 func (p *Robot) OnDisconnect(remote xnetcommon.IRemote) error {
 	p.manager.stats.disconnect.Add(1)
 	if p.shouldPrintVerbose(false) || GConfigYaml.Robot.Logging.DetailFailures {
-		ColorPrintf(Red, "uid=%d OnDisconnect remote=%p reason=%d\n", p.uid, remote, remote.GetDisconnectReason())
+		ColorPrintf(Red, "aid=%d OnDisconnect remote=%p reason=%d\n", p.aid, remote, remote.GetDisconnectReason())
 	}
-	log.Warnf("uid=%d OnDisconnect remote=%p reason=%d", p.uid, remote, remote.GetDisconnectReason())
+	log.Warnf("aid=%d OnDisconnect remote=%p reason=%d", p.aid, remote, remote.GetDisconnectReason())
 	p.Close()
 	return nil
 }
@@ -331,11 +331,11 @@ func (p *Robot) flushPendingCommands() {
 func (p *Robot) View() robotView {
 	connected := p.Remote != nil && p.Remote.IsConnect()
 	return robotView{
-		UID:              p.uid,
+		AID:              p.aid,
 		GatewayAddr:      p.gatewayAddr,
 		Connected:        connected,
 		Verified:         p.verified,
-		UserReady:        p.userReady,
+		AccountReady:     p.accountReady,
 		HeartbeatSession: p.heartbeatSession,
 		Seq:              p.seq,
 		Pending:          len(p.pending),

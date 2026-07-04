@@ -33,10 +33,11 @@
 #   lvup_point = float(lvupPointSource)
 #
 # 宠物个体自己的成长基础四维:
-#   saved_base_vital = baseVital + random(-2, -1, 0, 1, 2)
-#   saved_base_str = baseStr + random(-2, -1, 0, 1, 2)
-#   saved_base_tough = baseTough + random(-2, -1, 0, 1, 2)
-#   saved_base_dex = baseDex + random(-2, -1, 0, 1, 2)
+#   grade_offset 由 PetGrade 决定: Common=-2, Rare=-1, Epic=0, Legendary=1, Mythic=2
+#   saved_base_vital = baseVital + grade_offset
+#   saved_base_str = baseStr + grade_offset
+#   saved_base_tough = baseTough + grade_offset
+#   saved_base_dex = baseDex + grade_offset
 
 # 再随机分配 10 点到四维, 只影响初始 raw 属性:
 #   final_base_vital = saved_base_vital
@@ -57,6 +58,7 @@
 #   raw_dex = int(init_factor * final_base_dex)
 #
 # 生成真实宠物实例时, 运行方必须保存实例字段:
+#   grade
 #   saved_base_vital, saved_base_str, saved_base_tough, saved_base_dex
 #   初始 raw 四维
 #       raw_vital, raw_str, raw_tough, raw_dex

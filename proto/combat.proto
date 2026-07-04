@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package user;
+package account;
 option go_package = "server/proto/pb;pb";
 
 enum CombatEnemyGroupEnemyCountRange {
@@ -24,15 +24,77 @@ enum CombatCampPosition {
   CombatCampPosition_Count = 10;
 }
 
+enum CombatActionType {
+  CombatActionType_Unknown = 0;
+  CombatActionType_Attack = 1;
+  CombatActionType_Defense = 2;
+  CombatActionType_Skill = 3;
+  CombatActionType_Wait = 4;
+  CombatActionType_Escape = 5;
+  CombatActionType_Capture = 6;
+  CombatActionType_SwitchPet = 7;
+  CombatActionType_Item = 8;
+  CombatActionType_EquipmentSkill = 9;
+  CombatActionType_ProfessionSkill = 10;
+}
+
+enum CombatIntentSource {
+  CombatIntentSource_Unknown = 0;
+  CombatIntentSource_Player = 1;
+  CombatIntentSource_TimeoutDefault = 2;
+  CombatIntentSource_EnemyAI = 3;
+}
+
+enum CombatEventKind {
+  CombatEventKind_Unknown = 0;
+  CombatEventKind_Action = 1; // 普通出手结算, 如 A 攻击 B
+  CombatEventKind_Counter = 2; // 反击事件
+  CombatEventKind_Combo = 3; // 多单位联手/合击事件
+  CombatEventKind_Status = 4; // 状态, 被动, 持续效果触发
+}
+
+enum CombatEffectKind {
+  CombatEffectKind_Unknown = 0;
+  CombatEffectKind_Damage = 1; // 伤害表现, 通常携带 HP delta
+  CombatEffectKind_Heal = 2; // 治疗表现, 预留
+  CombatEffectKind_Guard = 3; // 防御/守护表现
+  CombatEffectKind_Miss = 4; // 未命中或无有效目标, 预留
+  CombatEffectKind_Status = 5; // 状态变化表现
+  CombatEffectKind_UnitAlive = 6; // 存活状态变化表现
+  CombatEffectKind_Text = 7; // 纯文本提示, 预留
+}
+
+enum CombatAssetType {
+  CombatAssetType_Unknown = 0;
+  CombatAssetType_HP = 1;
+  CombatAssetType_MP = 2;
+  CombatAssetType_Rage = 3;
+}
+
+enum CombatStatusDeltaType {
+  CombatStatusDeltaType_Unknown = 0;
+  CombatStatusDeltaType_Add = 1;
+  CombatStatusDeltaType_Remove = 2;
+  CombatStatusDeltaType_Update = 3;
+}
+
+enum CombatBattleEndReason {
+  CombatBattleEndReason_Unknown = 0;
+  CombatBattleEndReason_InitiatorWin = 1;
+  CombatBattleEndReason_DefenderWin = 2;
+  CombatBattleEndReason_Draw = 3;
+  CombatBattleEndReason_Escape = 4;
+}
+
 message CombatUnitKey {
-  uint64 account_uid = 1; // 账号 uid; 玩家单位为 AccountRecord.uid, 怪物/NPC 为 0
+  uint64 aid = 1; // 账号 ID; 玩家单位为 AccountRecord.aid, 怪物/NPC 为 0
   uint64 character_uuid = 2; // 角色 UUID; 玩家单位为所属角色 UUID, 怪物/NPC 为 0
   uint64 pet_uuid = 3; // 宠物 UUID; 玩家宠物单位为宠物 UUID, 角色单位为 0, 怪物/NPC 为本场战斗临时唯一 ID
 }
 
 message CombatUnitAttribute {
   uint64 exp = 1; // 当前经验值, 客户端按配置规则推导等级
-  uint64 hp = 2; // 当前生命值
+  uint64 hp = 2; // 开战生命值
   uint64 attack = 3; // 攻击力
   uint64 defense = 4; // 防御力
   uint64 agility = 5; // 敏捷
@@ -46,7 +108,7 @@ message CombatEquipmentBind {
 message CombatUnit {
   CombatCamp camp = 1; // 所属阵营
   uint32 position = 2; // 阵营内站位槽位, 只表示阵型/显示位置, 不参与单位身份
-  CombatUnitKey key = 3; // 战斗单位身份 key; 玩家单位由 account_uid + character_uuid + pet_uuid 唯一确定
+  CombatUnitKey key = 3; // 战斗单位身份 key; 玩家单位由 aid + character_uuid + pet_uuid 唯一确定
   uint32 character_id = 10; // 角色资源 ID; 怪物/NPC 为 0
   uint32 pet_id = 11; // 宠物或怪物资源 ID; 纯角色单位为 0
   uint32 mount_pet_id = 13; // 骑宠资源 ID; 没有骑宠时为 0
@@ -54,7 +116,91 @@ message CombatUnit {
   repeated CombatEquipmentBind equipment_list = 30; // 开战时可见装备绑定列表
 }
 
+message CombatStatusState {
+  uint32 status_id = 1; // 状态 ID
+  uint32 stack = 2; // 当前层数
+  int64 expire_round = 3; // 过期回合; 小于 0 表示无固定过期回合
+}
+
+message CombatUnitState {
+  CombatUnitKey unit_key = 1; // 状态所属单位
+  uint64 hp = 2; // 当前 HP
+  uint64 max_hp = 3; // 本场战斗最大 HP
+  bool alive = 4; // 当前是否存活
+  repeated CombatStatusState status_state_list = 10; // 当前状态快照
+}
+
+message CombatActionOption {
+  CombatUnitKey unit_key = 1; // 可出手单位
+  CombatActionType action_type = 2; // 可选动作类型
+  uint32 action_id = 3; // 角色动作枚举值或宠物技能 ID
+  repeated CombatUnitKey target_key_list = 10; // 该动作可选主目标; 防御和待机可为空
+}
+
 message CombatBattleStart {
   uint64 battle_id = 1; // 战斗唯一 ID
   repeated CombatUnit unit_list = 10; // 开战时场上可见单位列表
+}
+
+message CombatActionIntent {
+  CombatUnitKey unit_key = 1; // 出手单位身份 key
+  CombatActionType action_type = 2; // 出手类型
+  uint32 action_id = 3; // 角色动作为 CharacterAction 枚举值, 宠物/敌方技能为宠物技能 ID
+  CombatUnitKey target_key = 4; // 客户端或 AI 选择的主目标; 实际多目标由 CombatEvent/CombatEffect 展开
+  // 字段 5 是旧 defaulted bool, 已废弃; 新代码使用 intent_source 区分玩家, 超时默认和敌方 AI.
+  CombatIntentSource intent_source = 6; // 出手意图来源
+}
+
+message CombatAssetDelta {
+  CombatAssetType asset_type = 1; // 发生变化的运行期属性
+  int64 delta = 2; // 本次变化量, 扣减为负数, 增加为正数
+  uint64 after = 3; // 变化后的值
+}
+
+message CombatStatusDelta {
+  uint32 status_id = 1; // 状态 ID
+  CombatStatusDeltaType delta_type = 2; // Add/Remove/Update
+  uint32 stack_after = 3; // 变化后的层数
+  int64 expire_round = 4; // 过期回合; 小于 0 表示无固定过期回合
+}
+
+message CombatUnitStateDelta {
+  CombatUnitKey unit_key = 1; // 状态发生变化的单位
+  repeated CombatAssetDelta asset_delta_list = 10; // HP, MP, 怒气等数值变化
+  repeated CombatStatusDelta status_delta_list = 20; // buff/debuff/异常状态变化
+  bool alive_changed = 30; // 是否包含存活状态变化
+  bool alive = 31; // alive_changed=true 时表示变化后的存活状态
+}
+
+message CombatEffect {
+  uint32 effect_id = 1; // 事件内唯一, 从 1 开始, 按表现顺序递增
+  CombatEffectKind effect_kind = 2; // 效果表现类型
+  repeated CombatUnitKey source_unit_key_list = 10; // 本效果来源单位列表
+  repeated CombatUnitKey target_unit_key_list = 11; // 本效果目标单位列表
+  repeated CombatUnitStateDelta unit_delta_list = 20; // 本效果造成的单位状态变化
+  string text = 30; // 预留文本提示; 首版客户端优先用结构化数据本地格式化
+}
+
+message CombatEvent {
+  uint32 event_id = 1; // 本回合内唯一, 从 1 开始, 按执行顺序递增
+  uint32 parent_event_id = 2; // 0 表示顶层事件; 非 0 表示由某事件触发
+  CombatEventKind event_kind = 3; // 事件类型, 反击和状态触发链用 parent_event_id 串联
+  CombatActionType action_type = 4; // Attack/Defense/Skill 等表现类型
+  uint32 action_id = 5; // 角色动作枚举值或技能 ID
+  repeated CombatUnitKey source_unit_key_list = 10; // 事件来源方, 支持 A1+A2 联手
+  repeated CombatUnitKey target_unit_key_list = 11; // 事件目标方, 支持 A 同时命中多人
+  repeated CombatEffect effect_list = 20; // 本事件内按顺序回放的效果列表
+}
+
+message CombatSettlementReward {
+  CombatUnitKey unit_key = 1; // 获得结算变化的单位
+  uint64 exp_delta = 2; // 本次获得经验
+  repeated CombatAssetDelta asset_change_list = 3; // 结算阶段产生的资源变化
+}
+
+message CombatBattleSettlement {
+  CombatBattleEndReason end_reason = 1; // 战斗结束原因
+  repeated CombatUnitKey winner_unit_key_list = 2; // 胜利方单位
+  repeated CombatUnitKey loser_unit_key_list = 3; // 失败方单位
+  repeated CombatSettlementReward reward_list = 10; // 结算奖励或资源变化; 首版为空
 }

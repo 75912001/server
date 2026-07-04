@@ -16,7 +16,7 @@ var GRobotManager *RobotManager
 
 type RobotManager struct {
 	iEventMgr   *xevent.ListMgr
-	robotsByUID map[uint64]*Robot
+	robotsByAID map[uint64]*Robot
 	robots      []*Robot
 	stats       *RobotStats
 	mu          sync.RWMutex
@@ -28,7 +28,7 @@ type RobotManager struct {
 func NewRobotManager() *RobotManager {
 	return &RobotManager{
 		iEventMgr:   xevent.NewListMgr(1, Bus),
-		robotsByUID: make(map[uint64]*Robot),
+		robotsByAID: make(map[uint64]*Robot),
 		stats:       &RobotStats{},
 		closed:      make(chan struct{}),
 	}
@@ -53,10 +53,10 @@ func (p *RobotManager) buildRobots() {
 	}
 	cfg := GConfigYaml.Robot
 	for i := 0; i < cfg.Count; i++ {
-		uid := cfg.UIDStart + uint64(i)*cfg.UIDStep
-		robot := NewRobot(p, uid)
+		aid := cfg.AIDStart + uint64(i)*cfg.AIDStep
+		robot := NewRobot(p, aid)
 		p.robots = append(p.robots, robot)
-		p.robotsByUID[uid] = robot
+		p.robotsByAID[aid] = robot
 	}
 }
 
@@ -76,8 +76,8 @@ func (p *RobotManager) startRobots(ctx context.Context) {
 		go func(r *Robot) {
 			if err := r.Start(ctx); err != nil {
 				p.stats.connectFail.Add(1)
-				ColorPrintf(Red, "robot start failed uid=%d err=%v\n", r.uid, err)
-				log.Errorf("robot start failed uid=%d err=%v", r.uid, err)
+				ColorPrintf(Red, "robot start failed aid=%d err=%v\n", r.aid, err)
+				log.Errorf("robot start failed aid=%d err=%v", r.aid, err)
 			}
 		}(robot)
 		if (i+1)%cfg.StartupBatchSize == 0 {
@@ -91,31 +91,31 @@ func (p *RobotManager) Robots() []*Robot {
 	defer p.mu.RUnlock()
 	robots := append([]*Robot(nil), p.robots...)
 	sort.Slice(robots, func(i, j int) bool {
-		return robots[i].uid < robots[j].uid
+		return robots[i].aid < robots[j].aid
 	})
 	return robots
 }
 
-func (p *RobotManager) Find(uid uint64) (*Robot, bool) {
+func (p *RobotManager) Find(aid uint64) (*Robot, bool) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
-	robot, ok := p.robotsByUID[uid]
+	robot, ok := p.robotsByAID[aid]
 	return robot, ok
 }
 
-func (p *RobotManager) UpdateRobotUID(robot *Robot, oldUID uint64, newUID uint64) error {
+func (p *RobotManager) UpdateRobotAID(robot *Robot, oldAID uint64, newAID uint64) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if existing := p.robotsByUID[newUID]; existing != nil && existing != robot {
+	if existing := p.robotsByAID[newAID]; existing != nil && existing != robot {
 		if existing.Remote != nil || existing.verified {
-			return fmt.Errorf("login uid duplicated old=%d new=%d", oldUID, newUID)
+			return fmt.Errorf("login aid duplicated old=%d new=%d", oldAID, newAID)
 		}
-		delete(p.robotsByUID, newUID)
+		delete(p.robotsByAID, newAID)
 	}
-	if p.robotsByUID[oldUID] == robot {
-		delete(p.robotsByUID, oldUID)
+	if p.robotsByAID[oldAID] == robot {
+		delete(p.robotsByAID, oldAID)
 	}
-	p.robotsByUID[newUID] = robot
+	p.robotsByAID[newAID] = robot
 	return nil
 }
 

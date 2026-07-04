@@ -30,7 +30,7 @@ func (p *Robot) startHeartBeatTimer() {
 		if p.isClosed() || !p.verified || p.Remote == nil || !p.Remote.IsConnect() {
 			return nil
 		}
-		p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "UserHeartbeatReq", Source: "heartbeat"})
+		p.manager.iEventMgr.Send(&RobotCommand{Robot: p, Command: "AccountHeartbeatReq", Source: "heartbeat"})
 		return nil
 	})
 	p.heartbeatTimer = xtimer.GTimer.AddMillisecond(cb, time.Now().Add(GConfigYaml.Robot.HeartbeatInterval).UnixMilli(), p.manager.iEventMgr)

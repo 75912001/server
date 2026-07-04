@@ -6,6 +6,7 @@ func Load(dir string) (*Manager, error) {
 		Pet:       newPetConfig(),
 		Character: newCharacterConfig(),
 		Enemy:     newEnemyGroupConfig(),
+		Scene:     newSceneConfig(),
 		Exp:       newExpConfig(),
 	}
 
@@ -19,6 +20,9 @@ func Load(dir string) (*Manager, error) {
 		return nil, err
 	}
 	if err := manager.Enemy.load(dir); err != nil {
+		return nil, err
+	}
+	if err := manager.Scene.load(dir); err != nil {
 		return nil, err
 	}
 	if err := manager.Exp.load(dir); err != nil {
@@ -37,6 +41,9 @@ func Load(dir string) (*Manager, error) {
 	if err := manager.Enemy.check(manager.Pet); err != nil {
 		return nil, err
 	}
+	if err := manager.Scene.check(manager.Enemy); err != nil {
+		return nil, err
+	}
 	if err := manager.Exp.check(); err != nil {
 		return nil, err
 	}
@@ -51,6 +58,9 @@ func Load(dir string) (*Manager, error) {
 		return nil, err
 	}
 	if err := manager.Enemy.assemble(); err != nil {
+		return nil, err
+	}
+	if err := manager.Scene.assemble(); err != nil {
 		return nil, err
 	}
 	if err := manager.Exp.assemble(); err != nil {

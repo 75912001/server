@@ -15,7 +15,7 @@ type loginAccountVerifyTokenReq struct {
 
 type loginSessionRes struct {
 	Account                 string `json:"account"`
-	Uid                     uint64 `json:"uid"`
+	Aid                     uint64 `json:"aid"`
 	ConnectTicket           string `json:"connectTicket"`
 	TicketExpireTimestampMs int64  `json:"ticketExpireTimestampMs"`
 	GatewayKey              string `json:"gatewayKey"`

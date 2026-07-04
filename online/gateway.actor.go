@@ -49,11 +49,11 @@ func (p *Gateway) streamBehavior(messages ...any) (xactor.Behavior, any, error) 
 				continue
 			}
 			if p.stream == nil {
-				xlog.GLog.Errorf("gateway[%s] stream not ready, drop frame uid=%d", p.Key, frame.GetUid())
+				xlog.GLog.Errorf("gateway[%s] stream not ready, drop frame aid=%d", p.Key, frame.GetAid())
 				continue
 			}
 			if err := p.stream.Send(&pb.OnlineStreamTunnelRes{Frames: []*pb.OnlineTunnelFrame{frame}}); err != nil {
-				xlog.GLog.Errorf("gateway[%s] stream send frame uid=%d err=%v", p.Key, frame.GetUid(), err)
+				xlog.GLog.Errorf("gateway[%s] stream send frame aid=%d err=%v", p.Key, frame.GetAid(), err)
 				p.stream = nil
 			}
 		case GatewayActorCmdStreamReset:

@@ -4,17 +4,17 @@ Login 服务是账号登录链路的 HTTP 入口，负责接收外部程序写�
 
 ## 服务设计
 
-login 只做登录凭证校验和 gateway 入口分配，不维护用户在线态。
+login 只做登录凭证校验和 gateway 入口分配，不维护账号在线态。
 
 - 外部程序通过 `POST /api/login/accountVerifyToken` 写入 `account/accountVerifyToken`。
-- 客户端通过 `POST /api/login/session` 使用 `account/accountVerifyToken` 换取 `uid/connectTicket/gateway`。
-- 客户端也可以通过 `POST /api/login/emailSession` 使用 `email/password` 换取 `uid/connectTicket/gateway`。
-- email/password 用户列表来自 login 当前运行配置文件的 `custom.emailPasswordUsers`，每次 email 登录都会重新读取文件。
-- `uid` 只能由 cache 根据账号解析或创建，login 不接受客户端提交 uid。
+- 客户端通过 `POST /api/login/session` 使用 `account/accountVerifyToken` 换取 `aid/connectTicket/gateway`。
+- 客户端也可以通过 `POST /api/login/emailSession` 使用 `email/password` 换取 `aid/connectTicket/gateway`。
+- email/password 账号列表来自 login 当前运行配置文件的 `custom.emailPasswordAccounts`，每次 email 登录都会重新读取文件。
+- `aid` 只能由 cache 根据账号解析或创建，login 不接受客户端提交 aid。
 - gateway 由 login 从 etcd 发现，按本地 `availableLoad` 最大优先选择；负载相同时按 gateway key 字典序稳定选择。
 - login 选中 gateway 后会先本地扣减 1 个 `availableLoad`，避免短时间批量请求全部打到同一个实例；后续 etcd update 会覆盖本地估算值。
-- `connectTicket` 由 login 使用 HMAC-SHA256 签发，绑定 `uid/account/gatewayKey/nonce/expireTimestampMs`。
-- 客户端连接 gateway 后发送 `UserVerifyReq(uid, connect_ticket)`，gateway 负责验签和后续 online/cache 在线流程。
+- `connectTicket` 由 login 使用 HMAC-SHA256 签发，绑定 `aid/account/gatewayKey/nonce/expireTimestampMs`。
+- 客户端连接 gateway 后发送 `AccountVerifyReq(aid, connect_ticket)`，gateway 负责验签和后续 online/cache 在线流程。
 
 ## 架构
 
@@ -27,17 +27,17 @@ login 只做登录凭证校验和 gateway 入口分配，不维护用户在线�
 客户端
   -> login HTTP /api/login/session
   -> cache CacheUseAccountVerifyToken
-  <- uid + connectTicket + gatewayKey + gatewayAddr
-  -> gateway TCP UserVerifyReq(uid + connectTicket)
-  -> online/cache 用户在线流程
+  <- aid + connectTicket + gatewayKey + gatewayAddr
+  -> gateway TCP AccountVerifyReq(aid + connectTicket)
+  -> online/cache 账号在线流程
 
 客户端
   -> login HTTP /api/login/emailSession
-  -> login 读取运行配置 custom.emailPasswordUsers
+  -> login 读取运行配置 custom.emailPasswordAccounts
   -> cache CacheSetAccountVerifyToken
   -> cache CacheUseAccountVerifyToken
-  <- uid + connectTicket + gatewayKey + gatewayAddr
-  -> gateway TCP UserVerifyReq(uid + connectTicket)
+  <- aid + connectTicket + gatewayKey + gatewayAddr
+  -> gateway TCP AccountVerifyReq(aid + connectTicket)
 ```
 
 ## 核心能力
@@ -53,7 +53,7 @@ login 只做登录凭证校验和 gateway 入口分配，不维护用户在线�
 
 ### `POST /api/login/accountVerifyToken`
 
-外部程序调用，用于写入账号级一次性验证凭证 accountVerifyToken。该接口不创建 uid，不选择 gateway，不返回 connectTicket。
+外部程序调用，用于写入账号级一次性验证凭证 accountVerifyToken。该接口不创建 aid，不选择 gateway，不返回 connectTicket。
 
 请求体：
 
@@ -100,7 +100,7 @@ login 只做登录凭证校验和 gateway 入口分配，不维护用户在线�
 ```json
 {
   "account": "robot.10001",
-  "uid": 10001,
+  "aid": 10001,
   "connectTicket": "...",
   "ticketExpireTimestampMs": 1717600000000,
   "gatewayKey": "/project/server/1/gateway/1/",
@@ -114,9 +114,9 @@ login 只做登录凭证校验和 gateway 入口分配，不维护用户在线�
 2. 解析 JSON，请求只允许 `account` 和 `accountVerifyToken`。
 3. 对 `account` 去除首尾空格，空 `account/accountVerifyToken` 返回 `400`。
 4. 调用 cache `CacheUseAccountVerifyToken(account, accountVerifyToken)`，由 cache 原子验证并消费 accountVerifyToken。
-5. cache 消费成功后确保账号存在，必要时创建 `account -> uid` 映射和占位 `AccountRecord`，并返回可信 uid。
+5. cache 消费成功后确保账号存在，必要时创建 `account -> aid` 映射和占位 `AccountRecord`，并返回可信 aid。
 6. login 从 gateway 管理器中选择本地 `availableLoad` 最大的可用 gateway，并先本地扣减 1 个可用负载。
-7. login 构造 `ConnectTicketPayload`，payload 包含 `version/uid/account/gatewayKey/nonce/issuedTimestampMs/expireTimestampMs`。
+7. login 构造 `ConnectTicketPayload`，payload 包含 `version/aid/account/gatewayKey/nonce/issuedTimestampMs/expireTimestampMs`。
 8. login 使用 `ticketSecret` 对 payload 做 HMAC-SHA256 签名，返回 `connectTicket` 和目标 gateway 信息。
 
 ### `POST /api/login/emailSession`
@@ -127,7 +127,7 @@ login 只做登录凭证校验和 gateway 入口分配，不维护用户在线�
 
 ```json
 {
-  "email": "user@example.com",
+  "email": "account@example.com",
   "password": "plain-password"
 }
 ```
@@ -136,8 +136,8 @@ login 只做登录凭证校验和 gateway 入口分配，不维护用户在线�
 
 ```json
 {
-  "account": "user@example.com",
-  "uid": 10001,
+  "account": "account@example.com",
+  "aid": 10001,
   "connectTicket": "...",
   "ticketExpireTimestampMs": 1717600000000,
   "gatewayKey": "/project/server/1/gateway/1/",
@@ -150,10 +150,10 @@ login 只做登录凭证校验和 gateway 入口分配，不维护用户在线�
 1. 要求 HTTP method 为 `POST`。
 2. 解析 JSON，请求只允许 `email` 和 `password`。
 3. `email` 去除首尾空格后转小写，`password` 不 trim，按原字符串精确匹配。
-4. 每次请求重新读取 login 当前运行配置文件，解析 `custom.emailPasswordUsers`。
+4. 每次请求重新读取 login 当前运行配置文件，解析 `custom.emailPasswordAccounts`。
 5. 配置中 email 同样 trim 后转小写；email 不存在或密码错误返回 `401`。
 6. login 生成内部随机 accountVerifyToken，调用 cache `CacheSetAccountVerifyToken(account=email, accountVerifyToken, expireSecond)`。
-7. login 立即调用 cache `CacheUseAccountVerifyToken(account=email, accountVerifyToken)`，由 cache 原子消费 accountVerifyToken、确保账号存在并返回可信 uid。
+7. login 立即调用 cache `CacheUseAccountVerifyToken(account=email, accountVerifyToken)`，由 cache 原子消费 accountVerifyToken、确保账号存在并返回可信 aid。
 8. login 选择 gateway、签发 `connectTicket`，返回连接信息。
 
 ## 错误语义
@@ -178,7 +178,7 @@ accountVerifyToken 在 `CacheUseAccountVerifyToken` 成功后即被消费；如�
 | `custom.accountVerifyTokenPath` | `/api/login/accountVerifyToken` | 外部程序写 accountVerifyToken 的 HTTP 路径 |
 | `custom.sessionPath` | `/api/login/session` | 客户端换取登录票据的 HTTP 路径 |
 | `custom.emailSessionPath` | `/api/login/emailSession` | 客户端使用 email/password 换取登录票据的 HTTP 路径 |
-| `custom.emailPasswordUsers` | `[]` | email/password 用户列表；注册系统写入当前运行配置文件后，下次 email 登录读取生效 |
+| `custom.emailPasswordAccounts` | `[]` | email/password 账号列表；注册系统写入当前运行配置文件后，下次 email 登录读取生效 |
 | `custom.accountVerifyTokenExpireSecond` | `10s` | accountVerifyToken 有效时间，配置使用 Go duration 字符串 |
 | `custom.ticketExpireSecond` | `10s` | `connectTicket` 有效时间，配置使用 Go duration 字符串 |
 | `custom.ticketSecret` | `common.ConnectTicketSecretDefault` | `connectTicket` HMAC 密钥，必须和 gateway 一致 |
@@ -199,10 +199,10 @@ login 的 etcd 回调按顺序执行，cache 本地 map 不额外加锁；gatewa
 
 ## 一致性约定
 
-- login 不信任客户端 uid，也不接受 uid 入参。
-- `/api/login/accountVerifyToken` 只写 accountVerifyToken，不创建账号映射和用户档案。
-- `/api/login/session` 只在 accountVerifyToken 消费成功后才获取 uid 和签发票据。
-- `/api/login/emailSession` 在 email/password 校验成功后生成内部随机 accountVerifyToken，并复用 `CacheSetAccountVerifyToken`、`CacheUseAccountVerifyToken` 完成账号创建和 uid 获取。
+- login 不信任客户端 aid，也不接受 aid 入参。
+- `/api/login/accountVerifyToken` 只写 accountVerifyToken，不创建账号映射和账号档案。
+- `/api/login/session` 只在 accountVerifyToken 消费成功后才获取 aid 和签发票据。
+- `/api/login/emailSession` 在 email/password 校验成功后生成内部随机 accountVerifyToken，并复用 `CacheSetAccountVerifyToken`、`CacheUseAccountVerifyToken` 完成账号创建和 aid 获取。
 - email/password 明文保存在 login 当前运行配置文件中；生产环境需要通过文件权限和部署流程保护该配置。
 - login 不调用 gateway prepare-login，不写 gateway pending 表，也不写 Redis 在线态。
 - `connectTicket` 只负责首次连接 gateway 的身份校验；登录成功后的 `heartbeatSession` 由 gateway 生成和轮换，不进入 login。
@@ -216,12 +216,12 @@ login 的 etcd 回调按顺序执行，cache 本地 map 不额外加锁；gatewa
 - `login credential config invalid`：login 当前运行配置文件缺失、格式错误、账号配置重复，或存在空 email/password。
 - `cache not available`：login 未发现 cache，cache 不可用，或 cache RPC 返回不可用。
 - `gateway not available`：login 未发现可用 gateway，或所有 gateway `availableLoad` 为 0/连接不可用。
-- `cache account uid is empty`：cache 消费 accountVerifyToken 成功但返回 uid 为 0，属于 cache 数据异常。
-- `connect ticket invalid`：gateway 校验失败，重点检查 `ticketSecret`、目标 gateway key、uid 和票据过期时间。
+- `cache account aid is empty`：cache 消费 accountVerifyToken 成功但返回 aid 为 0，属于 cache 数据异常。
+- `connect ticket invalid`：gateway 校验失败，重点检查 `ticketSecret`、目标 gateway key、aid 和票据过期时间。
 
 ## 待改进项
 
 - 为 `/api/login/session` 增加 accountVerifyToken 重放、gateway 不可用、ticket 过期/篡改等边界测试。
-- 后续应将 `emailPasswordUsers.password` 从明文升级为哈希。
+- 后续应将 `emailPasswordAccounts.password` 从明文升级为哈希。
 - HTTP 响应可补充 trace id，方便串联 login、cache、gateway、online 日志。
-- 后续如果需要断线重连，应在 gateway 侧设计重连票据或 cache userSession 续期策略，不应复用一次性 accountVerifyToken。
+- 后续如果需要断线重连，应在 gateway 侧设计重连票据或 cache accountSession 续期策略，不应复用一次性 accountVerifyToken。

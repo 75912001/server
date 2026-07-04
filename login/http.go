@@ -81,8 +81,8 @@ func normalizeEmail(email string) string {
 	return strings.ToLower(strings.TrimSpace(email))
 }
 
-// loadEmailPasswordUsers 每次从当前运行配置文件读取 email/password 账号表。
-func loadEmailPasswordUsers() (map[string]string, error) {
+// loadEmailPasswordAccounts 每次从当前运行配置文件读取 email/password 账号表。
+func loadEmailPasswordAccounts() (map[string]string, error) {
 	configPath := xconfig.GConfigMgr.ExecutablePath
 	if configPath == "" {
 		return nil, errLoginCredentialConfigInvalid
@@ -95,18 +95,18 @@ func loadEmailPasswordUsers() (map[string]string, error) {
 	if err = yaml.Unmarshal(data, &cfg); err != nil {
 		return nil, err
 	}
-	users := make(map[string]string, len(cfg.Custom.EmailPasswordUsers))
-	for _, user := range cfg.Custom.EmailPasswordUsers {
-		email := normalizeEmail(user.Email)
-		if email == "" || user.Password == "" {
+	accounts := make(map[string]string, len(cfg.Custom.EmailPasswordAccounts))
+	for _, account := range cfg.Custom.EmailPasswordAccounts {
+		email := normalizeEmail(account.Email)
+		if email == "" || account.Password == "" {
 			return nil, errLoginCredentialConfigInvalid
 		}
-		if _, exists := users[email]; exists {
+		if _, exists := accounts[email]; exists {
 			return nil, errLoginCredentialConfigInvalid
 		}
-		users[email] = user.Password
+		accounts[email] = account.Password
 	}
-	return users, nil
+	return accounts, nil
 }
 
 // cacheErrorToHTTP 将 Cache gRPC 错误转换为 login HTTP 错误码和错误信息。

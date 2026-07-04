@@ -1,18 +1,18 @@
 #!/bin/bash
 
-# 该脚本从 proto/user.cmd.proto 中提取消息定义，并生成 main/register.message.go。
+# 该脚本从 proto/account.cmd.proto 中提取消息定义，并生成 main/register.message.go。
 
 scriptDir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 serverPath=$(cd "${scriptDir}/../.." && pwd)
 simulatorPath="tool/robot"
 protoPath="${1:-proto}"
-inputProto="${protoPath}/user.cmd.proto"
+inputProto="${protoPath}/account.cmd.proto"
 outputGo="${simulatorPath}/main/register.message.go"
 
 cd "${serverPath}" || exit 1
 
 if [ ! -f "${inputProto}" ]; then
-    echo -e "\e[91m proto file not found: ${inputProto}\e[0m"
+    printf '\033[91m proto file not found: %s\033[0m\n' "${inputProto}"
     exit 1
 fi
 
@@ -41,11 +41,11 @@ GOEOF
 grep -E '^[[:space:]]+[A-Za-z0-9]+_CMD[[:space:]]*=' "${inputProto}" |
 while read -r line; do
     enumName=$(echo "${line}" | sed -E 's/^[[:space:]]*([A-Za-z0-9]+)_CMD[[:space:]]*=.*/\1/')
-    if [ "${enumName}" = "UserMsgIDUnknown" ]; then
+    if [ "${enumName}" = "AccountMsgIDUnknown" ]; then
         continue
     fi
     cat >> "${outputGo}" <<GOEOF
-	registerMessage(uint32(pb.MsgIDUser_${enumName}_CMD), func() proto.Message { return &pb.${enumName}{} })
+	registerMessage(uint32(pb.MsgIDAccount_${enumName}_CMD), func() proto.Message { return &pb.${enumName}{} })
 GOEOF
 done
 
@@ -60,5 +60,5 @@ func registerMessage(messageID uint32, newProtoMessage func() proto.Message) {
 GOEOF
 
 gofmt -w "${outputGo}"
-echo -e "\e[92m generate register.message.go successfully: ${outputGo}\e[0m"
+printf '\033[92m generate register.message.go successfully: %s\033[0m\n' "${outputGo}"
 exit 0

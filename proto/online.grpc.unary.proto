@@ -4,25 +4,25 @@ package online;
 option go_package = "server/proto/pb;pb";
 import "options.proto";
 
-message OnlineBindUserReq {
+message OnlineBindAccountReq {
   string gateway_key = 1; // gatewayKey, Gateway 服务在 etcd 中注册的唯一身份
   string client_ip = 2; // 客户端 IP, 由 Gateway 从 TCP remote 提取
   string account = 3; // 登录账号, 由 Gateway 校验 connectTicket 后传入
-  uint64 uid = 4; // uid, 用户唯一标识, 由 login/cache 可信链路生成
-  string user_session = 6; // userSession, 一次登录生成的固定连接身份, 心跳不轮换
+  uint64 aid = 4; // aid, 账号唯一标识, 由 login/cache 可信链路生成
+  string account_session = 6; // accountSession, 一次登录生成的固定连接身份, 心跳不轮换
 }
 
-message OnlineBindUserRes {
+message OnlineBindAccountRes {
 }
 
-// 用户 actor 解绑请求 (Gateway -> Online), Gateway 在 TCP 断开、顶号、主动离线和回滚等场景下发出。
-message OnlineUnbindUserReq {
-  uint64 uid = 1;                                    // 离线用户 uid
+// Account actor 解绑请求 (Gateway -> Online), Gateway 在 TCP 断开、顶号、主动离线和回滚等场景下发出。
+message OnlineUnbindAccountReq {
+  uint64 aid = 1;                                    // 离线账号 aid
   uint32 reason = 2;                                 // 离线原因
   string msg = 3;                                    // 离线说明
   string gateway_key = 4;                            // 发起离线的 gatewayKey
-  string user_session = 5;                           // userSession, 一次登录生成的固定连接身份, 只清理匹配的在线态
+  string account_session = 5;                        // accountSession, 一次登录生成的固定连接身份, 只清理匹配的在线态
 }
 
-message OnlineUnbindUserRes {
+message OnlineUnbindAccountRes {
 }

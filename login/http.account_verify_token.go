@@ -12,14 +12,14 @@ type accountVerifyTokenReq struct {
 	AccountVerifyToken string `json:"accountVerifyToken"` // accountVerifyToken, 不能为空
 }
 
-// accountVerifyTokenRes 是外部程序写入 accountVerifyToken 后的响应体, 不返回 uid。
+// accountVerifyTokenRes 是外部程序写入 accountVerifyToken 后的响应体, 不返回 aid。
 type accountVerifyTokenRes struct {
 	Account            string `json:"account"`            // 已写入 accountVerifyToken 的账号
 	AccountVerifyToken string `json:"accountVerifyToken"` // 已写入的 accountVerifyToken
 	ExpireSecond       uint64 `json:"expireSecond"`       // accountVerifyToken 有效秒数
 }
 
-// handleLoginAccountVerifyToken 供外部程序写入 accountVerifyToken; 这里只写凭证, 不创建 uid, 也不分配 gateway。
+// handleLoginAccountVerifyToken 供外部程序写入 accountVerifyToken; 这里只写凭证, 不创建 aid, 也不分配 gateway。
 func handleLoginAccountVerifyToken(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")

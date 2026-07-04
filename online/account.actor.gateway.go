@@ -9,15 +9,15 @@ import (
 	grpcstatus "google.golang.org/grpc/status"
 )
 
-func (p *Account) onBind(req *pb.OnlineBindUserReq, accountRecord *pb.AccountRecord) (*pb.OnlineBindUserRes, error) {
-	uid := p.uid
+func (p *Account) onBind(req *pb.OnlineBindAccountReq, accountRecord *pb.AccountRecord) (*pb.OnlineBindAccountRes, error) {
+	aid := p.aid
 	account := strings.TrimSpace(req.GetAccount())
 	gatewayKey := strings.TrimSpace(req.GetGatewayKey())
-	userSession := req.GetUserSession()
-	if uid == 0 || account == "" || gatewayKey == "" || userSession == "" {
+	accountSession := req.GetAccountSession()
+	if aid == 0 || account == "" || gatewayKey == "" || accountSession == "" {
 		return nil, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	if accountRecord == nil || accountRecord.GetUid() != uid || strings.TrimSpace(accountRecord.GetAccount()) != account {
+	if accountRecord == nil || accountRecord.GetAid() != aid || strings.TrimSpace(accountRecord.GetAccount()) != account {
 		return nil, grpcstatus.Error(grpccodes.Unauthenticated, "account record mismatch")
 	}
 	if accountRecord.GetAccountCreateTimestampMs() == 0 {
@@ -25,10 +25,11 @@ func (p *Account) onBind(req *pb.OnlineBindUserReq, accountRecord *pb.AccountRec
 	}
 
 	p.gatewayKey = gatewayKey
-	p.userSession = userSession
+	p.accountSession = accountSession
 	p.account = accountRecord.GetAccount()
 	p.clientIP = req.GetClientIp()
 	p.accountRecord = accountRecord
-	GAccountMgr.accounts.Add(uid, p)
-	return &pb.OnlineBindUserRes{}, nil
+	p.clearOnlineCharacterUUIDs()
+	GAccountMgr.accounts.Add(aid, p)
+	return &pb.OnlineBindAccountRes{}, nil
 }

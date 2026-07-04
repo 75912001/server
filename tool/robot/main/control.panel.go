@@ -33,11 +33,11 @@ type controlPanelOverview struct {
 }
 
 type robotView struct {
-	UID              uint64 `json:"uid"`
+	AID              uint64 `json:"aid"`
 	GatewayAddr      string `json:"gatewayAddr"`
 	Connected        bool   `json:"connected"`
 	Verified         bool   `json:"verified"`
-	UserReady        bool   `json:"userReady"`
+	AccountReady     bool   `json:"accountReady"`
 	HeartbeatSession string `json:"heartbeatSession"`
 	Seq              uint64 `json:"seq"`
 	Pending          int    `json:"pending"`
@@ -55,7 +55,7 @@ type apiView struct {
 
 type controlPanelSendReq struct {
 	Scope   string `json:"scope"`
-	UID     uint64 `json:"uid"`
+	AID     uint64 `json:"aid"`
 	Message string `json:"message"`
 }
 
@@ -155,12 +155,12 @@ func (p *ControlPanel) handleSend(w http.ResponseWriter, r *http.Request) {
 	case "all":
 		queued := p.manager.QueueAllCommand(req.Message)
 		writeJSON(w, controlPanelSendRes{OK: true, Message: "queued all " + req.Message, Queued: queued})
-	case "uid":
-		if err := p.manager.QueueUIDCommand(req.UID, req.Message); err != nil {
+	case "aid":
+		if err := p.manager.QueueAIDCommand(req.AID, req.Message); err != nil {
 			writeJSONStatus(w, http.StatusBadRequest, controlPanelSendRes{OK: false, Message: err.Error()})
 			return
 		}
-		writeJSON(w, controlPanelSendRes{OK: true, Message: "queued uid " + strconv.FormatUint(req.UID, 10) + " " + req.Message, Queued: 1})
+		writeJSON(w, controlPanelSendRes{OK: true, Message: "queued aid " + strconv.FormatUint(req.AID, 10) + " " + req.Message, Queued: 1})
 	default:
 		writeJSONStatus(w, http.StatusBadRequest, controlPanelSendRes{OK: false, Message: "invalid scope"})
 	}
@@ -243,15 +243,15 @@ th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white
   <section class="bar">
     <select id="message"></select>
     <button onclick="sendAll()">all</button>
-    <input id="uid" placeholder="uid" inputmode="numeric">
-    <button onclick="sendUID()">uid</button>
+    <input id="aid" placeholder="aid" inputmode="numeric">
+    <button onclick="sendAID()">aid</button>
     <button class="secondary" onclick="refresh()">刷新</button>
     <div class="log" id="log"></div>
   </section>
   <section class="split">
     <div>
       <table>
-        <thead><tr><th>UID</th><th>连接</th><th>登录</th><th>用户档案</th><th>Gateway</th><th>HeartbeatSession</th><th>Seq</th><th>队列</th></tr></thead>
+        <thead><tr><th>AID</th><th>连接</th><th>登录</th><th>用户档案</th><th>Gateway</th><th>HeartbeatSession</th><th>Seq</th><th>队列</th></tr></thead>
         <tbody id="robots"></tbody>
       </table>
     </div>
@@ -279,18 +279,18 @@ async function refresh(){
   const current=select.value;
   select.innerHTML=apiMessages.map(x=>` + "`" + `<option value="${x.name}">${x.name} ${x.id}</option>` + "`" + `).join('');
   if(current) select.value=current;
-  document.getElementById('robots').innerHTML=(data.robots||[]).map(r=>` + "`" + `<tr><td>${r.uid}</td><td>${status(r.connected)}</td><td>${status(r.verified)}</td><td>${status(r.userReady)}</td><td>${r.gatewayAddr||''}</td><td>${r.heartbeatSession||''}</td><td>${r.seq}</td><td>${r.pending}</td></tr>` + "`" + `).join('');
+  document.getElementById('robots').innerHTML=(data.robots||[]).map(r=>` + "`" + `<tr><td>${r.aid}</td><td>${status(r.connected)}</td><td>${status(r.verified)}</td><td>${status(r.accountReady)}</td><td>${r.gatewayAddr||''}</td><td>${r.heartbeatSession||''}</td><td>${r.seq}</td><td>${r.pending}</td></tr>` + "`" + `).join('');
   document.getElementById('gateways').innerHTML=(data.gateways||[]).map(g=>` + "`" + `<tr><td>${g.key}</td><td>${g.addr}</td></tr>` + "`" + `).join('');
 }
-async function send(scope,uid){
+async function send(scope,aid){
   const message=document.getElementById('message').value;
-  const res=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scope,uid,message})});
+  const res=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scope,aid,message})});
   const data=await res.json();
   document.getElementById('log').textContent=data.message||'';
   await refresh();
 }
 function sendAll(){send('all',0)}
-function sendUID(){send('uid',Number(document.getElementById('uid').value||0))}
+function sendAID(){send('aid',Number(document.getElementById('aid').value||0))}
 refresh(); setInterval(refresh,2000);
 </script>
 </body>

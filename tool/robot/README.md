@@ -1,20 +1,20 @@
 ## 客户端模拟器 Robot 模式
 
-`robot` 用于模拟真实 TCP 客户端连接 gateway。现在统一使用 robot 管理器运行，配置 1 个 robot 时可以作为单用户调试，配置 1000/10000 个 robot 时可以作为压测客户端。
+`robot` 用于模拟真实 TCP 客户端连接 gateway。现在统一使用 robot 管理器运行，配置 1 个 robot 时可以作为单账号调试，配置 1000/10000 个 robot 时可以作为压测客户端。
 
 ## 构建
 
 在仓库根目录生成 protobuf 代码：
 
 ```bash
-cd D:/src/github.com/server
+cd D:/src/github.com/sa.project/server
 python gen.py
 ```
 
 生成客户端消息注册表并构建客户端：
 
 ```bash
-cd D:/src/github.com/server/tool/robot
+cd D:/src/github.com/sa.project/server/tool/robot
 ./gen.register.message.sh
 ./build.sh
 ```
@@ -24,17 +24,17 @@ cd D:/src/github.com/server/tool/robot
 运行目录必须是：
 
 ```text
-D:\src\github.com\server\tool\robot\bin
+D:\src\github.com\sa.project\server\tool\robot\bin
 ```
 
 启动：
 
 ```bash
-cd D:/src/github.com/server/tool/robot/bin
+cd D:/src/github.com/sa.project/server/tool/robot/bin
 ./robot.exe
 ```
 
-客户端启动后会读取 `config.yaml`，发现 gateway/cache 服务，按 robot 配置分批连接 gateway，并自动发送 `UserVerifyReq` 登录。登录成功后会先发送 `UserRecordReq` 获取用户档案；如果用户档案为空才发送 `UserCreateReq` 创建用户。用户档案就绪后才会启动随机业务发包。
+客户端启动后会读取 `config.yaml`，发现 gateway/cache 服务，按 robot 配置分批连接 gateway，并自动发送 `AccountVerifyReq` 登录。登录成功后会先发送 `AccountRecordReq` 获取账号档案；如果账号档案尚未创建, robot 不会自动发送 `CharacterCreateReq`，需要通过控制台或控制面板显式发送创建请求。账号档案就绪后才会启动随机业务发包。
 
 如果开启控制面板，启动日志会输出面板地址：
 
@@ -49,8 +49,8 @@ control panel: http://127.0.0.1:18080/
 ```yaml
 robot:
   count: 1
-  uidStart: 10001
-  uidStep: 1
+  aidStart: 10001
+  aidStep: 1
   startupBatchSize: 100
   startupBatchInterval: 100ms
   heartbeatInterval: 10s
@@ -60,7 +60,7 @@ robot:
   messages:
     - name: RobotPingReq
       weight: 80
-    - name: UserRecordReq
+    - name: AccountRecordReq
       weight: 20
   logging:
     summaryInterval: 5s
@@ -79,8 +79,8 @@ controlPanel:
 
 关键字段：
 
-- `count`：启动 robot 数量。设置为 `1` 时就是单用户调试。
-- `uidStart` / `uidStep`：生成 UID，例如 `10001,10002,10003`。
+- `count`：启动 robot 数量。设置为 `1` 时就是单账号调试。
+- `aidStart` / `aidStep`：生成 AID，例如 `10001,10002,10003`。
 - `startupBatchSize` / `startupBatchInterval`：分批启动，避免瞬间打满本机和 gateway。
 - `heartbeatInterval`：每个 robot 的心跳间隔。
 - `actionInterval`：随机业务发包间隔。`0s` 表示不自动发业务包，只手工命令发包。
@@ -126,8 +126,8 @@ RobotPingReq:
 
 动态字段：
 
-- `UserVerifyReq.uid` 和 `UserVerifyReq.connectTicket` 会被 robot 当前登录结果覆盖。
-- `UserHeartbeatReq.lastHeartbeatSession` 为空时，会使用当前 robot 的 heartbeatSession。
+- `AccountVerifyReq.aid` 和 `AccountVerifyReq.connectTicket` 会被 robot 当前登录结果覆盖。
+- `AccountHeartbeatReq.lastHeartbeatSession` 为空时，会使用当前 robot 的 heartbeatSession。
 - `RobotPingReq.seq` 为 `0` 时，会使用当前 robot 自增序号。
 - `RobotPingReq.clientTime` 为 `0` 时，会使用当前毫秒时间。
 
@@ -137,7 +137,7 @@ RobotPingReq:
 list
 stats
 all RobotPingReq
-uid 10001 RobotPingReq
+aid 10001 RobotPingReq
 quit
 exit
 ```
@@ -147,7 +147,7 @@ exit
 - `list`：重新读取并列出 `api.yaml` 中的消息。
 - `stats`：打印连接、登录、发包、收包、失败等统计。
 - `all RobotPingReq`：所有 robot 发送一次 `RobotPingReq`。
-- `uid 10001 RobotPingReq`：指定 UID 的 robot 发送一次 `RobotPingReq`。
+- `aid 10001 RobotPingReq`：指定 AID 的 robot 发送一次 `RobotPingReq`。
 - `quit` / `exit`：关闭所有 robot 并退出。
 
 ## 控制面板
@@ -161,18 +161,18 @@ http://127.0.0.1:18080/
 面板支持：
 
 - 查看 robot 总数、在线数、登录成功数、发送/接收/失败统计。
-- 查看最多前 200 个 robot 的 UID、连接、登录、用户档案、gateway、heartbeatSession、seq、队列。
+- 查看最多前 200 个 robot 的 AID、连接、登录、账号档案、gateway、heartbeatSession、seq、队列。
 - 查看当前发现的 gateway 列表。
 - 从 `api.yaml` 读取消息列表。
 - 点击 `all` 给所有 robot 发送当前选择的消息。
-- 输入 UID 后点击 `uid` 给指定 robot 发送当前选择的消息。
+- 输入 AID 后点击 `aid` 给指定 robot 发送当前选择的消息。
 
 面板接口：
 
 - `GET /api/overview`：返回统计、robot 快照、gateway、api 消息。
-- `POST /api/send`：发送消息，body 示例：`{"scope":"uid","uid":10001,"message":"RobotPingReq"}`。
+- `POST /api/send`：发送消息，body 示例：`{"scope":"aid","aid":10001,"message":"RobotPingReq"}`。
 
-如果指定 UID 的 robot 正在登录，业务命令会先进入待发送队列。`RobotPingReq` 必须等用户档案创建或确认存在后才会发送。如果已经登录但第一次心跳还没返回，业务消息仍可发送，包头 `SessionID` 使用 robot 本地递增值。
+如果指定 AID 的 robot 正在登录，业务命令会先进入待发送队列。`RobotPingReq` 必须等账号档案创建或确认存在后才会发送。如果已经登录但第一次心跳还没返回，业务消息仍可发送，包头 `SessionID` 使用 robot 本地递增值。
 
 ## RobotPing
 
@@ -189,13 +189,13 @@ online 收到后直接回显：
 - `serverTime`
 - `payload`
 
-该消息不写 Redis，不修改用户档案。
+该消息不写 Redis，不修改账号档案。
 
 调用要求：
 
-- `RobotPingReq` 只能在用户档案已经创建后调用。
-- robot 登录成功后会先发送 `UserRecordReq`，用户档案为空时才发送 `UserCreateReq`。
-- 如果 `UserCreateReq` 返回用户已存在，robot 也会认为用户档案已经就绪。
+- `RobotPingReq` 只能在账号档案已经创建后调用。
+- robot 登录成功后会先发送 `AccountRecordReq`，账号档案为空时等待玩家显式发送 `CharacterCreateReq`。
+- 如果 `CharacterCreateReq` 返回账号已存在，robot 也会认为账号档案已经就绪。
 
 ## 压测注意事项
 

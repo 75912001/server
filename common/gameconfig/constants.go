@@ -2,7 +2,7 @@ package gameconfig
 
 import pb "server/proto/pb"
 
-const petSavedBaseRandomMin = -2
+const petSavedBaseGradeOffsetMin = -2
 
 var elementOrder = []pb.AssetElemental{
 	pb.AssetElemental_AssetElemental_Earth,
@@ -39,4 +39,8 @@ func isPetSkillID(id int) bool {
 
 func isCharacterID(id int) bool {
 	return id >= int(pb.AssetIDRange_AssetIDRange_Character_Start) && id <= int(pb.AssetIDRange_AssetIDRange_Character_End)
+}
+
+func isSceneID(id int) bool {
+	return id >= int(pb.AssetIDRange_AssetIDRange_Scene_Start) && id <= int(pb.AssetIDRange_AssetIDRange_Scene_End)
 }

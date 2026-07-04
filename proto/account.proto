@@ -1,0 +1,178 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+import "account.record.proto";
+import "character.proto";
+import "combat.proto";
+
+// ===================================================================
+// 消息体定义 — 客户端 ↔ Gateway TCP 协议层
+// ===================================================================
+
+//0x000001#client->gateway#账号登录验证-请求
+message AccountVerifyReq
+{
+  uint64 aid = 1; // aid, 账号唯一标识, 由 login 服务下发, 客户端登录 Gateway 时携带
+  string connect_ticket = 2; // connectTicket, login 签发的短期连接票据, 客户端登录 Gateway 时携带
+}
+
+//0x000002#gateway->client#账号登录验证-回复
+message AccountVerifyRes
+{
+  int64  server_timestamp_ms = 1;   // 服务器当前时间戳，单位毫秒（用于客户端对时）
+  string heartbeat_session = 2; // heartbeatSession, 客户端后续心跳携带的心跳认证凭证
+}
+
+//0x000003#client->gateway#账号主动下线-请求
+message AccountOfflineReq
+{
+  uint32 reason = 1;   // 1=账号主动离线
+}
+
+//0x00000A#client->gateway#心跳-请求
+message AccountHeartbeatReq {
+  string last_heartbeat_session = 1;   // 上次 Gateway 下发的 heartbeatSession
+}
+
+//0x00000B#gateway->client#心跳-回复
+message AccountHeartbeatRes {
+  int64 server_timestamp_ms  = 1;   // 服务器时间毫秒
+  string next_heartbeat_session = 2;   // 客户端下次心跳必须使用的 heartbeatSession
+}
+
+//0x00000C#client->gateway#请求账号档案-请求
+message AccountRecordReq {
+}
+
+//0x00000D#gateway->client#请求账号档案-回复
+message AccountRecordRes {
+  AccountRecord account_record = 1; // 账号档案
+}
+
+//0x00000E#client->gateway#创建角色-请求
+message CharacterCreateReq
+{
+  uint32 character_slot_index = 1; // 角色创建槽位索引, 从 0 开始; 该槽位已有有效角色时创建失败
+  uint32 character_id = 2; // 角色资源 ID; 0 表示使用默认角色资源, 非 0 时必须是可创建玩家角色
+  string character_nick = 3; // 角色昵称; 去除首尾空白后 1-12 个字符, 空字符串表示使用默认昵称
+  ElementalPoints character_elemental = 4; // 角色地水火风元素点数; 必须提交且由 online 校验合法性
+  CharacterAttributePoints character_attribute = 5; // 角色体力腕力耐力速度点数; 必须提交且由 online 校验合法性
+}
+
+//0x00000F#gateway->client#创建角色-回复
+message CharacterCreateRes
+{
+  AccountRecord account_record = 1; // 创建角色后的账号档案
+}
+
+//0x000010#client->gateway#机器人压测-请求
+message RobotPingReq
+{
+  uint64 seq = 1; // 客户端递增序号
+  int64 client_timestamp_ms = 2; // 客户端发送时间戳，单位毫秒
+  string payload = 3; // 压测透传数据
+}
+
+//0x000011#gateway->client#机器人压测-回复
+message RobotPingRes
+{
+  uint64 seq = 1; // 对应请求中的客户端递增序号
+  int64 client_timestamp_ms = 2; // 对应请求中的客户端发送时间戳，单位毫秒
+  int64 server_timestamp_ms = 3; // 服务端回复时间戳，单位毫秒
+  string payload = 4; // 对应请求中的压测透传数据
+}
+
+//0x000012#client->gateway#设置自动遇敌-请求
+message AutoEncounterSetReq {
+  bool enabled = 1; // 是否开启自动遇敌
+}
+
+//0x000013#gateway->client#设置自动遇敌-回复
+message AutoEncounterSetRes {
+  bool enabled = 1; // 服务端确认后的自动遇敌状态
+  int64 server_timestamp_ms = 2; // 服务端回复时间戳, 单位毫秒
+}
+
+//0x000014#gateway->client#战斗开始-通知
+message CombatBattleStartNotify {
+  CombatBattleStart battle_start = 1; // 开战快照, 只包含战斗 ID 和初始可见单位
+}
+
+//0x000015#client->gateway#战斗回合出手-请求
+message CombatRoundActionReq {
+  uint64 battle_id = 1; // 战斗唯一 ID
+  uint32 round = 2; // 客户端提交的回合号
+  CombatUnitKey unit_key = 3; // 本次提交动作的出手单位
+  CombatActionType action_type = 4; // 出手类型
+  uint32 action_id = 5; // 角色动作为 CharacterAction 枚举值, 宠物技能为宠物技能 ID
+  CombatUnitKey target_key = 6; // 动作主目标; 防御和待机可为空
+}
+
+//0x000016#gateway->client#战斗回合出手-回复
+message CombatRoundActionRes {
+  uint64 battle_id = 1; // 战斗唯一 ID
+  uint32 round = 2; // 已接收的回合号
+  CombatUnitKey unit_key = 3; // 已接收动作的出手单位
+}
+
+//0x000017#gateway->client#战斗回合结果-通知
+message CombatRoundResultNotify {
+  uint64 battle_id = 1; // 战斗唯一 ID
+  uint32 round = 2; // 已结算的回合号
+  repeated CombatActionIntent intent_list = 3; // 本回合双方进入执行队列的出手意图列表
+  bool battle_finished = 6; // 本回合结算后战斗是否已经结束
+  repeated CombatEvent event_list = 10; // 本回合事件链, 用于表达攻击, 反击, 合击和状态变化
+  CombatBattleSettlement settlement = 20; // battle_finished=true 时携带战斗结算数据
+}
+
+//0x000018#gateway->client#战斗回合准备-通知
+message CombatRoundPrepareNotify {
+  uint64 battle_id = 1; // 战斗唯一 ID
+  uint32 round = 2; // 当前回合号, 从 1 开始
+  int64 server_timestamp_ms = 3; // 服务端当前时间戳, 单位毫秒
+  int64 round_deadline_timestamp_ms = 4; // 当前回合截止时间戳, 单位毫秒
+  repeated CombatUnitState unit_state_list = 10; // 当前全场运行期状态快照
+  repeated CombatActionOption action_option_list = 20; // 当前客户端可提交的合法动作选项
+  repeated CombatUnitKey required_unit_key_list = 30; // 当前回合必须由客户端提交动作的单位
+  repeated CombatUnitKey ready_unit_key_list = 31; // 当前回合已提交动作的单位
+}
+
+//0x000019#gateway->client#战斗回合出手就绪-通知
+message CombatRoundReadyNotify {
+  uint64 battle_id = 1; // 战斗唯一 ID
+  uint32 round = 2; // 当前回合号
+  repeated CombatUnitKey required_unit_key_list = 10; // 当前回合必须由客户端提交动作的单位
+  repeated CombatUnitKey ready_unit_key_list = 11; // 当前回合已提交动作的单位
+}
+
+//0x00001A#client->gateway#角色上线-请求
+message CharacterOnlineReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号且尚未上线
+}
+
+//0x00001B#gateway->client#角色上线-回复
+message CharacterOnlineRes {
+}
+
+//0x00001C#client->gateway#角色下线-请求
+message CharacterOfflineReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号且当前已上线
+}
+
+//0x00001D#gateway->client#角色下线-回复
+message CharacterOfflineRes {
+}
+
+//0x00001E#client->gateway#进入场景-请求
+message SceneEnterReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号且当前已上线
+  uint32 scene_id = 2; // 目标场景 ID, 必须存在于 scene.yaml
+}
+
+//0x00001F#gateway->client#进入场景-回复
+message SceneEnterRes {
+  uint64 character_uuid = 1; // 已进入场景的角色 UUID
+  uint32 scene_id = 2; // 已进入的场景 ID
+  int64 server_timestamp_ms = 3; // 服务端回复时间戳, 单位毫秒
+}

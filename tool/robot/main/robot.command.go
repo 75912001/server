@@ -36,15 +36,15 @@ func (p *RobotManager) ExecuteCommand(command string) bool {
 		p.PrintStats()
 	case "all":
 		p.executeAllCommand(parts)
-	case "uid":
-		p.executeUIDCommand(parts)
+	case "aid":
+		p.executeAIDCommand(parts)
 	default:
 		robots := p.Robots()
 		if len(robots) == 1 {
 			p.iEventMgr.Send(&RobotCommand{Robot: robots[0], Command: parts[0], Verbose: true, Source: "manual"})
 			return false
 		}
-		ColorPrintf(Yellow, "use command: all <MessageName> or uid <UID> <MessageName>\n")
+		ColorPrintf(Yellow, "use command: all <MessageName> or aid <AID> <MessageName>\n")
 	}
 	return false
 }
@@ -59,17 +59,17 @@ func (p *RobotManager) executeAllCommand(parts []string) {
 	ColorPrintf(Cyan, "queued command=%s robots=%d\n", command, queued)
 }
 
-func (p *RobotManager) executeUIDCommand(parts []string) {
+func (p *RobotManager) executeAIDCommand(parts []string) {
 	if len(parts) < 3 {
-		ColorPrintf(Yellow, "usage: uid <UID> <MessageName>\n")
+		ColorPrintf(Yellow, "usage: aid <AID> <MessageName>\n")
 		return
 	}
-	uid, err := strconv.ParseUint(parts[1], 10, 64)
+	aid, err := strconv.ParseUint(parts[1], 10, 64)
 	if err != nil {
-		ColorPrintf(Red, "parse uid failed: %v\n", err)
+		ColorPrintf(Red, "parse aid failed: %v\n", err)
 		return
 	}
-	if err := p.QueueUIDCommand(uid, parts[2]); err != nil {
+	if err := p.QueueAIDCommand(aid, parts[2]); err != nil {
 		ColorPrintf(Red, "%v\n", err)
 	}
 }
@@ -83,10 +83,10 @@ func (p *RobotManager) QueueAllCommand(command string) int {
 	return len(robots)
 }
 
-func (p *RobotManager) QueueUIDCommand(uid uint64, command string) error {
-	robot, ok := p.Find(uid)
+func (p *RobotManager) QueueAIDCommand(aid uint64, command string) error {
+	robot, ok := p.Find(aid)
 	if !ok {
-		return errors.Errorf("robot not found uid=%d", uid)
+		return errors.Errorf("robot not found aid=%d", aid)
 	}
 	p.iEventMgr.Send(&RobotCommand{Robot: robot, Command: command, Verbose: true, Source: "manual"})
 	return nil
@@ -101,9 +101,9 @@ func (p *Robot) SendCommand(event *RobotCommand) error {
 			return nil
 		}
 		p.manager.stats.commandError.Add(1)
-		return errors.WithMessagef(xerror.Disconnect, "robot closed uid=%d", p.uid)
+		return errors.WithMessagef(xerror.Disconnect, "robot closed aid=%d", p.aid)
 	}
-	if event.Command != "UserVerifyReq" && !p.verified {
+	if event.Command != "AccountVerifyReq" && !p.verified {
 		p.pending = append(p.pending, RobotPendingCommand{
 			Command: event.Command,
 			Verbose: event.Verbose,
@@ -111,11 +111,11 @@ func (p *Robot) SendCommand(event *RobotCommand) error {
 		})
 		p.manager.stats.queued.Add(1)
 		if p.shouldPrintVerbose(event.Verbose) {
-			ColorPrintf(Yellow, "uid=%d not verified, queued command=%s\n", p.uid, event.Command)
+			ColorPrintf(Yellow, "aid=%d not verified, queued command=%s\n", p.aid, event.Command)
 		}
 		return nil
 	}
-	if requiresUserReady(event.Command) && !p.userReady {
+	if requiresAccountReady(event.Command) && !p.accountReady {
 		p.pending = append(p.pending, RobotPendingCommand{
 			Command: event.Command,
 			Verbose: event.Verbose,
@@ -123,11 +123,11 @@ func (p *Robot) SendCommand(event *RobotCommand) error {
 		})
 		p.manager.stats.queued.Add(1)
 		if p.shouldPrintVerbose(event.Verbose) {
-			ColorPrintf(Yellow, "uid=%d user not created, queued command=%s\n", p.uid, event.Command)
+			ColorPrintf(Yellow, "aid=%d account not created, queued command=%s\n", p.aid, event.Command)
 		}
 		return nil
 	}
-	if event.Source == "heartbeat" && event.Command == "UserHeartbeatReq" {
+	if event.Source == "heartbeat" && event.Command == "AccountHeartbeatReq" {
 		if p.heartbeatWait {
 			return nil
 		}
@@ -144,25 +144,25 @@ func (p *Robot) SendCommand(event *RobotCommand) error {
 func (p *Robot) sendCommandNow(command string, verbose bool, source string) error {
 	data, err := loadAPI(apiYamlPath)
 	if err != nil {
-		p.onCommandError(verbose, "uid=%d load api yaml failed: %v", p.uid, err)
+		p.onCommandError(verbose, "aid=%d load api yaml failed: %v", p.aid, err)
 		return err
 	}
 	apiData, ok := data[command]
 	if !ok {
 		err = xerror.NotFound
-		p.onCommandError(verbose, "uid=%d api not found in api.yaml command=%s", p.uid, command)
+		p.onCommandError(verbose, "aid=%d api not found in api.yaml command=%s", p.aid, command)
 		return err
 	}
 	num, err := strconv.ParseUint(apiData.ID, 0, 32)
 	if err != nil {
-		p.onCommandError(verbose, "uid=%d parse messageID failed: %v", p.uid, err)
+		p.onCommandError(verbose, "aid=%d parse messageID failed: %v", p.aid, err)
 		return err
 	}
 	messageID := uint32(num)
 	message := GMessage.Find(messageID)
 	if message == nil {
 		err = xerror.NotFound
-		p.onCommandError(verbose, "uid=%d message not found: 0x%X", p.uid, messageID)
+		p.onCommandError(verbose, "aid=%d message not found: 0x%X", p.aid, messageID)
 		return err
 	}
 
@@ -170,25 +170,25 @@ func (p *Robot) sendCommandNow(command string, verbose bool, source string) erro
 	if apiData.Msg != nil {
 		msgData, err = json.Marshal(apiData.Msg)
 		if err != nil {
-			p.onCommandError(verbose, "uid=%d json marshal failed: %v", p.uid, err)
+			p.onCommandError(verbose, "aid=%d json marshal failed: %v", p.aid, err)
 			return err
 		}
 	}
 	protoMsg, err := message.JsonUnmarshal(msgData)
 	if err != nil {
-		p.onCommandError(verbose, "uid=%d message json unmarshal failed command=%s err=%v", p.uid, command, err)
+		p.onCommandError(verbose, "aid=%d message json unmarshal failed command=%s err=%v", p.aid, command, err)
 		return err
 	}
 	if err = p.fillDynamicFields(protoMsg); err != nil {
-		p.onCommandError(verbose, "uid=%d fill dynamic fields failed command=%s err=%v", p.uid, command, err)
+		p.onCommandError(verbose, "aid=%d fill dynamic fields failed command=%s err=%v", p.aid, command, err)
 		return err
 	}
 
 	if p.shouldPrintVerbose(verbose) {
 		fmt.Println()
-		ColorPrintf(Blue, "uid=%d messageID: 0x%x\n", p.uid, messageID)
+		ColorPrintf(Blue, "aid=%d messageID: 0x%x\n", p.aid, messageID)
 		ColorPrintf(Blue, "Message: %s\n", marshalJSON(protoMsg))
-		log.Infof("\n======send message======\nuid=%d\n%s\nmessageID: 0x%x\nMessage: %s", p.uid, command, messageID, marshalJSON(protoMsg))
+		log.Infof("\n======send message======\naid=%d\n%s\nmessageID: 0x%x\nMessage: %s", p.aid, command, messageID, marshalJSON(protoMsg))
 	}
 
 	sessionID := p.nextPacketSessionID()
@@ -200,18 +200,18 @@ func (p *Robot) sendCommandNow(command string, verbose bool, source string) erro
 			MessageID: messageID,
 			SessionID: sessionID,
 			ResultID:  0,
-			Key:       p.uid,
+			Key:       p.aid,
 		},
 		PBMessage: protoMsg,
 	}
 	if p.Remote == nil || !p.Remote.IsConnect() {
 		err = errors.WithMessage(xerror.Link, "remote is nil or disconnected")
-		p.onCommandError(verbose, "uid=%d client send failed: %v", p.uid, err)
+		p.onCommandError(verbose, "aid=%d client send failed: %v", p.aid, err)
 		p.manager.stats.sendFail.Add(1)
 		return err
 	}
 	if err = p.Remote.Send(packet); err != nil {
-		p.onCommandError(verbose, "uid=%d client send failed: %v", p.uid, err)
+		p.onCommandError(verbose, "aid=%d client send failed: %v", p.aid, err)
 		p.manager.stats.sendFail.Add(1)
 		return err
 	}
@@ -224,12 +224,12 @@ func (p *Robot) sendCommandNow(command string, verbose bool, source string) erro
 
 func (p *Robot) fillDynamicFields(msg any) error {
 	switch m := msg.(type) {
-	case *pb.UserVerifyReq:
-		m.Uid = p.uid
+	case *pb.AccountVerifyReq:
+		m.Aid = p.aid
 		if p.connectTicket != "" {
 			m.ConnectTicket = p.connectTicket
 		}
-	case *pb.UserHeartbeatReq:
+	case *pb.AccountHeartbeatReq:
 		if m.GetLastHeartbeatSession() == "" {
 			m.LastHeartbeatSession = p.heartbeatSession
 		}
@@ -261,6 +261,6 @@ func (p *Robot) onCommandError(verbose bool, format string, a ...any) {
 	log.Errorf(format, a...)
 }
 
-func requiresUserReady(command string) bool {
+func requiresAccountReady(command string) bool {
 	return command == "RobotPingReq"
 }
