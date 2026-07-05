@@ -7,11 +7,9 @@ import (
 	pb "server/proto/pb"
 )
 
-var expLevelKeys = stringSet("max")
-
 func newExpConfig() *ExpConfig {
 	return &ExpConfig{
-		byLevel: map[int]*LevelEntry{},
+		byLevel: map[uint32]*LevelEntry{},
 	}
 }
 
@@ -43,14 +41,15 @@ func (e *ExpConfig) load(dir string) error {
 		if level < minLevel || level > maxLevel {
 			return configError("经验等级超出协议范围: level:%d range:[%d,%d]", level, minLevel, maxLevel)
 		}
-		if _, ok := e.byLevel[level]; ok {
+		levelKey := uint32(level)
+		if int(levelKey) != level {
+			return configError("经验等级超出范围: %d", level)
+		}
+		if _, ok := e.byLevel[levelKey]; ok {
 			return configError("经验等级重复: %d", level)
 		}
 		levelData, err := requireMap(levelNode, FileExp+".levels."+rawLevel)
 		if err != nil {
-			return err
-		}
-		if err := assertKnownKeys(levelData, expLevelKeys, FileExp+".levels."+rawLevel); err != nil {
 			return err
 		}
 		maxNode, err := requireKey(levelData, "max", FileExp+".levels."+rawLevel)
@@ -61,7 +60,7 @@ func (e *ExpConfig) load(dir string) error {
 		if err != nil {
 			return err
 		}
-		e.byLevel[level] = &LevelEntry{Level: level, MaxExp: maxExp}
+		e.byLevel[levelKey] = &LevelEntry{Level: level, MaxExp: maxExp}
 		levelNumbers = append(levelNumbers, level)
 	}
 
@@ -83,7 +82,7 @@ func (e *ExpConfig) load(dir string) error {
 		if level != expectedLevel {
 			return configError("经验等级必须连续: expected:%d actual:%d", expectedLevel, level)
 		}
-		entry := e.byLevel[level]
+		entry := e.byLevel[uint32(level)]
 		if previous == nil {
 			entry.MinExp = 0
 		} else {
