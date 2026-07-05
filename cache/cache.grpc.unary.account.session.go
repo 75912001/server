@@ -18,41 +18,6 @@ const (
 	accountSessionFieldOnlineKey        = "onlineKey"
 )
 
-// cacheAccountSessionRecordMap 将完整在线会话转成 Redis 哈希字段。
-func cacheAccountSessionRecordMap(gatewayKey string, accountSession string, loginTimestampMs int64, onlineKey string) (map[string]string, bool) {
-	if gatewayKey == "" || accountSession == "" || loginTimestampMs == 0 || onlineKey == "" {
-		return nil, false
-	}
-	records := map[string]string{
-		accountSessionFieldGatewayKey:       gatewayKey,
-		accountSessionFieldAccountSession:   accountSession,
-		accountSessionFieldLoginTimestampMs: xtime.FormatTimestampMs(loginTimestampMs),
-		accountSessionFieldOnlineKey:        onlineKey,
-	}
-	return records, true
-}
-
-// cacheAccountSessionFromMap 从 Redis 哈希字段还原完整在线会话。
-func cacheAccountSessionFromMap(records map[string]string) (*pb.CacheAccountSession, bool) {
-	if len(records) == 0 {
-		return nil, false
-	}
-	loginTimestampMs, ok := xtime.ParseTimestampMs(records[accountSessionFieldLoginTimestampMs])
-	if !ok || loginTimestampMs == 0 {
-		return nil, false
-	}
-	session := &pb.CacheAccountSession{
-		GatewayKey:       records[accountSessionFieldGatewayKey],
-		AccountSession:   records[accountSessionFieldAccountSession],
-		LoginTimestampMs: loginTimestampMs,
-		OnlineKey:        records[accountSessionFieldOnlineKey],
-	}
-	if session.GetGatewayKey() == "" || session.GetAccountSession() == "" || session.GetLoginTimestampMs() == 0 || session.GetOnlineKey() == "" {
-		return nil, false
-	}
-	return session, true
-}
-
 // CacheGetAccountSession 读取指定 aid 当前完整在线会话。
 func (s *cacheGRPCServer) CacheGetAccountSession(ctx context.Context, req *pb.CacheGetAccountSessionReq) (*pb.CacheGetAccountSessionRes, error) {
 	aid := req.GetAid()
@@ -63,8 +28,17 @@ func (s *cacheGRPCServer) CacheGetAccountSession(ctx context.Context, req *pb.Ca
 	if err != nil {
 		return &pb.CacheGetAccountSessionRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
-	session, ok := cacheAccountSessionFromMap(values)
-	if !ok {
+	loginTimestampMs, ok := xtime.ParseTimestampMs(values[accountSessionFieldLoginTimestampMs])
+	if !ok || loginTimestampMs == 0 {
+		return &pb.CacheGetAccountSessionRes{}, grpcstatus.Error(grpccodes.NotFound, "account session not found")
+	}
+	session := &pb.CacheAccountSession{
+		GatewayKey:       values[accountSessionFieldGatewayKey],
+		AccountSession:   values[accountSessionFieldAccountSession],
+		LoginTimestampMs: loginTimestampMs,
+		OnlineKey:        values[accountSessionFieldOnlineKey],
+	}
+	if session.GetGatewayKey() == "" || session.GetAccountSession() == "" || session.GetLoginTimestampMs() == 0 || session.GetOnlineKey() == "" {
 		return &pb.CacheGetAccountSessionRes{}, grpcstatus.Error(grpccodes.NotFound, "account session not found")
 	}
 	return &pb.CacheGetAccountSessionRes{Session: session}, nil
@@ -76,11 +50,16 @@ func (s *cacheGRPCServer) CacheBeginAccountSessionCAS(ctx context.Context, req *
 	if aid == 0 || req.GetExpireSecond() == 0 {
 		return &pb.CacheBeginAccountSessionCASRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	session, ok := cacheAccountSessionRecordMap(req.GetGatewayKey(), req.GetAccountSession(), req.GetLoginTimestampMs(), req.GetOnlineKey())
-	if !ok {
+	if req.GetGatewayKey() == "" || req.GetAccountSession() == "" || req.GetLoginTimestampMs() == 0 || req.GetOnlineKey() == "" {
 		return &pb.CacheBeginAccountSessionCASRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	created, err := GRedis.BeginAccountSessionCAS(ctx, aid, req.GetExpectedAccountSession(), session, req.GetExpireSecond())
+	records := map[string]string{
+		accountSessionFieldGatewayKey:       req.GetGatewayKey(),
+		accountSessionFieldAccountSession:   req.GetAccountSession(),
+		accountSessionFieldLoginTimestampMs: xtime.FormatTimestampMs(req.GetLoginTimestampMs()),
+		accountSessionFieldOnlineKey:        req.GetOnlineKey(),
+	}
+	created, err := GRedis.BeginAccountSessionCAS(ctx, aid, req.GetExpectedAccountSession(), records, req.GetExpireSecond())
 	if err != nil {
 		return &pb.CacheBeginAccountSessionCASRes{}, grpcstatus.Error(grpccodes.Internal, err.Error())
 	}
