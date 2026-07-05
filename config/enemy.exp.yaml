@@ -3,7 +3,7 @@
 
 # key: enemy level
 # value: enemybaseexptbl[level - 1]
-enemy_exp:
+enemyExp:
   1: 1
   2: 2
   3: 3
