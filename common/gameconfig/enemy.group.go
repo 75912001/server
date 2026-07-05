@@ -192,7 +192,7 @@ func parseEnemies(data yamlMap, group *EnemyGroupEntry, path string) ([]EnemyEnt
 			if err != nil {
 				return nil, err
 			}
-			enemy.Level, err := uint32Scalar(levelNode, enemyPath+".level")
+			enemy.Level, err = uint32Scalar(levelNode, enemyPath+".level")
 			if err != nil {
 				return nil, err
 			}
