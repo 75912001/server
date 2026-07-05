@@ -8,7 +8,7 @@ func newEnemyGroupConfig() *EnemyGroupConfig {
 	}
 }
 
-func (e *EnemyGroupConfig) load(dir string) error {
+func (p *EnemyGroupConfig) load(dir string) error {
 	root, err := loadYAMLMap(dir, FileEnemyGroup)
 	if err != nil {
 		return err
@@ -31,34 +31,27 @@ func (e *EnemyGroupConfig) load(dir string) error {
 		if err != nil {
 			return err
 		}
-		group, err := e.parseGroup(groupData, path)
+		group, err := p.parseGroup(groupData, path)
 		if err != nil {
 			return err
 		}
-		groupID := uint32(group.ID)
-		if int(groupID) != group.ID {
-			return configError("敌人组ID超出范围: %d", group.ID)
-		}
-		if _, ok := e.byID[groupID]; ok {
+		if _, ok := p.byID[group.ID]; ok {
 			return configError("敌人组ID重复: %d", group.ID)
 		}
-		e.byID[groupID] = group
-		e.ids = append(e.ids, group.ID)
+		p.byID[group.ID] = group
+		p.ids = append(p.ids, group.ID)
 	}
 	return nil
 }
 
-func (e *EnemyGroupConfig) parseGroup(data yamlMap, path string) (*EnemyGroupEntry, error) {
+func (p *EnemyGroupConfig) parseGroup(data yamlMap, path string) (*EnemyGroupEntry, error) {
 	idNode, err := requireKey(data, "id", path)
 	if err != nil {
 		return nil, err
 	}
-	id, err := intScalar(idNode, path+".id")
+	groupID, err := uint32Scalar(idNode, path+".id")
 	if err != nil {
 		return nil, err
-	}
-	if id <= 0 {
-		return nil, configError("敌人组ID非法: %d", id)
 	}
 	nameNode, err := requireKey(data, "name", path)
 	if err != nil {
@@ -77,7 +70,7 @@ func (e *EnemyGroupConfig) parseGroup(data yamlMap, path string) (*EnemyGroupEnt
 	}
 
 	group := &EnemyGroupEntry{
-		ID:              id,
+		ID:              groupID,
 		Name:            name,
 		IsBoss:          isBoss,
 		CountRange:      IntRange{Min: 1, Max: 1},
@@ -86,30 +79,30 @@ func (e *EnemyGroupConfig) parseGroup(data yamlMap, path string) (*EnemyGroupEnt
 		Captured:        true,
 	}
 	if group.IsBoss {
-		if err := assertAbsent(data, "countRange", "Boss 敌人组 countRange 无效, 不应配置: group:%d", id); err != nil {
+		if err := assertAbsent(data, "countRange", "Boss 敌人组 countRange 无效, 不应配置: group:%d", groupID); err != nil {
 			return nil, err
 		}
-		if err := assertAbsent(data, "levelRange", "Boss 敌人组 levelRange 无效, 不应配置: group:%d", id); err != nil {
+		if err := assertAbsent(data, "levelRange", "Boss 敌人组 levelRange 无效, 不应配置: group:%d", groupID); err != nil {
 			return nil, err
 		}
-		if err := assertAbsent(data, "roleLevelOffset", "Boss 敌人组 roleLevelOffset 无效, 不应配置: group:%d", id); err != nil {
+		if err := assertAbsent(data, "roleLevelOffset", "Boss 敌人组 roleLevelOffset 无效, 不应配置: group:%d", groupID); err != nil {
 			return nil, err
 		}
-		if err := assertAbsent(data, "captured", "Boss 敌人组 captured 无效, 不应配置: group:%d", id); err != nil {
+		if err := assertAbsent(data, "captured", "Boss 敌人组 captured 无效, 不应配置: group:%d", groupID); err != nil {
 			return nil, err
 		}
-		if err := assertAbsent(data, "babyRate", "Boss 敌人组 babyRate 无效, 不应配置: group:%d", id); err != nil {
+		if err := assertAbsent(data, "babyRate", "Boss 敌人组 babyRate 无效, 不应配置: group:%d", groupID); err != nil {
 			return nil, err
 		}
 		group.Captured = false
 		group.BabyRate = 0
 	} else {
 		if _, ok := data["countRange"]; !ok {
-			return nil, configError("普通敌人组缺少 countRange: group:%d", id)
+			return nil, configError("普通敌人组缺少 countRange: group:%d", groupID)
 		}
-		if _, hasLevelRange := data["levelRange"]; !hasLevelRange {
+		if _, ok := data["levelRange"]; !ok {
 			if _, hasRoleLevelOffset := data["roleLevelOffset"]; !hasRoleLevelOffset {
-				return nil, configError("普通敌人组缺少 levelRange 或 roleLevelOffset: group:%d", id)
+				return nil, configError("普通敌人组缺少 levelRange 或 roleLevelOffset: group:%d", groupID)
 			}
 		}
 		group.CountRange, err = intRange(data["countRange"], path+".countRange")
@@ -141,13 +134,13 @@ func (e *EnemyGroupConfig) parseGroup(data yamlMap, path string) (*EnemyGroupEnt
 			}
 		}
 		if babyRateNode, ok := data["babyRate"]; ok {
-			group.BabyRate, err = intScalar(babyRateNode, path+".babyRate")
+			group.BabyRate, err = uint32Scalar(babyRateNode, path+".babyRate")
 			if err != nil {
 				return nil, err
 			}
-		}
-		if group.BabyRate < int(pb.CombatEnemyGroupBabyRate_CombatEnemyGroupBabyRate_Min) || group.BabyRate > int(pb.CombatEnemyGroupBabyRate_CombatEnemyGroupBabyRate_Max) {
-			return nil, configError("敌人组 babyRate 超出范围: group:%d value:%d", id, group.BabyRate)
+			if group.BabyRate < uint32(pb.CombatEnemyGroupBabyRate_CombatEnemyGroupBabyRate_Min) || group.BabyRate > uint32(pb.CombatEnemyGroupBabyRate_CombatEnemyGroupBabyRate_Max) {
+				return nil, configError("敌人组 babyRate 超出范围: group:%d value:%d", groupID, group.BabyRate)
+			}
 		}
 	}
 
@@ -186,12 +179,9 @@ func parseEnemies(data yamlMap, group *EnemyGroupEntry, path string) ([]EnemyEnt
 		if err != nil {
 			return nil, err
 		}
-		enemyID, err := intScalar(idNode, enemyPath+".id")
+		enemyID, err := uint32Scalar(idNode, enemyPath+".id")
 		if err != nil {
 			return nil, err
-		}
-		if enemyID <= 0 {
-			return nil, configError("敌人组 enemy id 非法: group:%d enemy:%d", group.ID, enemyID)
 		}
 		enemy := EnemyEntry{ID: enemyID}
 		if group.IsBoss {
@@ -202,31 +192,28 @@ func parseEnemies(data yamlMap, group *EnemyGroupEntry, path string) ([]EnemyEnt
 			if err != nil {
 				return nil, err
 			}
-			enemy.Level, err = intScalar(levelNode, enemyPath+".level")
+			enemy.Level, err := uint32Scalar(levelNode, enemyPath+".level")
 			if err != nil {
 				return nil, err
 			}
-			if err := assertEnemyLevel(group.ID, enemy.ID, enemy.Level); err != nil {
-				return nil, err
+			if enemy.Level < uint32(pb.LevelRange_LevelRange_Min) || uint32(pb.LevelRange_LevelRange_Max) < enemy.Level {
+				return nil, configError("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d", group.ID, enemy.ID, enemy.Level)
 			}
 			enemy.Weight = 0
 		} else {
 			if weightNode, ok := enemyData["weight"]; ok {
-				enemy.Weight, err = intScalar(weightNode, enemyPath+".weight")
+				enemy.Weight, err = uint32Scalar(weightNode, enemyPath+".weight")
 				if err != nil {
 					return nil, err
 				}
-			}
-			if enemy.Weight < 0 {
-				return nil, configError("敌人组 enemy weight 不能为负数: group:%d enemy:%d weight:%d", group.ID, enemy.ID, enemy.Weight)
 			}
 			if levelNode, ok := enemyData["level"]; ok {
-				enemy.Level, err = intScalar(levelNode, enemyPath+".level")
+				enemy.Level, err = uint32Scalar(levelNode, enemyPath+".level")
 				if err != nil {
 					return nil, err
 				}
-				if err := assertEnemyLevel(group.ID, enemy.ID, enemy.Level); err != nil {
-					return nil, err
+				if enemy.Level < uint32(pb.LevelRange_LevelRange_Min) || uint32(pb.LevelRange_LevelRange_Max) < enemy.Level {
+					return nil, configError("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d", group.ID, enemy.ID, enemy.Level)
 				}
 			}
 		}
@@ -235,19 +222,12 @@ func parseEnemies(data yamlMap, group *EnemyGroupEntry, path string) ([]EnemyEnt
 	return out, nil
 }
 
-func assertEnemyLevel(groupID int, enemyID int, level int) error {
-	if level < int(pb.LevelRange_LevelRange_Min) || level > int(pb.LevelRange_LevelRange_Max) {
-		return configError("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d", groupID, enemyID, level)
-	}
-	return nil
-}
-
-func (e *EnemyGroupConfig) check(petConfig *PetConfig) error {
+func (p *EnemyGroupConfig) check(petConfig *PetConfig) error {
 	if petConfig == nil {
 		return nil
 	}
-	for _, groupID := range e.ids {
-		group := e.byID[uint32(groupID)]
+	for _, groupID := range p.ids {
+		group := p.byID[groupID]
 		for _, enemy := range group.Enemies {
 			if !petConfig.HasID(enemy.ID) {
 				return configError("敌人组引用了未定义宠物: group:%d pet:%d", group.ID, enemy.ID)
@@ -257,6 +237,6 @@ func (e *EnemyGroupConfig) check(petConfig *PetConfig) error {
 	return nil
 }
 
-func (e *EnemyGroupConfig) assemble() error {
+func (p *EnemyGroupConfig) assemble() error {
 	return nil
 }
