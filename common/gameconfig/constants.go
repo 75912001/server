@@ -2,7 +2,7 @@ package gameconfig
 
 import pb "server/proto/pb"
 
-const petSavedBaseGradeOffsetMin = -2
+const petSavedBaseGradeOffsetMin int32 = -2
 
 func isPetID(id uint32) bool {
 	return id >= uint32(pb.AssetIDRange_AssetIDRange_Pet_Start) && id <= uint32(pb.AssetIDRange_AssetIDRange_Pet_End)

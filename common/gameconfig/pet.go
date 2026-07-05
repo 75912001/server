@@ -2,12 +2,9 @@ package gameconfig
 
 import pb "server/proto/pb"
 
-var petAttributeKeySet = stringSet(petAttributeKeys...)
-var petGrowthKeys = stringSet("initNum", "lvupPointSource", "baseVital", "baseStr", "baseTough", "baseDex")
-
 func newPetConfig() *PetConfig {
 	return &PetConfig{
-		byID: map[int]*PetEntry{},
+		byID: map[uint32]*PetEntry{},
 	}
 }
 
@@ -34,10 +31,14 @@ func (p *PetConfig) load(dir string) error {
 		if err != nil {
 			return err
 		}
-		if _, ok := p.byID[entry.ID]; ok {
+		petID := uint32(entry.ID)
+		if int(petID) != entry.ID {
+			return configError("宠物ID超出范围: %d", entry.ID)
+		}
+		if _, ok := p.byID[petID]; ok {
 			return configError("宠物ID重复: %d", entry.ID)
 		}
-		p.byID[entry.ID] = entry
+		p.byID[petID] = entry
 		p.ids = append(p.ids, entry.ID)
 	}
 	if len(p.byID) == 0 {
@@ -51,7 +52,8 @@ func (p *PetConfig) parseEntry(data yamlMap, path string) (*PetEntry, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !isPetID(id) {
+	petID := uint32(id)
+	if id < 0 || int(petID) != id || !isPetID(petID) {
 		return nil, configError("宠物ID超出范围: %d", id)
 	}
 	rarity, err := p.requireInt(data, "rarity", path)
@@ -61,19 +63,19 @@ func (p *PetConfig) parseEntry(data yamlMap, path string) (*PetEntry, error) {
 	if rarity < int(pb.PetRarity_PetRarity_Common) || rarity > int(pb.PetRarity_PetRarity_Mythic) {
 		return nil, configError("宠物稀有度非法: ID:%d rarity:%d", id, rarity)
 	}
-	elemental, err := parsePetElemental(data, id, path)
+	elemental, err := parsePetElemental(data, petID, path)
 	if err != nil {
 		return nil, err
 	}
-	attribute, err := parsePetAttribute(data, id, path)
+	attribute, err := parsePetAttribute(data, petID, path)
 	if err != nil {
 		return nil, err
 	}
-	growth, err := parsePetGrowth(data, id, path)
+	growth, err := parsePetGrowth(data, petID, path)
 	if err != nil {
 		return nil, err
 	}
-	skillSlots, err := parsePetSkillSlots(data, id, path)
+	skillSlots, err := parsePetSkillSlots(data, petID, path)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +97,7 @@ func (p *PetConfig) requireInt(data yamlMap, key string, path string) (int, erro
 	return intScalar(node, path+"."+key)
 }
 
-func parsePetElemental(data yamlMap, petID int, path string) (map[pb.AssetElemental]int, error) {
+func parsePetElemental(data yamlMap, petID uint32, path string) (map[pb.AssetElemental]uint32, error) {
 	node, err := requireKey(data, "elemental", path)
 	if err != nil {
 		return nil, err
@@ -104,20 +106,33 @@ func parsePetElemental(data yamlMap, petID int, path string) (map[pb.AssetElemen
 	if err != nil {
 		return nil, err
 	}
-	out := make(map[pb.AssetElemental]int, len(elementOrder))
-	for _, elemental := range elementOrder {
+	out := make(map[pb.AssetElemental]uint32, int(pb.AssetElemental_AssetElemental_Max-pb.AssetElemental_AssetElemental_Unknow-1))
+	for elemental := pb.AssetElemental_AssetElemental_Unknow + 1; elemental < pb.AssetElemental_AssetElemental_Max; elemental++ {
 		out[elemental] = 0
 	}
 	for key, valueNode := range elementalData {
-		elemental, ok := elementByKey[key]
-		if !ok {
+		var elemental pb.AssetElemental
+		switch key {
+		case "earth":
+			elemental = pb.AssetElemental_AssetElemental_Earth
+		case "water":
+			elemental = pb.AssetElemental_AssetElemental_Water
+		case "fire":
+			elemental = pb.AssetElemental_AssetElemental_Fire
+		case "wind":
+			elemental = pb.AssetElemental_AssetElemental_Wind
+		}
+		if elemental <= pb.AssetElemental_AssetElemental_Unknow || elemental >= pb.AssetElemental_AssetElemental_Max {
 			return nil, configError("宠物 elemental 元素未知: ID:%d key:%s", petID, key)
 		}
 		value, err := intScalar(valueNode, path+".elemental."+key)
 		if err != nil {
 			return nil, err
 		}
-		out[elemental] = value
+		if value < 0 {
+			return nil, configError("宠物 elemental 值必须在[0,10]: ID:%d value:%d", petID, value)
+		}
+		out[elemental] = uint32(value)
 	}
 	if err := checkPetElemental(petID, out); err != nil {
 		return nil, err
@@ -125,16 +140,17 @@ func parsePetElemental(data yamlMap, petID int, path string) (map[pb.AssetElemen
 	return out, nil
 }
 
-func checkPetElemental(petID int, elemental map[pb.AssetElemental]int) error {
-	sum := 0
+func checkPetElemental(petID uint32, elemental map[pb.AssetElemental]uint32) error {
+	sum := uint32(0)
 	activeIndexes := []int{}
-	for index, elementalType := range elementOrder {
+	for elementalType := pb.AssetElemental_AssetElemental_Unknow + 1; elementalType < pb.AssetElemental_AssetElemental_Max; elementalType++ {
 		value := elemental[elementalType]
-		if value < 0 || value > 10 {
+		if value > 10 {
 			return configError("宠物 elemental 值必须在[0,10]: ID:%d value:%d", petID, value)
 		}
 		sum += value
 		if value > 0 {
+			index := int(elementalType - pb.AssetElemental_AssetElemental_Unknow - 1)
 			activeIndexes = append(activeIndexes, index)
 		}
 	}
@@ -149,7 +165,7 @@ func checkPetElemental(petID int, elemental map[pb.AssetElemental]int) error {
 		if distance < 0 {
 			distance = -distance
 		}
-		wrapDistance := len(elementOrder) - 1
+		wrapDistance := int(pb.AssetElemental_AssetElemental_Max - pb.AssetElemental_AssetElemental_Unknow - 2)
 		if distance != 1 && distance != wrapDistance {
 			return configError("宠物 elemental 两个元素必须相邻: ID:%d", petID)
 		}
@@ -157,7 +173,7 @@ func checkPetElemental(petID int, elemental map[pb.AssetElemental]int) error {
 	return nil
 }
 
-func parsePetAttribute(data yamlMap, petID int, path string) (PetAttributeEntry, error) {
+func parsePetAttribute(data yamlMap, petID uint32, path string) (PetAttributeEntry, error) {
 	node, err := requireKey(data, "attribute", path)
 	if err != nil {
 		return PetAttributeEntry{}, err
@@ -166,42 +182,46 @@ func parsePetAttribute(data yamlMap, petID int, path string) (PetAttributeEntry,
 	if err != nil {
 		return PetAttributeEntry{}, err
 	}
-	if err := assertKnownKeys(attributeData, petAttributeKeySet, path+".attribute"); err != nil {
-		return PetAttributeEntry{}, err
-	}
-	values := map[string]int{}
-	for _, key := range petAttributeKeys {
-		valueNode, err := requireKey(attributeData, key, path+".attribute")
-		if err != nil {
-			return PetAttributeEntry{}, err
+	out := PetAttributeEntry{}
+	for _, field := range []struct {
+		key      string
+		required bool
+		value    *int
+	}{
+		{key: "poisonResist", required: true, value: &out.PoisonResist},
+		{key: "paralysisResist", required: true, value: &out.ParalysisResist},
+		{key: "sleepResist", required: true, value: &out.SleepResist},
+		{key: "stoneResist", required: true, value: &out.StoneResist},
+		{key: "drunkResist", required: true, value: &out.DrunkResist},
+		{key: "confusionResist", required: true, value: &out.ConfusionResist},
+		{key: "critical", required: true, value: &out.Critical},
+		{key: "counter", required: true, value: &out.Counter},
+		{key: "get", value: &out.Get},
+		{key: "rate", value: &out.Rare},
+	} {
+		valueNode, ok := attributeData[field.key]
+		if !ok {
+			if !field.required {
+				continue
+			}
+			return PetAttributeEntry{}, configError("配置缺少必填字段: %s.attribute.%s", path, field.key)
 		}
-		values[key], err = intScalar(valueNode, path+".attribute."+key)
+		value, err := intScalar(valueNode, path+".attribute."+field.key)
 		if err != nil {
-			return PetAttributeEntry{}, configError("宠物 attribute 字段非法: ID:%d key:%s err:%v", petID, key, err)
+			return PetAttributeEntry{}, configError("宠物 attribute 字段非法: ID:%d key:%s err:%v", petID, field.key, err)
 		}
+		*field.value = value
 	}
-	return PetAttributeEntry{
-		PoisonResist:    values["poisonResist"],
-		ParalysisResist: values["paralysisResist"],
-		SleepResist:     values["sleepResist"],
-		StoneResist:     values["stoneResist"],
-		DrunkResist:     values["drunkResist"],
-		ConfusionResist: values["confusionResist"],
-		Critical:        values["critical"],
-		Counter:         values["counter"],
-	}, nil
+	return out, nil
 }
 
-func parsePetGrowth(data yamlMap, petID int, path string) (PetGrowthEntry, error) {
+func parsePetGrowth(data yamlMap, petID uint32, path string) (PetGrowthEntry, error) {
 	node, err := requireKey(data, "growth", path)
 	if err != nil {
 		return PetGrowthEntry{}, err
 	}
 	growthData, err := requireMap(node, path+".growth")
 	if err != nil {
-		return PetGrowthEntry{}, err
-	}
-	if err := assertKnownKeys(growthData, petGrowthKeys, path+".growth"); err != nil {
 		return PetGrowthEntry{}, err
 	}
 	initNum, err := requireNonNegativeGrowthInt(growthData, "initNum", petID, path)
@@ -235,27 +255,27 @@ func parsePetGrowth(data yamlMap, petID int, path string) (PetGrowthEntry, error
 	if err != nil {
 		return PetGrowthEntry{}, err
 	}
-	for key, value := range map[string]int{
+	for key, value := range map[string]uint32{
 		"baseVital": baseVital,
 		"baseStr":   baseStr,
 		"baseTough": baseTough,
 		"baseDex":   baseDex,
 	} {
-		if value+petSavedBaseGradeOffsetMin <= 0 {
+		if int32(value)+petSavedBaseGradeOffsetMin <= 0 {
 			return PetGrowthEntry{}, configError("宠物 growth.%s 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d", key, petID, value, petSavedBaseGradeOffsetMin)
 		}
 	}
 	return PetGrowthEntry{
-		InitNum:         initNum,
+		InitNum:         int(initNum),
 		LvupPointSource: lvupPointSource,
-		BaseVital:       baseVital,
-		BaseStr:         baseStr,
-		BaseTough:       baseTough,
-		BaseDex:         baseDex,
+		BaseVital:       int(baseVital),
+		BaseStr:         int(baseStr),
+		BaseTough:       int(baseTough),
+		BaseDex:         int(baseDex),
 	}, nil
 }
 
-func requireNonNegativeGrowthInt(data yamlMap, key string, petID int, path string) (int, error) {
+func requireNonNegativeGrowthInt(data yamlMap, key string, petID uint32, path string) (uint32, error) {
 	node, err := requireKey(data, key, path+".growth")
 	if err != nil {
 		return 0, err
@@ -264,10 +284,14 @@ func requireNonNegativeGrowthInt(data yamlMap, key string, petID int, path strin
 	if err != nil {
 		return 0, configError("宠物 growth.%s 非法: ID:%d err:%v", key, petID, err)
 	}
-	return value, nil
+	out := uint32(value)
+	if int(out) != value {
+		return 0, configError("宠物 growth.%s 超出范围: ID:%d value:%d", key, petID, value)
+	}
+	return out, nil
 }
 
-func parsePetSkillSlots(data yamlMap, petID int, path string) ([]int, error) {
+func parsePetSkillSlots(data yamlMap, petID uint32, path string) ([]uint32, error) {
 	node, err := requireKey(data, "skill", path)
 	if err != nil {
 		return nil, err
@@ -279,16 +303,17 @@ func parsePetSkillSlots(data yamlMap, petID int, path string) ([]int, error) {
 	if len(skillSlots) == 0 {
 		return nil, configError("宠物 skill 须大于 0 个槽位: ID:%d", petID)
 	}
-	out := make([]int, 0, len(skillSlots))
+	out := make([]uint32, 0, len(skillSlots))
 	for index, slotNode := range skillSlots {
 		skillID, err := intScalar(slotNode, path+".skill["+itoa(index)+"]")
 		if err != nil {
 			return nil, configError("宠物 skill 槽位非法: ID:%d err:%v", petID, err)
 		}
-		if skillID != 0 && !isPetSkillID(skillID) {
+		petSkillID := uint32(skillID)
+		if skillID != 0 && (skillID < 0 || int(petSkillID) != skillID || !isPetSkillID(petSkillID)) {
 			return nil, configError("宠物 skill 槽位ID超出范围: ID:%d skill:%d", petID, skillID)
 		}
-		out = append(out, skillID)
+		out = append(out, petSkillID)
 	}
 	return out, nil
 }
@@ -298,12 +323,13 @@ func (p *PetConfig) check(petSkill *PetSkillConfig) error {
 		return configError("宠物技能配置管理器不能为空")
 	}
 	for _, petID := range p.ids {
-		pet := p.byID[petID]
+		pet := p.byID[uint32(petID)]
 		for _, skillID := range pet.SkillSlots {
 			if skillID == 0 {
 				continue
 			}
-			if !petSkill.HasID(skillID) {
+			skillIDValue := int(skillID)
+			if uint32(skillIDValue) != skillID || !petSkill.HasID(skillIDValue) {
 				return configError("宠物引用了未定义技能: pet:%d skill:%d", pet.ID, skillID)
 			}
 		}
