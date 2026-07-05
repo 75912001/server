@@ -2,7 +2,7 @@ package gameconfig
 
 func newCharacterConfig() *CharacterConfig {
 	return &CharacterConfig{
-		byID: map[int]*CharacterEntry{},
+		byID: map[uint32]*CharacterEntry{},
 	}
 }
 
@@ -51,7 +51,11 @@ func (c *CharacterConfig) parseEntry(data yamlMap, path string) (*CharacterEntry
 	if err != nil {
 		return nil, err
 	}
-	if !isCharacterID(id) {
+	if id < 0 {
+		return nil, configError("角色ID超出范围: %d", id)
+	}
+	characterID := uint32(id)
+	if int(characterID) != id || !isCharacterID(characterID) {
 		return nil, configError("角色ID超出范围: %d", id)
 	}
 	isRole := false
@@ -62,7 +66,7 @@ func (c *CharacterConfig) parseEntry(data yamlMap, path string) (*CharacterEntry
 		}
 	}
 	return &CharacterEntry{
-		ID:     id,
+		ID:     characterID,
 		IsRole: isRole,
 	}, nil
 }
