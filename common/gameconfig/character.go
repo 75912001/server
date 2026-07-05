@@ -47,16 +47,13 @@ func (c *CharacterConfig) parseEntry(data yamlMap, path string) (*CharacterEntry
 	if err != nil {
 		return nil, err
 	}
-	id, err := intScalar(idNode, path+".id")
+	characterID, err := uint32Scalar(idNode, path+".id")
 	if err != nil {
 		return nil, err
 	}
-	if id < 0 {
-		return nil, configError("角色ID超出范围: %d", id)
-	}
-	characterID := uint32(id)
-	if int(characterID) != id || !isCharacterID(characterID) {
-		return nil, configError("角色ID超出范围: %d", id)
+
+	if !isCharacterID(characterID) {
+		return nil, configError("角色ID超出范围: %d", characterID)
 	}
 	isRole := false
 	if isRoleNode, ok := data["isRole"]; ok {
