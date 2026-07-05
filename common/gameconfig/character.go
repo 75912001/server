@@ -6,7 +6,7 @@ func newCharacterConfig() *CharacterConfig {
 	}
 }
 
-func (c *CharacterConfig) load(dir string) error {
+func (p *CharacterConfig) load(dir string) error {
 	root, err := loadYAMLMap(dir, FileCharacter)
 	if err != nil {
 		return err
@@ -29,20 +29,20 @@ func (c *CharacterConfig) load(dir string) error {
 		if err != nil {
 			return err
 		}
-		entry, err := c.parseEntry(characterData, path)
+		entry, err := p.parseEntry(characterData, path)
 		if err != nil {
 			return err
 		}
-		if _, ok := c.byID[entry.ID]; ok {
+		if _, ok := p.byID[entry.ID]; ok {
 			return configError("角色ID重复: %d", entry.ID)
 		}
-		c.byID[entry.ID] = entry
-		c.ids = append(c.ids, entry.ID)
+		p.byID[entry.ID] = entry
+		p.ids = append(p.ids, entry.ID)
 	}
 	return nil
 }
 
-func (c *CharacterConfig) parseEntry(data yamlMap, path string) (*CharacterEntry, error) {
+func (p *CharacterConfig) parseEntry(data yamlMap, path string) (*CharacterEntry, error) {
 	idNode, err := requireKey(data, "id", path)
 	if err != nil {
 		return nil, err
@@ -68,10 +68,10 @@ func (c *CharacterConfig) parseEntry(data yamlMap, path string) (*CharacterEntry
 	}, nil
 }
 
-func (c *CharacterConfig) check() error {
+func (p *CharacterConfig) check() error {
 	return nil
 }
 
-func (c *CharacterConfig) assemble() error {
+func (p *CharacterConfig) assemble() error {
 	return nil
 }
