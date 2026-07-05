@@ -2,12 +2,9 @@ package gameconfig
 
 import pb "server/proto/pb"
 
-var enemyGroupKeys = stringSet("id", "name", "isBoss", "countRange", "levelRange", "roleLevelOffset", "captured", "babyRate", "enemies")
-var enemyKeys = stringSet("id", "weight", "level")
-
 func newEnemyGroupConfig() *EnemyGroupConfig {
 	return &EnemyGroupConfig{
-		byID: map[int]*EnemyGroupEntry{},
+		byID: map[uint32]*EnemyGroupEntry{},
 	}
 }
 
@@ -34,17 +31,18 @@ func (e *EnemyGroupConfig) load(dir string) error {
 		if err != nil {
 			return err
 		}
-		if err := assertKnownKeys(groupData, enemyGroupKeys, path); err != nil {
-			return err
-		}
 		group, err := e.parseGroup(groupData, path)
 		if err != nil {
 			return err
 		}
-		if _, ok := e.byID[group.ID]; ok {
+		groupID := uint32(group.ID)
+		if int(groupID) != group.ID {
+			return configError("敌人组ID超出范围: %d", group.ID)
+		}
+		if _, ok := e.byID[groupID]; ok {
 			return configError("敌人组ID重复: %d", group.ID)
 		}
-		e.byID[group.ID] = group
+		e.byID[groupID] = group
 		e.ids = append(e.ids, group.ID)
 	}
 	return nil
@@ -184,9 +182,6 @@ func parseEnemies(data yamlMap, group *EnemyGroupEntry, path string) ([]EnemyEnt
 		if err != nil {
 			return nil, err
 		}
-		if err := assertKnownKeys(enemyData, enemyKeys, enemyPath); err != nil {
-			return nil, err
-		}
 		idNode, err := requireKey(enemyData, "id", enemyPath)
 		if err != nil {
 			return nil, err
@@ -252,7 +247,7 @@ func (e *EnemyGroupConfig) check(petConfig *PetConfig) error {
 		return nil
 	}
 	for _, groupID := range e.ids {
-		group := e.byID[groupID]
+		group := e.byID[uint32(groupID)]
 		for _, enemy := range group.Enemies {
 			if !petConfig.HasID(enemy.ID) {
 				return configError("敌人组引用了未定义宠物: group:%d pet:%d", group.ID, enemy.ID)
