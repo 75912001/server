@@ -16,16 +16,16 @@ func (e *EnemyExpConfig) load(dir string) error {
 	if err != nil {
 		return err
 	}
-	expNode, err := requireKey(root, "enemy_exp", FileEnemyExp)
+	expNode, err := requireKey(root, "enemyExp", FileEnemyExp)
 	if err != nil {
 		return err
 	}
-	values, err := requireMap(expNode, FileEnemyExp+".enemy_exp")
+	values, err := requireMap(expNode, FileEnemyExp+".enemyExp")
 	if err != nil {
 		return err
 	}
 	if len(values) == 0 {
-		return configError("敌人基础经验配置中没有解析到 enemy_exp 数据: %s", FileEnemyExp)
+		return configError("敌人基础经验配置中没有解析到 enemyExp 数据: %s", FileEnemyExp)
 	}
 
 	levels := make([]uint32, 0, len(values))
@@ -41,7 +41,7 @@ func (e *EnemyExpConfig) load(dir string) error {
 		if _, ok := e.byLevel[lv]; ok {
 			return configError("敌人基础经验等级重复: %d", level)
 		}
-		baseExp, err := nonNegativeIntScalar(valueNode, FileEnemyExp+".enemy_exp."+rawLevel)
+		baseExp, err := nonNegativeIntScalar(valueNode, FileEnemyExp+".enemyExp."+rawLevel)
 		if err != nil {
 			return err
 		}
