@@ -1,5 +1,21 @@
 package gameconfig
 
+type CharacterConfig struct {
+	Character []*CharacterEntry `yaml:"character"`
+	byID      map[uint32]*CharacterEntry
+}
+
+type CharacterEntry struct {
+	// ID 来自 character[].id, 必须处于协议角色资源ID段内, 并且在 character.yaml 内唯一.
+	ID *uint32 `yaml:"id"`
+	// IsRole 来自 character[].isRole, 标记该角色资源是否可作为玩家角色; 缺省时按 false 处理.
+	IsRole *bool `yaml:"isRole"`
+}
+
+func (p *CharacterConfig) GetByID(id uint32) *CharacterEntry {
+	return p.byID[id]
+}
+
 func newCharacterConfig() *CharacterConfig {
 	return &CharacterConfig{
 		byID: map[uint32]*CharacterEntry{},
@@ -7,65 +23,32 @@ func newCharacterConfig() *CharacterConfig {
 }
 
 func (p *CharacterConfig) load(dir string) error {
-	root, err := loadYAMLMap(dir, FileCharacter)
-	if err != nil {
+	if err := loadYAMLFile(dir, FileCharacter, p); err != nil {
 		return err
 	}
-	characterNode, err := requireKey(root, "character", FileCharacter)
-	if err != nil {
-		return err
-	}
-	characters, err := requireSeq(characterNode, FileCharacter+".character")
-	if err != nil {
-		return err
-	}
-	if len(characters) == 0 {
-		return configError("角色配置中没有解析到 character 数据: %s", FileCharacter)
-	}
-
-	for i, characterNode := range characters {
-		path := configErrorPath(FileCharacter, "character", i)
-		characterData, err := requireMap(characterNode, path)
-		if err != nil {
-			return err
-		}
-		entry, err := p.parseEntry(characterData, path)
-		if err != nil {
-			return err
-		}
-		if _, ok := p.byID[entry.ID]; ok {
-			return configError("角色ID重复: %d", entry.ID)
-		}
-		p.byID[entry.ID] = entry
-		p.ids = append(p.ids, entry.ID)
-	}
-	return nil
+	return p.configure()
 }
 
-func (p *CharacterConfig) parseEntry(data yamlMap, path string) (*CharacterEntry, error) {
-	idNode, err := requireKey(data, "id", path)
-	if err != nil {
-		return nil, err
-	}
-	characterID, err := uint32Scalar(idNode, path+".id")
-	if err != nil {
-		return nil, err
-	}
-
-	if !isCharacterID(characterID) {
-		return nil, configError("角色ID超出范围: %d", characterID)
-	}
-	isRole := false
-	if isRoleNode, ok := data["isRole"]; ok {
-		isRole, err = boolScalar(isRoleNode, path+".isRole")
-		if err != nil {
-			return nil, err
+func (p *CharacterConfig) configure() error {
+	p.byID = map[uint32]*CharacterEntry{}
+	for i, character := range p.Character {
+		path := configErrorPath(FileCharacter, "character", i)
+		if character == nil {
+			continue
 		}
+		if character.ID == nil {
+			return configError("配置缺少必填字段: %s.id", path)
+		}
+		if !isCharacterID(*character.ID) {
+			return configError("角色ID超出范围: %d", *character.ID)
+		}
+		defaultBool(&character.IsRole, false)
+		if _, ok := p.byID[*character.ID]; ok {
+			return configError("角色ID重复: %d", *character.ID)
+		}
+		p.byID[*character.ID] = character
 	}
-	return &CharacterEntry{
-		ID:     characterID,
-		IsRole: isRole,
-	}, nil
+	return nil
 }
 
 func (p *CharacterConfig) check() error {
