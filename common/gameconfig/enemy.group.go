@@ -1,238 +1,209 @@
 package gameconfig
 
-import pb "server/proto/pb"
+import (
+	xmap "github.com/75912001/xlib/map"
+	xruntime "github.com/75912001/xlib/runtime"
+	"github.com/pkg/errors"
+
+	pb "server/proto/pb"
+)
+
+type EnemyGroupConfig struct {
+	*xmap.MapMgr[uint32, *EnemyGroupEntry]
+}
+
+type EnemyGroupEntry struct {
+	// ID 来自 enemyGroups[].id, 必须为正数, 并且在 enemy.group.yaml 内唯一.
+	ID *uint32 `yaml:"id"`
+	// IsBoss 来自 enemyGroups[].isBoss, 缺省为 false; Boss 组按固定 enemies 顺序出怪, 不使用普通组随机规则.
+	IsBoss *bool `yaml:"isBoss"`
+	// CountRange 来自 enemyGroups[].countRange, 表示普通敌人组出怪数量范围; Boss 组不允许配置.
+	CountRange *IntRange `yaml:"countRange"`
+	// LevelRange 来自 enemyGroups[].levelRange, 表示普通敌人组随机等级范围; 与 RoleLevelOffset 至少配置一个, Boss 组不允许配置.
+	LevelRange *IntRange `yaml:"levelRange"`
+	// RoleLevelOffset 来自 enemyGroups[].roleLevelOffset, 表示基于玩家等级的随机偏移范围; 与 LevelRange 至少配置一个, Boss 组不允许配置.
+	RoleLevelOffset *IntRange `yaml:"roleLevelOffset"`
+	// Captured 来自 enemyGroups[].captured, 表示普通敌人组是否允许捕获, 缺省为 true; Boss 组固定为 false.
+	Captured *bool `yaml:"captured"`
+	// BabyRate 来自 enemyGroups[].babyRate, 表示每只敌人成为 1 级宠物宝宝的十万分率, 缺省为0; Boss 组不允许配置.
+	BabyRate *uint32 `yaml:"babyRate"`
+	// Enemies 来自 enemyGroups[].enemies, 保存敌人模板列表, 每个敌人ID必须引用 pet.yaml 中存在的宠物ID.
+	Enemies []EnemyEntry `yaml:"enemies"`
+}
+
+type EnemyEntry struct {
+	// ID 来自 enemies[].id, 表示作为敌人模板的宠物ID, 必须能在 pet.yaml 中找到.
+	ID *uint32 `yaml:"id"`
+	// Weight 来自 enemies[].weight, 表示普通敌人组随机选择权重, 缺省为0且代表必定出现; Boss 组不允许配置.
+	Weight *uint32 `yaml:"weight"`
+	// Level 来自 enemies[].level, 表示指定敌人等级; Boss 组必填, 普通组可选, 值必须处于协议等级范围.
+	Level *uint32 `yaml:"level"`
+}
+
+type IntRange struct {
+	// Min 表示闭区间最小值, 由 YAML 中二元数组的第一个元素解析得到.
+	Min *int
+	// Max 表示闭区间最大值, 由 YAML 中二元数组的第二个元素解析得到, 且必须大于等于 Min.
+	Max *int
+}
 
 func newEnemyGroupConfig() *EnemyGroupConfig {
 	return &EnemyGroupConfig{
-		byID: map[uint32]*EnemyGroupEntry{},
+		MapMgr: xmap.NewMapMgr[uint32, *EnemyGroupEntry](),
 	}
 }
 
 func (p *EnemyGroupConfig) load(dir string) error {
-	root, err := loadYAMLMap(dir, FileEnemyGroup)
-	if err != nil {
+	var root struct {
+		EnemyGroups []*EnemyGroupEntry `yaml:"enemyGroups"`
+	}
+	if err := loadYAMLFile(dir, FileEnemyGroup, &root); err != nil {
 		return err
 	}
-	groupsNode, err := requireKey(root, "enemyGroups", FileEnemyGroup)
-	if err != nil {
-		return err
-	}
-	groups, err := requireSeq(groupsNode, FileEnemyGroup+".enemyGroups")
-	if err != nil {
-		return err
-	}
-	if len(groups) == 0 {
-		return configError("敌人组配置中没有解析到 enemyGroups 数据: %s", FileEnemyGroup)
-	}
+	return p.configure(root.EnemyGroups)
+}
 
-	for i, groupNode := range groups {
-		path := configErrorPath(FileEnemyGroup, "enemyGroups", i)
-		groupData, err := requireMap(groupNode, path)
-		if err != nil {
-			return err
+func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
+	for i, group := range entries {
+		if group.ID == nil {
+			return errors.Errorf("敌人组缺少 id: index:%d %v", i, xruntime.Location())
 		}
-		group, err := p.parseGroup(groupData, path)
-		if err != nil {
-			return err
+		if *group.ID == 0 {
+			return errors.Errorf("敌人组ID非法: id:%d %v", *group.ID, xruntime.Location())
 		}
-		if _, ok := p.byID[group.ID]; ok {
-			return configError("敌人组ID重复: %d", group.ID)
+
+		if group.IsBoss == nil {
+			defaultValue := false
+			group.IsBoss = &defaultValue
 		}
-		p.byID[group.ID] = group
-		p.ids = append(p.ids, group.ID)
+
+		if *group.IsBoss {
+			if group.CountRange != nil {
+				return errors.Errorf("Boss 敌人组不允许配置 countRange: group:%d %v", *group.ID, xruntime.Location())
+			}
+			if group.LevelRange != nil {
+				return errors.Errorf("Boss 敌人组不允许配置 levelRange: group:%d %v", *group.ID, xruntime.Location())
+			}
+			if group.RoleLevelOffset != nil {
+				return errors.Errorf("Boss 敌人组不允许配置 roleLevelOffset: group:%d %v", *group.ID, xruntime.Location())
+			}
+			if group.Captured != nil {
+				return errors.Errorf("Boss 敌人组不允许配置 captured: group:%d %v", *group.ID, xruntime.Location())
+			}
+			if group.BabyRate != nil {
+				return errors.Errorf("Boss 敌人组不允许配置 babyRate: group:%d %v", *group.ID, xruntime.Location())
+			}
+			captured := false
+			group.Captured = &captured
+			babyRate := uint32(0)
+			group.BabyRate = &babyRate
+		} else {
+			if group.CountRange == nil {
+				return errors.Errorf("普通敌人组缺少 countRange: group:%d %v", *group.ID, xruntime.Location())
+			}
+			if group.CountRange.Min == nil || group.CountRange.Max == nil {
+				return errors.Errorf("普通敌人组 countRange 无效: group:%d %v", *group.ID, xruntime.Location())
+			}
+			if *group.CountRange.Min < int(pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Min) ||
+				*group.CountRange.Max > int(pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Max) {
+				return errors.Errorf("普通敌人组 countRange 超出范围: group:%d range:[%d,%d] expected:[%d,%d] %v",
+					*group.ID, *group.CountRange.Min, *group.CountRange.Max,
+					pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Min,
+					pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Max, xruntime.Location())
+			}
+			if group.LevelRange == nil && group.RoleLevelOffset == nil {
+				return errors.Errorf("普通敌人组缺少 levelRange 或 roleLevelOffset: group:%d %v", *group.ID, xruntime.Location())
+			}
+			if group.LevelRange != nil && group.RoleLevelOffset != nil {
+				return errors.Errorf("普通敌人组不能同时配置 levelRange 和 roleLevelOffset: group:%d %v", *group.ID, xruntime.Location())
+			}
+			if group.LevelRange != nil {
+				if group.LevelRange.Min == nil || group.LevelRange.Max == nil {
+					return errors.Errorf("普通敌人组 levelRange 无效: group:%d %v", *group.ID, xruntime.Location())
+				}
+				if *group.LevelRange.Min < int(pb.LevelRange_LevelRange_Min) || *group.LevelRange.Max > int(pb.LevelRange_LevelRange_Max) {
+					return errors.Errorf("普通敌人组 levelRange 超出范围: group:%d range:[%d,%d] expected:[%d,%d] %v",
+						*group.ID, *group.LevelRange.Min, *group.LevelRange.Max, pb.LevelRange_LevelRange_Min, pb.LevelRange_LevelRange_Max, xruntime.Location())
+				}
+			}
+			if group.RoleLevelOffset != nil {
+				if group.RoleLevelOffset.Min == nil || group.RoleLevelOffset.Max == nil {
+					return errors.Errorf("普通敌人组 roleLevelOffset 无效: group:%d %v", *group.ID, xruntime.Location())
+				}
+			}
+			if group.Captured == nil {
+				defaultValue := true
+				group.Captured = &defaultValue
+			}
+			if group.BabyRate == nil {
+				defaultValue := uint32(0)
+				group.BabyRate = &defaultValue
+			}
+			if *group.BabyRate < uint32(pb.CombatEnemyGroupBabyRate_CombatEnemyGroupBabyRate_Min) || *group.BabyRate > uint32(pb.CombatEnemyGroupBabyRate_CombatEnemyGroupBabyRate_Max) {
+				return errors.Errorf("敌人组 babyRate 超出范围: group:%d value:%d %v", *group.ID, *group.BabyRate, xruntime.Location())
+			}
+		}
+
+		if len(group.Enemies) == 0 {
+			return errors.Errorf("敌人组 enemies 不能为空: group:%d %v", *group.ID, xruntime.Location())
+		}
+		if len(group.Enemies) > int(pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Max) {
+			return errors.Errorf("敌人组 enemies 超过最大站位数量: group:%d size:%d %v", *group.ID, len(group.Enemies), xruntime.Location())
+		}
+		for enemyIndex := range group.Enemies {
+			enemy := &group.Enemies[enemyIndex]
+			if enemy.ID == nil {
+				return errors.Errorf("敌人组 enemy 缺少 id: group:%d index:%d %v", *group.ID, enemyIndex, xruntime.Location())
+			}
+			if *group.IsBoss {
+				if enemy.Weight != nil {
+					return errors.Errorf("Boss 敌人组不允许配置 weight: group:%d enemy:%d %v", *group.ID, *enemy.ID, xruntime.Location())
+				}
+				if enemy.Level == nil {
+					return errors.Errorf("Boss 敌人组必须配置 level: group:%d enemy:%d %v", *group.ID, *enemy.ID, xruntime.Location())
+				}
+				if *enemy.Level < uint32(pb.LevelRange_LevelRange_Min) || uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level {
+					return errors.Errorf("Boss 敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v", *group.ID, *enemy.ID, *enemy.Level, xruntime.Location())
+				}
+				weight := uint32(0)
+				enemy.Weight = &weight
+				continue
+			}
+
+			if enemy.Weight == nil {
+				weight := uint32(0)
+				enemy.Weight = &weight
+			}
+			if enemy.Level == nil {
+				level := uint32(0)
+				enemy.Level = &level
+				continue
+			}
+			if *enemy.Level < uint32(pb.LevelRange_LevelRange_Min) || uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level {
+				return errors.Errorf("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v", *group.ID, *enemy.ID, *enemy.Level, xruntime.Location())
+			}
+		}
+
+		if !p.AddIfNotExist(*group.ID, group) {
+			return errors.Errorf("敌人组ID重复: %d %v", *group.ID, xruntime.Location())
+		}
 	}
 	return nil
 }
 
-func (p *EnemyGroupConfig) parseGroup(data yamlMap, path string) (*EnemyGroupEntry, error) {
-	idNode, err := requireKey(data, "id", path)
-	if err != nil {
-		return nil, err
-	}
-	groupID, err := uint32Scalar(idNode, path+".id")
-	if err != nil {
-		return nil, err
-	}
-	nameNode, err := requireKey(data, "name", path)
-	if err != nil {
-		return nil, err
-	}
-	name, err := stringScalar(nameNode, path+".name")
-	if err != nil {
-		return nil, err
-	}
-	isBoss := false
-	if isBossNode, ok := data["isBoss"]; ok {
-		isBoss, err = boolScalar(isBossNode, path+".isBoss")
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	group := &EnemyGroupEntry{
-		ID:              groupID,
-		Name:            name,
-		IsBoss:          isBoss,
-		CountRange:      IntRange{Min: 1, Max: 1},
-		LevelRange:      IntRange{Min: 1, Max: 1},
-		RoleLevelOffset: IntRange{Min: 0, Max: 0},
-		Captured:        true,
-	}
-	if group.IsBoss {
-		if err := assertAbsent(data, "countRange", "Boss 敌人组 countRange 无效, 不应配置: group:%d", groupID); err != nil {
-			return nil, err
-		}
-		if err := assertAbsent(data, "levelRange", "Boss 敌人组 levelRange 无效, 不应配置: group:%d", groupID); err != nil {
-			return nil, err
-		}
-		if err := assertAbsent(data, "roleLevelOffset", "Boss 敌人组 roleLevelOffset 无效, 不应配置: group:%d", groupID); err != nil {
-			return nil, err
-		}
-		if err := assertAbsent(data, "captured", "Boss 敌人组 captured 无效, 不应配置: group:%d", groupID); err != nil {
-			return nil, err
-		}
-		if err := assertAbsent(data, "babyRate", "Boss 敌人组 babyRate 无效, 不应配置: group:%d", groupID); err != nil {
-			return nil, err
-		}
-		group.Captured = false
-		group.BabyRate = 0
-	} else {
-		if _, ok := data["countRange"]; !ok {
-			return nil, configError("普通敌人组缺少 countRange: group:%d", groupID)
-		}
-		if _, ok := data["levelRange"]; !ok {
-			if _, hasRoleLevelOffset := data["roleLevelOffset"]; !hasRoleLevelOffset {
-				return nil, configError("普通敌人组缺少 levelRange 或 roleLevelOffset: group:%d", groupID)
-			}
-		}
-		group.CountRange, err = intRange(data["countRange"], path+".countRange")
-		if err != nil {
-			return nil, err
-		}
-		if err = assertRangeBounds(group.CountRange, int(pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Min), int(pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Max), path+".countRange"); err != nil {
-			return nil, err
-		}
-		if levelRangeNode, ok := data["levelRange"]; ok {
-			group.LevelRange, err = intRange(levelRangeNode, path+".levelRange")
-			if err != nil {
-				return nil, err
-			}
-			if err = assertRangeBounds(group.LevelRange, int(pb.LevelRange_LevelRange_Min), int(pb.LevelRange_LevelRange_Max), path+".levelRange"); err != nil {
-				return nil, err
-			}
-		}
-		if roleLevelOffsetNode, ok := data["roleLevelOffset"]; ok {
-			group.RoleLevelOffset, err = intRange(roleLevelOffsetNode, path+".roleLevelOffset")
-			if err != nil {
-				return nil, err
-			}
-		}
-		if capturedNode, ok := data["captured"]; ok {
-			group.Captured, err = boolScalar(capturedNode, path+".captured")
-			if err != nil {
-				return nil, err
-			}
-		}
-		if babyRateNode, ok := data["babyRate"]; ok {
-			group.BabyRate, err = uint32Scalar(babyRateNode, path+".babyRate")
-			if err != nil {
-				return nil, err
-			}
-			if group.BabyRate < uint32(pb.CombatEnemyGroupBabyRate_CombatEnemyGroupBabyRate_Min) || group.BabyRate > uint32(pb.CombatEnemyGroupBabyRate_CombatEnemyGroupBabyRate_Max) {
-				return nil, configError("敌人组 babyRate 超出范围: group:%d value:%d", groupID, group.BabyRate)
-			}
-		}
-	}
-
-	enemies, err := parseEnemies(data, group, path)
-	if err != nil {
-		return nil, err
-	}
-	group.Enemies = enemies
-	return group, nil
-}
-
-func parseEnemies(data yamlMap, group *EnemyGroupEntry, path string) ([]EnemyEntry, error) {
-	enemiesNode, err := requireKey(data, "enemies", path)
-	if err != nil {
-		return nil, err
-	}
-	enemyNodes, err := requireSeq(enemiesNode, path+".enemies")
-	if err != nil {
-		return nil, err
-	}
-	if len(enemyNodes) == 0 {
-		return nil, configError("敌人组 enemies 不能为空: group:%d", group.ID)
-	}
-	if len(enemyNodes) > int(pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Max) {
-		return nil, configError("敌人组 enemies 超过最大站位数量: group:%d size:%d", group.ID, len(enemyNodes))
-	}
-
-	out := make([]EnemyEntry, 0, len(enemyNodes))
-	for i, enemyNode := range enemyNodes {
-		enemyPath := path + ".enemies[" + itoa(i) + "]"
-		enemyData, err := requireMap(enemyNode, enemyPath)
-		if err != nil {
-			return nil, err
-		}
-		idNode, err := requireKey(enemyData, "id", enemyPath)
-		if err != nil {
-			return nil, err
-		}
-		enemyID, err := uint32Scalar(idNode, enemyPath+".id")
-		if err != nil {
-			return nil, err
-		}
-		enemy := EnemyEntry{ID: enemyID}
-		if group.IsBoss {
-			if err := assertAbsent(enemyData, "weight", "Boss 敌人组 enemy.weight 无效, 不应配置: group:%d enemy:%d", group.ID, enemyID); err != nil {
-				return nil, err
-			}
-			levelNode, err := requireKey(enemyData, "level", enemyPath)
-			if err != nil {
-				return nil, err
-			}
-			enemy.Level, err = uint32Scalar(levelNode, enemyPath+".level")
-			if err != nil {
-				return nil, err
-			}
-			if enemy.Level < uint32(pb.LevelRange_LevelRange_Min) || uint32(pb.LevelRange_LevelRange_Max) < enemy.Level {
-				return nil, configError("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d", group.ID, enemy.ID, enemy.Level)
-			}
-			enemy.Weight = 0
-		} else {
-			if weightNode, ok := enemyData["weight"]; ok {
-				enemy.Weight, err = uint32Scalar(weightNode, enemyPath+".weight")
-				if err != nil {
-					return nil, err
-				}
-			}
-			if levelNode, ok := enemyData["level"]; ok {
-				enemy.Level, err = uint32Scalar(levelNode, enemyPath+".level")
-				if err != nil {
-					return nil, err
-				}
-				if enemy.Level < uint32(pb.LevelRange_LevelRange_Min) || uint32(pb.LevelRange_LevelRange_Max) < enemy.Level {
-					return nil, configError("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d", group.ID, enemy.ID, enemy.Level)
-				}
-			}
-		}
-		out = append(out, enemy)
-	}
-	return out, nil
-}
-
-func (p *EnemyGroupConfig) check(petConfig *PetConfig) error {
-	if petConfig == nil {
-		return nil
-	}
-	for _, groupID := range p.ids {
-		group := p.byID[groupID]
+func (p *EnemyGroupConfig) check() error {
+	var err error
+	p.Foreach(func(_ uint32, group *EnemyGroupEntry) bool {
 		for _, enemy := range group.Enemies {
-			if !petConfig.HasID(enemy.ID) {
-				return configError("敌人组引用了未定义宠物: group:%d pet:%d", group.ID, enemy.ID)
+			if !GGameConfig.Pet.IsExist(*enemy.ID) {
+				err = errors.Errorf("敌人组引用了未定义宠物: group:%d pet:%d %v", *group.ID, *enemy.ID, xruntime.Location())
+				return false
 			}
 		}
+		return true
+	})
+	if err != nil {
+		return err
 	}
 	return nil
 }
