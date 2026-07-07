@@ -1,149 +1,106 @@
 package gameconfig
 
-var sceneKeys = stringSet("id", "name", "enemyGroups")
-var sceneEnemyGroupKeys = stringSet("id", "weight")
+import (
+	"strings"
+
+	xmap "github.com/75912001/xlib/map"
+	xruntime "github.com/75912001/xlib/runtime"
+	"github.com/pkg/errors"
+)
+
+type SceneConfig struct {
+	*xmap.MapMgr[uint32, *SceneEntry]
+}
+
+type SceneEntry struct {
+	// ID 来自 scenes[].id, 必须处于协议场景资源ID段内, 并且在 scene.yaml 内唯一.
+	ID *uint32 `yaml:"id"`
+	// Name 来自 scenes[].name, 表示场景名称, 主要用于配置识别, 日志和排障.
+	Name *string `yaml:"name"`
+	// EnemyGroups 来自 scenes[].enemyGroups, 保存当前场景可遇敌敌人组和权重.
+	EnemyGroups []SceneEnemyGroupEntry `yaml:"enemyGroups"`
+}
+
+type SceneEnemyGroupEntry struct {
+	// ID 来自 enemyGroups[].id, 必须引用 enemy.group.yaml 中存在的敌人组ID.
+	ID *uint32 `yaml:"id"`
+	// Weight 来自 enemyGroups[].weight, 表示当前场景选择该敌人组的权重, 必须大于0.
+	Weight *uint32 `yaml:"weight"`
+}
 
 func newSceneConfig() *SceneConfig {
 	return &SceneConfig{
-		byID: map[int]*SceneEntry{},
+		MapMgr: xmap.NewMapMgr[uint32, *SceneEntry](),
 	}
 }
 
-func (s *SceneConfig) load(dir string) error {
-	root, err := loadYAMLMap(dir, FileScene)
-	if err != nil {
+func (p *SceneConfig) load(dir string) error {
+	var root struct {
+		Scenes []*SceneEntry `yaml:"scenes"`
+	}
+	if err := loadYAMLFile(dir, FileScene, &root); err != nil {
 		return err
 	}
-	scenesNode, err := requireKey(root, "scenes", FileScene)
-	if err != nil {
-		return err
-	}
-	scenes, err := requireSeq(scenesNode, FileScene+".scenes")
-	if err != nil {
-		return err
-	}
-	if len(scenes) == 0 {
-		return configError("场景配置中没有解析到 scenes 数据: %s", FileScene)
-	}
-
-	for i, sceneNode := range scenes {
-		path := configErrorPath(FileScene, "scenes", i)
-		sceneData, err := requireMap(sceneNode, path)
-		if err != nil {
-			return err
-		}
-		if err := assertKnownKeys(sceneData, sceneKeys, path); err != nil {
-			return err
-		}
-		scene, err := s.parseScene(sceneData, path)
-		if err != nil {
-			return err
-		}
-		if _, ok := s.byID[scene.ID]; ok {
-			return configError("场景ID重复: %d", scene.ID)
-		}
-		s.byID[scene.ID] = scene
-		s.ids = append(s.ids, scene.ID)
-	}
-	return nil
+	return p.configure(root.Scenes)
 }
 
-func (s *SceneConfig) parseScene(data yamlMap, path string) (*SceneEntry, error) {
-	idNode, err := requireKey(data, "id", path)
-	if err != nil {
-		return nil, err
-	}
-	id, err := intScalar(idNode, path+".id")
-	if err != nil {
-		return nil, err
-	}
-	if !isSceneID(id) {
-		return nil, configError("场景ID超出协议范围: %d", id)
-	}
-	nameNode, err := requireKey(data, "name", path)
-	if err != nil {
-		return nil, err
-	}
-	name, err := stringScalar(nameNode, path+".name")
-	if err != nil {
-		return nil, err
-	}
-	enemyGroups, err := parseSceneEnemyGroups(data, id, path)
-	if err != nil {
-		return nil, err
-	}
-	return &SceneEntry{
-		ID:          id,
-		Name:        name,
-		EnemyGroups: enemyGroups,
-	}, nil
-}
-
-func parseSceneEnemyGroups(data yamlMap, sceneID int, path string) ([]SceneEnemyGroupEntry, error) {
-	groupsNode, err := requireKey(data, "enemyGroups", path)
-	if err != nil {
-		return nil, err
-	}
-	groupNodes, err := requireSeq(groupsNode, path+".enemyGroups")
-	if err != nil {
-		return nil, err
-	}
-	if len(groupNodes) == 0 {
-		return nil, configError("场景 enemyGroups 不能为空: scene:%d", sceneID)
-	}
-
-	out := make([]SceneEnemyGroupEntry, 0, len(groupNodes))
-	for i, groupNode := range groupNodes {
-		groupPath := path + ".enemyGroups[" + itoa(i) + "]"
-		groupData, err := requireMap(groupNode, groupPath)
-		if err != nil {
-			return nil, err
+func (p *SceneConfig) configure(entries []*SceneEntry) error {
+	for _, scene := range entries {
+		if scene.ID == nil {
+			return errors.Errorf("场景缺少 id %v", xruntime.Location())
 		}
-		if err := assertKnownKeys(groupData, sceneEnemyGroupKeys, groupPath); err != nil {
-			return nil, err
+		if !isSceneID(*scene.ID) {
+			return errors.Errorf("场景ID超出协议范围: scene:%d %v", *scene.ID, xruntime.Location())
 		}
-		idNode, err := requireKey(groupData, "id", groupPath)
-		if err != nil {
-			return nil, err
+		if scene.Name == nil {
+			return errors.Errorf("场景缺少 name: scene:%d %v", *scene.ID, xruntime.Location())
 		}
-		groupID, err := intScalar(idNode, groupPath+".id")
-		if err != nil {
-			return nil, err
+		if strings.TrimSpace(*scene.Name) == "" {
+			return errors.Errorf("场景 name 不能为空: scene:%d %v", *scene.ID, xruntime.Location())
 		}
-		if groupID <= 0 {
-			return nil, configError("场景 enemyGroups[].id 非法: scene:%d group:%d", sceneID, groupID)
+		if scene.EnemyGroups == nil {
+			return errors.Errorf("场景缺少 enemyGroups: scene:%d %v", *scene.ID, xruntime.Location())
 		}
-		weightNode, err := requireKey(groupData, "weight", groupPath)
-		if err != nil {
-			return nil, err
+		if len(scene.EnemyGroups) == 0 {
+			return errors.Errorf("场景 enemyGroups 不能为空: scene:%d %v", *scene.ID, xruntime.Location())
 		}
-		weight, err := intScalar(weightNode, groupPath+".weight")
-		if err != nil {
-			return nil, err
-		}
-		if weight <= 0 {
-			return nil, configError("场景 enemyGroups[].weight 必须大于0: scene:%d group:%d weight:%d", sceneID, groupID, weight)
-		}
-		out = append(out, SceneEnemyGroupEntry{ID: groupID, Weight: weight})
-	}
-	return out, nil
-}
-
-func (s *SceneConfig) check(enemyConfig *EnemyGroupConfig) error {
-	if enemyConfig == nil {
-		return nil
-	}
-	for _, sceneID := range s.ids {
-		scene := s.byID[sceneID]
-		for _, group := range scene.EnemyGroups {
-			if enemyConfig.GetByID(group.ID) == nil {
-				return configError("场景引用了未定义敌人组: scene:%d enemyGroup:%d", scene.ID, group.ID)
+		for i := range scene.EnemyGroups {
+			if scene.EnemyGroups[i].ID == nil {
+				return errors.Errorf("场景 enemyGroups 缺少 id: scene:%d index:%d %v", *scene.ID, i, xruntime.Location())
+			}
+			groupID := *scene.EnemyGroups[i].ID
+			if scene.EnemyGroups[i].Weight == nil {
+				return errors.Errorf("场景 enemyGroups 缺少 weight: scene:%d group:%d %v", *scene.ID, groupID, xruntime.Location())
+			}
+			weight := *scene.EnemyGroups[i].Weight
+			if weight == 0 {
+				return errors.Errorf("场景 enemyGroups[].weight 必须大于0: scene:%d group:%d weight:%d %v", *scene.ID, groupID, weight, xruntime.Location())
 			}
 		}
+		if !p.AddIfNotExist(*scene.ID, scene) {
+			return errors.Errorf("场景ID重复: scene:%d %v", *scene.ID, xruntime.Location())
+		}
 	}
 	return nil
 }
 
-func (s *SceneConfig) assemble() error {
+func (p *SceneConfig) check() error {
+	var err error
+	p.Foreach(func(sceneID uint32, scene *SceneEntry) bool {
+		for _, group := range scene.EnemyGroups {
+			if GGameConfig.Enemy.Get(*group.ID) == nil {
+				err = errors.Errorf("场景引用了未定义敌人组: scene:%d enemyGroup:%d %v", sceneID, *group.ID, xruntime.Location())
+				return false
+			}
+		}
+		return true
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *SceneConfig) assemble() error {
 	return nil
 }
