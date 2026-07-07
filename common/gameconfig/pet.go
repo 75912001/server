@@ -217,10 +217,18 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 		if len(pet.SkillSlots) == 0 {
 			return errors.Errorf("宠物 skill 须大于 0 个槽位: ID:%d %v", *pet.ID, xruntime.Location())
 		}
+		hasSkill := false
 		for index, skillID := range pet.SkillSlots {
-			if skillID != 0 && !isPetSkillID(skillID) {
+			if skillID == 0 {
+				continue
+			}
+			hasSkill = true
+			if !isPetSkillID(skillID) {
 				return errors.Errorf("宠物 skill 槽位ID超出范围: ID:%d skill:%d index:%d %v", *pet.ID, skillID, index, xruntime.Location())
 			}
+		}
+		if !hasSkill {
+			return errors.Errorf("宠物 skill 至少需要一个非0技能: ID:%d %v", *pet.ID, xruntime.Location())
 		}
 
 		if !p.AddIfNotExist(*pet.ID, pet) {
