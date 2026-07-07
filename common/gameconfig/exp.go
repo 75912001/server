@@ -1,111 +1,135 @@
 package gameconfig
 
 import (
-	"sort"
-	"strconv"
-
 	pb "server/proto/pb"
+
+	xmap "github.com/75912001/xlib/map"
+	xruntime "github.com/75912001/xlib/runtime"
+	"github.com/pkg/errors"
 )
+
+type ExpConfig struct {
+	*xmap.MapMgr[uint32, *LevelEntry]
+}
+
+type LevelEntry struct {
+	// Level 来自 exp.yaml 的 levels map key, 必须完整覆盖协议等级范围且连续.
+	Level *uint32
+	// MinExp 是 server 在加载 exp.yaml 时派生的本等级最小累计经验, 1 级固定为0, 其他等级为上一等级 MaxExp+1.
+	MinExp *uint32
+	// MaxExp 来自 levels.<level>.max, 表示本等级最大累计经验, 必须非负并随等级严格递增.
+	MaxExp *uint32 `yaml:"max"`
+}
+
+func (p *ExpConfig) GetLevel(totalExp uint32) (uint32, error) {
+	for level := uint32(pb.LevelRange_LevelRange_Min); level <= uint32(pb.LevelRange_LevelRange_Max); level++ {
+		entry := p.Get(level)
+		if entry == nil {
+			return 0, errors.Errorf("经验等级不存在: %d %v", level, xruntime.Location())
+		}
+		if totalExp <= *entry.MaxExp {
+			return *entry.Level, nil
+		}
+	}
+	return uint32(pb.LevelRange_LevelRange_Max), nil
+}
+
+func (p *ExpConfig) GetNextLevelTotalExp(totalExp uint32) (uint32, bool, error) {
+	level, err := p.GetLevel(totalExp)
+	if err != nil {
+		return 0, false, err
+	}
+	if level >= uint32(pb.LevelRange_LevelRange_Max) {
+		return 0, false, nil
+	}
+	nextLevelTotalExp, err := p.GetLevelMinExp(level + 1)
+	if err != nil {
+		return 0, false, err
+	}
+	return nextLevelTotalExp, true, nil
+}
+
+func (p *ExpConfig) GetLevelMinExp(level uint32) (uint32, error) {
+	if level < uint32(pb.LevelRange_LevelRange_Min) || level > uint32(pb.LevelRange_LevelRange_Max) {
+		return 0, errors.Errorf("经验等级不存在: %d %v", level, xruntime.Location())
+	}
+	entry := p.Get(level)
+	if entry == nil {
+		return 0, errors.Errorf("经验等级不存在: %d %v", level, xruntime.Location())
+	}
+	return *entry.MinExp, nil
+}
+
+func (p *ExpConfig) IsMaxLevel(totalExp uint32) (bool, error) {
+	level, err := p.GetLevel(totalExp)
+	if err != nil {
+		return false, err
+	}
+	return level >= uint32(pb.LevelRange_LevelRange_Max), nil
+}
 
 func newExpConfig() *ExpConfig {
 	return &ExpConfig{
-		byLevel: map[uint32]*LevelEntry{},
+		MapMgr: xmap.NewMapMgr[uint32, *LevelEntry](),
 	}
 }
 
-func (e *ExpConfig) load(dir string) error {
-	root, err := loadYAMLMap(dir, FileExp)
-	if err != nil {
+func (p *ExpConfig) load(dir string) error {
+	var root struct {
+		Levels map[uint32]*LevelEntry `yaml:"levels"`
+	}
+	if err := loadYAMLFile(dir, FileExp, &root); err != nil {
 		return err
 	}
-	levelsNode, err := requireKey(root, "levels", FileExp)
-	if err != nil {
-		return err
-	}
-	levels, err := requireMap(levelsNode, FileExp+".levels")
-	if err != nil {
-		return err
-	}
-	if len(levels) == 0 {
-		return configError("经验配置中没有解析到 levels 数据: %s", FileExp)
-	}
+	return p.configure(root.Levels)
+}
 
-	minLevel := int(pb.LevelRange_LevelRange_Min)
-	maxLevel := int(pb.LevelRange_LevelRange_Max)
-	levelNumbers := make([]int, 0, len(levels))
-	for rawLevel, levelNode := range levels {
-		level, err := strconv.Atoi(rawLevel)
-		if err != nil {
-			return configError("经验等级 key 必须是整数: %s", rawLevel)
-		}
+func (p *ExpConfig) configure(levels map[uint32]*LevelEntry) error {
+	minLevel := uint32(pb.LevelRange_LevelRange_Min)
+	maxLevel := uint32(pb.LevelRange_LevelRange_Max)
+	for level, entry := range levels {
 		if level < minLevel || level > maxLevel {
-			return configError("经验等级超出协议范围: level:%d range:[%d,%d]", level, minLevel, maxLevel)
+			return errors.Errorf("经验等级超出协议范围: level:%d expected:[%d,%d] %v", level, minLevel, maxLevel, xruntime.Location())
 		}
-		levelKey := uint32(level)
-		if int(levelKey) != level {
-			return configError("经验等级超出范围: %d", level)
-		}
-		if _, ok := e.byLevel[levelKey]; ok {
-			return configError("经验等级重复: %d", level)
-		}
-		levelData, err := requireMap(levelNode, FileExp+".levels."+rawLevel)
-		if err != nil {
-			return err
-		}
-		maxNode, err := requireKey(levelData, "max", FileExp+".levels."+rawLevel)
-		if err != nil {
-			return err
-		}
-		maxExp, err := nonNegativeIntScalar(maxNode, FileExp+".levels."+rawLevel+".max")
-		if err != nil {
-			return err
-		}
-		e.byLevel[levelKey] = &LevelEntry{Level: level, MaxExp: maxExp}
-		levelNumbers = append(levelNumbers, level)
+		p.Add(level, entry)
 	}
 
-	sort.Ints(levelNumbers)
-	expectedLevelCount := maxLevel - minLevel + 1
-	if len(levelNumbers) != expectedLevelCount {
-		return configError("经验等级数量必须完整覆盖协议范围: expected:%d actual:%d", expectedLevelCount, len(levelNumbers))
-	}
-	if levelNumbers[0] != minLevel {
-		return configError("经验等级必须从协议最小等级开始: expected:%d actual:%d", minLevel, levelNumbers[0])
-	}
-	if levelNumbers[len(levelNumbers)-1] != maxLevel {
-		return configError("经验等级必须覆盖到协议最大等级: expected:%d actual:%d", maxLevel, levelNumbers[len(levelNumbers)-1])
-	}
-
-	expectedLevel := minLevel
 	var previous *LevelEntry
-	for _, level := range levelNumbers {
-		if level != expectedLevel {
-			return configError("经验等级必须连续: expected:%d actual:%d", expectedLevel, level)
+	for level := minLevel; level <= maxLevel; level++ {
+		entry, ok := p.Find(level)
+		if !ok {
+			return errors.Errorf("经验等级必须连续覆盖协议范围: missing:%d %v", level, xruntime.Location())
 		}
-		entry := e.byLevel[uint32(level)]
+		if entry == nil {
+			return errors.Errorf("经验等级配置不能为空: level:%d %v", level, xruntime.Location())
+		}
+		if entry.MaxExp == nil {
+			return errors.Errorf("配置缺少必填字段: %s.levels.%d.max %v", FileExp, level, xruntime.Location())
+		}
+		levelValue := level
+		entry.Level = &levelValue
 		if previous == nil {
-			entry.MinExp = 0
+			minExp := uint32(0)
+			entry.MinExp = &minExp
 		} else {
-			if entry.MaxExp <= previous.MaxExp {
-				return configError("经验等级 max 必须严格递增: level:%d max:%d previous_max:%d", level, entry.MaxExp, previous.MaxExp)
+			if *entry.MaxExp <= *previous.MaxExp {
+				return errors.Errorf("经验等级 max 必须严格递增: level:%d max:%d previous_max:%d %v", level, *entry.MaxExp, *previous.MaxExp, xruntime.Location())
 			}
-			entry.MinExp = previous.MaxExp + 1
+			minExp := *previous.MaxExp + 1
+			entry.MinExp = &minExp
 		}
-		if entry.MinExp > entry.MaxExp {
-			return configError("经验等级区间不能反向: level:%d min:%d max:%d", level, entry.MinExp, entry.MaxExp)
+		if *entry.MinExp > *entry.MaxExp {
+			return errors.Errorf("经验等级区间不能反向: level:%d min:%d max:%d %v", level, *entry.MinExp, *entry.MaxExp, xruntime.Location())
 		}
-		e.levels = append(e.levels, entry)
 		previous = entry
-		expectedLevel++
 	}
-	e.max = maxLevel
 	return nil
 }
 
-func (e *ExpConfig) check() error {
+func (p *ExpConfig) check() error {
 	return nil
 }
 
-func (e *ExpConfig) assemble() error {
+func (p *ExpConfig) assemble() error {
 	return nil
 }
