@@ -69,7 +69,7 @@ func (p *EnemyExpConfig) GenerateEnemyExp(petID uint32, lv uint32) (uint32, erro
 	}
 	baseExp, ok := p.Find(lv)
 	if !ok {
-		return 0, configError("敌人基础经验等级不存在: level:%d", lv)
+		return 0, errors.Errorf("敌人基础经验等级不存在: level:%d", lv)
 	}
 	baseSum := *pet.Growth.BaseVital + *pet.Growth.BaseStr + *pet.Growth.BaseTough + *pet.Growth.BaseDex
 	// rank 加成是 2.5, 2.0 等小数, 这里统一乘以 100 用整数计算.
