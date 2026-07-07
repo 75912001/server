@@ -23,6 +23,7 @@
 # countRange: [2, 5]              # 敌人数量范围, [1, 10] 之内
 # levelRange: [最小等级, 最大等级] # 敌人等级范围, [1, 140] 之内
 # roleLevelOffset: [最小偏移, 最大偏移] # 角色等级偏移
+# levelRange 和 roleLevelOffset 必须且只能配置一个
 # captured: true/false 是否允许捕获 [默认:true]
 # babyRate: [0, 100000] 每只敌人成为宠物宝宝(1级)的概率(十万分率) [默认:0]
 # enemies[].id: 引用 pet.yaml 中的宠物ID (作为敌人模板)
