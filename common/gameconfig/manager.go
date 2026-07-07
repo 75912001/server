@@ -36,19 +36,19 @@ func Load(dir string) (*Manager, error) {
 	if err := manager.PetSkill.check(); err != nil {
 		return nil, err
 	}
-	if err := manager.Pet.check(manager.PetSkill); err != nil {
+	if err := manager.Pet.check(); err != nil {
 		return nil, err
 	}
 	if err := manager.Character.check(); err != nil {
 		return nil, err
 	}
-	if err := manager.Enemy.check(manager.Pet); err != nil {
+	if err := manager.Enemy.check(); err != nil {
 		return nil, err
 	}
 	if err := manager.EnemyExp.check(); err != nil {
 		return nil, err
 	}
-	if err := manager.Scene.check(manager.Enemy); err != nil {
+	if err := manager.Scene.check(); err != nil {
 		return nil, err
 	}
 	if err := manager.Exp.check(); err != nil {
