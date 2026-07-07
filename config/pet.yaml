@@ -16,6 +16,8 @@
   ## confusionResist - 混乱抗性
   ## critical - 暴击字段
   ## counter - 反击字段
+  ## rate - 稀有度字段 (原版本)
+  ## get - 基础捕获值 (原版本)
 # growth 原始成长配置: 用于生成和升级时的四维成长计算
 #   initNum: [配置] 初始系数, 参与初始四维计算.
 #   lvupPointSource: [配置] 原始升级成长点字段文本, 例如 4.50.
@@ -126,6 +128,8 @@ pet:
       confusionResist: 0
       critical: 5
       counter: 0
+      rate: 0
+      get: 1
     growth:
       initNum: 22
       lvupPointSource: 4.50
@@ -219,6 +223,8 @@ pet:
       confusionResist: 0
       critical: 5
       counter: 0
+      rate: 0
+      get: 3
     growth:
       initNum: 29
       lvupPointSource: 4.50
@@ -312,6 +318,8 @@ pet:
       confusionResist: 0
       critical: 5
       counter: 0
+      rate: 0
+      get: 3
     growth:
       initNum: 27
       lvupPointSource: 4.50
@@ -404,6 +412,8 @@ pet:
       confusionResist: 0
       critical: 5
       counter: 0
+      rate: 0
+      get: 3
     growth:
       initNum: 26
       lvupPointSource: 4.50
@@ -497,6 +507,8 @@ pet:
       confusionResist: 0
       critical: 5
       counter: 0
+      rate: 0
+      get: 3
     growth:
       initNum: 25
       lvupPointSource: 4.50
@@ -590,6 +602,8 @@ pet:
       confusionResist: 0
       critical: 1
       counter: 1
+      rate: 2
+      get: 0
     growth:
       initNum: 27
       lvupPointSource: 4.50
