@@ -19,9 +19,9 @@ type EnemyGroupEntry struct {
 	IsBoss *bool `yaml:"isBoss"`
 	// CountRange 来自 enemyGroups[].countRange, 表示普通敌人组出怪数量范围; Boss 组不允许配置.
 	CountRange *IntRange `yaml:"countRange"`
-	// LevelRange 来自 enemyGroups[].levelRange, 表示普通敌人组随机等级范围; 与 RoleLevelOffset 至少配置一个, Boss 组不允许配置.
+	// LevelRange 来自 enemyGroups[].levelRange, 表示普通敌人组随机等级范围; 与 RoleLevelOffset 必须且只能配置一个, Boss 组不允许配置.
 	LevelRange *IntRange `yaml:"levelRange"`
-	// RoleLevelOffset 来自 enemyGroups[].roleLevelOffset, 表示基于玩家等级的随机偏移范围; 与 LevelRange 至少配置一个, Boss 组不允许配置.
+	// RoleLevelOffset 来自 enemyGroups[].roleLevelOffset, 表示基于玩家等级的随机偏移范围; 与 LevelRange 必须且只能配置一个, Boss 组不允许配置.
 	RoleLevelOffset *IntRange `yaml:"roleLevelOffset"`
 	// Captured 来自 enemyGroups[].captured, 表示普通敌人组是否允许捕获, 缺省为 true; Boss 组固定为 false.
 	Captured *bool `yaml:"captured"`
@@ -155,32 +155,30 @@ func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 			if enemy.ID == nil {
 				return errors.Errorf("敌人组 enemy 缺少 id: group:%d index:%d %v", *group.ID, enemyIndex, xruntime.Location())
 			}
-			if *group.IsBoss {
+			enemyID := *enemy.ID
+			if *group.IsBoss { // 是 boss
 				if enemy.Weight != nil {
-					return errors.Errorf("Boss 敌人组不允许配置 weight: group:%d enemy:%d %v", *group.ID, *enemy.ID, xruntime.Location())
+					return errors.Errorf("Boss 敌人组不允许配置 weight: group:%d enemy:%d %v", *group.ID, enemyID, xruntime.Location())
 				}
 				if enemy.Level == nil {
-					return errors.Errorf("Boss 敌人组必须配置 level: group:%d enemy:%d %v", *group.ID, *enemy.ID, xruntime.Location())
+					return errors.Errorf("Boss 敌人组必须配置 level: group:%d enemy:%d %v", *group.ID, enemyID, xruntime.Location())
 				}
 				if *enemy.Level < uint32(pb.LevelRange_LevelRange_Min) || uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level {
-					return errors.Errorf("Boss 敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v", *group.ID, *enemy.ID, *enemy.Level, xruntime.Location())
+					return errors.Errorf("Boss 敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v", *group.ID, enemyID, *enemy.Level, xruntime.Location())
 				}
-				weight := uint32(0)
-				enemy.Weight = &weight
 				continue
 			}
 
+			// 是 非 boss
 			if enemy.Weight == nil {
 				weight := uint32(0)
 				enemy.Weight = &weight
 			}
 			if enemy.Level == nil {
-				level := uint32(0)
-				enemy.Level = &level
 				continue
 			}
 			if *enemy.Level < uint32(pb.LevelRange_LevelRange_Min) || uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level {
-				return errors.Errorf("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v", *group.ID, *enemy.ID, *enemy.Level, xruntime.Location())
+				return errors.Errorf("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v", *group.ID, enemyID, *enemy.Level, xruntime.Location())
 			}
 		}
 
