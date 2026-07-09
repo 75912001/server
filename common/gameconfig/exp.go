@@ -16,12 +16,12 @@ type LevelEntry struct {
 	// Level 来自 exp.yaml 的 levels map key, 必须完整覆盖协议等级范围且连续.
 	Level *uint32
 	// MinExp 是 server 在加载 exp.yaml 时派生的本等级最小累计经验, 1 级固定为0, 其他等级为上一等级 MaxExp+1.
-	MinExp *uint32
+	MinExp *uint64
 	// MaxExp 来自 levels.<level>.max, 表示本等级最大累计经验, 必须非负并随等级严格递增.
-	MaxExp *uint32 `yaml:"max"`
+	MaxExp *uint64 `yaml:"max"`
 }
 
-func (p *ExpConfig) GetLevel(totalExp uint32) (uint32, error) {
+func (p *ExpConfig) GetLevel(totalExp uint64) (uint32, error) {
 	for level := uint32(pb.LevelRange_LevelRange_Min); level <= uint32(pb.LevelRange_LevelRange_Max); level++ {
 		entry := p.Get(level)
 		if entry == nil {
@@ -34,7 +34,7 @@ func (p *ExpConfig) GetLevel(totalExp uint32) (uint32, error) {
 	return uint32(pb.LevelRange_LevelRange_Max), nil
 }
 
-func (p *ExpConfig) GetNextLevelTotalExp(totalExp uint32) (uint32, bool, error) {
+func (p *ExpConfig) GetNextLevelTotalExp(totalExp uint64) (uint64, bool, error) {
 	level, err := p.GetLevel(totalExp)
 	if err != nil {
 		return 0, false, err
@@ -49,7 +49,7 @@ func (p *ExpConfig) GetNextLevelTotalExp(totalExp uint32) (uint32, bool, error) 
 	return nextLevelTotalExp, true, nil
 }
 
-func (p *ExpConfig) GetLevelMinExp(level uint32) (uint32, error) {
+func (p *ExpConfig) GetLevelMinExp(level uint32) (uint64, error) {
 	if level < uint32(pb.LevelRange_LevelRange_Min) || level > uint32(pb.LevelRange_LevelRange_Max) {
 		return 0, errors.Errorf("经验等级不存在: %d %v", level, xruntime.Location())
 	}
@@ -60,7 +60,7 @@ func (p *ExpConfig) GetLevelMinExp(level uint32) (uint32, error) {
 	return *entry.MinExp, nil
 }
 
-func (p *ExpConfig) IsMaxLevel(totalExp uint32) (bool, error) {
+func (p *ExpConfig) IsMaxLevel(totalExp uint64) (bool, error) {
 	level, err := p.GetLevel(totalExp)
 	if err != nil {
 		return false, err
@@ -109,7 +109,7 @@ func (p *ExpConfig) configure(levels map[uint32]*LevelEntry) error {
 		levelValue := level
 		entry.Level = &levelValue
 		if previous == nil {
-			minExp := uint32(0)
+			minExp := uint64(0)
 			entry.MinExp = &minExp
 		} else {
 			if *entry.MaxExp <= *previous.MaxExp {
