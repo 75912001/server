@@ -4,13 +4,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"server/common/gameconfig"
-
 	xconfig "github.com/75912001/xlib/config"
 )
 
 var GCfgCustomGameConfigDir string
-var GGameConfig *gameconfig.Manager
 
 // initCustomConfig 从 xlib 配置管理器读取 online 自定义配置.
 func initCustomConfig() {
