@@ -94,11 +94,11 @@ message CombatUnitKey {
 
 message CombatUnitAttribute {
   uint64 exp = 1; // 当前经验值, 客户端按配置规则推导等级
-  uint64 hp = 2; // 开战生命值
-  uint64 attack = 3; // 攻击力
-  uint64 defense = 4; // 防御力
-  uint64 agility = 5; // 敏捷
-  uint64 loyalty = 6; // 忠诚度, 非宠物单位为 0
+  uint32 hp = 2; // 开战生命值
+  uint32 attack = 3; // 攻击力
+  uint32 defense = 4; // 防御力
+  uint32 agility = 5; // 敏捷
+  uint32 loyalty = 6; // 忠诚度, 非宠物单位为 0
 }
 
 message CombatEquipmentBind {
@@ -124,8 +124,8 @@ message CombatStatusState {
 
 message CombatUnitState {
   CombatUnitKey unit_key = 1; // 状态所属单位
-  uint64 hp = 2; // 当前 HP
-  uint64 max_hp = 3; // 本场战斗最大 HP
+  uint32 hp = 2; // 当前 HP
+  uint32 max_hp = 3; // 本场战斗最大 HP
   bool alive = 4; // 当前是否存活
   repeated CombatStatusState status_state_list = 10; // 当前状态快照
 }
@@ -153,8 +153,8 @@ message CombatActionIntent {
 
 message CombatAssetDelta {
   CombatAssetType asset_type = 1; // 发生变化的运行期属性
-  int64 delta = 2; // 本次变化量, 扣减为负数, 增加为正数
-  uint64 after = 3; // 变化后的值
+  int32 delta = 2; // 本次变化量, 扣减为负数, 增加为正数
+  uint32 after = 3; // 变化后的值
 }
 
 message CombatStatusDelta {
