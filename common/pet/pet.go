@@ -126,7 +126,7 @@ func create(pet *gameconfig.PetEntry, level uint32, grade pb.PetGrade) (
 }
 
 // NewRecord 创建-宠物
-func NewRecord(pet *gameconfig.PetEntry, petUUID uint64, level uint32, grade pb.PetGrade) (*pb.PetRecord, error) {
+func NewRecord(pet *gameconfig.PetEntry, petUUID uint64, level uint32, grade pb.PetGrade) *pb.PetRecord {
 	expMin, _ := gameconfig.GGameConfig.Exp.GetLevelMinExp(level)
 	savedBaseVital, savedBaseStr, savedBaseTough, savedBaseDex, rawVital, rawStr, rawTough, rawDex := create(pet, level, grade)
 	return &pb.PetRecord{
@@ -146,7 +146,7 @@ func NewRecord(pet *gameconfig.PetEntry, petUUID uint64, level uint32, grade pb.
 		CreateTimestampMs:  time.Now().UnixMilli(),
 		AssetRecordBaseMap: make(map[uint32]uint64),
 		RecordMap:          make(map[uint64]*pb.RecordPrimary),
-	}, nil
+	}
 }
 
 func rankGrowthRange(baseSum int) (float64, float64) {
