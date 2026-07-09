@@ -327,15 +327,15 @@ type PetRecord struct {
 	CarryStatus        PetCarryStatus            `protobuf:"varint,3,opt,name=carry_status,json=carryStatus,proto3,enum=account.PetCarryStatus" json:"carry_status,omitempty"`                                                                                        // 宠物携带状态; 只有角色随身携带时参与战斗/骑乘语义, 仓库内宠物固定为 Rest
 	Grade              PetGrade                  `protobuf:"varint,4,opt,name=grade,proto3,enum=account.PetGrade" json:"grade,omitempty"`                                                                                                                             // 宠物品阶, 决定创建时 SavedBase 成长偏移; 默认赠送宠物由 online 指定为 Mythic
 	Exp                uint64                    `protobuf:"varint,5,opt,name=exp,proto3" json:"exp,omitempty"`                                                                                                                                                       // 经验值, 用于升级或养成
-	Loyalty            uint64                    `protobuf:"varint,6,opt,name=loyalty,proto3" json:"loyalty,omitempty"`                                                                                                                                               // 宠物忠诚度; 创建默认值当前为 100
-	SavedBaseVitality  uint64                    `protobuf:"varint,7,opt,name=saved_base_vitality,json=savedBaseVitality,proto3" json:"saved_base_vitality,omitempty"`                                                                                                // 宠物保存基础体力成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
-	SavedBaseStrength  uint64                    `protobuf:"varint,8,opt,name=saved_base_strength,json=savedBaseStrength,proto3" json:"saved_base_strength,omitempty"`                                                                                                // 宠物保存基础腕力成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
-	SavedBaseToughness uint64                    `protobuf:"varint,9,opt,name=saved_base_toughness,json=savedBaseToughness,proto3" json:"saved_base_toughness,omitempty"`                                                                                             // 宠物保存基础耐力成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
-	SavedBaseDexterity uint64                    `protobuf:"varint,10,opt,name=saved_base_dexterity,json=savedBaseDexterity,proto3" json:"saved_base_dexterity,omitempty"`                                                                                            // 宠物保存基础速度成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
-	RawVitality        uint64                    `protobuf:"varint,11,opt,name=raw_vitality,json=rawVitality,proto3" json:"raw_vitality,omitempty"`                                                                                                                   // 宠物当前原始体力值; 创建和升级时累加生成, 战斗运行期 HP 等派生属性由该值参与换算
-	RawStrength        uint64                    `protobuf:"varint,12,opt,name=raw_strength,json=rawStrength,proto3" json:"raw_strength,omitempty"`                                                                                                                   // 宠物当前原始腕力值; 创建和升级时累加生成, 战斗运行期攻击等派生属性由该值参与换算
-	RawToughness       uint64                    `protobuf:"varint,13,opt,name=raw_toughness,json=rawToughness,proto3" json:"raw_toughness,omitempty"`                                                                                                                // 宠物当前原始耐力值; 创建和升级时累加生成, 战斗运行期防御等派生属性由该值参与换算
-	RawDexterity       uint64                    `protobuf:"varint,14,opt,name=raw_dexterity,json=rawDexterity,proto3" json:"raw_dexterity,omitempty"`                                                                                                                // 宠物当前原始速度值; 创建和升级时累加生成, 战斗运行期敏捷等派生属性由该值参与换算
+	Loyalty            uint32                    `protobuf:"varint,6,opt,name=loyalty,proto3" json:"loyalty,omitempty"`                                                                                                                                               // 宠物忠诚度; 创建默认值当前为 100
+	SavedBaseVitality  uint32                    `protobuf:"varint,7,opt,name=saved_base_vitality,json=savedBaseVitality,proto3" json:"saved_base_vitality,omitempty"`                                                                                                // 宠物保存基础体力成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
+	SavedBaseStrength  uint32                    `protobuf:"varint,8,opt,name=saved_base_strength,json=savedBaseStrength,proto3" json:"saved_base_strength,omitempty"`                                                                                                // 宠物保存基础腕力成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
+	SavedBaseToughness uint32                    `protobuf:"varint,9,opt,name=saved_base_toughness,json=savedBaseToughness,proto3" json:"saved_base_toughness,omitempty"`                                                                                             // 宠物保存基础耐力成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
+	SavedBaseDexterity uint32                    `protobuf:"varint,10,opt,name=saved_base_dexterity,json=savedBaseDexterity,proto3" json:"saved_base_dexterity,omitempty"`                                                                                            // 宠物保存基础速度成长值; 创建宠物时由配置基础值叠加个体随机值生成, 后续升级成长继续使用该固定值
+	RawVitality        uint32                    `protobuf:"varint,11,opt,name=raw_vitality,json=rawVitality,proto3" json:"raw_vitality,omitempty"`                                                                                                                   // 宠物当前原始体力值; 创建和升级时累加生成, 战斗运行期 HP 等派生属性由该值参与换算
+	RawStrength        uint32                    `protobuf:"varint,12,opt,name=raw_strength,json=rawStrength,proto3" json:"raw_strength,omitempty"`                                                                                                                   // 宠物当前原始腕力值; 创建和升级时累加生成, 战斗运行期攻击等派生属性由该值参与换算
+	RawToughness       uint32                    `protobuf:"varint,13,opt,name=raw_toughness,json=rawToughness,proto3" json:"raw_toughness,omitempty"`                                                                                                                // 宠物当前原始耐力值; 创建和升级时累加生成, 战斗运行期防御等派生属性由该值参与换算
+	RawDexterity       uint32                    `protobuf:"varint,14,opt,name=raw_dexterity,json=rawDexterity,proto3" json:"raw_dexterity,omitempty"`                                                                                                                // 宠物当前原始速度值; 创建和升级时累加生成, 战斗运行期敏捷等派生属性由该值参与换算
 	CreateTimestampMs  int64                     `protobuf:"varint,15,opt,name=create_timestamp_ms,json=createTimestampMs,proto3" json:"create_timestamp_ms,omitempty"`                                                                                               // 宠物创建时间戳, 单位毫秒
 	RebirthCount       uint64                    `protobuf:"varint,16,opt,name=rebirth_count,json=rebirthCount,proto3" json:"rebirth_count,omitempty"`                                                                                                                // 宠物转生次数
 	AssetRecordBaseMap map[uint32]uint64         `protobuf:"bytes,20,rep,name=asset_record_base_map,json=assetRecordBaseMap,proto3" json:"asset_record_base_map,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"` // 宠物基础数值记录, 包含宠物资源 ID
@@ -409,63 +409,63 @@ func (x *PetRecord) GetExp() uint64 {
 	return 0
 }
 
-func (x *PetRecord) GetLoyalty() uint64 {
+func (x *PetRecord) GetLoyalty() uint32 {
 	if x != nil {
 		return x.Loyalty
 	}
 	return 0
 }
 
-func (x *PetRecord) GetSavedBaseVitality() uint64 {
+func (x *PetRecord) GetSavedBaseVitality() uint32 {
 	if x != nil {
 		return x.SavedBaseVitality
 	}
 	return 0
 }
 
-func (x *PetRecord) GetSavedBaseStrength() uint64 {
+func (x *PetRecord) GetSavedBaseStrength() uint32 {
 	if x != nil {
 		return x.SavedBaseStrength
 	}
 	return 0
 }
 
-func (x *PetRecord) GetSavedBaseToughness() uint64 {
+func (x *PetRecord) GetSavedBaseToughness() uint32 {
 	if x != nil {
 		return x.SavedBaseToughness
 	}
 	return 0
 }
 
-func (x *PetRecord) GetSavedBaseDexterity() uint64 {
+func (x *PetRecord) GetSavedBaseDexterity() uint32 {
 	if x != nil {
 		return x.SavedBaseDexterity
 	}
 	return 0
 }
 
-func (x *PetRecord) GetRawVitality() uint64 {
+func (x *PetRecord) GetRawVitality() uint32 {
 	if x != nil {
 		return x.RawVitality
 	}
 	return 0
 }
 
-func (x *PetRecord) GetRawStrength() uint64 {
+func (x *PetRecord) GetRawStrength() uint32 {
 	if x != nil {
 		return x.RawStrength
 	}
 	return 0
 }
 
-func (x *PetRecord) GetRawToughness() uint64 {
+func (x *PetRecord) GetRawToughness() uint32 {
 	if x != nil {
 		return x.RawToughness
 	}
 	return 0
 }
 
-func (x *PetRecord) GetRawDexterity() uint64 {
+func (x *PetRecord) GetRawDexterity() uint32 {
 	if x != nil {
 		return x.RawDexterity
 	}
@@ -516,28 +516,28 @@ var file_pet_proto_rawDesc = []byte{
 	0x01, 0x28, 0x0e, 0x32, 0x11, 0x2e, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x2e, 0x50, 0x65,
 	0x74, 0x47, 0x72, 0x61, 0x64, 0x65, 0x52, 0x05, 0x67, 0x72, 0x61, 0x64, 0x65, 0x12, 0x10, 0x0a,
 	0x03, 0x65, 0x78, 0x70, 0x18, 0x05, 0x20, 0x01, 0x28, 0x04, 0x52, 0x03, 0x65, 0x78, 0x70, 0x12,
-	0x18, 0x0a, 0x07, 0x6c, 0x6f, 0x79, 0x61, 0x6c, 0x74, 0x79, 0x18, 0x06, 0x20, 0x01, 0x28, 0x04,
+	0x18, 0x0a, 0x07, 0x6c, 0x6f, 0x79, 0x61, 0x6c, 0x74, 0x79, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0d,
 	0x52, 0x07, 0x6c, 0x6f, 0x79, 0x61, 0x6c, 0x74, 0x79, 0x12, 0x2e, 0x0a, 0x13, 0x73, 0x61, 0x76,
 	0x65, 0x64, 0x5f, 0x62, 0x61, 0x73, 0x65, 0x5f, 0x76, 0x69, 0x74, 0x61, 0x6c, 0x69, 0x74, 0x79,
-	0x18, 0x07, 0x20, 0x01, 0x28, 0x04, 0x52, 0x11, 0x73, 0x61, 0x76, 0x65, 0x64, 0x42, 0x61, 0x73,
+	0x18, 0x07, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x11, 0x73, 0x61, 0x76, 0x65, 0x64, 0x42, 0x61, 0x73,
 	0x65, 0x56, 0x69, 0x74, 0x61, 0x6c, 0x69, 0x74, 0x79, 0x12, 0x2e, 0x0a, 0x13, 0x73, 0x61, 0x76,
 	0x65, 0x64, 0x5f, 0x62, 0x61, 0x73, 0x65, 0x5f, 0x73, 0x74, 0x72, 0x65, 0x6e, 0x67, 0x74, 0x68,
-	0x18, 0x08, 0x20, 0x01, 0x28, 0x04, 0x52, 0x11, 0x73, 0x61, 0x76, 0x65, 0x64, 0x42, 0x61, 0x73,
+	0x18, 0x08, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x11, 0x73, 0x61, 0x76, 0x65, 0x64, 0x42, 0x61, 0x73,
 	0x65, 0x53, 0x74, 0x72, 0x65, 0x6e, 0x67, 0x74, 0x68, 0x12, 0x30, 0x0a, 0x14, 0x73, 0x61, 0x76,
 	0x65, 0x64, 0x5f, 0x62, 0x61, 0x73, 0x65, 0x5f, 0x74, 0x6f, 0x75, 0x67, 0x68, 0x6e, 0x65, 0x73,
-	0x73, 0x18, 0x09, 0x20, 0x01, 0x28, 0x04, 0x52, 0x12, 0x73, 0x61, 0x76, 0x65, 0x64, 0x42, 0x61,
+	0x73, 0x18, 0x09, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x12, 0x73, 0x61, 0x76, 0x65, 0x64, 0x42, 0x61,
 	0x73, 0x65, 0x54, 0x6f, 0x75, 0x67, 0x68, 0x6e, 0x65, 0x73, 0x73, 0x12, 0x30, 0x0a, 0x14, 0x73,
 	0x61, 0x76, 0x65, 0x64, 0x5f, 0x62, 0x61, 0x73, 0x65, 0x5f, 0x64, 0x65, 0x78, 0x74, 0x65, 0x72,
-	0x69, 0x74, 0x79, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x04, 0x52, 0x12, 0x73, 0x61, 0x76, 0x65, 0x64,
+	0x69, 0x74, 0x79, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x12, 0x73, 0x61, 0x76, 0x65, 0x64,
 	0x42, 0x61, 0x73, 0x65, 0x44, 0x65, 0x78, 0x74, 0x65, 0x72, 0x69, 0x74, 0x79, 0x12, 0x21, 0x0a,
 	0x0c, 0x72, 0x61, 0x77, 0x5f, 0x76, 0x69, 0x74, 0x61, 0x6c, 0x69, 0x74, 0x79, 0x18, 0x0b, 0x20,
-	0x01, 0x28, 0x04, 0x52, 0x0b, 0x72, 0x61, 0x77, 0x56, 0x69, 0x74, 0x61, 0x6c, 0x69, 0x74, 0x79,
+	0x01, 0x28, 0x0d, 0x52, 0x0b, 0x72, 0x61, 0x77, 0x56, 0x69, 0x74, 0x61, 0x6c, 0x69, 0x74, 0x79,
 	0x12, 0x21, 0x0a, 0x0c, 0x72, 0x61, 0x77, 0x5f, 0x73, 0x74, 0x72, 0x65, 0x6e, 0x67, 0x74, 0x68,
-	0x18, 0x0c, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0b, 0x72, 0x61, 0x77, 0x53, 0x74, 0x72, 0x65, 0x6e,
+	0x18, 0x0c, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0b, 0x72, 0x61, 0x77, 0x53, 0x74, 0x72, 0x65, 0x6e,
 	0x67, 0x74, 0x68, 0x12, 0x23, 0x0a, 0x0d, 0x72, 0x61, 0x77, 0x5f, 0x74, 0x6f, 0x75, 0x67, 0x68,
-	0x6e, 0x65, 0x73, 0x73, 0x18, 0x0d, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0c, 0x72, 0x61, 0x77, 0x54,
+	0x6e, 0x65, 0x73, 0x73, 0x18, 0x0d, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0c, 0x72, 0x61, 0x77, 0x54,
 	0x6f, 0x75, 0x67, 0x68, 0x6e, 0x65, 0x73, 0x73, 0x12, 0x23, 0x0a, 0x0d, 0x72, 0x61, 0x77, 0x5f,
-	0x64, 0x65, 0x78, 0x74, 0x65, 0x72, 0x69, 0x74, 0x79, 0x18, 0x0e, 0x20, 0x01, 0x28, 0x04, 0x52,
+	0x64, 0x65, 0x78, 0x74, 0x65, 0x72, 0x69, 0x74, 0x79, 0x18, 0x0e, 0x20, 0x01, 0x28, 0x0d, 0x52,
 	0x0c, 0x72, 0x61, 0x77, 0x44, 0x65, 0x78, 0x74, 0x65, 0x72, 0x69, 0x74, 0x79, 0x12, 0x2e, 0x0a,
 	0x13, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
 	0x70, 0x5f, 0x6d, 0x73, 0x18, 0x0f, 0x20, 0x01, 0x28, 0x03, 0x52, 0x11, 0x63, 0x72, 0x65, 0x61,
