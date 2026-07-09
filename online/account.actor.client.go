@@ -152,7 +152,7 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 	}
 
 	// character attribute
-	if !isValidCharacterAttributeAllocation(req.GetCharacterAttribute()) {
+	if req.GetCharacterAttribute().GetVitality()+req.GetCharacterAttribute().GetStrength()+req.GetCharacterAttribute().GetToughness()+req.GetCharacterAttribute().GetDexterity() != uint32(pb.CharacterAttributeLimit_CharacterAttributeLimit_TotalPoint) {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterCreateRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
