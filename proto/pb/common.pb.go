@@ -69,6 +69,52 @@ func (LevelRange) EnumDescriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{0}
 }
 
+type Constants int32
+
+const (
+	Constants_Constants_Unknow                    Constants = 0
+	Constants_Constants_Character_Name_Max_Length Constants = 12 // 角色名称最大长度
+)
+
+// Enum value maps for Constants.
+var (
+	Constants_name = map[int32]string{
+		0:  "Constants_Unknow",
+		12: "Constants_Character_Name_Max_Length",
+	}
+	Constants_value = map[string]int32{
+		"Constants_Unknow":                    0,
+		"Constants_Character_Name_Max_Length": 12,
+	}
+)
+
+func (x Constants) Enum() *Constants {
+	p := new(Constants)
+	*p = x
+	return p
+}
+
+func (x Constants) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Constants) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_proto_enumTypes[1].Descriptor()
+}
+
+func (Constants) Type() protoreflect.EnumType {
+	return &file_common_proto_enumTypes[1]
+}
+
+func (x Constants) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Constants.Descriptor instead.
+func (Constants) EnumDescriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{1}
+}
+
 type KV struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -262,8 +308,13 @@ var file_common_proto_rawDesc = []byte{
 	0x6e, 0x6b, 0x6e, 0x6f, 0x77, 0x10, 0x00, 0x12, 0x12, 0x0a, 0x0e, 0x4c, 0x65, 0x76, 0x65, 0x6c,
 	0x52, 0x61, 0x6e, 0x67, 0x65, 0x5f, 0x4d, 0x69, 0x6e, 0x10, 0x01, 0x12, 0x13, 0x0a, 0x0e, 0x4c,
 	0x65, 0x76, 0x65, 0x6c, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x5f, 0x4d, 0x61, 0x78, 0x10, 0x8c, 0x01,
-	0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2a, 0x4a, 0x0a, 0x09, 0x43, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x74, 0x73, 0x12, 0x14, 0x0a,
+	0x10, 0x43, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x74, 0x73, 0x5f, 0x55, 0x6e, 0x6b, 0x6e, 0x6f,
+	0x77, 0x10, 0x00, 0x12, 0x27, 0x0a, 0x23, 0x43, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x74, 0x73,
+	0x5f, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x4e, 0x61, 0x6d, 0x65, 0x5f,
+	0x4d, 0x61, 0x78, 0x5f, 0x4c, 0x65, 0x6e, 0x67, 0x74, 0x68, 0x10, 0x0c, 0x42, 0x14, 0x5a, 0x12,
+	0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x3b,
+	0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -278,16 +329,17 @@ func file_common_proto_rawDescGZIP() []byte {
 	return file_common_proto_rawDescData
 }
 
-var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_common_proto_goTypes = []any{
 	(LevelRange)(0), // 0: account.LevelRange
-	(*KV)(nil),      // 1: account.KV
-	(*Rect)(nil),    // 2: account.Rect
-	(*Point)(nil),   // 3: account.Point
+	(Constants)(0),  // 1: account.Constants
+	(*KV)(nil),      // 2: account.KV
+	(*Rect)(nil),    // 3: account.Rect
+	(*Point)(nil),   // 4: account.Point
 }
 var file_common_proto_depIdxs = []int32{
-	3, // 0: account.Rect.pos:type_name -> account.Point
+	4, // 0: account.Rect.pos:type_name -> account.Point
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -343,7 +395,7 @@ func file_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_common_proto_rawDesc,
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,

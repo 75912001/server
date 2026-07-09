@@ -24,3 +24,9 @@ enum LevelRange {
   LevelRange_Min = 1;
   LevelRange_Max = 140;
 }
+
+
+enum Constants {
+  Constants_Unknow = 0;
+  Constants_Character_Name_Max_Length = 12; // 角色名称最大长度
+}
