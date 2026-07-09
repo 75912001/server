@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 	"time"
@@ -88,11 +89,15 @@ func TestMarshalJSONUsesEnumNumbers(t *testing.T) {
 	if strings.Contains(data, "PetCarryStatus_Battle") || strings.Contains(data, "PetGrade_Mythic") {
 		t.Fatalf("marshalJSON enum output = %s, want enum numbers", data)
 	}
-	if !strings.Contains(data, `"carryStatus": 2`) {
-		t.Fatalf("marshalJSON carryStatus output = %s, want carryStatus enum number", data)
+	var got map[string]any
+	if err := json.Unmarshal([]byte(data), &got); err != nil {
+		t.Fatalf("marshalJSON output is invalid JSON: %v, data:%s", err, data)
 	}
-	if !strings.Contains(data, `"grade": 5`) {
-		t.Fatalf("marshalJSON grade output = %s, want grade enum number", data)
+	if value, ok := got["carryStatus"].(float64); !ok || int(value) != int(pb.PetCarryStatus_PetCarryStatus_Battle) {
+		t.Fatalf("marshalJSON carryStatus = %v, want %d", got["carryStatus"], pb.PetCarryStatus_PetCarryStatus_Battle)
+	}
+	if value, ok := got["grade"].(float64); !ok || int(value) != int(pb.PetGrade_PetGrade_Mythic) {
+		t.Fatalf("marshalJSON grade = %v, want %d", got["grade"], pb.PetGrade_PetGrade_Mythic)
 	}
 }
 
