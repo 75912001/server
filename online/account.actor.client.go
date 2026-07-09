@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"server/common"
 	"server/common/gameconfig"
 	commonpet "server/common/pet"
 	pb "server/proto/pb"
@@ -140,13 +141,13 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 
 	// character nick
 	resolvedCharacterNick := strings.TrimSpace(req.GetCharacterNick())
-	if !isValidCharacterNick(resolvedCharacterNick) {
+	if !common.IsValidCharacterNick(resolvedCharacterNick) {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterCreateRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
 
 	// character elemental
-	if !isValidElementalAllocation(req.GetCharacterElemental()) {
+	if !common.IsValidElementalAllocation(req.GetCharacterElemental()) {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterCreateRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
