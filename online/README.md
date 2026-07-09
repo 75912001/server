@@ -108,7 +108,7 @@ client TCP
 当前已实现业务：
 
 - `AccountRecordReq`：返回 online 本地缓存的 `AccountRecord`。
-- `CharacterCreateReq`：由客户端发起角色创建, 请求携带 `character_slot_index`, `character_id`, `character_nick` 以及必填 `character_elemental/character_attribute`; `character_elemental` 包含地水火风四项, 每项必须在 0-10, 总和必须等于 10, 且只能是单元素或两个相邻元素; `character_attribute` 包含体力/腕力/耐力/速度四项, 每项必须在 0-20, 总和必须等于 20; 未提交或非法时返回 `InvalidArgument`; online 在指定角色槽位为空时初始化服务端权威账号档案数据, 设置 `account_record_create_timestamp_ms`, 按 `used_uuid` 生成指定或默认角色 `uuid/nick/asset_id`, 写入 `CharacterRecord.exp=0`, `elemental`, `available_point=0`, `attribute`, `scene_id=2000001`, `create_timestamp_ms` 和 `rebirth_count=0`, 不在 `asset_id_record_map` 写入方向和动作, 5 只默认宠物按 4000101/4000102/4000103/4000104/4000105 顺序追加到角色 `pet_record_list`, 5 只默认宠物 `PetRecord.exp=0`, `create_timestamp_ms`, `rebirth_count=0`, 品阶均为 `PetGrade_Mythic`, 第一只状态为 `Battle`, 其余状态为 `Wait`, 默认不写入账号 `pet_warehouse_record_map`, 再调用 `CacheSetAccountRecord` 写回; `aid/account/account_create_timestamp_ms` 必须来自 `OnlineBindAccount` 绑定阶段已校验的 cache 档案。
+- `CharacterCreateReq`：由客户端发起角色创建, 请求携带 `character_slot_index`, `character_id`, `character_nick` 以及必填 `character_elemental/character_attribute`; `character_elemental` 包含地水火风四项, 每项必须在 0-10, 总和必须等于 10, 且只能是单元素或两个相邻元素; `character_attribute` 包含体力/腕力/耐力/速度四项, 每项必须在 0-20, 总和必须等于 20; 未提交或非法时返回 `InvalidArgument`; online 在指定角色槽位为空时初始化服务端权威账号档案数据, 设置 `account_record_create_timestamp_ms`, 按 `used_uuid` 生成指定或默认角色 `uuid/nick/asset_id`, 写入 `CharacterRecord.exp=0`, `earth/water/fire/wind`, `available_point=0`, `vitality/strength/toughness/dexterity`, `scene_id=2000001`, `create_timestamp_ms` 和 `rebirth_count=0`, 不在 `asset_id_record_map` 写入方向和动作, 5 只默认宠物按 4000101/4000102/4000103/4000104/4000105 顺序追加到角色 `pet_record_list`, 5 只默认宠物 `PetRecord.exp=0`, `create_timestamp_ms`, `rebirth_count=0`, 品阶均为 `PetGrade_Mythic`, 第一只状态为 `Battle`, 其余状态为 `Wait`, 默认不写入账号 `pet_warehouse_record_map`, 再调用 `CacheSetAccountRecord` 写回; `aid/account/account_create_timestamp_ms` 必须来自 `OnlineBindAccount` 绑定阶段已校验的 cache 档案。
 - `CharacterOnlineReq`：由客户端选择角色后发起, 请求携带 `character_uuid`; Account actor 校验角色属于当前账号, 未上线, 且角色 `scene_id` 存在于 `scene.yaml` 后, 写入角色最后登录时间戳并写回 cache, 再将 UUID 加入内存在线集合并设为 active character, 同时清理自动遇敌状态, 返回空 `CharacterOnlineRes`。
 - `CharacterOfflineReq`：由客户端选择角色下线时发起, 请求携带 `character_uuid`; Account actor 校验角色属于当前账号且已上线后, 写入角色最后登出时间戳并写回 cache, 再从内存在线集合移除 UUID; 如果该角色是 active character, 同步清空 active character, 返回空 `CharacterOfflineRes`。
 - `SceneEnterReq`：由客户端请求已上线角色进入指定场景, 请求携带 `character_uuid` 和 `scene_id`; Account actor 校验角色属于当前账号且已上线, `scene_id` 存在于 `scene.yaml`, 且当前不在战斗中, 然后写入角色 `scene_id`, 写回 cache, 设为 active character, 清理自动遇敌状态, 返回 `SceneEnterRes`。
@@ -129,7 +129,7 @@ client TCP
 - 角色在线集合和 active character 只存在 Account actor 内存中, 不写入 `AccountRecord`, 不写入 Redis/cache; `OnlineUnbindAccount` 清理 Account actor 时会给仍在线角色写入最后登出时间戳并清空这些运行期状态。
 - `CharacterCreateReq` 只创建角色档案, 不会自动将角色加入在线集合。
 - `AccountRecord` 是账号级档案聚合根, `aid/account` 下管理多个角色; `character_record_list` 的数组下标是角色槽位, 空槽使用 `uuid == 0` 的 `CharacterRecord` 占位, 每个账号最多可用角色槽位数量由 proto 常量 `AccountRecordLimit_MaxCharacterSlotCount` 定义, 完整角色业务 key 是 `aid + uuid`。
-- `CharacterRecord.asset_id` 是角色资源 ID/角色 ID 的权威字段; `CharacterRecord.exp/elemental/available_point/attribute/scene_id/create_timestamp_ms/rebirth_count/last_login_timestamp_ms/last_logout_timestamp_ms` 直接保存角色经验、元素、可用点、基础状态、当前场景、创建时间、转生次数和上下线时间; `asset_id_record_map` 当前不承载角色资源 ID、经验、元素、属性、场景、创建时间、转生次数、上下线时间戳、方向和动作; 角色 HP 由基础状态计算, 不写入角色记录。
+- `CharacterRecord.asset_id` 是角色资源 ID/角色 ID 的权威字段; `CharacterRecord.exp/earth/water/fire/wind/available_point/vitality/strength/toughness/dexterity/scene_id/create_timestamp_ms/rebirth_count/last_login_timestamp_ms/last_logout_timestamp_ms` 直接保存角色经验、元素点数、可用点、基础状态、当前场景、创建时间、转生次数和上下线时间; `asset_id_record_map` 当前不承载角色资源 ID、经验、元素、属性、场景、创建时间、转生次数、上下线时间戳、方向和动作; 角色 HP 由基础状态计算, 不写入角色记录。
 - `CharacterRecord.pet_record_list` 只保存角色当前随身携带宠物, 按携带顺序排列, 单角色最多携带 `PetRecordLimit_MaxCarryCount` 只; `AccountRecord.pet_warehouse_record_map` 是账号宠物仓库, 同账号下所有角色共享, 最多存放 `AccountRecordLimit_MaxPetWarehouseCount` 只.
 - `PetRecord.exp/loyalty/saved_base_*/raw_*/create_timestamp_ms/rebirth_count` 直接保存宠物经验、忠诚度、成长基础值、当前原始属性、创建时间和转生次数; `asset_record_base_map` 只保存宠物资源 ID。`PetRecord.grade` 表示宠物品阶, 创建宠物时决定 SavedBase 成长偏移: `Common=-2`, `Rare=-1`, `Epic=0`, `Legendary=1`, `Mythic=2`; `Raw` 四维仍由 SavedBase 和现有初始/升级公式推导, 不额外叠加品阶倍率.
 - `PetRecord.carry_status` 表示宠物携带状态; 角色随身宠物中最多一只 `Battle`, 最多一只 `Mount`, 仓库内宠物固定为 `Rest`. `Mount` 需要忠诚度 100 和骑乘权限, 当前仓库暂未建模骑乘权限字段.
@@ -139,7 +139,7 @@ client TCP
 - `CombatRoundResultNotify.intent_list` 只表示本回合选择或默认填充的出手意图, `CombatIntentSource` 区分玩家, 超时默认和敌方 AI; `event_list` 使用 `event_id + parent_event_id` 表达攻击, 反击, 合击和状态触发链; `CombatEvent.effect_list` 是可顺序回放的 typed 效果列表, 首版实际生成 `Damage`, `Guard`, `UnitAlive` 和必要的 `Miss`.
 - HP, alive 和防御状态只存在 `AccountCombatState` 运行期, 不写回 `AccountRecord` cache; 战斗胜负优先看阵营角色单位是否全部死亡, 无角色单位的阵营退回看全阵营单位是否全灭; 战斗结束后若自动遇敌仍开启, 清理本场状态并重新注册 5 秒遇敌 timer, 下次仍按 active character 当前场景重新选择敌人组.
 - 旧版战斗 token 映射: `BP` 对应 `CombatRoundPrepareNotify` 中的可控单位和时间窗口, `BC` 对应 `CombatBattleStart.unit_list + CombatRoundPrepareNotify.unit_state_list`, `BA` 对应 `CombatRoundReadyNotify`, `B_RECV` 对应 `CombatRoundActionReq`, 旧动作脚本 `BB/BD/BV/BE` 等表现节点对应 `CombatRoundResultNotify.event_list.effect_list`.
-- 本轮不兼容旧 cache `AccountRecord`; 已存在但缺少 `CharacterRecord.asset_id/attribute` 等新结构化字段的档案视为旧格式, 开发环境需要清理 cache 或重新创建账号。
+- 本轮不兼容旧 cache `AccountRecord`; 已存在但缺少 `CharacterRecord.asset_id/vitality` 等角色根字段的档案视为旧格式, 开发环境需要清理 cache 或重新创建账号。
 
 ## 排障
 
@@ -147,7 +147,7 @@ client TCP
 - `account not online` 不再作为解绑失败条件，本地 Account actor 不存在会返回成功。
 - 业务包无响应：检查 gateway stream 是否注册、online 是否有对应 aid actor。
 - `AccountRecord` 缺少角色记录：检查客户端是否完成 `CharacterCreateReq`, 以及 online 写回 cache 是否成功。
-- `CharacterRecord.asset_id` 为 0 或 `attribute` 缺失：这是旧 cache 档案或服务端初始化异常, 开发环境清理 cache 后重新创建账号。
+- `CharacterRecord.asset_id` 为 0 或基础状态根字段全为 0：这是旧 cache 档案或服务端初始化异常, 开发环境清理 cache 后重新创建账号。
 - `auto encounter failed`: 检查账号是否已有 active online character 和 `Battle` 宠物, 角色 `scene_id` 是否存在于 `scene.yaml`, 场景是否配置可选敌人组, 以及 `pet.yaml`/`exp.yaml` 是否能生成宠物战斗属性.
 - `invalid combat action`: 检查客户端提交的 `battle_id/round/unit_key` 是否匹配当前战斗, 角色动作是否只使用攻击/防御, 宠物技能是否来自当前战斗宠物模板技能槽.
 - `DeadlineExceeded`：gateway 调用 online 超时，检查 gateway `onlineRPCTimeout`、online 日志和 actor 是否阻塞。

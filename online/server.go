@@ -34,7 +34,7 @@ func NewOnlineServer(args []string) *OnlineServer {
 // PreStart 配置 gRPC selector / etcd 回调，再调用 xlib server 完成日志/actor/timer 初始化，并注册 OnlineService。
 func (p *OnlineServer) PreStart(ctx context.Context) error {
 	var err error
-	GGameConfig, err = gameconfig.Load(GCfgCustomGameConfigDir)
+	gameconfig.GGameConfig, err = gameconfig.Load(GCfgCustomGameConfigDir)
 	if err != nil {
 		return errors.WithMessagef(err, "load game config failed, dir:%s %v", GCfgCustomGameConfigDir, xruntime.Location())
 	}
