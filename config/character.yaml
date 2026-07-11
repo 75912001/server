@@ -11,7 +11,7 @@ character:
   - id: 1000011
     name: "吉米"
     isRole: true
-    description: "吉米-蓝"
+    description: "吉米-蓝" # 资源提取器 动画序号 5
     color: "blue"
     sprite: #[10817,12344] 1528 个文件
       unarmed: #[11705,12048] 344 个文件
@@ -583,7 +583,7 @@ character:
   - id: 1000012
     name: "吉米"
     isRole: true
-    description: "吉米-棕"
+    description: "吉米-棕" # 资源提取器 动画序号 15
     color: "brown"
     sprite: #[13873,15400] 1528 个文件
       unarmed: #[14761,15104] 344 个文件
@@ -1155,7 +1155,7 @@ character:
   - id: 1000013
     name: "吉米"
     isRole: true
-    description: "吉米-红"
+    description: "吉米-红" # 资源提取器 动画序号 0
     color: "red"
     sprite: #[9289,10816] 1528 个文件
       unarmed: #[10177,10520] 344 个文件
@@ -1727,7 +1727,7 @@ character:
   - id: 1000014
     name: "吉米"
     isRole: true
-    description: "吉米-橙"
+    description: "吉米-橙" # 资源提取器 动画序号 10
     color: "orange"
     sprite: #[12345,13872] 1528 个文件
       unarmed: #[13233,13576] 344 个文件
@@ -2300,7 +2300,7 @@ character:
   - id: 1000021
     name: "羅倫斯"
     isRole: true
-    description: "羅倫斯-蓝"
+    description: "羅倫斯-蓝" # 资源提取器 动画序号 30
     color: "blue"
     sprite: #[18457,19984] 1528 个文件
       unarmed: #[19345,19688] 344 个文件
@@ -2872,7 +2872,7 @@ character:
   - id: 1000022
     name: "羅倫斯"
     isRole: true
-    description: "羅倫斯-黄"
+    description: "羅倫斯-黄" # 资源提取器 动画序号 20
     color: "yellow"
     sprite: #[15401,16928] 1528 个文件
       unarmed: #[16289,16632] 344 个文件
@@ -3444,7 +3444,7 @@ character:
   - id: 1000023
     name: "羅倫斯"
     isRole: true
-    description: "羅倫斯-红"
+    description: "羅倫斯-红" # 资源提取器 动画序号 25
     color: "red"
     sprite: #[16929,18456] 1528 个文件
       unarmed: #[17817,18160] 344 个文件
@@ -4016,7 +4016,7 @@ character:
   - id: 1000024
     name: "羅倫斯"
     isRole: true
-    description: "羅倫斯-黑"
+    description: "羅倫斯-黑" # 资源提取器 动画序号 35
     color: "black"
     sprite: #[19985,21512] 1528 个文件
       unarmed: #[20873,21216] 344 个文件
@@ -4588,7 +4588,7 @@ character:
   - id: 1000031
     name: "強普"
     isRole: true
-    description: "強普-黑"
+    description: "強普-黑"  # 资源提取器 动画序号 50
     color: "black"
     sprite: #[24569,26096] 1528 个文件
       unarmed: #[25457,25800] 344 个文件
@@ -5160,7 +5160,7 @@ character:
   - id: 1000032
     name: "強普"
     isRole: true
-    description: "強普-棕"
+    description: "強普-棕" # 资源提取器 动画序号 40
     color: "brown"
     sprite: #[21513,23040] 1528 个文件
       unarmed: #[22401,22744] 344 个文件
@@ -5732,7 +5732,7 @@ character:
   - id: 1000033
     name: "強普"
     isRole: true
-    description: "強普-红"
+    description: "強普-红"  # 资源提取器 动画序号 55
     color: "red"
     sprite: #[26097,27624] 1528 个文件
       unarmed: #[26985,27328] 344 个文件
@@ -6304,7 +6304,7 @@ character:
   - id: 1000034
     name: "強普"
     isRole: true
-    description: "強普-黄"
+    description: "強普-黄" # 资源提取器 动画序号 45
     color: "yellow"
     sprite: #[23041,24568] 1528 个文件
       unarmed: #[23929,24272] 344 个文件
@@ -6876,7 +6876,7 @@ character:
   - id: 1000041
     name: "庫比"
     isRole: true
-    description: "庫比-蓝"
+    description: "庫比-蓝" # 资源提取器 动画序号 65
     color: "blue"
     sprite: #[29153,30680] 1528 个文件
       unarmed: #[30041,30384] 344 个文件
@@ -7448,7 +7448,7 @@ character:
   - id: 1000042
     name: "庫比"
     isRole: true
-    description: "庫比-绿"
+    description: "庫比-绿" # 资源提取器 动画序号 75
     color: "green"
     sprite: #[32209,33736] 1528 个文件
       unarmed: #[33097,33440] 344 个文件
@@ -8020,7 +8020,7 @@ character:
   - id: 1000043
     name: "庫比"
     isRole: true
-    description: "庫比-黄"
+    description: "庫比-黄" # 资源提取器 动画序号 60
     color: "yellow"
     sprite: #[27625,29152] 1528 个文件
       unarmed: #[28513,28856] 344 个文件
@@ -8592,7 +8592,7 @@ character:
   - id: 1000044
     name: "庫比"
     isRole: true
-    description: "庫比-棕"
+    description: "庫比-棕" # 资源提取器 动画序号 70
     color: "brown"
     sprite: #[30681,32208] 1528 个文件
       unarmed: #[31569,31912] 344 个文件
@@ -9164,7 +9164,7 @@ character:
   - id: 1000051
     name: "卡伯菲"
     isRole: true
-    description: "卡伯菲-绿"
+    description: "卡伯菲-绿" # 资源提取器 动画序号 85
     color: "green"
     sprite: #[35265,36792] 1528 个文件
       unarmed: #[36153,36496] 344 个文件
@@ -9736,7 +9736,7 @@ character:
   - id: 1000052
     name: "卡伯菲"
     isRole: true
-    description: "卡伯菲-粉"
+    description: "卡伯菲-粉" # 资源提取器 动画序号 80
     color: "pink"
     sprite: #[33737,35264] 1528 个文件
       unarmed: #[34625,34968] 344 个文件
@@ -10308,7 +10308,7 @@ character:
   - id: 1000053
     name: "卡伯菲"
     isRole: true
-    description: "卡伯菲-白"
+    description: "卡伯菲-白" # 资源提取器 动画序号 95
     color: "white"
     sprite: #[38321,39848] 1528 个文件
       unarmed: #[39209,39552] 344 个文件
@@ -10880,7 +10880,7 @@ character:
   - id: 1000054
     name: "卡伯菲"
     isRole: true
-    description: "卡伯菲-黄"
+    description: "卡伯菲-黄" # 资源提取器 动画序号 90
     color: "yellow"
     sprite: #[36793,38320] 1528 个文件
       unarmed: #[37681,38024] 344 个文件
@@ -11452,7 +11452,7 @@ character:
   - id: 1000061
     name: "酋力安"
     isRole: true
-    description: "酋力安-黑"
+    description: "酋力安-黑" # 资源提取器 动画序号 115
     color: "black"
     sprite: #[44429,45956] 1528 个文件
       unarmed: #[45317,45660] 344 个文件
@@ -12024,7 +12024,7 @@ character:
   - id: 1000062
     name: "酋力安"
     isRole: true
-    description: "酋力安-蓝"
+    description: "酋力安-蓝" # 资源提取器 动画序号 105
     color: "blue"
     sprite: #[41373,42900] 1528 个文件
       unarmed: #[42261,42604] 344 个文件
@@ -12596,7 +12596,7 @@ character:
   - id: 1000063
     name: "酋力安"
     isRole: true
-    description: "酋力安-棕"
+    description: "酋力安-棕"  # 资源提取器 动画序号 100
     color: "brown"
     sprite: #[39849,41372]  (NOTE: 126235,126236,126237,126238 单独再增加这四个文件,用在 stick.right 中. 见: defense,sad,angry ) 个文件
       unarmed: #[40733,41076] 344 个文件
@@ -13168,7 +13168,7 @@ character:
   - id: 1000064
     name: "酋力安"
     isRole: true
-    description: "酋力安-橙"
+    description: "酋力安-橙" # 资源提取器 动画序号 110
     color: "orange"
     sprite: #[42901,44428] 1528 个文件
       unarmed: #[43789,44132] 344 个文件
@@ -13740,7 +13740,7 @@ character:
   - id: 1000071
     name: "愛倫"
     isRole: true
-    description: "愛倫-绿"
+    description: "愛倫-绿" # 资源提取器 动画序号 120
     color: "green"
     sprite: #[45957,47484]  个文件
       unarmed: #[46845,47188] 344 个文件
@@ -14312,7 +14312,7 @@ character:
   - id: 1000072
     name: "愛倫"
     isRole: true
-    description: "愛倫-蓝"
+    description: "愛倫-蓝" # 资源提取器 动画序号 130
     color: "blue"
     sprite: #[49013,50540] 1528 个文件
       unarmed: #[49901,50244] 344 个文件
@@ -14884,7 +14884,7 @@ character:
   - id: 1000073
     name: "愛倫"
     isRole: true
-    description: "愛倫-粉"
+    description: "愛倫-粉" # 资源提取器 动画序号 135
     color: "pink"
     sprite: #[50541,52068] 1528 个文件
       unarmed: #[51429,51772] 344 个文件
@@ -15456,7 +15456,7 @@ character:
   - id: 1000074
     name: "愛倫"
     isRole: true
-    description: "愛倫-黄"
+    description: "愛倫-黄" # 资源提取器 动画序号 125
     color: "yellow"
     sprite: #[47485,49012] 1528 个文件
       unarmed: #[48373,48716] 344 个文件
@@ -16028,7 +16028,7 @@ character:
   - id: 1000081
     name: "瑪蕾菲雅"
     isRole: true
-    description: "瑪蕾菲雅-粉"
+    description: "瑪蕾菲雅-粉" # 资源提取器 动画序号 145
     color: "pink"
     sprite: #[53597,55124] 1528 个文件
       unarmed: #[54485,54828] 344 个文件
@@ -16600,7 +16600,7 @@ character:
   - id: 1000082
     name: "瑪蕾菲雅"
     isRole: true
-    description: "瑪蕾菲雅-绿"
+    description: "瑪蕾菲雅-绿" # 资源提取器 动画序号 140
     color: "green"
     sprite: #[52069,53596]  个文件
       unarmed: #[52957,53300] 344 个文件
@@ -17172,7 +17172,7 @@ character:
   - id: 1000083
     name: "瑪蕾菲雅"
     isRole: true
-    description: "瑪蕾菲雅-蓝"
+    description: "瑪蕾菲雅-蓝" # 资源提取器 动画序号 155
     color: "blue"
     sprite: #[56653,58180] 1528 个文件
       unarmed: #[57541,57884] 344 个文件
@@ -17744,7 +17744,7 @@ character:
   - id: 1000084
     name: "瑪蕾菲雅"
     isRole: true
-    description: "瑪蕾菲雅-黄"
+    description: "瑪蕾菲雅-黄" # 资源提取器 动画序号 150
     color: "yellow"
     sprite: #[55125,56652] 1528 个文件
       unarmed: #[56013,56356] 344 个文件
@@ -18316,7 +18316,7 @@ character:
   - id: 1000091
     name: "希希亞"
     isRole: true
-    description: "希希亞-绿"
+    description: "希希亞-绿" # 资源提取器 动画序号 170
     color: "green"
     sprite: #[61237,62764] 1528 个文件
       unarmed: #[62125,62468] 344 个文件
@@ -18888,7 +18888,7 @@ character:
   - id: 1000092
     name: "希希亞"
     isRole: true
-    description: "希希亞-棕"
+    description: "希希亞-棕" # 资源提取器 动画序号 175
     color: "brown"
     sprite: #[62765,64292] 1528 个文件
       unarmed: #[63653,63996] 344 个文件
@@ -19460,7 +19460,7 @@ character:
   - id: 1000093
     name: "希希亞"
     isRole: true
-    description: "希希亞-蓝"
+    description: "希希亞-蓝" # 资源提取器 动画序号 165
     color: "blue"
     sprite: #[59709,61236] 1528 个文件
       unarmed: #[60597,60940] 344 个文件
@@ -20032,7 +20032,7 @@ character:
   - id: 1000094
     name: "希希亞"
     isRole: true
-    description: "希希亞-白"
+    description: "希希亞-白" # 资源提取器 动画序号 160
     color: "white"
     sprite: #[58181,59708] 1528 个文件
       unarmed: #[59069,59412] 344 个文件
@@ -20604,7 +20604,7 @@ character:
   - id: 1000101
     name: "菲莉雅"
     isRole: true
-    description: "菲莉雅-蓝"
+    description: "菲莉雅-蓝" # 资源提取器 动画序号 195
     color: "green"
     sprite: #[68877,70404] 1528 个文件
       unarmed: #[69765,70108] 344 个文件
@@ -21176,7 +21176,7 @@ character:
   - id: 1000102
     name: "菲莉雅"
     isRole: true
-    description: "菲莉雅-棕"
+    description: "菲莉雅-棕" # 资源提取器 动画序号 180
     color: "brown"
     sprite: #[64293,65820] 1528 个文件
       unarmed: #[65181,65524] 344 个文件
@@ -21748,7 +21748,7 @@ character:
   - id: 1000103
     name: "菲莉雅"
     isRole: true
-    description: "菲莉雅-黑"
+    description: "菲莉雅-黑" # 资源提取器 动画序号 190
     color: "black"
     sprite: #[67349,68876] 1528 个文件
       unarmed: #[68237,68580] 344 个文件
@@ -22320,7 +22320,7 @@ character:
   - id: 1000104
     name: "菲莉雅"
     isRole: true
-    description: "菲莉雅-黄"
+    description: "菲莉雅-黄" # 资源提取器 动画序号 185
     color: "yellow"
     sprite: #[65821,67348] 1528 个文件
       unarmed: #[66709,67052] 344 个文件
@@ -22892,7 +22892,7 @@ character:
   - id: 1000111
     name: "米亞"
     isRole: true
-    description: "米亞-蓝"
+    description: "米亞-蓝" # 资源提取器 动画序号 210
     color: "blue"
     sprite: #[73461,74988] 1528 个文件
       unarmed: #[74349,74692] 344 个文件
@@ -23464,7 +23464,7 @@ character:
   - id: 1000112
     name: "米亞"
     isRole: true
-    description: "米亞-橙"
+    description: "米亞-橙" # 资源提取器 动画序号 205
     color: "yellow"
     sprite: #[71933,73460] 1528 个文件
       unarmed: #[72821,73164] 344 个文件
@@ -24036,7 +24036,7 @@ character:
   - id: 1000113
     name: "米亞"
     isRole: true
-    description: "米亞-红"
+    description: "米亞-红" # 资源提取器 动画序号 200
     color: "red"
     sprite: #[70405,71932] 1528 个文件
       unarmed: #[71293,71636] 344 个文件
@@ -24608,7 +24608,7 @@ character:
   - id: 1000114
     name: "米亞"
     isRole: true
-    description: "米亞-白"
+    description: "米亞-白" # 资源提取器 动画序号 215
     color: "white"
     sprite: #[74989,76516] 1528 个文件
       unarmed: #[75877,76220] 344 个文件
@@ -25180,7 +25180,7 @@ character:
   - id: 1000121
     name: "露露"
     isRole: true
-    description: "露露-绿"
+    description: "露露-绿" # 资源提取器 动画序号 225
     color: "green"
     sprite: #[78070,79621] 1552 个文件
       unarmed: #[78958,79325] 368 个文件
@@ -25752,7 +25752,7 @@ character:
   - id: 1000122
     name: "露露"
     isRole: true
-    description: "露露-蓝"
+    description: "露露-蓝" # 资源提取器 动画序号 235
     color: "blue"
     sprite: #[81174,82726] 1552 个文件 (NOTE: 中间 82211 没用到, 实际用到文件数量为 1552)
       unarmed: #[82062,82430] 368 个文件 (NOTE: 中间 82211 没用到, 实际用到文件数量为 368)
@@ -26324,7 +26324,7 @@ character:
   - id: 1000123
     name: "露露"
     isRole: true
-    description: "露露-红"
+    description: "露露-红" # 资源提取器 动画序号 230
     color: "red"
     sprite: #[79622,81173] 1552 个文件
       unarmed: #[80510,80877] 368 个文件
@@ -26896,7 +26896,7 @@ character:
   - id: 1000124
     name: "露露"
     isRole: true
-    description: "露露-黄"
+    description: "露露-黄" # 资源提取器 动画序号 220
     color: "yellow"
     sprite: #[76517,78069] 1552 个文件 (NOTE: 中间 77508 没用到, 实际用到文件数量为 1552)
       unarmed: #[77405,77773] 368 个文件 (NOTE: 中间 77508 没用到, 实际用到文件数量为 368)
