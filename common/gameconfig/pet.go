@@ -47,7 +47,7 @@ type PetAttributeEntry struct {
 	// Counter 来自 attribute.counter, 表示反击相关修正值.
 	Counter *uint32 `yaml:"counter"`
 	// Get 来自 attribute.get, 基础捕获值 (原版本)
-	Get *uint32 `yaml:"get"`
+	Get *int32 `yaml:"get"`
 	// Rare 来自 attribute.rate, 稀有度字段 (原版本)
 	Rare *uint32 `yaml:"rate"`
 }

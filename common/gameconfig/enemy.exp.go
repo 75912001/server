@@ -73,7 +73,7 @@ func (p *EnemyExpConfig) GenerateEnemyExp(petID uint32, lv uint32) (uint32, erro
 	}
 	baseSum := *pet.Growth.BaseVital + *pet.Growth.BaseStr + *pet.Growth.BaseTough + *pet.Growth.BaseDex
 	// rank 加成是 2.5, 2.0 等小数, 这里统一乘以 100 用整数计算.
-	rankBonusHundredths := uint32(0)
+	rankBonusHundredths := int32(0)
 	switch {
 	case baseSum >= 100:
 		rankBonusHundredths = 250
@@ -86,18 +86,18 @@ func (p *EnemyExpConfig) GenerateEnemyExp(petID uint32, lv uint32) (uint32, erro
 	case baseSum >= 80:
 		rankBonusHundredths = 50
 	}
-	alphaHundredths := *pet.Attribute.Critical +
-		*pet.Attribute.Counter +
+	alphaHundredths := int32(*pet.Attribute.Critical) +
+		int32(*pet.Attribute.Counter) +
 		*pet.Attribute.Get +
-		*pet.Attribute.PoisonResist +
-		*pet.Attribute.ParalysisResist +
-		*pet.Attribute.SleepResist +
-		*pet.Attribute.StoneResist +
-		*pet.Attribute.DrunkResist +
-		*pet.Attribute.ConfusionResist +
-		*pet.Attribute.Rare*100
+		int32(*pet.Attribute.PoisonResist) +
+		int32(*pet.Attribute.ParalysisResist) +
+		int32(*pet.Attribute.SleepResist) +
+		int32(*pet.Attribute.StoneResist) +
+		int32(*pet.Attribute.DrunkResist) +
+		int32(*pet.Attribute.ConfusionResist) +
+		int32(*pet.Attribute.Rare*100)
 
-	exp := baseExp + (rankBonusHundredths+alphaHundredths)*lv/100
+	exp := baseExp + uint32(rankBonusHundredths+alphaHundredths)*lv/100
 	if exp < 1 {
 		return 1, nil
 	}

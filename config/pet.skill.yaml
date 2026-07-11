@@ -10,7 +10,8 @@ skill:
     cost: 500
   - id: 9000002
     name: 攻击
-    description: 通常攻击,other_without_myself
+    description: 通常攻击
+    option: other_without_myself
     cost: 1000
   - id: 9000003
     name: 防御
@@ -18,13 +19,21 @@ skill:
     cost: 1000
   - id: 9000004
     name: 破除防御
-    description: 对采取防敌人攻击可能,other_without_myself
+    description: 对采取防敌人攻击可能
+    option: other_without_myself
     cost: 1500
   - id: 9000005
     name: 连续攻击
-    description: 两次连续攻击,other_without_myself
+    description: 两次连续攻击
+    option: other_without_myself
     cost: 2000
   - id: 9000006
     name: 三段攻击
-    description: 3次连续攻击,other_without_myself
+    description: 3次连续攻击
+    option: other_without_myself
     cost: 5000
+  - id: 9000007
+    name: 愤怒
+    description: 防御率下降 攻击力和敏捷上升 给予敌人愤怒一击
+    option: 攻%+200 防%-60 回避70 other_without_myself
+    cost: 1000
