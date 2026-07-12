@@ -15,6 +15,7 @@ const (
 	OnlineAccountActorCmdBind         xactor.CMD = 101
 	OnlineAccountActorCmdUnbind       xactor.CMD = 102
 	OnlineAccountActorCmdClientPacket xactor.CMD = 103
+	OnlineAccountActorCmdStop         xactor.CMD = 104
 )
 
 func (p *Account) PostBind(req *pb.OnlineBindAccountReq, accountRecord *pb.AccountRecord) (*pb.OnlineBindAccountRes, error) {
@@ -44,7 +45,6 @@ func (p *Account) PostClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket)
 
 func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 	var resp any
-	var err error
 	for _, raw := range messages {
 		if event, ok := raw.(*xcontrol.Event); ok {
 			if event.ISwitch.IsOn() {
@@ -71,10 +71,17 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if !ok {
 				continue
 			}
-			resp, err = p.onBind(req, accountRecord)
-			if err != nil {
-				return p.behavior, resp, err
-			}
+			characterManager := newCharacterMgr(p, accountRecord)
+
+			p.characterManager.clearRuntime()
+			p.gatewayKey = req.GetGatewayKey()
+			p.accountSession = req.GetAccountSession()
+			p.account = req.GetAccount()
+			p.clientIP = req.GetClientIp()
+			p.accountRecord = accountRecord
+			p.characterManager = characterManager
+			GAccountMgr.accounts.Add(p.aid, p)
+			resp = &pb.OnlineBindAccountRes{}
 		case OnlineAccountActorCmdUnbind:
 			gatewayKey, ok := msg.Args[0].(string)
 			if !ok {
@@ -91,9 +98,9 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if currentAccount, ok := GAccountMgr.accounts.Find(p.aid); ok && currentAccount == p {
 				GAccountMgr.accounts.Del(p.aid)
 			}
-			p.clearCombatRuntime()
-			p.persistOnlineCharacterLogoutTimestamp(time.Now().UnixMilli())
-			p.clearOnlineCharacterUUIDs()
+			p.updateCharacterLogout()
+			p.updateAccountRecord()
+			p.characterManager.clearRuntime()
 			p.gatewayKey = ""
 			p.accountSession = ""
 			resp = true
@@ -107,6 +114,15 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 				continue
 			}
 			p.onClientPacket(gateway, pkt)
+		case OnlineAccountActorCmdStop:
+			// Stop 也必须在 Account actor 内完成批量持久化和运行态清理,
+			// 避免服务关闭与尚未处理完的角色请求并发读写同一聚合根.
+			p.updateCharacterLogout()
+			p.updateAccountRecord()
+			p.characterManager.clearRuntime()
+			p.gatewayKey = ""
+			p.accountSession = ""
+			resp = true
 		}
 	}
 	return p.behavior, resp, nil
@@ -117,4 +133,24 @@ func (p *Account) offlineAccountSessionMatch(gatewayKey string, accountSession s
 		return false
 	}
 	return p.accountSession == accountSession
+}
+
+// updateCharacterLogoutTimestamp 将指定登出时间写入全部在线角色档案并持久化账号记录;
+func (p *Account) updateCharacterLogout() {
+	timestampMs := time.Now().UnixMilli()
+	if p.characterManager == nil || p.accountRecord == nil {
+		return
+	}
+	for _, character := range p.characterManager.characters {
+		if character == nil || !character.online || character.record == nil {
+			continue
+		}
+		character.record.LastLogoutTimestampMs = timestampMs
+	}
+}
+
+func (p *Account) updateAccountRecord() {
+	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
+		xlog.GLog.Errorf("set account record after account offline failed aid:%d err:%v", p.aid, err)
+	}
 }
