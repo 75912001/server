@@ -24,7 +24,7 @@ func (p *onlineGRPCServer) OnlineBindAccount(_ context.Context, req *pb.OnlineBi
 	if accountRecord == nil || accountRecord.GetAid() != aid || accountRecord.GetAccount() != account {
 		return nil, grpcstatus.Error(grpccodes.Unauthenticated, "account record mismatch")
 	}
-	if accountRecord.GetAccountCreateTimestampMs() == 0 {
+	if accountRecord.GetCreateTimestampMs() == 0 {
 		return nil, grpcstatus.Error(grpccodes.Internal, "invalid account record")
 	}
 	req.Account = account
