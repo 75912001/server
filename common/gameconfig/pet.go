@@ -4,6 +4,7 @@ import (
 	xmap "github.com/75912001/xlib/map"
 	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 
 	pb "server/proto/pb"
 )
@@ -28,6 +29,32 @@ type PetEntry struct {
 }
 
 type PetElementalEntry map[pb.AssetElemental]*uint32
+
+var petElementalByYAMLKey = map[string]pb.AssetElemental{
+	"earth": pb.AssetElemental_AssetElemental_Earth,
+	"water": pb.AssetElemental_AssetElemental_Water,
+	"fire":  pb.AssetElemental_AssetElemental_Fire,
+	"wind":  pb.AssetElemental_AssetElemental_Wind,
+}
+
+// UnmarshalYAML 将共享配置使用的元素名称转换为服务端协议枚举, 未知名称直接返回错误.
+func (p *PetElementalEntry) UnmarshalYAML(node *yaml.Node) error {
+	var raw map[string]*uint32
+	if err := node.Decode(&raw); err != nil {
+		return err
+	}
+
+	parsed := make(PetElementalEntry, len(raw))
+	for key, value := range raw {
+		elemental, ok := petElementalByYAMLKey[key]
+		if !ok {
+			return errors.Errorf("宠物 elemental 元素未知: %s", key)
+		}
+		parsed[elemental] = value
+	}
+	*p = parsed
+	return nil
+}
 
 type PetAttributeEntry struct {
 	// PoisonResist 来自 attribute.poisonResist, 表示毒抗性修正值.
