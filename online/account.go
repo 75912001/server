@@ -22,7 +22,7 @@ type Account struct {
 
 func newAccount(aid uint64) *Account {
 	u := &Account{aid: aid}
-	u.characterManager, _ = newCharacterMgr(u, nil)
+	u.characterManager = newCharacterMgr(u, nil)
 	u.actor = xactor.NewActor[uint64](aid, nil, u.behavior)
 	u.actor.Start()
 	return u
