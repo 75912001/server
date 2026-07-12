@@ -4,6 +4,7 @@ import (
 	xmap "github.com/75912001/xlib/map"
 	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 
 	pb "server/proto/pb"
 )
@@ -45,6 +46,24 @@ type IntRange struct {
 	Min *int
 	// Max 表示闭区间最大值, 由 YAML 中二元数组的第二个元素解析得到, 且必须大于等于 Min.
 	Max *int
+}
+
+// UnmarshalYAML 严格读取 YAML 二元整数数组, 并保证最小值不大于最大值.
+func (p *IntRange) UnmarshalYAML(node *yaml.Node) error {
+	var values []int
+	if err := node.Decode(&values); err != nil {
+		return err
+	}
+	if len(values) != 2 {
+		return errors.Errorf("整数范围必须包含2个值: got:%d", len(values))
+	}
+	if values[0] > values[1] {
+		return errors.Errorf("整数范围最小值不能大于最大值: min:%d max:%d", values[0], values[1])
+	}
+
+	p.Min = valuePtr(values[0])
+	p.Max = valuePtr(values[1])
+	return nil
 }
 
 func newEnemyGroupConfig() *EnemyGroupConfig {
