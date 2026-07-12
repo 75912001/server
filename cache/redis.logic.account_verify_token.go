@@ -92,11 +92,17 @@ func (p *Redis) createAccountAfterLock(ctx context.Context, account string) (*pb
 	}
 
 	now := time.Now().UnixMilli()
+	characterRecords := make([]*pb.CharacterRecord, int(pb.AccountRecordLimit_AccountRecordLimit_MaxCharacterSlotCount))
+	for i := range characterRecords {
+		// 空槽必须保存为非 nil 的零 UUID 记录, 使槽位下标在所有服务间保持稳定.
+		characterRecords[i] = &pb.CharacterRecord{}
+	}
 	accountRecord = &pb.AccountRecord{
-		Aid:                            aid,
-		Account:                        account,
-		AccountCreateTimestampMs:       now,
-		AccountRecordCreateTimestampMs: 0,
+		Aid:                   aid,
+		Account:               account,
+		CreateTimestampMs:     now,
+		CharacterRecordList:   characterRecords,
+		PetWarehouseRecordMap: make(map[uint64]*pb.PetRecord),
 	}
 	if err = p.SetAccountRecord(ctx, aid, accountRecord); err != nil {
 		return nil, false, err
@@ -130,7 +136,7 @@ func (p *Redis) GetAccountRecordByAccount(ctx context.Context, account string) (
 	if accountRecord.GetAccount() != account {
 		return nil, true, errors.Errorf("account record account mismatch, account: %s aid: %d record_account: %s %v", account, aid, accountRecord.GetAccount(), xruntime.Location())
 	}
-	if accountRecord.GetAccountCreateTimestampMs() == 0 {
+	if accountRecord.GetCreateTimestampMs() == 0 {
 		return nil, true, errors.Errorf("account record create time is empty, account: %s aid: %d %v", account, aid, xruntime.Location())
 	}
 	return accountRecord, true, nil

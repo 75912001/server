@@ -119,7 +119,7 @@ GroupAIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 3. 不存在时获取 `account:{account}:lock`。
 4. 拿到锁后再次查询账号映射，避免重复创建。
 5. 初始化 `account:aid:sequence:{groupID}` 为 `GroupAIDStart(groupID)-1`，并通过 `INCR` 生成 aid。
-6. 写入 `account:{aid}:record`，设置 `aid`、`account`、`account_create_timestamp_ms`，`account_record_create_timestamp_ms` 初始为 0；角色、宠物和其它游戏数据不在 cache 创建。
+6. 写入 `account:{aid}:record`, 设置 `aid`、`account`、`create_timestamp_ms`, 同时创建固定 5 个 UUID 为 0 的空角色槽位和空宠物仓库; cache 不创建具体角色和宠物数据。
 7. 写入 `account:{account}:aid`。
 8. 释放 `account:{account}:lock`。
 
@@ -139,7 +139,7 @@ GroupAIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 - cache 只按 protobuf 透传存储 `AccountRecord`, 不校验宠物是否同时存在于角色随身携带列表和账号宠物仓库, 也不校验 `PetRecord.carry_status` 业务规则.
 - `CacheSetAccountRecord` 要求请求 `aid` 与 `AccountRecord.aid` 完全一致。
 - `CacheGetAccountRecord` 对 Redis `nil` 返回 `NotFound`，其它 Redis 或反序列化错误返回 `Internal`。
-- `EnsureAccount` 只创建账号壳 `AccountRecord`; `used_uuid` 和 `character_record_list` 等游戏数据由 online 的 `CharacterCreateReq` 初始化后再通过 `CacheSetAccountRecord` 写回。
+- `EnsureAccount` 创建基础 `AccountRecord`, 包含 `aid/account/create_timestamp_ms`、固定 5 个 UUID 为 0 的空角色槽位和空宠物仓库; 具体角色、宠物及 `used_uuid` 由 online 的 `CharacterCreateReq` 填充后通过 `CacheSetAccountRecord` 写回。
 - 本轮不兼容旧 cache `AccountRecord`; 已存在但缺少 `CharacterRecord.asset_id/vitality` 等角色根字段的档案视为旧格式, 开发环境需要清理 cache 或重新创建账号。
 - 直接在 Redis CLI 中看到 `\x08...` 属于正常现象。
 - 读取时必须通过 `CacheGetAccountRecord` 或 protobuf 反序列化解析。
