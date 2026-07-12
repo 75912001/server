@@ -184,3 +184,15 @@ message SceneEnterRes {
   uint32 scene_id = 2; // 已进入的场景 ID
   int64 server_timestamp_ms = 3; // 服务端回复时间戳, 单位毫秒
 }
+
+//0x000020#client->gateway#战斗流程完成-请求
+message CombatFlowCompleteReq {
+  string battle_id = 1; // 已完成全部客户端表现并退出战斗场景的战斗 ID
+  uint64 character_uuid = 2; // 本场战斗所属的玩家角色 UUID
+}
+
+//0x000021#gateway->client#战斗流程完成-回复
+message CombatFlowCompleteRes {
+  string battle_id = 1; // 服务端已确认流程完成的战斗 ID
+  uint64 character_uuid = 2; // 本场战斗所属的玩家角色 UUID
+}

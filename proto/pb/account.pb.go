@@ -1561,6 +1561,118 @@ func (x *SceneEnterRes) GetServerTimestampMs() int64 {
 	return 0
 }
 
+// 0x000020#client->gateway#战斗流程完成-请求
+type CombatFlowCompleteReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BattleId      string `protobuf:"bytes,1,opt,name=battle_id,json=battleId,proto3" json:"battle_id,omitempty"`                 // 已完成全部客户端表现并退出战斗场景的战斗 ID
+	CharacterUuid uint64 `protobuf:"varint,2,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"` // 本场战斗所属的玩家角色 UUID
+}
+
+func (x *CombatFlowCompleteReq) Reset() {
+	*x = CombatFlowCompleteReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_account_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CombatFlowCompleteReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CombatFlowCompleteReq) ProtoMessage() {}
+
+func (x *CombatFlowCompleteReq) ProtoReflect() protoreflect.Message {
+	mi := &file_account_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CombatFlowCompleteReq.ProtoReflect.Descriptor instead.
+func (*CombatFlowCompleteReq) Descriptor() ([]byte, []int) {
+	return file_account_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *CombatFlowCompleteReq) GetBattleId() string {
+	if x != nil {
+		return x.BattleId
+	}
+	return ""
+}
+
+func (x *CombatFlowCompleteReq) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
+// 0x000021#gateway->client#战斗流程完成-回复
+type CombatFlowCompleteRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BattleId      string `protobuf:"bytes,1,opt,name=battle_id,json=battleId,proto3" json:"battle_id,omitempty"`                 // 服务端已确认流程完成的战斗 ID
+	CharacterUuid uint64 `protobuf:"varint,2,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"` // 本场战斗所属的玩家角色 UUID
+}
+
+func (x *CombatFlowCompleteRes) Reset() {
+	*x = CombatFlowCompleteRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_account_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CombatFlowCompleteRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CombatFlowCompleteRes) ProtoMessage() {}
+
+func (x *CombatFlowCompleteRes) ProtoReflect() protoreflect.Message {
+	mi := &file_account_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CombatFlowCompleteRes.ProtoReflect.Descriptor instead.
+func (*CombatFlowCompleteRes) Descriptor() ([]byte, []int) {
+	return file_account_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *CombatFlowCompleteRes) GetBattleId() string {
+	if x != nil {
+		return x.BattleId
+	}
+	return ""
+}
+
+func (x *CombatFlowCompleteRes) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
 var File_account_proto protoreflect.FileDescriptor
 
 var file_account_proto_rawDesc = []byte{
@@ -1789,9 +1901,21 @@ var file_account_proto_rawDesc = []byte{
 	0x52, 0x07, 0x73, 0x63, 0x65, 0x6e, 0x65, 0x49, 0x64, 0x12, 0x2e, 0x0a, 0x13, 0x73, 0x65, 0x72,
 	0x76, 0x65, 0x72, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x5f, 0x6d, 0x73,
 	0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x11, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x54, 0x69,
-	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x4d, 0x73, 0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72,
-	0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x4d, 0x73, 0x22, 0x5b, 0x0a, 0x15, 0x43, 0x6f, 0x6d,
+	0x62, 0x61, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x43, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x65, 0x52,
+	0x65, 0x71, 0x12, 0x1b, 0x0a, 0x09, 0x62, 0x61, 0x74, 0x74, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x62, 0x61, 0x74, 0x74, 0x6c, 0x65, 0x49, 0x64, 0x12,
+	0x25, 0x0a, 0x0e, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x75, 0x75, 0x69,
+	0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0d, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74,
+	0x65, 0x72, 0x55, 0x75, 0x69, 0x64, 0x22, 0x5b, 0x0a, 0x15, 0x43, 0x6f, 0x6d, 0x62, 0x61, 0x74,
+	0x46, 0x6c, 0x6f, 0x77, 0x43, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x73, 0x12,
+	0x1b, 0x0a, 0x09, 0x62, 0x61, 0x74, 0x74, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x08, 0x62, 0x61, 0x74, 0x74, 0x6c, 0x65, 0x49, 0x64, 0x12, 0x25, 0x0a, 0x0e,
+	0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x04, 0x52, 0x0d, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x55,
+	0x75, 0x69, 0x64, 0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -1806,7 +1930,7 @@ func file_account_proto_rawDescGZIP() []byte {
 	return file_account_proto_rawDescData
 }
 
-var file_account_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_account_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_account_proto_goTypes = []any{
 	(*AccountVerifyReq)(nil),         // 0: account.AccountVerifyReq
 	(*AccountVerifyRes)(nil),         // 1: account.AccountVerifyRes
@@ -1833,37 +1957,39 @@ var file_account_proto_goTypes = []any{
 	(*CharacterOfflineRes)(nil),      // 22: account.CharacterOfflineRes
 	(*SceneEnterReq)(nil),            // 23: account.SceneEnterReq
 	(*SceneEnterRes)(nil),            // 24: account.SceneEnterRes
-	(*AccountRecord)(nil),            // 25: account.AccountRecord
-	(*ElementalPoints)(nil),          // 26: account.ElementalPoints
-	(*CharacterAttributePoints)(nil), // 27: account.CharacterAttributePoints
-	(*CombatBattleStart)(nil),        // 28: account.CombatBattleStart
-	(*CombatUnitKey)(nil),            // 29: account.CombatUnitKey
-	(CombatActionType)(0),            // 30: account.CombatActionType
-	(*CombatActionIntent)(nil),       // 31: account.CombatActionIntent
-	(*CombatEvent)(nil),              // 32: account.CombatEvent
-	(*CombatBattleSettlement)(nil),   // 33: account.CombatBattleSettlement
-	(*CombatUnitState)(nil),          // 34: account.CombatUnitState
-	(*CombatActionOption)(nil),       // 35: account.CombatActionOption
+	(*CombatFlowCompleteReq)(nil),    // 25: account.CombatFlowCompleteReq
+	(*CombatFlowCompleteRes)(nil),    // 26: account.CombatFlowCompleteRes
+	(*AccountRecord)(nil),            // 27: account.AccountRecord
+	(*ElementalPoints)(nil),          // 28: account.ElementalPoints
+	(*CharacterAttributePoints)(nil), // 29: account.CharacterAttributePoints
+	(*CombatBattleStart)(nil),        // 30: account.CombatBattleStart
+	(*CombatUnitKey)(nil),            // 31: account.CombatUnitKey
+	(CombatActionType)(0),            // 32: account.CombatActionType
+	(*CombatActionIntent)(nil),       // 33: account.CombatActionIntent
+	(*CombatEvent)(nil),              // 34: account.CombatEvent
+	(*CombatBattleSettlement)(nil),   // 35: account.CombatBattleSettlement
+	(*CombatUnitState)(nil),          // 36: account.CombatUnitState
+	(*CombatActionOption)(nil),       // 37: account.CombatActionOption
 }
 var file_account_proto_depIdxs = []int32{
-	25, // 0: account.AccountRecordRes.account_record:type_name -> account.AccountRecord
-	26, // 1: account.CharacterCreateReq.character_elemental:type_name -> account.ElementalPoints
-	27, // 2: account.CharacterCreateReq.character_attribute:type_name -> account.CharacterAttributePoints
-	25, // 3: account.CharacterCreateRes.account_record:type_name -> account.AccountRecord
-	28, // 4: account.CombatBattleStartNotify.battle_start:type_name -> account.CombatBattleStart
-	29, // 5: account.CombatRoundActionReq.unit_key:type_name -> account.CombatUnitKey
-	30, // 6: account.CombatRoundActionReq.action_type:type_name -> account.CombatActionType
-	29, // 7: account.CombatRoundActionReq.target_key:type_name -> account.CombatUnitKey
-	29, // 8: account.CombatRoundActionRes.unit_key:type_name -> account.CombatUnitKey
-	31, // 9: account.CombatRoundResultNotify.intent_list:type_name -> account.CombatActionIntent
-	32, // 10: account.CombatRoundResultNotify.event_list:type_name -> account.CombatEvent
-	33, // 11: account.CombatRoundResultNotify.settlement:type_name -> account.CombatBattleSettlement
-	34, // 12: account.CombatRoundPrepareNotify.unit_state_list:type_name -> account.CombatUnitState
-	35, // 13: account.CombatRoundPrepareNotify.action_option_list:type_name -> account.CombatActionOption
-	29, // 14: account.CombatRoundPrepareNotify.required_unit_key_list:type_name -> account.CombatUnitKey
-	29, // 15: account.CombatRoundPrepareNotify.ready_unit_key_list:type_name -> account.CombatUnitKey
-	29, // 16: account.CombatRoundReadyNotify.required_unit_key_list:type_name -> account.CombatUnitKey
-	29, // 17: account.CombatRoundReadyNotify.ready_unit_key_list:type_name -> account.CombatUnitKey
+	27, // 0: account.AccountRecordRes.account_record:type_name -> account.AccountRecord
+	28, // 1: account.CharacterCreateReq.character_elemental:type_name -> account.ElementalPoints
+	29, // 2: account.CharacterCreateReq.character_attribute:type_name -> account.CharacterAttributePoints
+	27, // 3: account.CharacterCreateRes.account_record:type_name -> account.AccountRecord
+	30, // 4: account.CombatBattleStartNotify.battle_start:type_name -> account.CombatBattleStart
+	31, // 5: account.CombatRoundActionReq.unit_key:type_name -> account.CombatUnitKey
+	32, // 6: account.CombatRoundActionReq.action_type:type_name -> account.CombatActionType
+	31, // 7: account.CombatRoundActionReq.target_key:type_name -> account.CombatUnitKey
+	31, // 8: account.CombatRoundActionRes.unit_key:type_name -> account.CombatUnitKey
+	33, // 9: account.CombatRoundResultNotify.intent_list:type_name -> account.CombatActionIntent
+	34, // 10: account.CombatRoundResultNotify.event_list:type_name -> account.CombatEvent
+	35, // 11: account.CombatRoundResultNotify.settlement:type_name -> account.CombatBattleSettlement
+	36, // 12: account.CombatRoundPrepareNotify.unit_state_list:type_name -> account.CombatUnitState
+	37, // 13: account.CombatRoundPrepareNotify.action_option_list:type_name -> account.CombatActionOption
+	31, // 14: account.CombatRoundPrepareNotify.required_unit_key_list:type_name -> account.CombatUnitKey
+	31, // 15: account.CombatRoundPrepareNotify.ready_unit_key_list:type_name -> account.CombatUnitKey
+	31, // 16: account.CombatRoundReadyNotify.required_unit_key_list:type_name -> account.CombatUnitKey
+	31, // 17: account.CombatRoundReadyNotify.ready_unit_key_list:type_name -> account.CombatUnitKey
 	18, // [18:18] is the sub-list for method output_type
 	18, // [18:18] is the sub-list for method input_type
 	18, // [18:18] is the sub-list for extension type_name
@@ -2180,6 +2306,30 @@ func file_account_proto_init() {
 				return nil
 			}
 		}
+		file_account_proto_msgTypes[25].Exporter = func(v any, i int) any {
+			switch v := v.(*CombatFlowCompleteReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_account_proto_msgTypes[26].Exporter = func(v any, i int) any {
+			switch v := v.(*CombatFlowCompleteRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2187,7 +2337,7 @@ func file_account_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_account_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   25,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
