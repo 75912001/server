@@ -138,7 +138,7 @@ message CombatActionOption {
 }
 
 message CombatBattleStart {
-  uint64 battle_id = 1; // 战斗唯一 ID
+  string battle_id = 1; // 战斗唯一 UUID 字符串
   repeated CombatUnit unit_list = 10; // 开战时场上可见单位列表
 }
 

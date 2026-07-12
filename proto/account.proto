@@ -104,7 +104,7 @@ message CombatBattleStartNotify {
 
 //0x000015#client->gateway#战斗回合出手-请求
 message CombatRoundActionReq {
-  uint64 battle_id = 1; // 战斗唯一 ID
+  string battle_id = 1; // 战斗唯一 UUID 字符串
   uint32 round = 2; // 客户端提交的回合号
   CombatUnitKey unit_key = 3; // 本次提交动作的出手单位
   CombatActionType action_type = 4; // 出手类型
@@ -115,7 +115,7 @@ message CombatRoundActionReq {
 
 //0x000016#gateway->client#战斗回合出手-回复
 message CombatRoundActionRes {
-  uint64 battle_id = 1; // 战斗唯一 ID
+  string battle_id = 1; // 战斗唯一 UUID 字符串
   uint32 round = 2; // 已接收的回合号
   CombatUnitKey unit_key = 3; // 已接收动作的出手单位
   uint64 character_uuid = 4; // 本次动作所属的玩家角色 UUID
@@ -123,7 +123,7 @@ message CombatRoundActionRes {
 
 //0x000017#gateway->client#战斗回合结果-通知
 message CombatRoundResultNotify {
-  uint64 battle_id = 1; // 战斗唯一 ID
+  string battle_id = 1; // 战斗唯一 UUID 字符串
   uint32 round = 2; // 已结算的回合号
   repeated CombatActionIntent intent_list = 3; // 本回合双方进入执行队列的出手意图列表
   uint64 character_uuid = 4; // 本场战斗所属的玩家角色 UUID
@@ -134,7 +134,7 @@ message CombatRoundResultNotify {
 
 //0x000018#gateway->client#战斗回合准备-通知
 message CombatRoundPrepareNotify {
-  uint64 battle_id = 1; // 战斗唯一 ID
+  string battle_id = 1; // 战斗唯一 UUID 字符串
   uint32 round = 2; // 当前回合号, 从 1 开始
   int64 server_timestamp_ms = 3; // 服务端当前时间戳, 单位毫秒
   int64 round_deadline_timestamp_ms = 4; // 当前回合截止时间戳, 单位毫秒
@@ -147,7 +147,7 @@ message CombatRoundPrepareNotify {
 
 //0x000019#gateway->client#战斗回合出手就绪-通知
 message CombatRoundReadyNotify {
-  uint64 battle_id = 1; // 战斗唯一 ID
+  string battle_id = 1; // 战斗唯一 UUID 字符串
   uint32 round = 2; // 当前回合号
   uint64 character_uuid = 3; // 本场战斗所属的玩家角色 UUID
   repeated CombatUnitKey required_unit_key_list = 10; // 当前回合必须由客户端提交动作的单位
