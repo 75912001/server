@@ -37,16 +37,16 @@ go test ./online ./gateway ./cache ./login ./tool/robot/main ./proto/pb
 - `OnlineBindAccount` 会从 cache 读取 account record；登录票据校验和 cache accountSession 编排由 gateway 负责
 - online 启动会先加载共享游戏配置; 配置缺失, 服务端消费字段非法或跨表引用错误时应启动失败, 且不继续注册 etcd/gRPC
 - `pet.yaml` 的 server 校验范围只包含 `id`, `rarity`, `elemental`, `attribute`, `growth`, `skill` 和技能引用; 宠物名称, 栖息地, 出生地, 描述, sprite, PNG, `.tpsheet` 和 frame 完整性由 sa.desktop 校验
-- `CharacterCreateReq` 会按客户端传入的 `character_slot_index`, `character_id`, `character_nick` 以及必填 `character_elemental/character_attribute` 在 cache 账号壳档案上初始化 `account_record_create_timestamp_ms/used_uuid/character_record_list/pet_warehouse_record_map`, 写入 `CharacterRecord.exp=0`, `earth/water/fire/wind`, `available_point=0`, `vitality/strength/toughness/dexterity`, `scene_id=2000001`, `create_timestamp_ms` 和 `rebirth_count=0`, 不在 `asset_id_record_map` 写入方向和动作, 不写入角色 HP, 并写回 cache; 未提交元素或基础状态, 元素单项超出 0-10, 元素总和不等于 10, 两个非相邻元素组合, 基础状态单项超出 0-20 或基础状态总和不等于 20 都应返回非法参数
-- 新账号首次登录后不会自动创建角色; 玩家显式发送 `CharacterCreateReq` 后能拿到默认角色和 5 只默认随身携带宠物, 默认账号宠物仓库为空; 重启或重登后通过 `AccountRecordReq` 能读回同一份 `AccountRecord`
+- `CharacterCreateReq` 会按客户端传入的 `character_slot_index`, `character_id`, `character_nick` 以及必填 `character_elemental/character_attribute` 填充 cache 建号时创建的指定空槽位, 递增 `used_uuid`, 写入 `CharacterRecord.exp=0`, `earth/water/fire/wind`, `available_point=0`, `vitality/strength/toughness/dexterity`, `scene_id=2000001`, `create_timestamp_ms` 和 `rebirth_count=0`, 不在 `asset_id_record_map` 写入方向和动作, 不写入角色 HP, 并写回 cache; 未提交元素或基础状态, 元素单项超出 0-10, 元素总和不等于 10, 两个非相邻元素组合, 基础状态单项超出 0-20 或基础状态总和不等于 20 都应返回非法参数
+- 新账号首次登录后已经包含非 0 `create_timestamp_ms`、固定 5 个 UUID 为 0 的空角色槽位和空宠物仓库, 但不会自动创建具体角色; 玩家显式发送 `CharacterCreateReq` 后能拿到指定槽位角色和 5 只默认随身携带宠物; 重启或重登后通过 `AccountRecordReq` 能读回同一份 `AccountRecord`
 - `CharacterCreateReq` 不会自动让角色上线; 客户端需要显式发送 `CharacterOnlineReq(character_uuid)` 才会在 Account actor 内存中标记该角色在线
-- manager 构建应拒绝超过 5 个角色槽位、nil 槽位记录和重复的非 0 角色 UUID; 有效角色单元必须直接引用 `AccountRecord.CharacterRecord`, 初始全部离线
+- manager 构建应要求恰好 5 个角色槽位, 并拒绝 nil 槽位记录和重复的非 0 角色 UUID; 有效角色单元必须直接引用 `AccountRecord.CharacterRecord`, 初始全部离线
 - `CharacterOnlineReq` 对不存在角色, `character_uuid=0` 或已在线角色应返回错误; 成功时应先写入 `last_login_timestamp_ms` 并写回 cache, 再只初始化目标角色单元为 online, 自动遇敌和战斗运行态为 false/空, 响应为空 body
 - 两个以上角色应能独立上线; 开关、timer 序列和 combat state 互不覆盖, 不存在 active character 切换
 - `CharacterOfflineReq` 对不存在角色, `character_uuid=0` 或未在线角色应返回错误; 成功时应先写入 `last_logout_timestamp_ms` 并写回 cache, 再只取消目标角色战斗/timer 并设为离线, 不结算奖励, 其他角色继续运行
 - `SceneEnterReq` 对不存在角色, `character_uuid=0`, `scene_id=0`, 未上线角色, 不存在场景或目标角色战斗中应返回错误; 成功时只写入目标角色 `scene_id`, 写回 cache, 返回 `SceneEnterRes.character_uuid/scene_id/server_timestamp_ms`, 并以 `session_id=0` 推送 `AutoEncounterSetRes(enabled=false)` 重置客户端角色级开关
 - 账号解绑或 Account actor 停止时, 所有在线角色应写入同一个 `last_logout_timestamp_ms`, 再批量清理各自 timer, 战斗和在线状态
-- 新建 `AccountRecord.aid > 0`, `character_record_list` 非空, 至少一个角色 `uuid > 0`, 默认 `CharacterRecord.asset_id == 1000011`, 指定创建时应保存请求中的可创建角色 ID、昵称、`earth/water/fire/wind` 和 `vitality/strength/toughness/dexterity`, 默认角色按顺序携带 4000101/4000102/4000103/4000104/4000105 五只宠物, 五只默认宠物 `PetRecord.exp=0`, 品阶均为 `PetGrade_Mythic`, 第一只为 `Battle`, 其余为 `Wait`, 默认账号 `pet_warehouse_record_map` 为空
+- 新建 `AccountRecord.aid > 0`, `create_timestamp_ms > 0`, `character_record_list` 恰好包含 5 个 UUID 为 0 的非 nil 空槽位, `pet_warehouse_record_map` 为空; 指定创建角色后应保存请求中的可创建角色 ID、昵称、`earth/water/fire/wind` 和 `vitality/strength/toughness/dexterity`, 默认角色按顺序携带 4000101/4000102/4000103/4000104/4000105 五只宠物, 五只默认宠物 `PetRecord.exp=0`, 品阶均为 `PetGrade_Mythic`, 第一只为 `Battle`, 其余为 `Wait`
 - 新建默认宠物应写入 `loyalty`, `saved_base_*`, `raw_*`, `create_timestamp_ms` 和 `rebirth_count=0` 直字段; `asset_record_base_map` 只保存宠物资源 ID; PetGrade 到 SavedBase 偏移映射为 `Common=-2`, `Rare=-1`, `Epic=0`, `Legendary=1`, `Mythic=2`, 默认赠送宠物使用 Mythic 的 `+2` 偏移; 战斗单位属性从这些字段换算, 旧 cache 缺失新结构化字段时不会静默迁移
 - `AutoEncounterSetReq` 缺少或使用 0 `character_uuid` 必须明确返回 `InvalidArgument`, 不允许回退到任意当前角色; 所有普通响应必须回显请求 session ID
 - `AutoEncounterSetReq(character_uuid, enabled=true)` 要求目标角色在线, 场景有效且有 `Battle` 宠物; 各角色 5 秒 timer 可并行触发各自 `CombatBattleStartNotify`, 战斗中切换开关只影响战后下一次遇敌
