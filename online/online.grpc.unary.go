@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"strings"
+
 	pb "server/proto/pb"
 
 	grpccodes "google.golang.org/grpc/codes"
@@ -10,8 +12,9 @@ import (
 
 func (p *onlineGRPCServer) OnlineBindAccount(_ context.Context, req *pb.OnlineBindAccountReq) (*pb.OnlineBindAccountRes, error) {
 	aid := req.GetAid()
-	account := req.GetAccount()
-	if aid == 0 || account == "" || req.GetGatewayKey() == "" || req.GetAccountSession() == "" {
+	account := strings.TrimSpace(req.GetAccount())
+	gatewayKey := strings.TrimSpace(req.GetGatewayKey())
+	if aid == 0 || account == "" || gatewayKey == "" || req.GetAccountSession() == "" {
 		return nil, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
 	accountRecord, err := unaryCacheGetAccountRecord(aid)
@@ -27,7 +30,15 @@ func (p *onlineGRPCServer) OnlineBindAccount(_ context.Context, req *pb.OnlineBi
 	if accountRecord.GetCreateTimestampMs() == 0 {
 		return nil, grpcstatus.Error(grpccodes.Internal, "invalid account record")
 	}
+	if err := validateCharacterRecords(accountRecord); err != nil {
+		return nil, grpcstatus.Errorf(grpccodes.DataLoss, "invalid character records: %v", err)
+	}
+	// protobuf 不保留空 map 的存在性, RPC 边界校验后统一恢复为可写空 map.
+	if accountRecord.PetWarehouseRecordMap == nil {
+		accountRecord.PetWarehouseRecordMap = make(map[uint64]*pb.PetRecord)
+	}
 	req.Account = account
+	req.GatewayKey = gatewayKey
 	res, err := GAccountMgr.Bind(aid, req, accountRecord)
 	if err != nil {
 		return nil, err
