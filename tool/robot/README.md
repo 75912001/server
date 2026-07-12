@@ -34,7 +34,7 @@ cd D:/src/github.com/sa.project/server/tool/robot/bin
 ./robot.exe
 ```
 
-客户端启动后会读取 `config.yaml`，发现 gateway/cache 服务，按 robot 配置分批连接 gateway，并自动发送 `AccountVerifyReq` 登录。登录成功后会先发送 `AccountRecordReq` 获取账号档案；如果账号档案尚未创建, robot 不会自动发送 `CharacterCreateReq`，需要通过控制台或控制面板显式发送创建请求。账号档案就绪后才会启动随机业务发包。
+客户端启动后会读取 `config.yaml`, 发现 gateway/cache 服务, 按 robot 配置分批连接 gateway, 并自动发送 `AccountVerifyReq` 登录。登录成功后会先发送 `AccountRecordReq` 获取账号档案; 新账号档案已经包含创建时间、固定 5 个空角色槽位和空宠物仓库, robot 不会自动发送 `CharacterCreateReq`, 需要通过控制台或控制面板显式创建具体角色。账号档案校验通过后启动随机业务发包。
 
 如果开启控制面板，启动日志会输出面板地址：
 

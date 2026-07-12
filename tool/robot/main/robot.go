@@ -279,7 +279,7 @@ func (p *Robot) applyPacketState(packet *xpacket.Packet) {
 }
 
 func accountRecordReady(accountRecord *pb.AccountRecord) bool {
-	return accountRecord != nil && accountRecord.GetAid() != 0 && accountRecord.GetAccountRecordCreateTimestampMs() != 0
+	return accountRecord != nil && accountRecord.GetAid() != 0 && accountRecord.GetCreateTimestampMs() != 0
 }
 
 func (p *Robot) isExpectedNonZeroResult(packet *xpacket.Packet) bool {

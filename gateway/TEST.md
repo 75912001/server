@@ -88,7 +88,7 @@ cd /d/src/github.com/sa.project/server/tool/robot/bin
 重点验证：
 
 - 输入 `AccountVerifyReq` 后，客户端收到 `AccountVerifyRes`，并且 `ResultID == 0`。
-- 登录成功后发送 `AccountRecordReq`; 新账号应收到 `account_record_create_timestamp_ms == 0` 的账号壳档案, 不应由登录流程自动创建角色。玩家显式发送 `CharacterCreateReq` 后, 才应收到包含默认角色, 默认随身携带宠物和账号宠物仓库的服务端 `AccountRecord`。
+- 登录成功后发送 `AccountRecordReq`; 新账号应收到包含非 0 `create_timestamp_ms`、固定 5 个 UUID 为 0 的空角色槽位和空宠物仓库的 `AccountRecord`, 登录流程不自动创建具体角色。玩家显式发送 `CharacterCreateReq` 后, 服务端才填充指定槽位并创建默认随身携带宠物。
 - 登录成功后，客户端按配置自动发送 `AccountHeartbeatReq`，服务端返回 `AccountHeartbeatRes.next_heartbeat_session`。
 - 输入业务命令时，gateway 通过当前账号绑定的 online 透传上行包。
 - 双 online 同 `availableLoad` 时，批量登录不应全部集中到 `/online/1/`，选中实例的本地负载会先扣减，后续 etcd 更新再覆盖本地估算值。

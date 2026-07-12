@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	common "server/common"
 	pb "server/proto/pb"
 
 	xevent "github.com/75912001/xlib/event"
@@ -26,51 +25,15 @@ func TestRobotAccountVerifyQueuesAccountRecordReq(t *testing.T) {
 	}
 }
 
-func TestRobotAccountRecordShellDoesNotAutoCreate(t *testing.T) {
+func TestRobotAccountRecordMarksReady(t *testing.T) {
 	robot, commands := newRobotForStateTest(t)
 
 	robot.applyPacketState(&xpacket.Packet{
 		Header: &xpacket.Header{MessageID: uint32(pb.MsgIDAccount_AccountRecordRes_CMD)},
 		PBMessage: &pb.AccountRecordRes{AccountRecord: &pb.AccountRecord{
-			Aid:                      10001,
-			Account:                  "robot.10001",
-			AccountCreateTimestampMs: 123,
-		}},
-	})
-
-	assertNoRobotCommand(t, commands)
-	if robot.accountReady {
-		t.Fatal("robot accountReady = true, want false")
-	}
-}
-
-func TestRobotAccountRecordNotCreatedResultDoesNotAutoCreate(t *testing.T) {
-	robot, commands := newRobotForStateTest(t)
-
-	robot.applyPacketState(&xpacket.Packet{
-		Header: &xpacket.Header{
-			MessageID: uint32(pb.MsgIDAccount_AccountRecordRes_CMD),
-			ResultID:  common.ECOnlineAccountNotCreated.Code(),
-		},
-		PBMessage: &pb.AccountRecordRes{},
-	})
-
-	assertNoRobotCommand(t, commands)
-	if robot.accountReady {
-		t.Fatal("robot accountReady = true, want false")
-	}
-}
-
-func TestRobotCreatedAccountRecordMarksReady(t *testing.T) {
-	robot, commands := newRobotForStateTest(t)
-
-	robot.applyPacketState(&xpacket.Packet{
-		Header: &xpacket.Header{MessageID: uint32(pb.MsgIDAccount_AccountRecordRes_CMD)},
-		PBMessage: &pb.AccountRecordRes{AccountRecord: &pb.AccountRecord{
-			Aid:                            10001,
-			Account:                        "robot.10001",
-			AccountCreateTimestampMs:       123,
-			AccountRecordCreateTimestampMs: 456,
+			Aid:               10001,
+			Account:           "robot.10001",
+			CreateTimestampMs: 123,
 		}},
 	})
 

@@ -123,7 +123,7 @@ func (p *Robot) SendCommand(event *RobotCommand) error {
 		})
 		p.manager.stats.queued.Add(1)
 		if p.shouldPrintVerbose(event.Verbose) {
-			ColorPrintf(Yellow, "aid=%d account not created, queued command=%s\n", p.aid, event.Command)
+			ColorPrintf(Yellow, "aid=%d account record not ready, queued command=%s\n", p.aid, event.Command)
 		}
 		return nil
 	}

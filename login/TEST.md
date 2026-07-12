@@ -120,7 +120,7 @@ curl -i -X POST "http://127.0.0.1:30401/api/login/emailSession" \
 3. gateway 使用本机 `gatewayKey`、配置中的 `ticketSecret` 和客户端 aid 校验 `connectTicket`。
 4. 验签成功后 gateway 选择 online，执行在线登录和顶号流程。
 5. gateway 返回 `AccountVerifyRes`，其中包含后续心跳使用的 `heartbeatSession`。
-6. 客户端发送 `AccountRecordReq` 拉取服务端 `AccountRecord`; 新账号 `account_record_create_timestamp_ms == 0` 时保持未创建状态, 只有玩家显式发送 `CharacterCreateReq` 才由 online 初始化角色, 默认随身携带宠物和账号宠物仓库后返回完整 `AccountRecord`。
+6. 客户端发送 `AccountRecordReq` 拉取服务端 `AccountRecord`; 新账号已经包含非 0 `create_timestamp_ms`、固定 5 个 UUID 为 0 的空角色槽位和空宠物仓库, 只有玩家显式发送 `CharacterCreateReq` 后 online 才填充具体角色和默认随身携带宠物。
 
 期望：
 

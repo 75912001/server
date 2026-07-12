@@ -17,7 +17,7 @@ _Avoid_: account id, session id, connection id
 _Avoid_: account, connection, session
 
 **AccountRecord**:
-某个 `aid` 对应的账号档案快照。`account_record_create_timestamp_ms = 0` 表示账号已存在, 但账号资料尚未完成创建。
+某个 `aid` 对应的账号档案快照。建号时即写入 `create_timestamp_ms`, 创建 5 个空角色槽位和空宠物仓库, 不存在后续单独初始化账号档案的状态。
 _Avoid_: session, cache entry, profile fragment
 
 **AccountRecord extension record**:

@@ -83,13 +83,18 @@ func cacheEnsureRobotAccountRecord(aid uint64) error {
 		}
 		return errors.WithMessagef(err, "CacheGetAccountRecord aid:%d", aid)
 	}
+	characterRecords := make([]*pb.CharacterRecord, int(pb.AccountRecordLimit_AccountRecordLimit_MaxCharacterSlotCount))
+	for i := range characterRecords {
+		characterRecords[i] = &pb.CharacterRecord{}
+	}
 	_, err = pb.GXCacheServiceService.CacheSetAccountRecord(context.Background(), &pb.CacheSetAccountRecordReq{
 		Aid: aid,
 		AccountRecord: &pb.AccountRecord{
-			Aid:                            aid,
-			Account:                        account,
-			AccountCreateTimestampMs:       time.Now().UnixMilli(),
-			AccountRecordCreateTimestampMs: 0,
+			Aid:                   aid,
+			Account:               account,
+			CreateTimestampMs:     time.Now().UnixMilli(),
+			CharacterRecordList:   characterRecords,
+			PetWarehouseRecordMap: make(map[uint64]*pb.PetRecord),
 		},
 	})
 	if err != nil {
