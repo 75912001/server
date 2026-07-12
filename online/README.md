@@ -57,12 +57,12 @@ accountSession
 
 处理顺序：
 
-1. 校验 aid、account、gatewayKey 和 `accountSession` 非空。
+1. 在 gRPC 入口规范化 account、gatewayKey, 并校验 aid、account、gatewayKey 和 `accountSession` 非空。
 2. 调用 cache `CacheGetAccountRecord` 读取账号档案。
-3. 校验 `AccountRecord.aid/account` 与请求一致。
-4. 按 aid 获取或创建 Account actor。
-5. Account actor 校验角色槽位不超过 5 个、非空角色记录的 UUID 唯一, 再构建只引用 `AccountRecord.CharacterRecord` 的 `characterMgr`.
-6. Account actor 绑定本地状态: `gatewayKey`, `accountSession`, account, clientIP, accountRecord.
+3. 在 gRPC 入口校验 `AccountRecord.aid/account/create_timestamp_ms` 与请求及档案契约一致, 并校验恰好 5 个非 nil 角色槽位和非 0 角色 UUID 唯一。
+4. 在 gRPC 入口将 protobuf 传输后可能为 nil 的空宠物仓库恢复为可写空 map。
+5. 按 aid 获取或创建 Account actor。
+6. Account actor 信任已校验数据, 构建只引用 `AccountRecord.CharacterRecord` 的 `characterMgr`, 再绑定 `gatewayKey`, `accountSession`, account, clientIP 和 accountRecord.
 7. 写入 `GAccountMgr.accounts[aid]`.
 8. 返回 gateway.
 
@@ -128,7 +128,7 @@ client TCP
 - online 不写 cache accountSession, 因此不能作为“是否允许上线”的权威。
 - `OnlineBindAccount` 建立账号 session 时 manager 为全部有效角色创建离线单元, 客户端必须显式发送 `CharacterOnlineReq`.
 - 项目不维护服务端 active character. 每个角色单元的 online、自动遇敌和战斗状态只存在 Account actor 内存中, 不写入 `AccountRecord` 或 Redis/cache; 单 Account actor 串行处理最多 5 个角色的并行运行态, 不额外创建角色 actor 或锁.
-- `CharacterCreateReq` 在 cache 写入成功后才注册新的离线角色单元; 写入失败会恢复本地槽位、UUID 序列和账号初始化字段, 不留下半提交运行态.
+- `CharacterCreateReq` 在 cache 写入成功后才注册新的离线角色单元; 写入失败会恢复本地槽位和 UUID 序列, 不留下半提交运行态.
 - `AccountRecord` 是账号级档案聚合根, `aid/account/create_timestamp_ms` 在 cache 建号时写入; `character_record_list` 同时创建固定 5 个非 nil 槽位, 数组下标是角色槽位, 空槽使用 `uuid == 0` 的 `CharacterRecord` 占位; `pet_warehouse_record_map` 同时创建为空仓库, protobuf 传输省略空 map 时由 online 绑定边界恢复为可写空 map; 完整角色业务 key 是 `aid + uuid`。
 - `CharacterRecord.asset_id` 是角色资源 ID/角色 ID 的权威字段; `CharacterRecord.exp/earth/water/fire/wind/available_point/vitality/strength/toughness/dexterity/scene_id/create_timestamp_ms/rebirth_count/last_login_timestamp_ms/last_logout_timestamp_ms` 直接保存角色经验、元素点数、可用点、基础状态、当前场景、创建时间、转生次数和上下线时间; `asset_id_record_map` 当前不承载角色资源 ID、经验、元素、属性、场景、创建时间、转生次数、上下线时间戳、方向和动作; 角色 HP 由基础状态计算, 不写入角色记录。
 - `CharacterRecord.pet_record_list` 只保存角色当前随身携带宠物, 按携带顺序排列, 单角色最多携带 `PetRecordLimit_MaxCarryCount` 只; `AccountRecord.pet_warehouse_record_map` 是账号宠物仓库, 同账号下所有角色共享, 最多存放 `AccountRecordLimit_MaxPetWarehouseCount` 只.

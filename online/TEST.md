@@ -40,7 +40,7 @@ go test ./online ./gateway ./cache ./login ./tool/robot/main ./proto/pb
 - `CharacterCreateReq` 会按客户端传入的 `character_slot_index`, `character_id`, `character_nick` 以及必填 `character_elemental/character_attribute` 填充 cache 建号时创建的指定空槽位, 递增 `used_uuid`, 写入 `CharacterRecord.exp=0`, `earth/water/fire/wind`, `available_point=0`, `vitality/strength/toughness/dexterity`, `scene_id=2000001`, `create_timestamp_ms` 和 `rebirth_count=0`, 不在 `asset_id_record_map` 写入方向和动作, 不写入角色 HP, 并写回 cache; 未提交元素或基础状态, 元素单项超出 0-10, 元素总和不等于 10, 两个非相邻元素组合, 基础状态单项超出 0-20 或基础状态总和不等于 20 都应返回非法参数
 - 新账号首次登录后已经包含非 0 `create_timestamp_ms`、固定 5 个 UUID 为 0 的空角色槽位和空宠物仓库, 但不会自动创建具体角色; 玩家显式发送 `CharacterCreateReq` 后能拿到指定槽位角色和 5 只默认随身携带宠物; 重启或重登后通过 `AccountRecordReq` 能读回同一份 `AccountRecord`
 - `CharacterCreateReq` 不会自动让角色上线; 客户端需要显式发送 `CharacterOnlineReq(character_uuid)` 才会在 Account actor 内存中标记该角色在线
-- manager 构建应要求恰好 5 个角色槽位, 并拒绝 nil 槽位记录和重复的非 0 角色 UUID; 有效角色单元必须直接引用 `AccountRecord.CharacterRecord`, 初始全部离线
+- `OnlineBindAccount` gRPC 入口应要求恰好 5 个角色槽位, 并拒绝 nil 槽位记录和重复的非 0 角色 UUID; Account actor 只基于已校验档案构建 manager, 有效角色单元必须直接引用 `AccountRecord.CharacterRecord`, 初始全部离线
 - `CharacterOnlineReq` 对不存在角色, `character_uuid=0` 或已在线角色应返回错误; 成功时应先写入 `last_login_timestamp_ms` 并写回 cache, 再只初始化目标角色单元为 online, 自动遇敌和战斗运行态为 false/空, 响应为空 body
 - 两个以上角色应能独立上线; 开关、timer 序列和 combat state 互不覆盖, 不存在 active character 切换
 - `CharacterOfflineReq` 对不存在角色, `character_uuid=0` 或未在线角色应返回错误; 成功时应先写入 `last_logout_timestamp_ms` 并写回 cache, 再只取消目标角色战斗/timer 并设为离线, 不结算奖励, 其他角色继续运行
