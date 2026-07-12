@@ -42,6 +42,9 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	case pb.MsgIDAccount_CombatRoundActionReq_CMD:
 		p.onCombatRoundActionReq(gateway, pkt)
 		return
+	case pb.MsgIDAccount_CombatFlowCompleteReq_CMD:
+		p.onCombatFlowCompleteReq(gateway, pkt)
+		return
 	case pb.MsgIDAccount_RobotPingReq_CMD:
 		p.onRobotPingReq(gateway, pkt)
 		return
@@ -151,7 +154,7 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 	}
 
 	characterUUID := nextAccountRecordUUID(p.accountRecord)
-	character := &pb.CharacterRecord{
+	characterRecord := &pb.CharacterRecord{
 		Uuid:              characterUUID,
 		Nick:              resolvedCharacterNick,
 		AssetId:           uint64(req.GetCharacterId()),
@@ -193,19 +196,19 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 		newPet := gameconfig.GGameConfig.Pet.Get(pet.assetID)
 		petUUID := nextAccountRecordUUID(p.accountRecord)
 		petRecord := commonpet.NewRecord(newPet, petUUID, pet.level, pb.PetGrade_PetGrade_Mythic)
-		character.PetRecordList = append(character.PetRecordList, petRecord)
+		characterRecord.PetRecordList = append(characterRecord.PetRecordList, petRecord)
 	}
 
-	p.accountRecord.CharacterRecordList[slotIndex] = character
+	p.accountRecord.CharacterRecordList[slotIndex] = characterRecord
 
 	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
 		xlog.GLog.Errorf("set account record failed aid:%d err:%v", p.aid, err)
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterCreateRes_CMD), xerror.Internal.Code())
 		return
 	}
-	p.characterManager.characters[characterUUID] = &accountCharacter{
+	p.characterManager.characters[characterUUID] = &character{
 		account: p,
-		record:  character,
+		record:  characterRecord,
 	}
 	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDAccount_CharacterCreateRes_CMD), xerror.Success.Code(), &pb.CharacterCreateRes{
 		AccountRecord: p.accountRecord,
