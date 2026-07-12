@@ -17,14 +17,6 @@ import (
 func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	msgID := pb.MsgIDAccount(pkt.GetMessageId())
 	switch msgID {
-	default:
-		if !p.accountRecordReady() {
-			xlog.GLog.Warnf("unknown client packet aid:%d messageID:%d", p.aid, pkt.GetMessageId())
-			return
-		}
-	}
-
-	switch msgID {
 	case pb.MsgIDAccount_AccountRecordReq_CMD:
 		p.sendClientRes(gateway, pkt, uint32(pb.MsgIDAccount_AccountRecordRes_CMD), xerror.Success.Code(),
 			&pb.AccountRecordRes{
@@ -119,17 +111,17 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 
 	// characterSlotIndex
 	characterSlotIndex := req.GetCharacterSlotIndex()
-	if characterSlotIndex >= maxCharacterSlotCount {
+	if characterSlotIndex >= uint32(pb.AccountRecordLimit_AccountRecordLimit_MaxCharacterSlotCount) {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterCreateRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
 	slotIndex := int(characterSlotIndex)
-	for len(p.accountRecord.CharacterRecordList) <= slotIndex {
-		p.accountRecord.CharacterRecordList = append(p.accountRecord.CharacterRecordList, &pb.CharacterRecord{})
-	}
-	if character := p.accountRecord.CharacterRecordList[slotIndex]; character != nil && character.GetUuid() != 0 {
-		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterCreateRes_CMD), xerror.AlreadyExists.Code())
-		return
+	if slotIndex < len(p.accountRecord.CharacterRecordList) {
+		character := p.accountRecord.CharacterRecordList[slotIndex]
+		if character != nil && character.GetUuid() != 0 {
+			p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterCreateRes_CMD), xerror.AlreadyExists.Code())
+			return
+		}
 	}
 
 	// character id
@@ -158,10 +150,6 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 		return
 	}
 
-	if p.accountRecord.PetWarehouseRecordMap == nil { // todo menglc 创建角色账号的时候应该创建
-		p.accountRecord.PetWarehouseRecordMap = make(map[uint64]*pb.PetRecord)
-	}
-
 	characterUUID := nextAccountRecordUUID(p.accountRecord)
 	character := &pb.CharacterRecord{
 		Uuid:              characterUUID,
@@ -178,10 +166,10 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 		Toughness:         req.CharacterAttribute.GetToughness(),
 		Dexterity:         req.CharacterAttribute.GetDexterity(),
 		CreateTimestampMs: time.Now().UnixMilli(),
-		SceneId:           defaultCharacterSceneID,
+		SceneId:           2000001,
 		AssetIdRecordMap:  make(map[uint32]uint64),
 		RecordMap:         make(map[uint64]*pb.RecordPrimary),
-		PetRecordList:     make([]*pb.PetRecord, 0, maxPetCarryCount),
+		PetRecordList:     make([]*pb.PetRecord, 0, int(pb.PetRecordLimit_PetRecordLimit_MaxCarryCount)),
 	}
 
 	// pet
@@ -197,9 +185,9 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 		{assetID: 4000104, nick: "邦奇诺", level: 1, carryStatus: pb.PetCarryStatus_PetCarryStatus_Wait},
 		{assetID: 4000105, nick: "布鲁顿", level: 1, carryStatus: pb.PetCarryStatus_PetCarryStatus_Wait},
 	}
-	if len(defaultPetRecords) > maxPetCarryCount {
-		xlog.GLog.Fatalf("default pet count %d exceeds maximum %d", len(defaultPetRecords), maxPetCarryCount)
-		panic(fmt.Sprintf("default pet count %d exceeds maximum %d", len(defaultPetRecords), maxPetCarryCount))
+	if len(defaultPetRecords) > int(pb.PetRecordLimit_PetRecordLimit_MaxCarryCount) {
+		xlog.GLog.Fatalf("default pet count %d exceeds maximum %d", len(defaultPetRecords), pb.PetRecordLimit_PetRecordLimit_MaxCarryCount)
+		panic(fmt.Sprintf("default pet count %d exceeds maximum %d", len(defaultPetRecords), pb.PetRecordLimit_PetRecordLimit_MaxCarryCount))
 	}
 	for _, pet := range defaultPetRecords {
 		newPet := gameconfig.GGameConfig.Pet.Get(pet.assetID)
@@ -215,6 +203,10 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterCreateRes_CMD), xerror.Internal.Code())
 		return
 	}
+	p.characterManager.characters[characterUUID] = &accountCharacter{
+		account: p,
+		record:  character,
+	}
 	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDAccount_CharacterCreateRes_CMD), xerror.Success.Code(), &pb.CharacterCreateRes{
 		AccountRecord: p.accountRecord,
 	})
@@ -227,25 +219,23 @@ func (p *Account) onCharacterOnlineReq(gateway *Gateway, pkt *pb.OnlineClientPac
 		return
 	}
 	characterUUID := req.GetCharacterUuid()
-	character := p.findCharacterRecord(characterUUID)
-	if character == nil {
+	character := p.characterManager.find(characterUUID)
+	if character == nil || character.record == nil {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterOnlineRes_CMD), xerror.NotFound.Code())
 		return
 	}
-	if p.isCharacterOnline(characterUUID) {
+	if character.online {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterOnlineRes_CMD), xerror.AlreadyExists.Code())
 		return
 	}
-	character.LastLoginTimestampMs = time.Now().UnixMilli()
+	character.record.LastLoginTimestampMs = time.Now().UnixMilli()
 	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
 		xlog.GLog.Errorf("set account record after character online failed aid:%d character:%d err:%v", p.aid, characterUUID, err)
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterOnlineRes_CMD), xerror.Internal.Code())
 		return
 	}
-	p.onlineCharacterUUIDSet[characterUUID] = struct{}{}
-	p.activeCharacterUUID = characterUUID
-	p.autoEncounterEnabled = false
-	p.clearAutoEncounterTimer()
+	character.clearRuntime()
+	character.online = true
 	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDAccount_CharacterOnlineRes_CMD), xerror.Success.Code(), &pb.CharacterOnlineRes{})
 }
 
@@ -256,25 +246,23 @@ func (p *Account) onCharacterOfflineReq(gateway *Gateway, pkt *pb.OnlineClientPa
 		return
 	}
 	characterUUID := req.GetCharacterUuid()
-	character := p.findCharacterRecord(characterUUID)
-	if character == nil {
+	character := p.characterManager.find(characterUUID)
+	if character == nil || character.record == nil {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterOfflineRes_CMD), xerror.NotFound.Code())
 		return
 	}
-	if !p.isCharacterOnline(characterUUID) {
+	if !character.online {
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterOfflineRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
-	character.LastLogoutTimestampMs = time.Now().UnixMilli()
+	character.record.LastLogoutTimestampMs = time.Now().UnixMilli()
 	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
 		xlog.GLog.Errorf("set account record after character offline failed aid:%d character:%d err:%v", p.aid, characterUUID, err)
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_CharacterOfflineRes_CMD), xerror.Internal.Code())
 		return
 	}
-	delete(p.onlineCharacterUUIDSet, characterUUID)
-	if p.activeCharacterUUID == characterUUID {
-		p.activeCharacterUUID = 0
-	}
+	character.clearRuntime()
+	character.online = false
 	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDAccount_CharacterOfflineRes_CMD), xerror.Success.Code(), &pb.CharacterOfflineRes{})
 }
 
@@ -285,16 +273,16 @@ func (p *Account) onSceneEnterReq(gateway *Gateway, pkt *pb.OnlineClientPacket) 
 		return
 	}
 	characterUUID := req.GetCharacterUuid()
-	character := p.findCharacterRecord(characterUUID)
-	if character == nil { // 角色-不存在
+	character := p.characterManager.find(characterUUID)
+	if character == nil || character.record == nil { // 角色-不存在
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_SceneEnterRes_CMD), xerror.NotFound.Code())
 		return
 	}
-	if !p.isCharacterOnline(characterUUID) { // 角色-不在线
+	if !character.online { // 角色-不在线
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_SceneEnterRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
-	if p.combatState != nil { // 战斗中
+	if character.combatState != nil { // 战斗中
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_SceneEnterRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
@@ -304,15 +292,19 @@ func (p *Account) onSceneEnterReq(gateway *Gateway, pkt *pb.OnlineClientPacket) 
 		return
 	}
 
-	character.SceneId = req.GetSceneId()
+	character.record.SceneId = character.record.GetSceneId()
 	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
 		xlog.GLog.Errorf("set account record after scene enter failed aid:%d character:%d scene:%d err:%v", p.aid, characterUUID, req.GetSceneId(), err)
 		p.sendClientErr(gateway, pkt, uint32(pb.MsgIDAccount_SceneEnterRes_CMD), xerror.Internal.Code())
 		return
 	}
-	p.activeCharacterUUID = characterUUID
-	p.autoEncounterEnabled = false
-	p.clearAutoEncounterTimer()
+	if character.autoEncounterEnabled {
+		character.autoEncounterEnabled = false
+		character.clearAutoEncounterTimer()
+	}
+	// SceneEnter 成功后始终推送 session_id=0 的最终状态. 即使遇敌原本已关闭,
+	// 客户端也需要这条权威重置信号同步清除该角色的本地自动战斗开关.
+	character.notifyAutoEncounterState(gateway)
 	p.sendClientRes(gateway, pkt, uint32(pb.MsgIDAccount_SceneEnterRes_CMD), xerror.Success.Code(), &pb.SceneEnterRes{
 		CharacterUuid:     characterUUID,
 		SceneId:           req.GetSceneId(),
