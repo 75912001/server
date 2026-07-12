@@ -2,50 +2,35 @@ package main
 
 import (
 	"context"
-	"math/rand"
 	pb "server/proto/pb"
-	"time"
 
 	xactor "github.com/75912001/xlib/actor"
-	xtimer "github.com/75912001/xlib/timer"
+	xlog "github.com/75912001/xlib/log"
 )
 
 type Account struct {
-	aid            uint64
-	account        string
-	gatewayKey     string
-	accountSession string
-	clientIP       string
-	accountRecord  *pb.AccountRecord
+	aid            uint64            // 账号 id
+	account        string            // 账号
+	gatewayKey     string            // gateway key
+	accountSession string            // 账号 session
+	clientIP       string            // 客户端 ip
+	accountRecord  *pb.AccountRecord // 账号 记录
 	actor          *xactor.Actor[uint64]
 
-	onlineCharacterUUIDSet map[uint64]struct{}
-	activeCharacterUUID    uint64
-
-	autoEncounterEnabled  bool
-	autoEncounterTimer    *xtimer.Second
-	autoEncounterTimerSeq uint64
-	roundTimer            *xtimer.Second
-	roundTimerSeq         uint64
-	combatState           *accountCombatState
-	lastBattleID          uint64
-	rng                   *rand.Rand
+	characterManager *characterMgr // 账号内全部角色的在线和战斗运行态
 }
 
 func newAccount(aid uint64) *Account {
-	u := &Account{
-		aid:                    aid,
-		onlineCharacterUUIDSet: make(map[uint64]struct{}),
-		rng:                    rand.New(rand.NewSource(time.Now().UnixNano() + int64(aid))),
-	}
+	u := &Account{aid: aid}
+	u.characterManager, _ = newCharacterMgr(u, nil)
 	u.actor = xactor.NewActor[uint64](aid, nil, u.behavior)
 	u.actor.Start()
 	return u
 }
 
 func (p *Account) Stop() {
-	p.clearCombatRuntime()
-	p.persistOnlineCharacterLogoutTimestamp(time.Now().UnixMilli())
-	p.clearOnlineCharacterUUIDs()
+	if _, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineAccountActorCmdStop)); err != nil {
+		xlog.GLog.Errorf("account stop cleanup failed aid:%d err:%v", p.aid, err)
+	}
 	p.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
 }
