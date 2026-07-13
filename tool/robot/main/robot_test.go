@@ -16,7 +16,7 @@ func TestRobotAccountVerifyQueuesAccountRecordReq(t *testing.T) {
 	robot, commands := newRobotForStateTest(t)
 
 	robot.applyPacketState(&xpacket.Packet{
-		Header:    &xpacket.Header{MessageID: uint32(pb.MsgIDAccount_AccountVerifyRes_CMD)},
+		Header:    &xpacket.Header{MessageID: uint32(pb.MsgID_AccountVerifyRes_CMD)},
 		PBMessage: &pb.AccountVerifyRes{HeartbeatSession: "heartbeat-session"},
 	})
 
@@ -29,7 +29,7 @@ func TestRobotAccountRecordMarksReady(t *testing.T) {
 	robot, commands := newRobotForStateTest(t)
 
 	robot.applyPacketState(&xpacket.Packet{
-		Header: &xpacket.Header{MessageID: uint32(pb.MsgIDAccount_AccountRecordRes_CMD)},
+		Header: &xpacket.Header{MessageID: uint32(pb.MsgID_AccountRecordRes_CMD)},
 		PBMessage: &pb.AccountRecordRes{AccountRecord: &pb.AccountRecord{
 			Aid:               10001,
 			Account:           "robot.10001",

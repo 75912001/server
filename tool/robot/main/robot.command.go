@@ -136,7 +136,6 @@ func (p *Robot) SendCommand(event *RobotCommand) error {
 	err := p.sendCommandNow(event.Command, event.Verbose, event.Source)
 	if err != nil && event.Source == "heartbeat" {
 		p.heartbeatWait = false
-		p.heartbeatPacketID = 0
 	}
 	return err
 }
@@ -191,14 +190,10 @@ func (p *Robot) sendCommandNow(command string, verbose bool, source string) erro
 		log.Infof("\n======send message======\naid=%d\n%s\nmessageID: 0x%x\nMessage: %s", p.aid, command, messageID, marshalJSON(protoMsg))
 	}
 
-	sessionID := p.nextPacketSessionID()
-	if source == "heartbeat" {
-		p.heartbeatPacketID = sessionID
-	}
 	packet := &xpacket.Packet{
 		Header: &xpacket.Header{
 			MessageID: messageID,
-			SessionID: sessionID,
+			SessionID: 0,
 			ResultID:  0,
 			Key:       p.aid,
 		},
@@ -243,14 +238,6 @@ func (p *Robot) fillDynamicFields(msg any) error {
 		}
 	}
 	return nil
-}
-
-func (p *Robot) nextPacketSessionID() uint32 {
-	p.packetSessionID++
-	if p.packetSessionID == 0 {
-		p.packetSessionID++
-	}
-	return p.packetSessionID
 }
 
 func (p *Robot) onCommandError(verbose bool, format string, a ...any) {

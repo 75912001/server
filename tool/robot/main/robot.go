@@ -28,11 +28,9 @@ type Robot struct {
 	gatewayAddr       string
 	heartbeatSession  string
 	connectTicket     string
-	packetSessionID   uint32
 	verified          bool
 	accountReady      bool
 	heartbeatWait     bool
-	heartbeatPacketID uint32
 	heartbeatTimerSeq uint64
 	seq               uint64
 	heartbeatTimer    *xtimer.Millisecond
@@ -110,7 +108,6 @@ func (p *Robot) Close() {
 		p.verified = false
 		p.accountReady = false
 		p.heartbeatWait = false
-		p.heartbeatPacketID = 0
 		p.gatewayAddr = ""
 		p.heartbeatSession = ""
 		p.connectTicket = ""
@@ -266,11 +263,10 @@ func (p *Robot) applyPacketState(packet *xpacket.Packet) {
 			p.markAccountReady()
 		}
 	case *pb.AccountHeartbeatRes:
-		if !p.heartbeatWait || packet.Header.SessionID != p.heartbeatPacketID {
+		if !p.heartbeatWait {
 			return
 		}
 		p.heartbeatWait = false
-		p.heartbeatPacketID = 0
 		if packet.Header.ResultID == 0 {
 			p.heartbeatSession = msg.GetNextHeartbeatSession()
 			p.startHeartBeatTimer()
@@ -283,7 +279,7 @@ func accountRecordReady(accountRecord *pb.AccountRecord) bool {
 }
 
 func (p *Robot) isExpectedNonZeroResult(packet *xpacket.Packet) bool {
-	return packet.Header.MessageID == uint32(pb.MsgIDAccount_CharacterCreateRes_CMD) &&
+	return packet.Header.MessageID == uint32(pb.MsgID_CharacterCreateRes_CMD) &&
 		packet.Header.ResultID == xerror.AlreadyExists.Code()
 }
 

@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# 该脚本从 proto/account.cmd.proto 中提取消息定义，并生成 main/register.message.go。
+# 该脚本从 proto/cmd.proto 中提取全部消息定义, 并生成 main/register.message.go.
 
 scriptDir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 serverPath=$(cd "${scriptDir}/../.." && pwd)
 simulatorPath="tool/robot"
 protoPath="${1:-proto}"
-inputProto="${protoPath}/account.cmd.proto"
+inputProto="${protoPath}/cmd.proto"
 outputGo="${simulatorPath}/main/register.message.go"
 
 cd "${serverPath}" || exit 1
@@ -41,11 +41,11 @@ GOEOF
 grep -E '^[[:space:]]+[A-Za-z0-9]+_CMD[[:space:]]*=' "${inputProto}" |
 while read -r line; do
     enumName=$(echo "${line}" | sed -E 's/^[[:space:]]*([A-Za-z0-9]+)_CMD[[:space:]]*=.*/\1/')
-    if [ "${enumName}" = "AccountMsgIDUnknown" ]; then
+    if [ "${enumName}" = "MsgIDUnknown" ]; then
         continue
     fi
     cat >> "${outputGo}" <<GOEOF
-	registerMessage(uint32(pb.MsgIDAccount_${enumName}_CMD), func() proto.Message { return &pb.${enumName}{} })
+	registerMessage(uint32(pb.MsgID_${enumName}_CMD), func() proto.Message { return &pb.${enumName}{} })
 GOEOF
 done
 
