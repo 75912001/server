@@ -60,6 +60,7 @@
 #   raw_dex = int(init_factor * final_base_dex)
 #
 # 生成真实宠物实例时, 运行方必须保存实例字段:
+#   asset_id: 宠物配置 ID, 用于后续重新取得 PetGrowthEntry 等模板配置
 #   grade
 #   saved_base_vital, saved_base_str, saved_base_tough, saved_base_dex
 #   初始 raw 四维
@@ -72,7 +73,7 @@
 # [推导] agility = int(raw_dex * 0.01)
 ############################################################
 # 宠物升级伪代码:
-# rank 的来源, 发生在生成宠物时:
+# Rank 是服务端加载 pet.yaml 时生成的配置派生数据, 不写入 PetRecord, 客户端也不参与计算:
 #   base_sum = baseVital + baseStr + baseTough + baseDex
 #   if base_sum >= 100: rank = 0
 #   elif base_sum >= 95: rank = 1
@@ -80,6 +81,8 @@
 #   elif base_sum >= 85: rank = 3
 #   elif base_sum >= 80: rank = 4
 #   else: rank = 5
+#   PetGrowthEntry.Rank = rank
+# 后续升级通过 PetRecord.asset_id 取得宠物配置, 直接使用 PetGrowthEntry.Rank, 不重复推导.
 #
 # 生成本次升级随机点:
 #   add_vital = 0
