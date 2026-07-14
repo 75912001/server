@@ -25,6 +25,25 @@
 #   baseStr: [配置] 宠物模板固定基础腕力/攻击值
 #   baseTough: [配置] 宠物模板固定基础耐力/防御值
 #   baseDex: [配置] 宠物模板固定基础速度/敏捷值
+# battleAI 敌方基础动作AI: 仅控制普通攻击、防御和PVE逃跑, 不从skill槽随机选招
+#   仅敌方怪物/NPC读取battleAI. 玩家战斗宠物的动作由客户端分别提交, 不读取这些权重
+#   attackWeight: 普通攻击相对权重, 整数范围[0,2147483647]. 例如10/1/1表示10:1:1, 不是10%/1%/1%
+#   defenseWeight: 防御相对权重, 整数范围[0,2147483647]. 防御是基础动作, 不要求skill中存在9000003
+#   escapeWeight: PVE逃跑相对权重, 整数范围[0,2147483647]. 逃跑是基础动作, 不是宠物技能
+#   三项权重总和范围[0,2147483647]. 总和为0时服务端直接选择防御
+#   targetScope仅在本次权重选中普通攻击时生效, 可选值及精确范围:
+#     allOpponents: 所有仍存活且未逃跑的敌对角色和宠物
+#     playerCharacters: 所有仍存活且未逃跑的敌对玩家角色, 不包含玩家宠物
+#     playerPets: 所有仍存活且未逃跑的敌对玩家宠物, 不包含角色
+#     partyLeader: 开战单位顺序中的首个仍存活敌对玩家角色
+#   targetSelection在targetScope候选中选择最终目标, 可选值及规则:
+#     random: 使用本场确定性随机流等概率选择
+#     highestHp/lowestHp: 按当前战斗HP选择最高/最低者
+#     highestAttack: 按开战战斗攻击力选择最高者
+#     highestAgility/lowestAgility: 按开战战斗敏捷选择最高/最低者
+#     elementalSubdue: 用当前双方元素按8.5物理元素矩阵计算100点基准伤害, 选择最高者
+#   非random方式出现并列时保留开战单位顺序中的首个候选. 指定范围没有候选目标时本回合退化为防御
+#   权重使用8.5 enemy1.txt的at/gu/es相对值; targetScope和targetSelection分别对应at的第2和第3个参数
 # habitat: 栖息地
 # level1Spawn: 1级出生地
 # description: 描述
@@ -141,6 +160,12 @@ pet:
       baseTough: 19
       baseDex: 17
     skill: [9000002,9000003,0,0,0,0,0]
+    battleAI:
+      attackWeight: 10
+      defenseWeight: 1
+      escapeWeight: 1
+      targetScope: allOpponents
+      targetSelection: random
     habitat: 琉璃洞窟 6X等. 無名洞地下3樓 8X等
     level1Spawn: 五兄弟任務取得、琉璃洞窟13樓
     description: 綠人龍，作夢都想偷走藍人龍的戒指，堅稱自己的利則恩首飾才是超熱門的搶手貨
@@ -236,6 +261,12 @@ pet:
       baseTough: 16
       baseDex: 20
     skill: [9000002,9000003,0,0,0,0,0]
+    battleAI:
+      attackWeight: 10
+      defenseWeight: 1
+      escapeWeight: 1
+      targetScope: allOpponents
+      targetSelection: random
     habitat: 達那村外 4X等. 漆黑洞窟 8X等
     level1Spawn: 五兄弟任務取得. 揚奇洛斯乘禮盒. 吉魯島(490.78)~(529.108)
     description: 藍人龍，騎寵，雖然跟藍正龍只差一個字，但藍人龍相信自己肯定比藍正龍帥
@@ -331,6 +362,12 @@ pet:
       baseTough: 15
       baseDex: 21
     skill: [9000002,9000003,0,0,0,0,0]
+    battleAI:
+      attackWeight: 10
+      defenseWeight: 1
+      escapeWeight: 1
+      targetScope: allOpponents
+      targetSelection: random
     habitat: 福爾德村上方 4X等. 漆黑洞窟 9X等
     level1Spawn: 五兄弟任務取得
     description: 為了追上黃人龍的音樂技巧，每天都努力的吹奏浦洛斯的笛，但因為很難聽常常被罵...
@@ -425,6 +462,12 @@ pet:
       baseTough: 16
       baseDex: 20
     skill: [9000002,9000003,0,0,0,0,0]
+    battleAI:
+      attackWeight: 10
+      defenseWeight: 1
+      escapeWeight: 1
+      targetScope: allOpponents
+      targetSelection: random
     habitat: 達那村外 4X等. 無名洞地下2樓 8X等
     level1Spawn: 五兄弟任務取得、吉魯島(441.104)(448.105)
     description: 紅人龍，五兄弟之中攻擊力最高的一個，專門打飛不長眼，最喜歡把自己的手環拿來玩套圈圈
@@ -520,6 +563,12 @@ pet:
       baseTough: 14
       baseDex: 24
     skill: [9000002,9000003,0,0,0,0,0]
+    battleAI:
+      attackWeight: 10
+      defenseWeight: 1
+      escapeWeight: 1
+      targetScope: allOpponents
+      targetSelection: random
     habitat: 達那村外 4X等. 無名洞地下2樓 8X等
     level1Spawn: 五兄弟任務取得
     description: 黃人龍,最喜歡做的事情是玩音樂,雖然現在大多數人都玩吉他,BASS但黃人龍依然喜歡最豎琴
@@ -615,6 +664,12 @@ pet:
       baseTough: 18
       baseDex: 32
     skill: [9000002,9000003,0,0,0,0,0]
+    battleAI:
+      attackWeight: 1
+      defenseWeight: 0
+      escapeWeight: 5
+      targetScope: allOpponents
+      targetSelection: random
     habitat: 伊甸园火城火山洞窑四楼(29,14)
     level1Spawn: 黑色魅惑箱II(絕版)
     description: 黑人龍，平常最喜歡做的事情就是比中指，不解釋自看圖
@@ -710,6 +765,12 @@ pet:
       baseTough: 25
       baseDex: 35
     skill: [ 9000002,9000003,9000007,0,0,0,0 ]
+    battleAI:
+      attackWeight: 10
+      defenseWeight: 1
+      escapeWeight: 0
+      targetScope: allOpponents
+      targetSelection: random
     habitat: 未知
     level1Spawn: 未知
     description: 未知
@@ -805,6 +866,12 @@ pet:
       baseTough: 20
       baseDex: 43
     skill: [ 9000002,9000003,9000007,0,0,0,0 ]
+    battleAI:
+      attackWeight: 10
+      defenseWeight: 1
+      escapeWeight: 0
+      targetScope: allOpponents
+      targetSelection: random
     habitat: 未知
     level1Spawn: 未知
     description: 未知
@@ -900,6 +967,12 @@ pet:
       baseTough: 23
       baseDex: 38
     skill: [ 9000002,9000003,9000007,0,0,0,0 ]
+    battleAI:
+      attackWeight: 10
+      defenseWeight: 1
+      escapeWeight: 0
+      targetScope: allOpponents
+      targetSelection: random
     habitat: 未知
     level1Spawn: 未知
     description: 未知
@@ -995,6 +1068,12 @@ pet:
       baseTough: 23
       baseDex: 35
     skill: [ 9000002,9000003,0,0,0,0,0 ]
+    battleAI:
+      attackWeight: 1
+      defenseWeight: 0
+      escapeWeight: 0
+      targetScope: allOpponents
+      targetSelection: random
     habitat: 未知
     level1Spawn: 未知
     description: 未知
