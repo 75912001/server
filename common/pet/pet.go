@@ -1,7 +1,6 @@
 package pet
 
 import (
-	"math/rand"
 	"server/common/gameconfig"
 	"server/proto/pb"
 	"time"
@@ -37,9 +36,9 @@ func CalculateAgility(rawDex uint32) uint32 {
 
 // 随机-4属性-分布
 func randomFourPointDistribution() (vital uint32, str uint32, tough uint32, dex uint32) {
-	randomU32 := xutil.RandomU32(0, 4)
 	for i := 0; i < rawRandomPointCount; i++ {
-		switch randomU32 {
+		// 每个随机点独立选择一项属性, 保证四项等概率且总点数固定.
+		switch xutil.RandomU32(0, 3) {
 		case 0:
 			vital++
 		case 1:
@@ -53,7 +52,7 @@ func randomFourPointDistribution() (vital uint32, str uint32, tough uint32, dex 
 	return vital, str, tough, dex
 }
 
-// 升级-宠物
+// upgrade 使用加载宠物配置时生成的 Rank 计算逐级成长, 不在升级时重复推导 Rank.
 func upgrade(pet *gameconfig.PetEntry, upgradeCount uint32,
 	savedBaseVital uint32,
 	savedBaseStr uint32,
@@ -67,14 +66,15 @@ func upgrade(pet *gameconfig.PetEntry, upgradeCount uint32,
 	newRawTough uint32,
 	newRawDex uint32) {
 	if upgradeCount == 0 {
-		return
+		// 零次升级必须保留调用方传入的当前 Raw, 避免 1 级宠物的初始属性被清零.
+		return rawVital, rawStr, rawTough, rawDex
 	}
-	baseSum := int(*pet.Growth.BaseVital) + int(*pet.Growth.BaseStr) + int(*pet.Growth.BaseTough) + int(*pet.Growth.BaseDex)
-	rankMin, rankMax := rankGrowthRange(baseSum)
+	rankMin, rankMax := rankGrowthRange(pet.Growth.Rank)
 	for i := uint32(0); i < upgradeCount; i++ {
 		randomVital, randomStr, randomTough, randomDex := randomFourPointDistribution()
-		rng := rand.New(rand.NewSource(time.Now().UnixNano() + int64(i)))
-		rankRand := rankMin + rng.Float64()*(rankMax-rankMin)
+		const randomPrecision = uint64(1_000_000_000)
+		randomRatio := float64(xutil.RandomU64(0, randomPrecision)) / float64(randomPrecision)
+		rankRand := rankMin + randomRatio*(rankMax-rankMin)
 		rawVital += uint32(float64(savedBaseVital+randomVital) * rankRand)
 		rawStr += uint32(float64(savedBaseStr+randomStr) * rankRand)
 		rawTough += uint32(float64(savedBaseTough+randomTough) * rankRand)
@@ -131,6 +131,7 @@ func NewRecord(pet *gameconfig.PetEntry, petUUID uint64, level uint32, grade pb.
 	savedBaseVital, savedBaseStr, savedBaseTough, savedBaseDex, rawVital, rawStr, rawTough, rawDex := create(pet, level, grade)
 	return &pb.PetRecord{
 		Uuid:               petUUID,
+		AssetId:            uint64(*pet.ID),
 		CarryStatus:        pb.PetCarryStatus_PetCarryStatus_Rest,
 		Grade:              grade,
 		Exp:                expMin,
@@ -149,21 +150,21 @@ func NewRecord(pet *gameconfig.PetEntry, petUUID uint64, level uint32, grade pb.
 	}
 }
 
-func rankGrowthRange(baseSum int) (float64, float64) {
-	if baseSum >= 100 {
+func rankGrowthRange(rank uint32) (float64, float64) {
+	switch rank {
+	case 0:
 		return 4.50, 5.00
-	}
-	if baseSum >= 95 {
+	case 1:
 		return 4.70, 5.20
-	}
-	if baseSum >= 90 {
+	case 2:
 		return 4.90, 5.40
-	}
-	if baseSum >= 85 {
+	case 3:
 		return 5.10, 5.60
-	}
-	if baseSum >= 80 {
+	case 4:
 		return 5.30, 5.80
+	case 5:
+		return 5.50, 6.00
+	default:
+		panic("invalid pet growth rank")
 	}
-	return 5.50, 6.00
 }
