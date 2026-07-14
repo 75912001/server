@@ -1,6 +1,8 @@
 package gameconfig
 
 import (
+	"math"
+
 	xmap "github.com/75912001/xlib/map"
 	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
@@ -26,6 +28,42 @@ type PetEntry struct {
 	Growth *PetGrowthEntry `yaml:"growth"`
 	// SkillSlots 来自 pet[].skill, 按配置顺序保存技能槽位; 0 表示空槽, 非0值必须引用 pet.skill.yaml 中存在的技能ID.
 	SkillSlots []uint32 `yaml:"skill"`
+	// BattleAI 来自 pet[].battleAI, 保存敌方单位基础攻击、防御、逃跑权重及攻击目标选择规则.
+	BattleAI *PetBattleAIEntry `yaml:"battleAI"`
+}
+
+type PetBattleAITargetScope string
+
+const (
+	PetBattleAITargetScopeAllOpponents     PetBattleAITargetScope = "allOpponents"
+	PetBattleAITargetScopePlayerCharacters PetBattleAITargetScope = "playerCharacters"
+	PetBattleAITargetScopePlayerPets       PetBattleAITargetScope = "playerPets"
+	PetBattleAITargetScopePartyLeader      PetBattleAITargetScope = "partyLeader"
+)
+
+type PetBattleAITargetSelection string
+
+const (
+	PetBattleAITargetSelectionRandom          PetBattleAITargetSelection = "random"
+	PetBattleAITargetSelectionHighestHP       PetBattleAITargetSelection = "highestHp"
+	PetBattleAITargetSelectionLowestHP        PetBattleAITargetSelection = "lowestHp"
+	PetBattleAITargetSelectionHighestAttack   PetBattleAITargetSelection = "highestAttack"
+	PetBattleAITargetSelectionHighestAgility  PetBattleAITargetSelection = "highestAgility"
+	PetBattleAITargetSelectionLowestAgility   PetBattleAITargetSelection = "lowestAgility"
+	PetBattleAITargetSelectionElementalSubdue PetBattleAITargetSelection = "elementalSubdue"
+)
+
+type PetBattleAIEntry struct {
+	// AttackWeight 是普通攻击相对权重, 范围[0,2147483647].
+	AttackWeight *uint32 `yaml:"attackWeight"`
+	// DefenseWeight 是本回合防御相对权重, 范围[0,2147483647].
+	DefenseWeight *uint32 `yaml:"defenseWeight"`
+	// EscapeWeight 是PVE逃跑相对权重, 范围[0,2147483647]. 逃跑是基础动作, 不是宠物技能.
+	EscapeWeight *uint32 `yaml:"escapeWeight"`
+	// TargetScope 限制普通攻击的候选目标类型.
+	TargetScope *PetBattleAITargetScope `yaml:"targetScope"`
+	// TargetSelection 定义在候选目标中选择最终目标的方式.
+	TargetSelection *PetBattleAITargetSelection `yaml:"targetSelection"`
 }
 
 type PetElementalEntry map[pb.AssetElemental]*uint32
@@ -261,11 +299,61 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 			return errors.Errorf("宠物 skill 至少需要一个非0技能: ID:%d %v", *pet.ID, xruntime.Location())
 		}
 
+		if pet.BattleAI == nil {
+			return errors.Errorf("宠物缺少 battleAI: pet:%d %v", *pet.ID, xruntime.Location())
+		}
+		if pet.BattleAI.AttackWeight == nil {
+			return errors.Errorf("宠物缺少 battleAI.attackWeight: pet:%d %v", *pet.ID, xruntime.Location())
+		}
+		if pet.BattleAI.DefenseWeight == nil {
+			return errors.Errorf("宠物缺少 battleAI.defenseWeight: pet:%d %v", *pet.ID, xruntime.Location())
+		}
+		if pet.BattleAI.EscapeWeight == nil {
+			return errors.Errorf("宠物缺少 battleAI.escapeWeight: pet:%d %v", *pet.ID, xruntime.Location())
+		}
+		weightSum := uint64(*pet.BattleAI.AttackWeight) + uint64(*pet.BattleAI.DefenseWeight) + uint64(*pet.BattleAI.EscapeWeight)
+		if *pet.BattleAI.AttackWeight > math.MaxInt32 || *pet.BattleAI.DefenseWeight > math.MaxInt32 || *pet.BattleAI.EscapeWeight > math.MaxInt32 || weightSum > math.MaxInt32 {
+			return errors.Errorf("宠物 battleAI 权重单项和总和必须在[0,2147483647]: pet:%d attack:%d defense:%d escape:%d %v", *pet.ID, *pet.BattleAI.AttackWeight, *pet.BattleAI.DefenseWeight, *pet.BattleAI.EscapeWeight, xruntime.Location())
+		}
+		if pet.BattleAI.TargetScope == nil || !validPetBattleAITargetScope(*pet.BattleAI.TargetScope) {
+			return errors.Errorf("宠物 battleAI.targetScope 非法: pet:%d value:%v %v", *pet.ID, pet.BattleAI.TargetScope, xruntime.Location())
+		}
+		if pet.BattleAI.TargetSelection == nil || !validPetBattleAITargetSelection(*pet.BattleAI.TargetSelection) {
+			return errors.Errorf("宠物 battleAI.targetSelection 非法: pet:%d value:%v %v", *pet.ID, pet.BattleAI.TargetSelection, xruntime.Location())
+		}
+
 		if !p.AddIfNotExist(*pet.ID, pet) {
 			return errors.Errorf("宠物ID重复: %d %v", *pet.ID, xruntime.Location())
 		}
 	}
 	return nil
+}
+
+func validPetBattleAITargetScope(scope PetBattleAITargetScope) bool {
+	switch scope {
+	case PetBattleAITargetScopeAllOpponents,
+		PetBattleAITargetScopePlayerCharacters,
+		PetBattleAITargetScopePlayerPets,
+		PetBattleAITargetScopePartyLeader:
+		return true
+	default:
+		return false
+	}
+}
+
+func validPetBattleAITargetSelection(selection PetBattleAITargetSelection) bool {
+	switch selection {
+	case PetBattleAITargetSelectionRandom,
+		PetBattleAITargetSelectionHighestHP,
+		PetBattleAITargetSelectionLowestHP,
+		PetBattleAITargetSelectionHighestAttack,
+		PetBattleAITargetSelectionHighestAgility,
+		PetBattleAITargetSelectionLowestAgility,
+		PetBattleAITargetSelectionElementalSubdue:
+		return true
+	default:
+		return false
+	}
 }
 
 // petRankFromBaseSum 根据宠物配置表的固定基础四维总和生成成长档位.
