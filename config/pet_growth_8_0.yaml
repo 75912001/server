@@ -1,5 +1,6 @@
-# 数据源: pet_growth_8_0.csv, enemybase1.txt
-# 当前 YAML 只包含 lvMin == 1 且 lvMax == 1 的固定 1 级宠物.
+# 数据源: pet_growth_8_0.csv, enemybase1.txt
+# 本文件保留 csa_8.0 原始数据和算法参考; 当前项目运行规则以 pet.yaml 为准, 使用 PetGrade 生成 SavedBase, 并将 rank 作为 PetGrowthEntry 的配置派生数据.
+# 当前 YAML 只包含 lvMin == 1 且 lvMax == 1 的固定 1 级宠物.
 # 完整宠物记录仍保留在 pet_growth_8_0.csv 中.
 # algorithm 是机器可读算法配置.
 # pets 是 1 级宠物模板数据.
