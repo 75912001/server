@@ -92,6 +92,8 @@ type PetGrowthEntry struct {
 	BaseTough *uint32 `yaml:"baseTough"`
 	// BaseDex 来自 growth.baseDex, 表示宠物模板固定基础速度/敏捷值, 加品阶最小偏移后必须仍大于0.
 	BaseDex *uint32 `yaml:"baseDex"`
+	// Rank 是加载 pet.yaml 后根据配置基础四维总和生成的成长档位, 不是 YAML 输入字段; 后续升级直接使用该值.
+	Rank uint32 `yaml:"-"`
 }
 
 func newPetConfig() *PetConfig {
@@ -237,6 +239,7 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 		if int32(baseDex)+petSavedBaseGradeOffsetMin <= 0 {
 			return errors.Errorf("宠物 growth.baseDex 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v", *pet.ID, baseDex, petSavedBaseGradeOffsetMin, xruntime.Location())
 		}
+		pet.Growth.Rank = petRankFromBaseSum(uint64(baseVital) + uint64(baseStr) + uint64(baseTough) + uint64(baseDex))
 
 		if pet.SkillSlots == nil {
 			return errors.Errorf("宠物缺少 skill: pet:%d %v", *pet.ID, xruntime.Location())
@@ -263,6 +266,26 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 		}
 	}
 	return nil
+}
+
+// petRankFromBaseSum 根据宠物配置表的固定基础四维总和生成成长档位.
+func petRankFromBaseSum(baseSum uint64) uint32 {
+	if baseSum >= 100 {
+		return 0
+	}
+	if baseSum >= 95 {
+		return 1
+	}
+	if baseSum >= 90 {
+		return 2
+	}
+	if baseSum >= 85 {
+		return 3
+	}
+	if baseSum >= 80 {
+		return 4
+	}
+	return 5
 }
 
 func (p *PetConfig) check() error {
