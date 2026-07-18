@@ -1836,30 +1836,30 @@ pet:
     - id: 4000259
       name: 贝洛宝克尔
       sprite: 259
-      enemyId: 0
-      rarity: 0
+      enemyId: 34
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 3
+        water: 7
       attribute:
         poisonResist: 0
         paralysisResist: 0
         sleepResist: 0
-        stoneResist: 0
+        stoneResist: 30
         drunkResist: 0
         confusionResist: 0
         critical: 0
         counter: 0
         rate: 0
-        get: 0
+        get: 7
       growth:
-        initNum: 0
+        initNum: 23
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+        baseVital: 30
+        baseStr: 13
+        baseTough: 31
+        baseDex: 14
+      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 默认有个技能 80 , 尚未添加
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1872,11 +1872,10 @@ pet:
     - id: 4000257
       name: 贝洛恩
       sprite: 257
-      enemyId: 0
-      rarity: 0
+      enemyId: 32
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1887,14 +1886,14 @@ pet:
         critical: 0
         counter: 0
         rate: 0
-        get: 0
+        get: 7
       growth:
-        initNum: 0
+        initNum: 24
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 30
+        baseStr: 12
+        baseTough: 30
+        baseDex: 15
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1908,11 +1907,11 @@ pet:
     - id: 4000601
       name: 贝洛波波
       sprite: 601
-      enemyId: 0
-      rarity: 0
+      enemyId: 1576
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        water: 5
+        fire: 5
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1920,17 +1919,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
-        rate: 0
-        get: 0
+        critical: 1
+        counter: 1
+        rate: 1
+        get: -1
       growth:
-        initNum: 0
+        initNum: 23
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 36
+        baseStr: 20
+        baseTough: 35
+        baseDex: 16
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1944,11 +1943,11 @@ pet:
     - id: 4000600
       name: 贝洛贝
       sprite: 600
-      enemyId: 0
-      rarity: 0
+      enemyId: 1575
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 7
+        wind: 3
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1956,17 +1955,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 20
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 33
+        baseStr: 17
+        baseTough: 37
+        baseDex: 18
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1980,30 +1979,30 @@ pet:
     - id: 4000260
       name: 贝洛宝利
       sprite: 260
-      enemyId: 0
-      rarity: 0
+      enemyId: 35
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        water: 3
+        fire: 7
       attribute:
         poisonResist: 0
         paralysisResist: 0
         sleepResist: 0
         stoneResist: 0
         drunkResist: 0
-        confusionResist: 0
+        confusionResist: 30
         critical: 0
         counter: 0
         rate: 0
-        get: 0
+        get: 5
       growth:
-        initNum: 0
+        initNum: 22
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+        baseVital: 29
+        baseStr: 16
+        baseTough: 30
+        baseDex: 15
+      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 默认有个技能 90 , 尚未添加
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2016,11 +2015,11 @@ pet:
     - id: 4000599
       name: 贝洛格
       sprite: 599
-      enemyId: 0
-      rarity: 0
+      enemyId: 1574
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 8
+        water: 2
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2028,17 +2027,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 19
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 34
+        baseStr: 17
+        baseTough: 39
+        baseDex: 15
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -2052,30 +2051,30 @@ pet:
     - id: 4000258
       name: 贝洛洛克
       sprite: 258
-      enemyId: 0
-      rarity: 0
+      enemyId: 33
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 7
+        water: 3
       attribute:
-        poisonResist: 0
+        poisonResist: 60
         paralysisResist: 0
         sleepResist: 0
-        stoneResist: 0
+        stoneResist: -20
         drunkResist: 0
         confusionResist: 0
         critical: 0
         counter: 0
         rate: 0
-        get: 0
+        get: 7
       growth:
-        initNum: 0
+        initNum: 19
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+        baseVital: 29
+        baseStr: 14
+        baseTough: 32
+        baseDex: 13
+      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 默认有个技能 60 , 尚未添加
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2088,11 +2087,11 @@ pet:
     - id: 4000598
       name: 贝洛金
       sprite: 598
-      enemyId: 0
-      rarity: 0
+      enemyId: 1573
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        fire: 4
+        wind: 6
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2100,17 +2099,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 21
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 32
+        baseStr: 19
+        baseTough: 34
+        baseDex: 19
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -2128,11 +2127,11 @@ pet:
     - id: 4000603
       name: 卡拉格尔
       sprite: 603
-      enemyId: 0
-      rarity: 0
+      enemyId: 1578
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 7
+        wind: 3
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2140,17 +2139,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
-        rate: 0
-        get: 0
+        critical: 1
+        counter: 1
+        rate: 2
+        get: -5
       growth:
-        initNum: 0
+        initNum: 16
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 22
+        baseStr: 22
+        baseTough: 41
+        baseDex: 13
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -2164,11 +2163,11 @@ pet:
     - id: 4000605
       name: 卡拉龟
       sprite: 605
-      enemyId: 0
-      rarity: 0
+      enemyId: 1580
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 4
+        water: 6
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2176,17 +2175,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
-        rate: 0
-        get: 0
+        critical: 1
+        counter: 1
+        rate: 1
+        get: -1
       growth:
-        initNum: 0
+        initNum: 15
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 28
+        baseStr: 21
+        baseTough: 39
+        baseDex: 10
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -2200,11 +2199,11 @@ pet:
     - id: 4000263
       name: 卡梅兰恩
       sprite: 263
-      enemyId: 0
-      rarity: 0
+      enemyId: 38
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        fire: 8
+        wind: 2
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2215,15 +2214,15 @@ pet:
         critical: 0
         counter: 0
         rate: 0
-        get: 0
+        get: 9
       growth:
-        initNum: 0
+        initNum: 12
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+        baseVital: 20
+        baseStr: 21
+        baseTough: 33
+        baseDex: 10
+      skill: [ 9000002,9000003,9000005,0,0,0,0 ]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2236,30 +2235,30 @@ pet:
     - id: 4000264
       name: 石龟
       sprite: 264
-      enemyId: 0
-      rarity: 0
+      enemyId: 39
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 9
+        wind: 1
       attribute:
         poisonResist: 0
         paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
+        sleepResist: -20
+        stoneResist: 65
         drunkResist: 0
         confusionResist: 0
         critical: 0
         counter: 0
         rate: 0
-        get: 0
+        get: 7
       growth:
-        initNum: 0
+        initNum: 20
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+        baseVital: 21
+        baseStr: 19
+        baseTough: 41
+        baseDex: 8
+      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 默认有个技能 80 , 尚未添加
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2272,11 +2271,11 @@ pet:
     - id: 4000262
       name: 绿龟
       sprite: 262
-      enemyId: 0
-      rarity: 0
+      enemyId: 37
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 6
+        wind: 4
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2287,14 +2286,14 @@ pet:
         critical: 0
         counter: 0
         rate: 0
-        get: 0
+        get: 9
       growth:
-        initNum: 0
+        initNum: 14
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 19
+        baseStr: 19
+        baseTough: 35
+        baseDex: 8
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -2308,11 +2307,10 @@ pet:
     - id: 4000602
       name: 蓝龟
       sprite: 602
-      enemyId: 0
-      rarity: 0
+      enemyId: 1577
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2320,17 +2318,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 15
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 31
+        baseStr: 24
+        baseTough: 38
+        baseDex: 10
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -2344,11 +2342,11 @@ pet:
     - id: 4000261
       name: 龟之盾
       sprite: 261
-      enemyId: 0
-      rarity: 0
+      enemyId: 36
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 3
+        wind: 7
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2359,14 +2357,14 @@ pet:
         critical: 0
         counter: 0
         rate: 0
-        get: 0
+        get: 9
       growth:
-        initNum: 0
+        initNum: 14
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 20
+        baseStr: 18
+        baseTough: 34
+        baseDex: 9
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -2380,11 +2378,11 @@ pet:
     - id: 4000604
       name: 龟之钢
       sprite: 604
-      enemyId: 0
-      rarity: 0
+      enemyId: 1579
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        fire: 4
+        wind: 6
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2392,17 +2390,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 13
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 23
+        baseStr: 25
+        baseTough: 35
+        baseDex: 13
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
