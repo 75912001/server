@@ -1,18 +1,21 @@
 package gameconfig
 
 const (
-	FileCharacter  = "character.yaml"
-	FileEnemyGroup = "enemy.group.yaml"
-	FileEnemyExp   = "enemy.exp.yaml"
-	FileExp        = "exp.yaml"
-	FilePetSkill   = "pet.skill.yaml"
-	FilePet        = "pet.yaml"
-	FileScene      = "scene.yaml"
+	FileCharacter      = "character.yaml"
+	FileCharacterSkill = "character.skill.yaml"
+	FileEnemyGroup     = "enemy.group.yaml"
+	FileEnemyExp       = "enemy.exp.yaml"
+	FileExp            = "exp.yaml"
+	FilePetSkill       = "pet.skill.yaml"
+	FilePet            = "pet.yaml"
+	FileScene          = "scene.yaml"
 )
 
 var GGameConfig *Manager
 
 type Manager struct {
+	// CharacterSkill 是 character.skill.yaml 的角色技能配置, 用于校验角色战斗技能输入.
+	CharacterSkill *CharacterSkillConfig
 	// PetSkill 是 pet.skill.yaml 的宠物技能配置, 用于校验宠物技能槽位引用和按技能ID查询技能描述.
 	PetSkill *PetSkillConfig
 	// Pet 是 pet.yaml 的宠物业务数值配置, 用于宠物模板查询和敌人组宠物ID引用校验.
