@@ -12,6 +12,10 @@ func isPetSkillID(id uint32) bool {
 	return id >= uint32(pb.AssetIDRange_AssetIDRange_Pet_Skill_Start) && id <= uint32(pb.AssetIDRange_AssetIDRange_Pet_Skill_End)
 }
 
+func isCharacterSkillID(id uint32) bool {
+	return id >= uint32(pb.AssetIDRange_AssetIDRange_Character_Skill_Start) && id <= uint32(pb.AssetIDRange_AssetIDRange_Character_Skill_End)
+}
+
 func isCharacterID(id uint32) bool {
 	return id >= uint32(pb.AssetIDRange_AssetIDRange_Character_Start) && id <= uint32(pb.AssetIDRange_AssetIDRange_Character_End)
 }
