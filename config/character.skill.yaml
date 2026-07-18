@@ -1,0 +1,21 @@
+# 角色技能-配置
+# 任何修改此文件的行为都需要通知客户端和服务端开发人员
+
+# 角色技能 [8000001,8999999]
+
+skill:
+  - id: 8000001
+    name: 攻击
+    description: 通常攻击
+  - id: 8000002
+    name: 防御
+    description: 通常防御
+  - id: 8000003
+    name: 逃离
+    description: 尝试逃离战斗
+  - id: 8000004
+    name: 捕获
+    description: 尝试捕获目标宠物
+  - id: 8000005
+    name: 换宠
+    description: 更换出战宠物
