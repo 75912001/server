@@ -1266,17 +1266,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 21
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 27
+        baseStr: 25
+        baseTough: 25
+        baseDex: 26
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1293,26 +1293,26 @@ pet:
       enemyId: 27
       rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        fire: 3
+        wind: 7
       attribute:
         poisonResist: 0
         paralysisResist: 0
         sleepResist: 0
         stoneResist: 0
         drunkResist: 0
-        confusionResist: 0
+        confusionResist: 20
         critical: 0
-        counter: 0
+        counter: 1
         rate: 0
-        get: 0
+        get: 5
       growth:
-        initNum: 0
+        initNum: 16
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 21
+        baseStr: 22
+        baseTough: 18
+        baseDex: 25
       skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 默认有个技能 90 , 尚未添加
       battleAI:
         attackWeight: 1
@@ -1329,8 +1329,8 @@ pet:
       enemyId: 1565
       rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        fire: 8
+        wind: 2
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1338,17 +1338,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 23
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 24
+        baseStr: 31
+        baseTough: 21
+        baseDex: 28
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1365,8 +1365,8 @@ pet:
       enemyId: 1566
       rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        water: 6
+        fire: 4
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1374,17 +1374,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 21
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 29
+        baseStr: 27
+        baseTough: 22
+        baseDex: 25
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1401,26 +1401,26 @@ pet:
       enemyId: 25
       rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 5
+        wind: 5
       attribute:
-        poisonResist: 0
+        poisonResist: 20
         paralysisResist: 0
         sleepResist: 0
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
         critical: 0
-        counter: 0
+        counter: 1
         rate: 0
-        get: 0
+        get: 7
       growth:
-        initNum: 0
+        initNum: 20
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 21
+        baseStr: 22
+        baseTough: 18
+        baseDex: 28
       skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 默认有个技能 60 , 尚未添加
       battleAI:
         attackWeight: 1
@@ -1437,8 +1437,7 @@ pet:
       enemyId: 26
       rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1447,16 +1446,16 @@ pet:
         drunkResist: 0
         confusionResist: 0
         critical: 0
-        counter: 0
+        counter: 1
         rate: 0
-        get: 0
+        get: 5
       growth:
-        initNum: 0
+        initNum: 18
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 22
+        baseStr: 22
+        baseTough: 18
+        baseDex: 28
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1473,8 +1472,8 @@ pet:
       enemyId: 21
       rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        fire: 6
+        wind: 4
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1483,16 +1482,16 @@ pet:
         drunkResist: 0
         confusionResist: 0
         critical: 0
-        counter: 0
+        counter: 1
         rate: 0
-        get: 0
+        get: 7
       growth:
-        initNum: 0
+        initNum: 22
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 22
+        baseStr: 23
+        baseTough: 19
+        baseDex: 23
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1509,8 +1508,8 @@ pet:
       enemyId: 1568
       rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 4
+        water: 6
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1518,17 +1517,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 22
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 29
+        baseStr: 25
+        baseTough: 24
+        baseDex: 26
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1545,11 +1544,11 @@ pet:
     - id: 4000256
       name: 威伯
       sprite: 256
-      enemyId: 0
-      rarity: 0
+      enemyId: 4
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 6
+        wind: 4
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1558,16 +1557,16 @@ pet:
         drunkResist: 0
         confusionResist: 0
         critical: 0
-        counter: 0
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 20
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 17
+        baseStr: 18
+        baseTough: 15
+        baseDex: 29
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1581,11 +1580,11 @@ pet:
     - id: 4000254
       name: 威威
       sprite: 254
-      enemyId: 0
-      rarity: 0
+      enemyId: 29
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        fire: 6
+        wind: 4
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1594,16 +1593,16 @@ pet:
         drunkResist: 0
         confusionResist: 0
         critical: 0
-        counter: 0
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 15
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 18
+        baseStr: 21
+        baseTough: 7
+        baseDex: 33
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1617,11 +1616,11 @@ pet:
     - id: 4000595
       name: 威斯
       sprite: 595
-      enemyId: 0
-      rarity: 0
+      enemyId: 1570
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        water: 8
+        fire: 2
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1629,17 +1628,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 17
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 29
+        baseStr: 23
+        baseTough: 14
+        baseDex: 31
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1653,11 +1652,11 @@ pet:
     - id: 4000596
       name: 威比
       sprite: 596
-      enemyId: 0
-      rarity: 0
+      enemyId: 1571
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        fire: 3
+        wind: 7
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1665,17 +1664,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 17
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 22
+        baseStr: 24
+        baseTough: 13
+        baseDex: 39
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1689,11 +1688,11 @@ pet:
     - id: 4000255
       name: 乌卡鲁
       sprite: 255
-      enemyId: 0
-      rarity: 0
+      enemyId: 30
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 3
+        water: 7
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1702,16 +1701,16 @@ pet:
         drunkResist: 0
         confusionResist: 0
         critical: 0
-        counter: 0
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 17
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 23
+        baseStr: 19
+        baseTough: 11
+        baseDex: 26
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1725,11 +1724,11 @@ pet:
     - id: 4000594
       name: 乌宝依
       sprite: 594
-      enemyId: 0
-      rarity: 0
+      enemyId: 1569
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        fire: 8
+        wind: 2
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1737,17 +1736,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
-        rate: 0
-        get: 0
+        critical: 1
+        counter: 1
+        rate: 1
+        get: -1
       growth:
-        initNum: 0
+        initNum: 18
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 23
+        baseStr: 28
+        baseTough: 13
+        baseDex: 35
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1761,11 +1760,11 @@ pet:
     - id: 4000253
       name: 乌宝宝
       sprite: 253
-      enemyId: 0
-      rarity: 0
+      enemyId: 28
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 3
+        wind: 7
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1774,16 +1773,16 @@ pet:
         drunkResist: 0
         confusionResist: 0
         critical: 0
-        counter: 0
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 13
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 17
+        baseStr: 20
+        baseTough: 10
+        baseDex: 32
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
@@ -1797,11 +1796,11 @@ pet:
     - id: 4000597
       name: 乌拉拉
       sprite: 597
-      enemyId: 0
-      rarity: 0
+      enemyId: 1572
+      rarity: 1
       elemental:
-        earth: 0
-        water: 0
+        earth: 9
+        wind: 1
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1809,17 +1808,17 @@ pet:
         stoneResist: 0
         drunkResist: 0
         confusionResist: 0
-        critical: 0
-        counter: 0
+        critical: 1
+        counter: 1
         rate: 0
-        get: 0
+        get: 11
       growth:
-        initNum: 0
+        initNum: 16
         lvupPointSource: 4.50
-        baseVital: 0
-        baseStr: 0
-        baseTough: 0
-        baseDex: 0
+        baseVital: 26
+        baseStr: 22
+        baseTough: 19
+        baseDex: 33
       skill: [ 9000002,9000003,0,0,0,0,0 ]
       battleAI:
         attackWeight: 1
