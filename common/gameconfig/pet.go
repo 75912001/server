@@ -2,6 +2,7 @@ package gameconfig
 
 import (
 	"math"
+	"strings"
 
 	xmap "github.com/75912001/xlib/map"
 	xruntime "github.com/75912001/xlib/runtime"
@@ -16,19 +17,19 @@ type PetConfig struct {
 }
 
 type PetEntry struct {
-	// ID 来自 pet[].id, 必须处于协议宠物资源ID段内, 并且会被 enemy.group.yaml 的 enemies[].id 引用.
+	// ID 来自 pet.<family>[].id, 必须处于协议宠物资源ID段内, 并且会被 enemy.group.yaml 的 enemies[].id 引用.
 	ID *uint32 `yaml:"id"`
-	// Rarity 来自 pet[].rarity, 使用协议 PetRarity 的整数值, 当前范围为普通到神话.
+	// Rarity 来自 pet.<family>[].rarity, 使用协议 PetRarity 的整数值, 当前范围为普通到神话.
 	Rarity *uint32 `yaml:"rarity"`
-	// Elemental 来自 pet[].elemental, key 转为协议元素类型, 值范围[0,10], 总和必须为10.
+	// Elemental 来自 pet.<family>[].elemental, key 转为协议元素类型, 值范围[0,10], 总和必须为10.
 	Elemental PetElementalEntry `yaml:"elemental"`
-	// Attribute 来自 pet[].attribute, 保存宠物抗性和战斗附加属性, 字段必须为非负值.
+	// Attribute 来自 pet.<family>[].attribute, 保存宠物抗性和战斗附加属性, 字段必须为非负值.
 	Attribute *PetAttributeEntry `yaml:"attribute"`
-	// Growth 来自 pet[].growth, 保存宠物生成和升级时使用的基础成长参数.
+	// Growth 来自 pet.<family>[].growth, 保存宠物生成和升级时使用的基础成长参数.
 	Growth *PetGrowthEntry `yaml:"growth"`
-	// SkillSlots 来自 pet[].skill, 按配置顺序保存技能槽位; 0 表示空槽, 非0值必须引用 pet.skill.yaml 中存在的技能ID.
+	// SkillSlots 来自 pet.<family>[].skill, 按配置顺序保存技能槽位; 0 表示空槽, 非0值必须引用 pet.skill.yaml 中存在的技能ID.
 	SkillSlots []uint32 `yaml:"skill"`
-	// BattleAI 来自 pet[].battleAI, 保存敌方单位基础攻击、防御、逃跑权重及攻击目标选择规则.
+	// BattleAI 来自 pet.<family>[].battleAI, 保存敌方单位基础攻击、防御、逃跑权重及攻击目标选择规则.
 	BattleAI *PetBattleAIEntry `yaml:"battleAI"`
 }
 
@@ -141,13 +142,34 @@ func newPetConfig() *PetConfig {
 }
 
 func (p *PetConfig) load(dir string) error {
+	// root 只适配 YAML 的系别结构; 校验后逐组写入 ID 索引, 运行时不保留系别.
 	var root struct {
-		Pet []*PetEntry `yaml:"pet"`
+		Pet map[string][]*PetEntry `yaml:"pet"`
 	}
 	if err := loadYAMLFile(dir, FilePet, &root); err != nil {
 		return err
 	}
-	return p.configure(root.Pet)
+	if len(root.Pet) == 0 {
+		return errors.Errorf("宠物配置 pet 段不能为空 %v", xruntime.Location())
+	}
+	for family, entries := range root.Pet {
+		trimmedFamily := strings.TrimSpace(family)
+		if trimmedFamily == "" {
+			return errors.Errorf("宠物系别不能为空 %v", xruntime.Location())
+		}
+		if trimmedFamily != family {
+			return errors.Errorf("宠物系别首尾不能包含空白: %q %v", family, xruntime.Location())
+		}
+		if len(entries) == 0 {
+			return errors.Errorf("宠物系别没有配置宠物: family:%s %v", family, xruntime.Location())
+		}
+	}
+	for _, entries := range root.Pet {
+		if err := p.configure(entries); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (p *PetConfig) configure(entries []*PetEntry) error {
@@ -252,32 +274,32 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 		if pet.Growth.BaseVital == nil {
 			return errors.Errorf("宠物缺少 growth.baseVital: pet:%d %v", *pet.ID, xruntime.Location())
 		}
-		baseVital := *pet.Growth.BaseVital
 		if pet.Growth.BaseStr == nil {
 			return errors.Errorf("宠物缺少 growth.baseStr: pet:%d %v", *pet.ID, xruntime.Location())
 		}
-		baseStr := *pet.Growth.BaseStr
 		if pet.Growth.BaseTough == nil {
 			return errors.Errorf("宠物缺少 growth.baseTough: pet:%d %v", *pet.ID, xruntime.Location())
 		}
-		baseTough := *pet.Growth.BaseTough
 		if pet.Growth.BaseDex == nil {
 			return errors.Errorf("宠物缺少 growth.baseDex: pet:%d %v", *pet.ID, xruntime.Location())
 		}
-		baseDex := *pet.Growth.BaseDex
-		if int32(baseVital)+petSavedBaseGradeOffsetMin <= 0 {
-			return errors.Errorf("宠物 growth.baseVital 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v", *pet.ID, baseVital, petSavedBaseGradeOffsetMin, xruntime.Location())
+		if int32(*pet.Growth.BaseVital)+petSavedBaseGradeOffsetMin <= 0 {
+			return errors.Errorf("宠物 growth.baseVital 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v",
+				*pet.ID, *pet.Growth.BaseVital, petSavedBaseGradeOffsetMin, xruntime.Location())
 		}
-		if int32(baseStr)+petSavedBaseGradeOffsetMin <= 0 {
-			return errors.Errorf("宠物 growth.baseStr 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v", *pet.ID, baseStr, petSavedBaseGradeOffsetMin, xruntime.Location())
+		if int32(*pet.Growth.BaseStr)+petSavedBaseGradeOffsetMin <= 0 {
+			return errors.Errorf("宠物 growth.baseStr 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v",
+				*pet.ID, *pet.Growth.BaseStr, petSavedBaseGradeOffsetMin, xruntime.Location())
 		}
-		if int32(baseTough)+petSavedBaseGradeOffsetMin <= 0 {
-			return errors.Errorf("宠物 growth.baseTough 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v", *pet.ID, baseTough, petSavedBaseGradeOffsetMin, xruntime.Location())
+		if int32(*pet.Growth.BaseTough)+petSavedBaseGradeOffsetMin <= 0 {
+			return errors.Errorf("宠物 growth.baseTough 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v",
+				*pet.ID, *pet.Growth.BaseTough, petSavedBaseGradeOffsetMin, xruntime.Location())
 		}
-		if int32(baseDex)+petSavedBaseGradeOffsetMin <= 0 {
-			return errors.Errorf("宠物 growth.baseDex 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v", *pet.ID, baseDex, petSavedBaseGradeOffsetMin, xruntime.Location())
+		if int32(*pet.Growth.BaseDex)+petSavedBaseGradeOffsetMin <= 0 {
+			return errors.Errorf("宠物 growth.baseDex 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v",
+				*pet.ID, *pet.Growth.BaseDex, petSavedBaseGradeOffsetMin, xruntime.Location())
 		}
-		pet.Growth.Rank = petRankFromBaseSum(uint64(baseVital) + uint64(baseStr) + uint64(baseTough) + uint64(baseDex))
+		pet.Growth.Rank = petRankFromBaseSum(uint64(*pet.Growth.BaseVital) + uint64(*pet.Growth.BaseStr) + uint64(*pet.Growth.BaseTough) + uint64(*pet.Growth.BaseDex))
 
 		if pet.SkillSlots == nil {
 			return errors.Errorf("宠物缺少 skill: pet:%d %v", *pet.ID, xruntime.Location())
@@ -313,13 +335,16 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 		}
 		weightSum := uint64(*pet.BattleAI.AttackWeight) + uint64(*pet.BattleAI.DefenseWeight) + uint64(*pet.BattleAI.EscapeWeight)
 		if *pet.BattleAI.AttackWeight > math.MaxInt32 || *pet.BattleAI.DefenseWeight > math.MaxInt32 || *pet.BattleAI.EscapeWeight > math.MaxInt32 || weightSum > math.MaxInt32 {
-			return errors.Errorf("宠物 battleAI 权重单项和总和必须在[0,2147483647]: pet:%d attack:%d defense:%d escape:%d %v", *pet.ID, *pet.BattleAI.AttackWeight, *pet.BattleAI.DefenseWeight, *pet.BattleAI.EscapeWeight, xruntime.Location())
+			return errors.Errorf("宠物 battleAI 权重单项和总和必须在[0,2147483647]: pet:%d attack:%d defense:%d escape:%d %v",
+				*pet.ID, *pet.BattleAI.AttackWeight, *pet.BattleAI.DefenseWeight, *pet.BattleAI.EscapeWeight, xruntime.Location())
 		}
 		if pet.BattleAI.TargetScope == nil || !validPetBattleAITargetScope(*pet.BattleAI.TargetScope) {
-			return errors.Errorf("宠物 battleAI.targetScope 非法: pet:%d value:%v %v", *pet.ID, pet.BattleAI.TargetScope, xruntime.Location())
+			return errors.Errorf("宠物 battleAI.targetScope 非法: pet:%d value:%v %v",
+				*pet.ID, pet.BattleAI.TargetScope, xruntime.Location())
 		}
 		if pet.BattleAI.TargetSelection == nil || !validPetBattleAITargetSelection(*pet.BattleAI.TargetSelection) {
-			return errors.Errorf("宠物 battleAI.targetSelection 非法: pet:%d value:%v %v", *pet.ID, pet.BattleAI.TargetSelection, xruntime.Location())
+			return errors.Errorf("宠物 battleAI.targetSelection 非法: pet:%d value:%v %v",
+				*pet.ID, pet.BattleAI.TargetSelection, xruntime.Location())
 		}
 
 		if !p.AddIfNotExist(*pet.ID, pet) {
