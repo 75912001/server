@@ -8,6 +8,7 @@ import (
 
 	xactor "github.com/75912001/xlib/actor"
 	xcontrol "github.com/75912001/xlib/control"
+	xerror "github.com/75912001/xlib/error"
 	xlog "github.com/75912001/xlib/log"
 )
 
@@ -16,6 +17,7 @@ const (
 	OnlineAccountActorCmdUnbind       xactor.CMD = 102
 	OnlineAccountActorCmdClientPacket xactor.CMD = 103
 	OnlineAccountActorCmdStop         xactor.CMD = 104
+	OnlineAccountActorCmdRoomFinished xactor.CMD = 105
 )
 
 func (p *Account) PostBind(req *pb.OnlineBindAccountReq, accountRecord *pb.AccountRecord) (*pb.OnlineBindAccountRes, error) {
@@ -41,6 +43,12 @@ func (p *Account) PostUnbind(gatewayKey string, accountSession string) {
 
 func (p *Account) PostClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	p.actor.SendMsg(xactor.NewMsg(context.Background(), OnlineAccountActorCmdClientPacket, gateway, pkt))
+}
+
+// PostCombatRoomFinishedSync 同步请求 Account actor 清除匹配房间引用并投递最终战报.
+func (p *Account) PostCombatRoomFinishedSync(characterUUID uint64, room *CombatRoom, gateway *Gateway, result *pb.CombatRoundResultNotify) error {
+	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineAccountActorCmdRoomFinished, characterUUID, room, gateway, result))
+	return err
 }
 
 func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
@@ -114,6 +122,25 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 				continue
 			}
 			p.onClientPacket(gateway, pkt)
+		case OnlineAccountActorCmdRoomFinished:
+			if len(msg.Args) != 4 {
+				continue
+			}
+			characterUUID, characterUUIDOK := msg.Args[0].(uint64)
+			room, roomOK := msg.Args[1].(*CombatRoom)
+			gateway, gatewayOK := msg.Args[2].(*Gateway)
+			result, resultOK := msg.Args[3].(*pb.CombatRoundResultNotify)
+			if !characterUUIDOK || !roomOK || !gatewayOK || !resultOK {
+				continue
+			}
+			character := p.characterManager.find(characterUUID)
+			if character == nil || character.combatRoom != room {
+				resp = true
+				continue
+			}
+			character.combatRoom = nil
+			p.sendClientRes(gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Success.Code(), result)
+			resp = true
 		case OnlineAccountActorCmdStop:
 			// Stop 也必须在 Account actor 内完成批量持久化和运行态清理,
 			// 避免服务关闭与尚未处理完的角色请求并发读写同一聚合根.
