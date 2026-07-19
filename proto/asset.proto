@@ -12,31 +12,31 @@ enum AssetType {
   AssetType_NPC = 5;
   AssetType_Decoration = 6;
   AssetType_Building = 7;
-  AssetType_Plant = 8;
+  AssetType_Character_Skill = 8;
   AssetType_Pet_Skill = 9;
 }
 
 enum AssetIDRange {
   AssetIDRange_Unknow = 0;
   AssetIDRange_Record_Start = 1;
-  AssetIDRange_Record_End = 1000000;
-  AssetIDRange_Character_Start = 1000001;
+  AssetIDRange_Record_End = 999999;
+  AssetIDRange_Character_Start = 1000000;
   AssetIDRange_Character_End = 1999999;
-  AssetIDRange_Scene_Start = 2000001;
+  AssetIDRange_Scene_Start = 2000000;
   AssetIDRange_Scene_End = 2999999;
-  AssetIDRange_Item_Start = 3000001;
+  AssetIDRange_Item_Start = 3000000;
   AssetIDRange_Item_End = 3999999;
-  AssetIDRange_Pet_Start = 4000001;
+  AssetIDRange_Pet_Start = 4000000;
   AssetIDRange_Pet_End = 4999999;
-  AssetIDRange_NPC_Start = 5000001;
+  AssetIDRange_NPC_Start = 5000000;
   AssetIDRange_NPC_End = 5999999;
-  AssetIDRange_Decoration_Start = 6000001;
+  AssetIDRange_Decoration_Start = 6000000;
   AssetIDRange_Decoration_End = 6999999;
-  AssetIDRange_Building_Start = 7000001;
+  AssetIDRange_Building_Start = 7000000;
   AssetIDRange_Building_End = 7999999;
-  AssetIDRange_Plant_Start = 8000001;
-  AssetIDRange_Plant_End = 8999999;
-  AssetIDRange_Pet_Skill_Start = 9000001;
+  AssetIDRange_Character_Skill_Start = 8000000;
+  AssetIDRange_Character_Skill_End = 8999999;
+  AssetIDRange_Pet_Skill_Start = 9000000;
   AssetIDRange_Pet_Skill_End = 9999999;
 }
 
