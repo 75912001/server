@@ -97,17 +97,17 @@ func (p *PetElementalEntry) UnmarshalYAML(node *yaml.Node) error {
 
 type PetAttributeEntry struct {
 	// PoisonResist 来自 attribute.poisonResist, 表示毒抗性修正值.
-	PoisonResist *uint32 `yaml:"poisonResist"`
+	PoisonResist *int32 `yaml:"poisonResist"`
 	// ParalysisResist 来自 attribute.paralysisResist, 表示麻痹抗性修正值.
-	ParalysisResist *uint32 `yaml:"paralysisResist"`
+	ParalysisResist *int32 `yaml:"paralysisResist"`
 	// SleepResist 来自 attribute.sleepResist, 表示睡眠抗性修正值.
-	SleepResist *uint32 `yaml:"sleepResist"`
+	SleepResist *int32 `yaml:"sleepResist"`
 	// StoneResist 来自 attribute.stoneResist, 表示石化抗性修正值.
-	StoneResist *uint32 `yaml:"stoneResist"`
+	StoneResist *int32 `yaml:"stoneResist"`
 	// DrunkResist 来自 attribute.drunkResist, 表示酒醉抗性修正值.
-	DrunkResist *uint32 `yaml:"drunkResist"`
+	DrunkResist *int32 `yaml:"drunkResist"`
 	// ConfusionResist 来自 attribute.confusionResist, 表示混乱抗性修正值.
-	ConfusionResist *uint32 `yaml:"confusionResist"`
+	ConfusionResist *int32 `yaml:"confusionResist"`
 	// Critical 来自 attribute.critical, 表示暴击相关修正值.
 	Critical *uint32 `yaml:"critical"`
 	// Counter 来自 attribute.counter, 表示反击相关修正值.
