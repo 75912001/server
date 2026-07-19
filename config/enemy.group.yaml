@@ -32,7 +32,7 @@
 
 enemyGroups:
   - id: 1
-    name: 利則諾頓巡逻队
+    name: 利则诺顿巡逻队
     countRange: [10, 10]
     levelRange: [1, 5]
     captured: true
@@ -43,7 +43,7 @@ enemyGroups:
         weight: 100
 
   - id: 2
-    name: 揚奇洛斯精锐
+    name: 扬奇洛斯精锐
     countRange: [10, 10]
     roleLevelOffset: [-1, 2]
     captured: true
@@ -62,7 +62,7 @@ enemyGroups:
         level: 10
 
   - id: 4
-    name: 邦奇諾长老会
+    name: 邦奇诺长老会
     isBoss: true
     enemies:
       - id: 4000104
