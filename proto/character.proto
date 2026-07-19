@@ -51,6 +51,13 @@ enum CharacterAttributeLimit {
   CharacterAttributeLimit_TotalPoint = 20; // 创建角色时体力腕力耐力速度总点数
 }
 
+// CharacterLuckState 保存角色持久化的8.5基础运气及其最近一次LS日自动刷新时间.
+// 装备修正和有效运气是运行期派生值, 不写入角色档案.
+message CharacterLuckState {
+  uint32 base_luck = 1; // 0仅表示首次登录尚未刷新; 正常持久化范围为1-5
+  int64 last_refresh_timestamp_ms = 2; // 最近一次自动LS日刷新时间, 单位毫秒
+}
+
 message CharacterRecord {
   uint64 uuid = 1; // 角色 UUID, 在所属 AccountRecord.aid 作用域内唯一
   string nick = 2; // 角色昵称
@@ -70,6 +77,7 @@ message CharacterRecord {
   int64 create_timestamp_ms = 16; // 角色创建时间戳, 单位毫秒
   uint64 rebirth_count = 17; // 角色转生次数
   uint32 scene_id = 18; // 角色当前场景 ID
+  CharacterLuckState luck_state = 19; // 角色基础运气和LS日自动刷新状态
   map<uint32, uint64> asset_id_record_map = 20; // 角色数值记录
   map<uint64, RecordPrimary> record_map = 1000; // 角色扩展记录表, 背包等临时角色数据先归入这里
   repeated PetRecord pet_record_list = 2000; // 角色当前随身携带宠物记录列表, 按携带顺序排列, 数量不超过 PetRecordLimit_MaxCarryCount
