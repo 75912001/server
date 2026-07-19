@@ -27,8 +27,8 @@ func (p *onlineGRPCServer) OnlineBindAccount(_ context.Context, req *pb.OnlineBi
 	if accountRecord == nil || accountRecord.GetAid() != aid || accountRecord.GetAccount() != account {
 		return nil, grpcstatus.Error(grpccodes.Unauthenticated, "account record mismatch")
 	}
-	if accountRecord.GetCreateTimestampMs() == 0 {
-		return nil, grpcstatus.Error(grpccodes.Internal, "invalid account record")
+	if err := validateAccountRecord(accountRecord); err != nil {
+		return nil, grpcstatus.Errorf(grpccodes.Internal, "invalid account record: %v", err)
 	}
 	// protobuf 不保留空 map 的存在性, RPC 边界校验后统一恢复为可写空 map.
 	if accountRecord.PetWarehouseRecordMap == nil {
