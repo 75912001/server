@@ -41,14 +41,14 @@ func newAccount(remote xnetcommon.IRemote) *Account {
 	return u
 }
 
-func sendClientRes(remote xnetcommon.IRemote, messageID uint32, sessionID uint32, resultID uint32, key uint64, message proto.Message) error {
+func sendClientRes(remote xnetcommon.IRemote, messageID uint32, resultID uint32, key uint64, message proto.Message) error {
 	if remote == nil || !remote.IsConnect() {
 		return nil
 	}
 	return remote.Send(&xpacket.Packet{
 		Header: &xpacket.Header{
 			MessageID: messageID,
-			SessionID: sessionID,
+			SessionID: 0,
 			ResultID:  resultID,
 			Key:       key,
 		},
