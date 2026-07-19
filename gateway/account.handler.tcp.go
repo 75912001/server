@@ -64,7 +64,7 @@ func (p *AccountHandlerTCP) OnPacket(remote xnetcommon.IRemote, packet xpacket.I
 
 	xlog.GLog.Debugf("phase=tcp_packet messageID=%d length=%d key=%d", header.MessageID, header.Length, header.Key)
 
-	if header.MessageID == uint32(pb.MsgIDAccount_AccountVerifyReq_CMD) { // 登录鉴权
+	if header.MessageID == uint32(pb.MsgID_AccountVerifyReq_CMD) { // 登录鉴权
 		err := handleAccountVerifyReq(remote, header, body)
 		if err != nil {
 			xlog.GLog.Warnf("handleAccountVerifyReq error: %v", err)

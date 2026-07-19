@@ -28,9 +28,9 @@ func (p *Account) OnClientPacket(header *xpacket.Header, body []byte) error {
 
 	// 通过验证
 	switch header.MessageID {
-	case uint32(pb.MsgIDAccount_AccountHeartbeatReq_CMD):
-		return p.OnHeartbeatReq(header, body)
-	case uint32(pb.MsgIDAccount_AccountOfflineReq_CMD):
+	case uint32(pb.MsgID_AccountHeartbeatReq_CMD):
+		return p.OnHeartbeatReq(body)
+	case uint32(pb.MsgID_AccountOfflineReq_CMD):
 		p.Disconnect(xnetcommon.DisconnectReasonClientShutdown)
 		return nil
 	default:
@@ -40,7 +40,7 @@ func (p *Account) OnClientPacket(header *xpacket.Header, body []byte) error {
 		Payload: &pb.OnlineTunnelFrame_ClientPacket{
 			ClientPacket: &pb.OnlineClientPacket{
 				MessageId: header.MessageID,
-				SessionId: header.SessionID,
+				SessionId: 0,
 				ResultId:  header.ResultID,
 				Key:       p.aid,
 				Body:      body,
@@ -59,7 +59,7 @@ func (p *Account) OnClientPacket(header *xpacket.Header, body []byte) error {
 //	heartbeatSession 是可轮换认证凭证，accountSession 是固定连接身份；
 //	若不一致视为重放/篡改，主动断开；
 //	一致时生成新 heartbeatSession，刷新 cache TTL 后下发，并重置心跳超时定时器。
-func (p *Account) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
+func (p *Account) OnHeartbeatReq(body []byte) error {
 	var req pb.AccountHeartbeatReq
 	if err := proto.Unmarshal(body, &req); err != nil {
 		return errors.WithMessagef(err, "AccountHeartbeatReq unmarshal %v", xruntime.Location())
@@ -85,10 +85,9 @@ func (p *Account) OnHeartbeatReq(header *xpacket.Header, body []byte) error {
 	p.restartHeartbeatTimer()
 
 	return sendClientRes(p.remote,
-		uint32(pb.MsgIDAccount_AccountHeartbeatRes_CMD),
-		header.SessionID,
+		uint32(pb.MsgID_AccountHeartbeatRes_CMD),
 		xerror.Success.Code(),
-		header.Key,
+		p.aid,
 		&pb.AccountHeartbeatRes{
 			ServerTimestampMs:    time.Now().UnixMilli(),
 			NextHeartbeatSession: nextHeartbeatSession,

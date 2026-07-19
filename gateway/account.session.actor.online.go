@@ -37,7 +37,7 @@ func buildClientPacketPassThrough(pkt *pb.OnlineClientPacket) *xpacket.PacketPas
 	header := &xpacket.Header{
 		Length:    xpacket.HeaderSize + uint32(len(pkt.GetBody())),
 		MessageID: pkt.GetMessageId(),
-		SessionID: pkt.GetSessionId(),
+		SessionID: 0,
 		ResultID:  pkt.GetResultId(),
 		Key:       pkt.GetKey(),
 	}
