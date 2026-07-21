@@ -212,7 +212,7 @@ type OnlineClientPacket struct {
 
 	// 这 4 个字段由 Gateway 从 TCP 的 24 字节 Header 中精准切出并赋值
 	MessageId uint32 `protobuf:"varint,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"` // 业务指令号, Online 据此路由到对应 Handler
-	SessionId uint32 `protobuf:"varint,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"` // TCP 包会话 ID, 由 Gateway 从客户端 Header.SessionID 透传
+	SessionId uint32 `protobuf:"varint,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"` // 保留字段, 当前固定为 0
 	ResultId  uint32 `protobuf:"varint,3,opt,name=result_id,json=resultId,proto3" json:"result_id,omitempty"`    // 结果 ID
 	Key       uint64 `protobuf:"varint,4,opt,name=key,proto3" json:"key,omitempty"`                              // 校验/路由 Key
 	// 剔除 24 字节包头后，剩下的客户端 Protobuf 二进制流。

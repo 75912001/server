@@ -27,9 +27,11 @@ enum MsgID {
   PetCarryStatusSetRes_CMD = 38; //0x000026#gateway->client#修改随身宠物状态-回复
   ItemUseReq_CMD = 39; //0x000027#client->gateway#使用角色道具-请求
   ItemUseRes_CMD = 40; //0x000028#gateway->client#使用角色道具-回复
-  CharacterRecordChangedNotify_CMD = 41; //0x000029#gateway->client#角色聚合档案变化-通知
-  GMCommandReq_CMD = 42; //0x00002a#client->gateway#执行GM命令-请求
-  GMCommandRes_CMD = 43; //0x00002b#gateway->client#执行GM命令-回复
+  CharacterBaseChangedNotify_CMD = 44; //0x00002c#gateway->client#角色基础数据变化-通知
+  CharacterPetChangedNotify_CMD = 46; //0x00002e#gateway->client#角色随身宠物变化-通知
+  CharacterItemChangedNotify_CMD = 48; //0x000030#gateway->client#角色道具变化-通知
+  GMCommandReq_CMD = 49; //0x000031#client->gateway#执行GM命令-请求
+  GMCommandRes_CMD = 50; //0x000032#gateway->client#执行GM命令-回复
   CombatAutoEncounterSetReq_CMD = 1048577; //0x100001#client->gateway#设置自动遇敌-请求
   CombatAutoEncounterSetRes_CMD = 1048578; //0x100002#gateway->client#设置自动遇敌-回复
   CombatBattleStartNotify_CMD = 1048580; //0x100004#gateway->client#战斗开始-通知
