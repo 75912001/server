@@ -1,6 +1,6 @@
 package gameconfig
 
-func Load(dir string) error {
+func Load(dir string) (err error) {
 	GGameConfig = &Manager{
 		CharacterSkill: newCharacterSkillConfig(),
 		PetSkill:       newPetSkillConfig(),
