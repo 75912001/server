@@ -68,6 +68,14 @@ func (p *ExpConfig) IsMaxLevel(totalExp uint64) (bool, error) {
 	return level >= uint32(pb.LevelRange_LevelRange_Max), nil
 }
 
+func (p *ExpConfig) GetMaxTotalExp() (uint64, error) {
+	entry := p.Get(uint32(pb.LevelRange_LevelRange_Max))
+	if entry == nil || entry.MaxExp == nil {
+		return 0, errors.Errorf("最高等级经验配置不完整: level:%d %v", pb.LevelRange_LevelRange_Max, xruntime.Location())
+	}
+	return *entry.MaxExp, nil
+}
+
 func newExpConfig() *ExpConfig {
 	return &ExpConfig{
 		MapMgr: xmap.NewMapMgr[uint32, *LevelEntry](),
