@@ -4,6 +4,7 @@ package account;
 option go_package = "server/proto/pb;pb";
 import "account.record.proto";
 import "character.proto";
+import "pet.proto";
 
 // ===================================================================
 // 消息体定义 — 客户端 ↔ Gateway TCP 协议层
@@ -114,4 +115,82 @@ message SceneEnterRes {
   uint64 character_uuid = 1; // 已进入场景的角色 UUID
   uint32 scene_id = 2; // 已进入的场景 ID
   int64 server_timestamp_ms = 3; // 服务端回复时间戳, 单位毫秒
+}
+
+// PetCarryStatusChange 表示服务端已持久化的一项宠物携带状态变更.
+message PetCarryStatusChange {
+  uint64 pet_uuid = 1; // 宠物 UUID, 必须属于响应 character_uuid 对应的随身宠物
+  PetCarryStatus carry_status = 2; // 服务端最终确认的携带状态
+}
+
+//0x000025#client->gateway#修改随身宠物状态-请求
+message PetCarryStatusSetReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号
+  PetCarryStatusChange change = 2; // 目标随身宠物状态变更
+}
+
+//0x000026#gateway->client#修改随身宠物状态-回复
+message PetCarryStatusSetRes {
+  uint64 character_uuid = 1; // 已修改随身宠物状态的角色 UUID
+  repeated PetCarryStatusChange change_list = 2; // 本次原子操作实际修改的状态列表, 包含被替换的战斗或骑乘宠物
+}
+
+//0x000027#client->gateway#使用角色道具-请求
+message ItemUseReq {
+  uint64 character_uuid = 1; // 道具所属角色 UUID
+  uint32 item_id = 2; // 使用的道具资源 ID
+  uint64 target_pet_uuid = 3; // 宠物目标 UUID; 角色目标道具必须为0
+}
+
+//0x000028#gateway->client#使用角色道具-回复
+message ItemUseRes {
+  uint64 character_uuid = 1; // 道具所属角色 UUID
+  uint32 item_id = 2; // 已使用的道具资源 ID
+  uint64 target_pet_uuid = 3; // 实际作用的宠物 UUID; 角色目标为0
+}
+
+//0x00002c#gateway->client#角色基础数据变化-通知
+message CharacterBaseChangedNotify {
+  CharacterBaseRecord character_base_record = 1; // cache持久化成功后的角色基础权威快照
+}
+
+//0x00002e#gateway->client#角色随身宠物变化-通知
+message CharacterPetChangedNotify {
+  uint64 character_uuid = 1; // 宠物所属角色 UUID
+  repeated PetRecord pet_record_list = 2; // 每项为变化后的完整随身宠物记录
+}
+
+//0x000030#gateway->client#角色道具变化-通知
+message CharacterItemChangedNotify {
+  uint64 character_uuid = 1; // 道具所属角色 UUID
+  map<uint32, uint64> item_count_map = 2; // 变化道具的最终数量, 0 表示已耗尽
+}
+
+// GMItemAddCommand 表示给发起命令的角色自身增加道具.
+message GMItemAddCommand {
+  uint32 item_id = 1; // 道具资源 ID, 必须存在于 item.yaml
+  uint64 count = 2; // 增加数量, 必须大于 0 且增加后不超过道具堆叠上限
+}
+
+// GMItemAddResult 表示服务端已持久化的道具增加结果.
+message GMItemAddResult {
+  uint32 item_id = 1; // 已增加的道具资源 ID
+  uint64 added_count = 2; // 本次实际增加数量
+  uint64 current_count = 3; // 增加后的角色持有数量
+}
+
+//0x000031#client->gateway#执行GM命令-请求
+message GMCommandReq {
+  uint64 character_uuid = 1; // 发起命令并接收结果的当前账号在线角色 UUID
+  oneof command {
+    GMItemAddCommand item_add = 10; // 对应客户端文本命令 gm item add <id> <cnt>
+  }
+}
+
+//0x000032#gateway->client#执行GM命令-回复
+message GMCommandRes {
+  uint64 character_uuid = 1; // 已执行命令的角色 UUID
+  oneof result {
+    GMItemAddResult item_add = 10; // 已持久化的道具增加结果
+  }
 }
