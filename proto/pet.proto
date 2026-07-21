@@ -20,25 +20,25 @@ enum PetAction {
 // PetRarity 表示宠物稀有度, 主要来自宠物资源配置 pet[].rarity.
 // 业务有效值为 Common 到 Mythic; Unknow 仅作为 proto3 默认值和非法/未初始化占位, Max 仅作为枚举边界占位.
 enum PetRarity {
-  PetRarity_Unknow = 0; // 未知稀有度, proto3 默认值; 正常业务配置和已创建宠物不应使用
-  PetRarity_Common = 1; // 普通等级, 基础宠物资源分层
-  PetRarity_Rare = 2; // 稀有等级, 高于普通的宠物资源分层
-  PetRarity_Epic = 3; // 史诗等级, 高于稀有的宠物资源分层
-  PetRarity_Legendary = 4; // 传说等级, 高于史诗的宠物资源分层
-  PetRarity_Mythic = 5; // 神话等级, 当前最高业务稀有度
-  PetRarity_Max = 6; // 稀有度枚举边界, 用于范围判断或扩展占位; 不作为业务值存储
+  PetRarity_Unknow = 0; // 未知稀有度, proto3 默认值; 正常业务配置和已创建宠物不应使用; 客户端显示色: 灰色 #9AA0A6
+  PetRarity_Common = 1; // 普通等级, 基础宠物资源分层; 客户端显示色: 白色 #F2F2F2
+  PetRarity_Rare = 2; // 稀有等级, 高于普通的宠物资源分层; 客户端显示色: 蓝色 #45A7FF
+  PetRarity_Epic = 3; // 史诗等级, 高于稀有的宠物资源分层; 客户端显示色: 紫色 #B56CFF
+  PetRarity_Legendary = 4; // 传说等级, 高于史诗的宠物资源分层; 客户端显示色: 橙色 #FF9F43
+  PetRarity_Mythic = 5; // 神话等级, 当前最高业务稀有度; 客户端显示色: 红色 #FF4A6E
+  PetRarity_Max = 6; // 稀有度枚举边界, 用于范围判断或扩展占位; 不作为业务值存储或显示
 }
 
 // PetGrade 表示宠物品阶, 用于描述宠物养成或评级体系中的等级分层.
 // 业务有效值为 Common 到 Mythic; Unknow 仅作为 proto3 默认值和非法/未初始化占位, Max 仅作为枚举边界占位.
 enum PetGrade {
-  PetGrade_Unknow = 0; // 未知品阶, proto3 默认值; 正常业务配置和已创建宠物不应使用
-  PetGrade_Common = 1; // 普通品阶, 基础宠物品阶分层
-  PetGrade_Rare = 2; // 稀有品阶, 高于普通的宠物品阶分层
-  PetGrade_Epic = 3; // 史诗品阶, 高于稀有的宠物品阶分层
-  PetGrade_Legendary = 4; // 传说品阶, 高于史诗的宠物品阶分层
-  PetGrade_Mythic = 5; // 神话品阶, 当前最高业务品阶
-  PetGrade_Max = 6; // 品阶枚举边界, 用于范围判断或扩展占位; 不作为业务值存储
+  PetGrade_Unknow = 0; // 未知品阶, proto3 默认值; 正常业务配置和已创建宠物不应使用; 客户端显示色: 灰色 #9AA0A6
+  PetGrade_Common = 1; // 普通品阶, 基础宠物品阶分层; 客户端显示色: 白色 #F2F2F2
+  PetGrade_Rare = 2; // 稀有品阶, 高于普通的宠物品阶分层; 客户端显示色: 蓝色 #45A7FF
+  PetGrade_Epic = 3; // 史诗品阶, 高于稀有的宠物品阶分层; 客户端显示色: 紫色 #B56CFF
+  PetGrade_Legendary = 4; // 传说品阶, 高于史诗的宠物品阶分层; 客户端显示色: 橙色 #FF9F43
+  PetGrade_Mythic = 5; // 神话品阶, 当前最高业务品阶; 客户端显示色: 红色 #FF4A6E
+  PetGrade_Max = 6; // 品阶枚举边界, 用于范围判断或扩展占位; 不作为业务值存储或显示
 }
 
 enum PetRecordLimit {
@@ -48,10 +48,10 @@ enum PetRecordLimit {
 
 enum PetCarryStatus {
   PetCarryStatus_Unknow = 0; // 未指定携带状态, 旧档案或非法默认值
-  PetCarryStatus_Rest = 1; // 休息, 不可参与战斗; 仓库内宠物固定为该状态
-  PetCarryStatus_Battle = 2; // 战斗, 角色战斗首发宠物; 单个角色最多一只
-  PetCarryStatus_Wait = 3; // 等待, 战斗中可以替换上场
-  PetCarryStatus_Mount = 4; // 骑乘, 角色当前骑乘宠物; 单个角色最多一只, 需要骑乘权限且忠诚度 100%
+  PetCarryStatus_Rest = 1; // 休息, 不可参与战斗; 仓库内宠物固定为该状态; 客户端状态色: 白色 #FFFFFF
+  PetCarryStatus_Battle = 2; // 战斗, 角色战斗首发宠物; 单个角色最多一只; 客户端状态色: 红色 #FF4A4A
+  PetCarryStatus_Wait = 3; // 等待, 战斗中可以替换上场; 客户端状态色: 蓝色 #45A7FF
+  PetCarryStatus_Mount = 4; // 骑乘, 角色当前骑乘宠物; 单个角色最多一只, 需要骑乘权限且忠诚度 100%; 客户端状态色: 黄色 #FFD84A
   PetCarryStatus_Max = 5;
 }
 
@@ -74,5 +74,10 @@ message PetRecord {
   uint64 rebirth_count = 16; // 宠物转生次数
   uint64 asset_id = 17; // 宠物资产 ID, 对应宠物配置 ID
   map<uint32, uint64> asset_record_base_map = 20; // 宠物基础数值记录
+  uint32 growth_baseline_hp = 21; // 成长率基准 HP 上限; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_attack = 22; // 成长率基准攻击力; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_defense = 23; // 成长率基准防御力; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_agility = 24; // 成长率基准敏捷; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_level = 25; // 成长率基准对应等级; 1 表示真实 1 级记录, 高等级首次获得时记录当前等级
   map<uint64, RecordPrimary> record_map = 1000; // 宠物扩展记录表
 }
