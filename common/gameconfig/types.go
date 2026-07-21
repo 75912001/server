@@ -6,6 +6,7 @@ const (
 	FileEnemyGroup     = "enemy.group.yaml"
 	FileEnemyExp       = "enemy.exp.yaml"
 	FileExp            = "exp.yaml"
+	FileItem           = "item.yaml"
 	FilePetSkill       = "pet.skill.yaml"
 	FilePet            = "pet.yaml"
 	FileScene          = "scene.yaml"
@@ -30,4 +31,6 @@ type Manager struct {
 	Scene *SceneConfig
 	// Exp 是 exp.yaml 的等级经验配置, 用于按累计经验推导等级和下一等级门槛.
 	Exp *ExpConfig
+	// Item 是 item.yaml 的可堆叠道具配置, 用于校验道具数量与使用效果.
+	Item *ItemConfig
 }
