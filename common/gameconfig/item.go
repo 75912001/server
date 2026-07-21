@@ -24,6 +24,7 @@ type ItemConfig struct {
 type ItemEntry struct {
 	ID       *uint32       `yaml:"-"`
 	Name     *string       `yaml:"name"`
+	Sprite   *uint32       `yaml:"sprite"`
 	MaxStack *uint64       `yaml:"maxStack"`
 	Use      *ItemUseEntry `yaml:"use"`
 }
@@ -55,6 +56,9 @@ func (p *ItemConfig) load(dir string) error {
 		entry.ID = &itemIDValue
 		if entry.Name == nil || strings.TrimSpace(*entry.Name) == "" {
 			return errors.Errorf("道具名称不能为空: id:%d %v", itemID, xruntime.Location())
+		}
+		if entry.Sprite == nil {
+			return errors.Errorf("道具sprite不能为空: id:%d %v", itemID, xruntime.Location())
 		}
 		if entry.MaxStack == nil || *entry.MaxStack == 0 {
 			return errors.Errorf("道具堆叠上限必须大于0: id:%d %v", itemID, xruntime.Location())
