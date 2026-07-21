@@ -10,6 +10,7 @@ func Load(dir string) error {
 		EnemyExp:       newEnemyExpConfig(),
 		Scene:          newSceneConfig(),
 		Exp:            newExpConfig(),
+		Item:           newItemConfig(),
 	}
 	if err := GGameConfig.CharacterSkill.load(dir); err != nil {
 		return err
@@ -33,6 +34,9 @@ func Load(dir string) error {
 		return err
 	}
 	if err := GGameConfig.Exp.load(dir); err != nil {
+		return err
+	}
+	if err := GGameConfig.Item.load(dir); err != nil {
 		return err
 	}
 
@@ -60,6 +64,9 @@ func Load(dir string) error {
 	if err := GGameConfig.Exp.check(); err != nil {
 		return err
 	}
+	if err := GGameConfig.Item.check(); err != nil {
+		return err
+	}
 
 	if err := GGameConfig.CharacterSkill.assemble(); err != nil {
 		return err
@@ -83,6 +90,9 @@ func Load(dir string) error {
 		return err
 	}
 	if err := GGameConfig.Exp.assemble(); err != nil {
+		return err
+	}
+	if err := GGameConfig.Item.assemble(); err != nil {
 		return err
 	}
 
