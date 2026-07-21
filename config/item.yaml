@@ -1,0 +1,40 @@
+# 道具-配置
+# 任何修改此文件的行为都需要通知客户端和服务端开发人员
+
+items:
+  3000001:
+    name: 宠物修炼丹-小
+    maxStack: 999
+    use:
+      target: pet
+      exp: 10000000
+  3000002:
+    name: 宠物修炼丹-中
+    maxStack: 999
+    use:
+      target: pet
+      exp: 50000000
+  3000003:
+    name: 宠物修炼丹-大
+    maxStack: 999
+    use:
+      target: pet
+      exp: 100000000
+  3000101:
+    name: 角色修炼丹-小
+    maxStack: 999
+    use:
+      target: character
+      exp: 10000000
+  3000102:
+    name: 角色修炼丹-中
+    maxStack: 999
+    use:
+      target: character
+      exp: 50000000
+  3000103:
+    name: 角色修炼丹-大
+    maxStack: 999
+    use:
+      target: character
+      exp: 100000000
