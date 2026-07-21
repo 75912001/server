@@ -135,7 +135,7 @@ GroupAIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 - `AccountRecord` 是账号级档案聚合根, `aid/account` 下管理多个角色; `character_record_list` 的数组下标是角色槽位, 空槽使用 `uuid == 0` 的 `CharacterRecord` 占位, 每个账号最多可用角色槽位数量由 proto 常量 `AccountRecordLimit_MaxCharacterSlotCount` 定义, 完整角色业务 key 是 `aid + uuid`。
 - `CharacterRecord.asset_id` 是角色资源 ID/角色 ID 的权威字段; `CharacterRecord.exp/earth/water/fire/wind/available_point/vitality/strength/toughness/dexterity/scene_id/create_timestamp_ms/rebirth_count/last_login_timestamp_ms/last_logout_timestamp_ms` 直接保存角色经验、元素点数、可用点、基础状态、当前场景、创建时间、转生次数和上下线时间; `asset_id_record_map` 当前不承载角色资源 ID、经验、元素、属性、场景、创建时间、转生次数、上下线时间戳、方向和动作。
 - `CharacterRecord.pet_record_list` 只保存角色当前随身携带宠物, 按携带顺序排列, 单角色最多携带 `PetRecordLimit_MaxCarryCount` 只; `AccountRecord.pet_warehouse_record_map` 是账号宠物仓库, 同账号下所有角色共享, 最多存放 `AccountRecordLimit_MaxPetWarehouseCount` 只.
-- `PetRecord.asset_id` 直接保存宠物资源 ID/宠物配置 ID; `PetRecord.nick` 只保存用户自定义昵称, 空字符串表示客户端显示宠物配置名称; `PetRecord.exp/loyalty/saved_base_*/raw_*/create_timestamp_ms/rebirth_count` 直接保存宠物经验、忠诚度、成长基础值、当前原始属性、创建时间和转生次数; `asset_record_base_map` 不承载宠物资源 ID。
+- `PetRecord.asset_id` 直接保存宠物资源 ID/宠物配置 ID; `PetRecord.nick` 只保存用户自定义昵称, 空字符串表示客户端显示宠物配置名称; `PetRecord.exp/loyalty/saved_base_*/raw_*/growth_baseline_*/create_timestamp_ms/rebirth_count` 直接保存宠物经验、忠诚度、成长基础值、当前原始属性、成长率基准等级及对应HP上限/攻击/防御/敏捷、创建时间和转生次数; 1级宠物使用1级基准, 无1级记录的高等级宠物使用首次获得时的当前等级和属性; `asset_record_base_map` 不承载宠物资源 ID。
 - cache 只按 protobuf 透传存储 `AccountRecord`, 不校验宠物是否同时存在于角色随身携带列表和账号宠物仓库, 也不校验 `PetRecord.carry_status` 业务规则.
 - `CacheSetAccountRecord` 要求请求 `aid` 与 `AccountRecord.aid` 完全一致。
 - `CacheGetAccountRecord` 对 Redis `nil` 返回 `NotFound`，其它 Redis 或反序列化错误返回 `Internal`。
