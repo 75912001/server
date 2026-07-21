@@ -51,6 +51,11 @@ enum CharacterAttributeLimit {
   CharacterAttributeLimit_TotalPoint = 20; // 创建角色时体力腕力耐力速度总点数
 }
 
+enum CharacterRecordLimit {
+  CharacterRecordLimit_Unspecified = 0; // 未指定角色档案限制, proto3 enum 默认值
+  CharacterRecordLimit_MaxDuelPoint = 100000000; // 角色决斗点(DP)持久化上限, 与8.5 CHAR_MAXDUELPOINT一致
+}
+
 // CharacterLuckState 保存角色持久化的8.5基础运气及其最近一次LS日自动刷新时间.
 // 装备修正和有效运气是运行期派生值, 不写入角色档案.
 message CharacterLuckState {
@@ -79,6 +84,9 @@ message CharacterRecord {
   uint32 scene_id = 18; // 角色当前场景 ID
   CharacterLuckState luck_state = 19; // 角色基础运气和LS日自动刷新状态
   map<uint32, uint64> asset_id_record_map = 20; // 角色数值记录
+  uint32 duel_point = 21; // 角色决斗点(DP), 初始100, 上限100000000
+  uint32 charm = 22; // 角色魅力, 0-100
+  map<uint32, uint64> item_count_map = 30; // 角色可堆叠道具数量, key为道具资源ID, value为持有数量
   map<uint64, RecordPrimary> record_map = 1000; // 角色扩展记录表, 背包等临时角色数据先归入这里
   repeated PetRecord pet_record_list = 2000; // 角色当前随身携带宠物记录列表, 按携带顺序排列, 数量不超过 PetRecordLimit_MaxCarryCount
 }
