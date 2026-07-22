@@ -44,3 +44,24 @@ items:
     use:
       target: character
       exp: 100000000
+  3000201:
+    name: 宠物罐头[小]
+    sprite: 0
+    maxStack: 999
+    use:
+      target: pet
+      loyalty: 10
+  3000202:
+    name: 宠物罐头[中]
+    sprite: 0
+    maxStack: 999
+    use:
+      target: pet
+      loyalty: 20
+  3000203:
+    name: 宠物罐头[大]
+    sprite: 0
+    maxStack: 999
+    use:
+      target: pet
+      loyalty: 40
