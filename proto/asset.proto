@@ -46,12 +46,8 @@ enum AssetIDRange {
 // [1, 999999] 账号档案资产 ID 范围
 enum AssetIDRecord {
   AssetIDRecord_Unknow = 0;
-  AssetIDRecord_Currency_Stone = 1; // 石币
-  AssetIDRecord_Currency_Shell = 2; // 贝壳
-  AssetIDRecord_Currency_Diamond = 3; // 钻石
   AssetIDRecord_Direction = 10;
   AssetIDRecord_Action = 11;
-
 }
 
 enum AssetElemental {
