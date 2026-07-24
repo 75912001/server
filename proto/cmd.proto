@@ -32,6 +32,16 @@ enum MsgID {
   CharacterItemChangedNotify_CMD = 48; //0x000030#gateway->client#角色道具变化-通知
   GMCommandReq_CMD = 49; //0x000031#client->gateway#执行GM命令-请求
   GMCommandRes_CMD = 50; //0x000032#gateway->client#执行GM命令-回复
+  PetWarehouseDepositReq_CMD = 51; //0x000033#client->gateway#将随身宠物存入仓库-请求
+  PetWarehouseDepositRes_CMD = 52; //0x000034#gateway->client#将随身宠物存入仓库-回复
+  PetWarehouseWithdrawReq_CMD = 53; //0x000035#client->gateway#将仓库宠物取出-请求
+  PetWarehouseWithdrawRes_CMD = 54; //0x000036#gateway->client#将仓库宠物取出-回复
+  PetNickSetReq_CMD = 55; //0x000037#client->gateway#修改随身宠物昵称-请求
+  PetNickSetRes_CMD = 56; //0x000038#gateway->client#修改随身宠物昵称-回复
+  ItemWarehouseDepositReq_CMD = 57; //0x000039#client->gateway#将角色背包物品存入账号仓库-请求
+  ItemWarehouseDepositRes_CMD = 58; //0x00003a#gateway->client#将角色背包物品存入账号仓库-回复
+  ItemWarehouseWithdrawReq_CMD = 59; //0x00003b#client->gateway#将账号仓库物品取入角色背包-请求
+  ItemWarehouseWithdrawRes_CMD = 60; //0x00003c#gateway->client#将账号仓库物品取入角色背包-回复
   CombatAutoEncounterSetReq_CMD = 1048577; //0x100001#client->gateway#设置自动遇敌-请求
   CombatAutoEncounterSetRes_CMD = 1048578; //0x100002#gateway->client#设置自动遇敌-回复
   CombatBattleStartNotify_CMD = 1048580; //0x100004#gateway->client#战斗开始-通知
