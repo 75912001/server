@@ -91,7 +91,7 @@ message CharacterRecord {
   uint32 shell = 11; // 贝壳
   uint32 diamond = 12; // 钻石
 
-  //map<uint64, uint64> asset_map = 20; // 资产表, key 为 asset_id, value 为数值
+  //map<uint32, uint64> asset_map = 20; // 资产表, key 为 asset_id, value 为数值
   ItemContainerRecord item_bag = 30; // 角色随身物品背包, 最多容纳 30 种道具或装备实例
   CharacterEquipmentRecord equipment = 40; // 角色当前穿戴装备; 新角色初始化为空消息, 未穿戴部位保持未设置
   //map<uint64, RecordPrimary> record_map = 1000; // 角色临时扩展记录表
