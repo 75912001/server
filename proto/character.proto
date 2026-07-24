@@ -5,6 +5,8 @@ option go_package = "server/proto/pb;pb";
 
 import "record.proto";
 import "pet.proto";
+import "equipment.proto";
+import "item.proto";
 
 enum CharacterAction {
   CharacterAction_Unknow = 0;
@@ -24,7 +26,7 @@ enum CharacterAction {
   CharacterAction_Max = 14;
 }
 
-message ElementalPoints
+message ElementalPoints // todo menglc 优化-移除, 扁平化
 {
   uint32 earth = 1; // 地元素点数, 0-10
   uint32 water = 2; // 水元素点数, 0-10
@@ -32,7 +34,7 @@ message ElementalPoints
   uint32 wind = 4; // 风元素点数, 0-10
 }
 
-message CharacterAttributePoints
+message CharacterAttributePoints // todo menglc 优化-移除, 扁平化
 {
   uint32 vitality = 1; // 体力点数, 0-20
   uint32 strength = 2; // 腕力点数, 0-20
@@ -40,23 +42,15 @@ message CharacterAttributePoints
   uint32 dexterity = 4; // 速度点数, 0-20
 }
 
-enum ElementalLimit {
-  ElementalLimit_Unspecified = 0; // 未指定元素限制, proto3 enum 默认值
-  ElementalLimit_MaxActiveTypeCount = 2; // 最多允许同时分配的元素种类数量
-  ElementalLimit_TotalPoint = 10; // 地水火风元素总点数
+enum CharacterLimit {
+  CharacterLimit_Unspecified = 0; // 未指定角色限制, proto3 enum 默认值
+  CharacterLimit_CreateAttributeTotalPoint = 20; // 创建角色时体力腕力耐力速度总点数
+  CharacterLimit_MaxItemBagCount = 30; // 角色随身背包最多可容纳的道具种类和装备实例总数
+  CharacterLimit_MagicPointMax = 100; // 角色每场战斗的初始魔法值和魔法值上限
+  CharacterLimit_MaxDuelPoint = 100000000; // 角色决斗点(DP)持久化上限
 }
 
-enum CharacterAttributeLimit {
-  CharacterAttributeLimit_Unspecified = 0; // 未指定角色基础状态限制, proto3 enum 默认值
-  CharacterAttributeLimit_TotalPoint = 20; // 创建角色时体力腕力耐力速度总点数
-}
-
-enum CharacterRecordLimit {
-  CharacterRecordLimit_Unspecified = 0; // 未指定角色档案限制, proto3 enum 默认值
-  CharacterRecordLimit_MaxDuelPoint = 100000000; // 角色决斗点(DP)持久化上限, 与8.5 CHAR_MAXDUELPOINT一致
-}
-
-// CharacterLuckState 保存角色持久化的8.5基础运气及其最近一次LS日自动刷新时间.
+// CharacterLuckState 保存角色持久化的基础运气及其最近一次LS日自动刷新时间.
 // 装备修正和有效运气是运行期派生值, 不写入角色档案.
 message CharacterLuckState {
   uint32 base_luck = 1; // 0仅表示首次登录尚未刷新; 正常持久化范围为1-5
@@ -84,14 +78,22 @@ message CharacterBaseRecord {
   uint64 rebirth_count = 17; // 角色转生次数
   uint32 scene_id = 18; // 角色当前场景 ID
   CharacterLuckState luck_state = 19; // 角色基础运气和 LS 日自动刷新状态
-  map<uint32, uint64> asset_id_record_map = 20; // 角色数值记录
   uint32 duel_point = 21; // 角色决斗点(DP)
   uint32 charm = 22; // 角色魅力
+  uint32 become_pig_remaining_seconds = 25; // 乌力化剩余在线秒数CHAR_BECOMEPIG; 0表示当前未处于乌力化 // todo menglc
+  uint32 become_pig_image_id = 26; // 乌力化服务器形象CHAR_BECOMEPIG_BBI; 未处于乌力化时必须为0 // todo menglc
 }
 
 message CharacterRecord {
   CharacterBaseRecord base = 1; // 角色基础权威数据; 完整角色 key 为 AccountRecord.aid + base.uuid
-  map<uint32, uint64> item_count_map = 30; // 角色可堆叠道具数量, key为道具资源ID, value为持有数量
-  map<uint64, RecordPrimary> record_map = 1000; // 角色扩展记录表, 背包等临时角色数据先归入这里
+
+  uint32 stone = 10; // 石币
+  uint32 shell = 11; // 贝壳
+  uint32 diamond = 12; // 钻石
+
+  //map<uint64, uint64> asset_map = 20; // 资产表, key 为 asset_id, value 为数值
+  ItemContainerRecord item_bag = 30; // 角色随身物品背包, 最多容纳 30 种道具或装备实例
+  CharacterEquipmentRecord equipment = 40; // 角色当前穿戴装备; 新角色初始化为空消息, 未穿戴部位保持未设置
+  //map<uint64, RecordPrimary> record_map = 1000; // 角色临时扩展记录表
   repeated PetRecord pet_record_list = 2000; // 角色当前随身携带宠物记录列表, 按携带顺序排列, 数量不超过 PetRecordLimit_MaxCarryCount
 }

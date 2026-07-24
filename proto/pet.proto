@@ -80,6 +80,6 @@ message PetRecord {
   uint32 growth_baseline_agility = 112; // 成长率基准敏捷; 无 1 级记录时使用首次获得时的当前值
   uint32 growth_baseline_level = 113; // 成长率基准对应等级; 1 表示真实 1 级记录, 高等级首次获得时记录当前等级
 
-  map<uint32, uint64> asset_record_base_map = 1000; // 宠物基础数值记录
-  map<uint64, RecordPrimary> record_map = 2000; // 宠物扩展记录表
+  //map<uint32, uint64> asset_record_base_map = 1000; // 宠物基础数值记录
+  //map<uint64, RecordPrimary> record_map = 2000; // 宠物扩展记录表
 }
