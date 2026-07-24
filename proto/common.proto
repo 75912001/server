@@ -25,6 +25,17 @@ enum LevelRange {
   LevelRange_Max = 140;
 }
 
+// CharacterRebirthNameColor 表示角色昵称按转生次数使用的客户端显示色.
+// 枚举值与转生次数一致; 业务有效值为 White 到 Purple, Max 仅作为枚举边界占位.
+enum CharacterRebirthNameColor {
+  CharacterRebirthNameColor_White = 0; // 0转昵称显示色: 白色 #FFFFFF
+  CharacterRebirthNameColor_Yellow = 1; // 1转昵称显示色: 黄色 #FFD84A
+  CharacterRebirthNameColor_Green = 2; // 2转昵称显示色: 绿色 #63B84A
+  CharacterRebirthNameColor_Blue = 3; // 3转昵称显示色: 蓝色 #45A7FF
+  CharacterRebirthNameColor_Red = 4; // 4转昵称显示色: 红色 #FF4A4A
+  CharacterRebirthNameColor_Purple = 5; // 5转昵称显示色: 紫色 #AD6CFF
+  CharacterRebirthNameColor_Max = 6; // 昵称颜色枚举边界, 用于范围判断或扩展占位; 不作为业务值存储或显示
+}
 
 enum Constants {
   Constants_Unknow = 0;
