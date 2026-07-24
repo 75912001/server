@@ -5,39 +5,59 @@ option go_package = "server/proto/pb;pb";
 
 import "record.proto";
 
+// EquipmentType 表示装备穿戴部位.
+// Unknow 仅作为 proto3 默认值和未初始化占位, Max 仅作为枚举边界.
 enum EquipmentType {
-  EquipmentType_Unknow = 0;
-  EquipmentType_Necklace = 1;
-  EquipmentType_Helmet = 2;
-  EquipmentType_Ring = 3;
-  EquipmentType_Weapon = 4;
-  EquipmentType_Chest = 5;
-  EquipmentType_Shield = 6;
-  EquipmentType_Gloves = 7;
-  EquipmentType_Belt = 8;
-  EquipmentType_Boots = 9;
-  EquipmentType_Max = 10;
+  EquipmentType_Unknow = 0; // 未知装备部位, proto3 默认值
+  EquipmentType_Necklace = 1; // 项链
+  EquipmentType_Helmet = 2; // 头盔
+  EquipmentType_Ring = 3; // 戒指
+  EquipmentType_Weapon = 4; // 武器
+  EquipmentType_Chest = 5; // 胸甲
+  EquipmentType_Shield = 6; // 盾牌
+  EquipmentType_Gloves = 7; // 手套
+  EquipmentType_Belt = 8; // 腰带
+  EquipmentType_Boots = 9; // 靴子
+  EquipmentType_Max = 10; // 装备部位枚举边界, 不作为业务值存储
 }
 
+// EquipmentRecord 保存单件装备的实例档案.
 message EquipmentRecord {
-  uint64 uuid = 1;
-  map<int32, uint64> record_base_map = 10;
-  map<int32, RecordPrimary> record_map = 1000;
+  uint64 uuid = 1; // 装备 UUID, 在所属 AccountRecord.aid 作用域内唯一
+  uint32 asset_id = 2; // 装备资产 ID, 对应装备配置 ID
+  map<int32, uint64> record_base_map = 10; // 装备基础数值表, key 使用 EquipmentRecordBase
+  map<int32, RecordPrimary> record_map = 1000; // 装备扩展记录表, key 使用 EquipmentRecordPrimary
 }
 
+// EquipmentRecordBase 定义 record_base_map 的基础数值类型.
 enum EquipmentRecordBase {
-  EquipmentRecordBase_Unknow = 0;
-  EquipmentRecordBase_DamagePercent = 10000;
-  EquipmentRecordBase_CritRate = 10001;
-  EquipmentRecordBase_CritDamageBonusRate = 10002;
+  EquipmentRecordBase_Unknow = 0; // 未知基础数值类型, proto3 默认值
+  EquipmentRecordBase_DamagePercent = 10000; // 伤害百分比
+  EquipmentRecordBase_CritRate = 10001; // 暴击率
+  EquipmentRecordBase_CritDamageBonusRate = 10002; // 暴击伤害加成率
 }
 
+// EquipmentRecordPrimary 定义 record_map 的一级扩展记录类型.
 enum EquipmentRecordPrimary {
-  EquipmentRecordPrimary_Unknow = 0;
-  EquipmentRecordPrimary_Slot = 1;
+  EquipmentRecordPrimary_Unknow = 0; // 未知一级记录类型, proto3 默认值
+  EquipmentRecordPrimary_Slot = 1; // 装备槽位记录
 }
 
+// EquipmentRecordSecondary 定义装备一级记录下的二级扩展记录类型.
 enum EquipmentRecordSecondary {
-  EquipmentRecordSecondary_Unknow = 0;
-  EquipmentRecordSecondary_Slot_Data = 1;
+  EquipmentRecordSecondary_Unknow = 0; // 未知二级记录类型, proto3 默认值
+  EquipmentRecordSecondary_Slot_Data = 1; // 装备槽位数据记录
+}
+
+// CharacterEquipmentRecord 保存角色当前穿戴的装备; 未穿戴部位保持未设置.
+message CharacterEquipmentRecord {
+  EquipmentRecord necklace = 1; // 当前穿戴的项链
+  EquipmentRecord helmet = 2; // 当前穿戴的头盔
+  EquipmentRecord ring = 3; // 当前穿戴的戒指
+  EquipmentRecord weapon = 4; // 当前穿戴的武器
+  EquipmentRecord chest = 5; // 当前穿戴的胸甲
+  EquipmentRecord shield = 6; // 当前穿戴的盾牌
+  EquipmentRecord gloves = 7; // 当前穿戴的手套
+  EquipmentRecord belt = 8; // 当前穿戴的腰带
+  EquipmentRecord boots = 9; // 当前穿戴的靴子
 }
