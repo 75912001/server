@@ -39,5 +39,7 @@ enum CharacterRebirthNameColor {
 
 enum Constants {
   Constants_Unknow = 0;
+  Constants_Elemental_Max_Active_Type_Count = 2; // 最多允许同时分配的元素种类数量
+  Constants_Elemental_Total_Point = 10; // 地水火风元素总点数
   Constants_Character_Name_Max_Length = 12; // 角色名称最大长度
 }
