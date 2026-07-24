@@ -12,11 +12,12 @@ enum AssetType {
   AssetType_NPC = 5;
   AssetType_Decoration = 6;
   AssetType_Building = 7;
-  AssetType_Character_Skill = 8;
-  AssetType_Pet_Skill = 9;
+  AssetType_Skill = 8;
 }
 
 enum AssetIDRange {
+  option allow_alias = true;
+
   AssetIDRange_Unknow = 0;
   AssetIDRange_Record_Start = 1;
   AssetIDRange_Record_End = 999999;
@@ -25,6 +26,10 @@ enum AssetIDRange {
   AssetIDRange_Scene_Start = 2000000;
   AssetIDRange_Scene_End = 2999999;
   AssetIDRange_Item_Start = 3000000;
+  AssetIDRange_Item_Item_Start = 3000000;
+  AssetIDRange_Item_Item_End = 3499999;
+  AssetIDRange_Item_Equipment_Start = 3500000;
+  AssetIDRange_Item_Equipment_End = 3999999;
   AssetIDRange_Item_End = 3999999;
   AssetIDRange_Pet_Start = 4000000;
   AssetIDRange_Pet_End = 4999999;
@@ -34,10 +39,8 @@ enum AssetIDRange {
   AssetIDRange_Decoration_End = 6999999;
   AssetIDRange_Building_Start = 7000000;
   AssetIDRange_Building_End = 7999999;
-  AssetIDRange_Character_Skill_Start = 8000000;
-  AssetIDRange_Character_Skill_End = 8999999;
-  AssetIDRange_Pet_Skill_Start = 9000000;
-  AssetIDRange_Pet_Skill_End = 9999999;
+  AssetIDRange_Skill_Start = 8000000;
+  AssetIDRange_Skill_End = 9999999;
 }
 
 enum AssetIDRecord {
@@ -45,7 +48,6 @@ enum AssetIDRecord {
   AssetIDRecord_AssetID = 1;
   AssetIDRecord_Direction = 10;
   AssetIDRecord_Action = 11;
-
 }
 
 enum AssetElemental {
