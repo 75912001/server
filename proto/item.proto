@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+
+import "equipment.proto";
+
+// ItemContainerRecord 保存不关心位置的道具和装备集合.
+message ItemContainerRecord {
+  map<uint32, uint64> item_count_map = 1; // 可堆叠道具总数, key 为道具资源 ID, value 为持有数量
+  map<uint64, EquipmentRecord> equipment_record_map = 2; // 装备实例, key 为账号级装备 UUID
+}
+
+// ItemStackTransfer 表示一次实际完成的可堆叠道具迁移.
+message ItemStackTransfer {
+  uint32 asset_id = 1; // 道具资源 ID
+  uint64 count = 2; // 本次实际迁移数量
+}
