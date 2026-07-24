@@ -5,10 +5,10 @@ option go_package = "server/proto/pb;pb";
 
 enum CharacterWeaponType {
   CharacterWeaponType_Unknow = 0;
-  CharacterWeaponType_Unarmed = 1;
-  CharacterWeaponType_Axe = 2;
-  CharacterWeaponType_Bow = 3;
-  CharacterWeaponType_Spear = 4;
-  CharacterWeaponType_Stick = 5;
+  CharacterWeaponType_Unarmed = 1; // 空手/爪/投掷斧/回旋镖/石头
+  CharacterWeaponType_Axe = 2; // 斧头
+  CharacterWeaponType_Bow = 3; // 弓
+  CharacterWeaponType_Spear = 4; // 长枪
+  CharacterWeaponType_Stick = 5; // 棍棒
   CharacterWeaponType_Max = 6;
 }

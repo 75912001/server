@@ -57,27 +57,29 @@ enum PetCarryStatus {
 
 message PetRecord {
   uint64 uuid = 1; // 宠物 UUID, 在所属 AccountRecord.aid 作用域内唯一
-  string nick = 2; // 用户自定义宠物昵称; 空字符串表示未设置, 客户端显示宠物配置名称
-  PetCarryStatus carry_status = 3; // 宠物携带状态; 只有角色随身携带时参与战斗/骑乘语义, 仓库内宠物固定为 Rest
-  PetGrade grade = 4; // 宠物品阶, 决定创建时 SavedBase 成长偏移; 默认赠送宠物由 online 指定为 Mythic
-  uint64 exp = 5; // 经验值, 用于升级或养成
-  uint32 loyalty = 6; // 宠物忠诚度; 创建默认值当前为 100
-  uint32 saved_base_vitality = 7; // 宠物实例基础体力成长值; 创建时由配置 growth.baseVital 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
-  uint32 saved_base_strength = 8; // 宠物实例基础腕力成长值; 创建时由配置 growth.baseStr 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
-  uint32 saved_base_toughness = 9; // 宠物实例基础耐力成长值; 创建时由配置 growth.baseTough 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
-  uint32 saved_base_dexterity = 10; // 宠物实例基础速度成长值; 创建时由配置 growth.baseDex 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
-  uint32 raw_vitality = 11; // 宠物当前原始体力值; 创建和升级时累加生成, 战斗运行期 HP 等派生属性由该值参与换算
-  uint32 raw_strength = 12; // 宠物当前原始腕力值; 创建和升级时累加生成, 战斗运行期攻击等派生属性由该值参与换算
-  uint32 raw_toughness = 13; // 宠物当前原始耐力值; 创建和升级时累加生成, 战斗运行期防御等派生属性由该值参与换算
-  uint32 raw_dexterity = 14; // 宠物当前原始速度值; 创建和升级时累加生成, 战斗运行期敏捷等派生属性由该值参与换算
-  int64 create_timestamp_ms = 15; // 宠物创建时间戳, 单位毫秒
-  uint64 rebirth_count = 16; // 宠物转生次数
-  uint64 asset_id = 17; // 宠物资产 ID, 对应宠物配置 ID
-  map<uint32, uint64> asset_record_base_map = 20; // 宠物基础数值记录
-  uint32 growth_baseline_hp = 21; // 成长率基准 HP 上限; 无 1 级记录时使用首次获得时的当前值
-  uint32 growth_baseline_attack = 22; // 成长率基准攻击力; 无 1 级记录时使用首次获得时的当前值
-  uint32 growth_baseline_defense = 23; // 成长率基准防御力; 无 1 级记录时使用首次获得时的当前值
-  uint32 growth_baseline_agility = 24; // 成长率基准敏捷; 无 1 级记录时使用首次获得时的当前值
-  uint32 growth_baseline_level = 25; // 成长率基准对应等级; 1 表示真实 1 级记录, 高等级首次获得时记录当前等级
-  map<uint64, RecordPrimary> record_map = 1000; // 宠物扩展记录表
+  uint32 asset_id = 2; // 宠物资产 ID, 对应宠物配置 ID
+  string nick = 3; // 用户自定义宠物昵称; 空字符串表示未设置, 客户端显示宠物配置名称
+  uint64 exp = 4; // 经验值, 用于升级或养成
+  uint32 loyalty = 5; // 宠物忠诚度; 创建默认值当前为 100
+  int64 create_timestamp_ms = 6; // 宠物创建时间戳, 单位毫秒
+  uint32 rebirth_count = 7; // 宠物转生次数
+  PetCarryStatus carry_status = 8; // 宠物携带状态; 只有角色随身携带时参与战斗/骑乘语义, 仓库内宠物固定为 Rest
+
+  PetGrade grade = 100; // 宠物品阶, 决定创建时 SavedBase 成长偏移
+  uint32 saved_base_vitality = 101; // 宠物实例基础体力成长值; 创建时由配置 growth.baseVital 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
+  uint32 saved_base_strength = 102; // 宠物实例基础腕力成长值; 创建时由配置 growth.baseStr 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
+  uint32 saved_base_toughness = 103; // 宠物实例基础耐力成长值; 创建时由配置 growth.baseTough 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
+  uint32 saved_base_dexterity = 104; // 宠物实例基础速度成长值; 创建时由配置 growth.baseDex 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
+  uint32 raw_vitality = 105; // 宠物当前原始体力值; 创建和升级时累加生成, 战斗运行期 HP 等派生属性由该值参与换算
+  uint32 raw_strength = 106; // 宠物当前原始腕力值; 创建和升级时累加生成, 战斗运行期攻击等派生属性由该值参与换算
+  uint32 raw_toughness = 107; // 宠物当前原始耐力值; 创建和升级时累加生成, 战斗运行期防御等派生属性由该值参与换算
+  uint32 raw_dexterity = 108; // 宠物当前原始速度值; 创建和升级时累加生成, 战斗运行期敏捷等派生属性由该值参与换算
+  uint32 growth_baseline_hp = 109; // 成长率基准 HP 上限; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_attack = 110; // 成长率基准攻击力; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_defense = 111; // 成长率基准防御力; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_agility = 112; // 成长率基准敏捷; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_level = 113; // 成长率基准对应等级; 1 表示真实 1 级记录, 高等级首次获得时记录当前等级
+
+  map<uint32, uint64> asset_record_base_map = 1000; // 宠物基础数值记录
+  map<uint64, RecordPrimary> record_map = 2000; // 宠物扩展记录表
 }
