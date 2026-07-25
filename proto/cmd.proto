@@ -6,14 +6,6 @@ option go_package = "server/proto/pb;pb";
 
 enum MsgID {
   MsgIDUnknown_CMD = 0; // proto3 首值必须为 0
-  CombatAutoEncounterSetReq_CMD = 1048577; //0x100001#client->gateway#设置自动遇敌-请求
-  CombatAutoEncounterSetRes_CMD = 1048578; //0x100002#gateway->client#设置自动遇敌-回复
-  CombatBattleStartNotify_CMD = 1048580; //0x100004#gateway->client#战斗开始-通知
-  CombatRoundActionReq_CMD = 1048581; //0x100005#client->gateway#战斗回合出手-请求
-  CombatRoundActionRes_CMD = 1048582; //0x100006#gateway->client#战斗回合出手-广播给战斗房间的所有角色-回复
-  CombatRoundResultNotify_CMD = 1048584; //0x100008#gateway->client#战斗回合结果-通知
-  CombatFlowCompleteReq_CMD = 1048585; //0x100009#client->gateway#战斗流程完成-请求
-  CombatFlowCompleteRes_CMD = 16777232; //0x1000010#gateway->client#战斗流程完成-回复
   AccountVerifyReq_CMD = 1; //0x000001#client->gateway#账号登录验证-请求
   AccountVerifyRes_CMD = 2; //0x000002#gateway->client#账号登录验证-回复
   AccountOfflineReq_CMD = 3; //0x000003#client->gateway#账号主动下线-请求
@@ -32,6 +24,14 @@ enum MsgID {
   CharacterSceneEnterReq_CMD = 4102; //0x001006#client->gateway#进入场景-请求
   CharacterSceneEnterRes_CMD = 4103; //0x001007#gateway->client#进入场景-回复
   CharacterBaseChangedNotify_CMD = 4104; //0x001008#gateway->client#角色基础数据变化-通知
+  CombatAutoEncounterSetReq_CMD = 1048577; //0x100001#client->gateway#设置自动遇敌-请求
+  CombatAutoEncounterSetRes_CMD = 1048578; //0x100002#gateway->client#设置自动遇敌-回复
+  CombatBattleStartNotify_CMD = 1048580; //0x100004#gateway->client#战斗开始-通知
+  CombatRoundActionReq_CMD = 1048581; //0x100005#client->gateway#战斗回合出手-请求
+  CombatRoundActionRes_CMD = 1048582; //0x100006#gateway->client#战斗回合出手-广播给战斗房间的所有角色-回复
+  CombatRoundResultNotify_CMD = 1048584; //0x100008#gateway->client#战斗回合结果-通知
+  CombatFlowCompleteReq_CMD = 1048585; //0x100009#client->gateway#战斗流程完成-请求
+  CombatFlowCompleteRes_CMD = 16777232; //0x1000010#gateway->client#战斗流程完成-回复
   GMCommandReq_CMD = 61440; //0x00f000#client->gateway#执行GM命令-请求
   GMCommandRes_CMD = 61441; //0x00f001#gateway->client#执行GM命令-回复
   ItemUseReq_CMD = 12288; //0x003000#client->gateway#使用角色道具-请求

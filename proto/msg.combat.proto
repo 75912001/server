@@ -1,0 +1,389 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+
+import "msg.character.proto";
+
+// 消息范围 [0x100000, 0x11ffff]
+
+// CombatEnemyGroupEnemyCountRange 定义普通敌人组单次生成敌人数量的闭区间边界.
+enum CombatEnemyGroupEnemyCountRange {
+  CombatEnemyGroupEnemyCountRange_Unknow = 0; // 未配置或非法的敌人数量
+  CombatEnemyGroupEnemyCountRange_Min = 1; // 单次生成敌人的最小数量
+  CombatEnemyGroupEnemyCountRange_Max = 10; // 单次生成敌人的最大数量, 同时受单阵营站位数量限制
+}
+
+// CombatEnemyGroupBabyRate 定义普通敌人成为 1 级宠物宝宝的十万分率边界.
+enum CombatEnemyGroupBabyRate {
+  CombatEnemyGroupBabyRate_Min = 0; // 最小十万分率, 表示不会生成宝宝
+  CombatEnemyGroupBabyRate_Max = 100000; // 最大十万分率, 表示必定生成宝宝
+}
+
+// CombatCamp 标识战斗单位所属的对战阵营.
+enum CombatCamp {
+  CombatCamp_Initiator = 0; // 发起战斗的一方
+  CombatCamp_Defender = 1; // 接受挑战或被遇到的一方
+}
+
+// CombatCampPosition 定义单个阵营的站位编号范围和槽位总数.
+enum CombatCampPosition {
+  CombatCampPosition_Unknow = 0; // 站位编号起始值, 当前实现中 0 是合法站位
+  CombatCampPosition_Count = 10; // 单阵营站位总数, 合法站位编号为 0-9
+}
+
+// CombatEventKind 标识回合事件在表现和触发链中的业务类型.
+enum CombatEventKind {
+  CombatEventKind_Unknown = 0; // 未指定或无法识别的事件
+  CombatEventKind_Action = 1; // 普通出手结算, 如 A 攻击 B
+  CombatEventKind_Counter = 2; // 反击事件
+  CombatEventKind_Combo = 3; // 多单位联手/合击事件
+  CombatEventKind_Status = 4; // 状态, 被动, 持续效果触发
+  CombatEventKind_Escape = 5; // 逃跑判定及离场表现
+}
+
+// CombatEffectKind 标识单个战斗效果的客户端表现和状态变化类型.
+enum CombatEffectKind {
+  CombatEffectKind_Unknown = 0; // 未指定或无法识别的效果
+  CombatEffectKind_Damage = 1; // 伤害表现, 通常携带 HP delta
+  CombatEffectKind_Heal = 2; // 治疗表现, 预留
+  CombatEffectKind_Guard = 3; // 防御/守护表现
+  CombatEffectKind_Miss = 4; // 未命中或无有效目标, 预留
+  CombatEffectKind_Status = 5; // 状态变化表现
+  CombatEffectKind_UnitAlive = 6; // 存活状态变化表现
+  CombatEffectKind_Text = 7; // 纯文本提示, 预留
+  CombatEffectKind_Dodge = 8; // 闪避表现, 不产生 HP 变化
+  CombatEffectKind_Motion = 9; // 接近目标或返回原位等位移动作
+  CombatEffectKind_Knockdown = 10; // 单位在指定位置倒地
+  CombatEffectKind_Knockback = 11; // 8.5 Ultimate 规则产生的击飞表现
+  CombatEffectKind_Escape = 12; // 逃跑成功或失败表现
+}
+
+// CombatHitResult 是一次攻击可同时携带的客户端表现标记.
+enum CombatHitResult {
+  CombatHitResult_Unknown = 0; // 未指定攻击结果
+  CombatHitResult_Normal = 1; // 普通命中
+  CombatHitResult_Critical = 2; // 暴击命中
+  CombatHitResult_Miss = 3; // 伤害计算结果为 0
+  CombatHitResult_Dodge = 4; // 目标成功闪避
+  CombatHitResult_Guard = 5; // 目标本回合选择防御
+  CombatHitResult_Death = 6; // 本次攻击使目标 HP 归零
+  CombatHitResult_Counter = 7; // 本次攻击属于反击链
+  CombatHitResult_Combo = 8; // 本次攻击属于合击成员
+  CombatHitResult_Knockdown = 9; // 目标倒地
+  CombatHitResult_Knockback = 10; // 目标被击飞
+}
+
+// CombatMotionType 标识客户端需要按顺序播放的位移动作.
+enum CombatMotionType {
+  CombatMotionType_Unknown = 0; // 未指定移动类型
+  CombatMotionType_Approach = 1; // 攻击者从本方站位移动到目标面前
+  CombatMotionType_ReturnHome = 2; // 单位返回自己的初始站位
+}
+
+// CombatKnockbackType 对应 8.5 的两类 Ultimate 击飞来源.
+enum CombatKnockbackType {
+  CombatKnockbackType_Unknown = 0; // 未发生击飞
+  CombatKnockbackType_AccumulatedOverkill = 1; // 累计过量伤害达到 maxHP*1.2+20
+  CombatKnockbackType_SingleHitOverkill = 2; // 单次伤害达到 maxHP*1.2+20
+}
+
+// CombatAssetType 标识战斗期间可发生增减的单位运行期数值.
+enum CombatAssetType {
+  CombatAssetType_Unknown = 0; // 未指定或无法识别的数值类型
+  CombatAssetType_HP = 1; // 生命值
+  CombatAssetType_MP = 2; // 魔法值
+  CombatAssetType_Rage = 3; // 怒气值
+}
+
+// CombatStatusDeltaType 标识状态相对上一份客户端状态的变化方式.
+enum CombatStatusDeltaType {
+  CombatStatusDeltaType_Unknown = 0; // 未指定或无法识别的状态变化
+  CombatStatusDeltaType_Add = 1; // 新增状态
+  CombatStatusDeltaType_Remove = 2; // 移除状态
+  CombatStatusDeltaType_Update = 3; // 更新状态层数或过期回合
+}
+
+// CombatBattleEndReason 标识战斗结束时的最终胜负或退出原因.
+enum CombatBattleEndReason {
+  CombatBattleEndReason_Unknown = 0; // 未结束或结束原因未知
+  CombatBattleEndReason_InitiatorWin = 1; // 发起方获胜
+  CombatBattleEndReason_DefenderWin = 2; // 防守方获胜
+  CombatBattleEndReason_Escape = 4; // 一方成功逃离战斗
+}
+
+// CombatUnitKey 唯一标识本场战斗中的一个角色、玩家宠物或敌方单位.
+message CombatUnitKey {
+  uint64 aid = 1; // 账号 ID; 玩家单位为 AccountRecord.aid, 怪物/NPC 为 0
+  uint64 character_uuid = 2; // 角色 UUID; 玩家单位为所属角色 UUID, 怪物/NPC 为 0
+  uint64 pet_uuid = 3; // 宠物 UUID; 玩家宠物单位为宠物 UUID, 角色单位为 0, 怪物/NPC 为本场战斗临时唯一 ID
+}
+
+// CombatLuckSnapshot 保存单位开战时的完整运气输入.
+// 基础运气来自CharacterRecord, 装备修正按当前已装备物品配置即时累计, 有效运气最终限制在1-5.
+message CombatLuckSnapshot {
+  sint32 base_luck = 1; // 角色持久化基础运气CHAR_LUCK
+  sint32 equipment_modifier = 2; // 本次根据当前已装备物品配置即时计算的ITEM_MODIFYLUCK合计
+  sint32 effective_luck = 3; // clamp(base_luck+equipment_modifier,1,5)
+}
+
+// CombatUnitAttribute 保存单位进入战斗时的基础属性快照, 后续运行期变化不回写此消息.
+message CombatUnitAttribute {
+  uint32 hp = 2; // 开战生命值
+  uint32 attack = 3; // 攻击力
+  uint32 defense = 4; // 防御力
+  uint32 agility = 5; // 敏捷
+  uint32 loyalty = 6; // 忠诚度, 非宠物单位为 0
+  ElementalPoints elemental = 7; // 地水火风元素点数, 当前共享配置总和为 10
+  uint32 level = 8; // 服务端根据经验或敌人配置得到的实际等级
+  uint32 current_mp = 9; // 战斗当前魔法值; 玩家角色开战时按CharacterLimit_MagicPointMax初始化
+  uint32 max_mp = 10; // 战斗魔法值上限; 玩家角色固定为CharacterLimit_MagicPointMax
+  uint32 become_pig_remaining_seconds = 11; // 玩家角色开战时的乌力化剩余在线秒数; 其他单位为0
+  uint32 become_pig_image_id = 12; // 玩家角色开战时的乌力化服务器形象ID; 其他单位为0
+  CombatLuckSnapshot luck = 15; // 玩家角色开战运气快照; 宠物和敌方单位为空
+}
+
+// CombatEquipmentBind 保存战斗开始时客户端可见的装备资源绑定信息.
+message CombatEquipmentBind {
+  uint32 equipment_id = 1; // 装备资源 ID
+}
+
+// CombatUnit 保存单位的身份、阵营、站位和开战属性等不可变快照.
+message CombatUnit {
+  CombatCamp camp = 1; // 所属阵营
+  uint32 position = 2; // 阵营内站位槽位, 只表示阵型/显示位置, 不参与单位身份
+  CombatUnitKey key = 3; // 战斗单位身份 key; 玩家单位由 aid + character_uuid + pet_uuid 唯一确定
+  uint32 character_id = 10; // 角色资源 ID; 怪物/NPC 为 0
+  uint32 pet_id = 11; // 宠物或怪物资源 ID; 纯角色单位为 0
+  uint32 mount_pet_id = 13; // 骑宠资源 ID; 没有骑宠时为 0
+  CombatUnitAttribute attribute = 20; // 开战时可见战斗属性快照
+  repeated CombatEquipmentBind equipment_list = 30; // 开战时可见装备绑定列表
+}
+
+// CombatBattleStart 保存本场战斗的唯一标识和全部初始可见单位快照.
+message CombatBattleStart {
+  string battle_id = 1; // 战斗唯一 UUID 字符串
+  repeated CombatUnit unit_list = 10; // 开战时场上可见单位列表
+}
+
+// CombatAssetDelta 描述一个运行期战斗数值在单次效果或结算中的变化结果.
+message CombatAssetDelta {
+  CombatAssetType asset_type = 1; // 发生变化的运行期属性
+  int32 delta = 2; // 本次变化量, 扣减为负数, 增加为正数
+  uint32 after = 3; // 变化后的值
+}
+
+// CombatStatusDelta 描述一个战斗状态在单次效果中的新增、移除或更新结果.
+message CombatStatusDelta {
+  uint32 status_id = 1; // 状态 ID
+  CombatStatusDeltaType delta_type = 2; // Add/Remove/Update
+  uint32 stack_after = 3; // 变化后的层数
+  int64 expire_round = 4; // 过期回合; 小于 0 表示无固定过期回合
+}
+
+// CombatUnitStateDelta 汇总单次效果对一个单位造成的数值、状态和存活变化.
+message CombatUnitStateDelta {
+  CombatUnitKey unit_key = 1; // 状态发生变化的单位
+  repeated CombatAssetDelta asset_delta_list = 10; // HP, MP, 怒气等数值变化
+  repeated CombatStatusDelta status_delta_list = 20; // buff/debuff/异常状态变化
+  bool alive_changed = 30; // 是否包含存活状态变化
+  bool alive = 31; // alive_changed=true 时表示变化后的存活状态
+  bool escaped_changed = 32; // 是否包含逃跑离场状态变化
+  bool escaped = 33; // escaped_changed=true 时表示单位是否已经逃离战斗
+}
+
+// CombatPosition 使用阵营和阵营内站位共同表示一个客户端逻辑位置.
+message CombatPosition {
+  CombatCamp camp = 1; // 位置所属阵营
+  uint32 position = 2; // 阵营内站位编号, 合法范围为 0-9
+}
+
+// CombatDamageDetail 保存一次命中用于客户端显示的伤害结果, 不暴露概率或随机数.
+message CombatDamageDetail {
+  uint32 displayed_damage = 1; // 8.5 本次攻击最终表现伤害, 可以大于目标剩余 HP
+  uint32 applied_hp_damage = 2; // 实际从目标当前 HP 扣除的数值
+  uint32 hp_before = 3; // 扣血前目标 HP
+  uint32 hp_after = 4; // 扣血后目标 HP
+  repeated CombatHitResult hit_result_list = 5; // 普通、暴击、防御、死亡等可组合结果
+}
+
+// CombatMotionDetail 保存一次位移动作的起点和终点.
+message CombatMotionDetail {
+  CombatUnitKey unit_key = 1; // 执行移动的单位
+  CombatMotionType motion_type = 2; // 接近目标或返回原位
+  CombatPosition from_position = 3; // 移动前逻辑位置
+  CombatPosition to_position = 4; // 移动后逻辑位置
+}
+
+// CombatKnockdownDetail 保存目标倒地位置及反击击倒的特殊返回顺序.
+message CombatKnockdownDetail {
+  CombatUnitKey source_unit_key = 1; // 造成击倒的单位
+  CombatUnitKey target_unit_key = 2; // 被击倒的单位
+  CombatPosition fall_position = 3; // 客户端播放倒地时使用的位置
+  bool return_home_before_fall = 4; // 反击击倒来访攻击者时必须先回原位再倒地
+}
+
+// CombatKnockbackDetail 保存 8.5 Ultimate 阈值产生的击飞结果.
+message CombatKnockbackDetail {
+  CombatUnitKey source_unit_key = 1; // 造成击飞的单位
+  CombatUnitKey target_unit_key = 2; // 被击飞的单位
+  CombatKnockbackType knockback_type = 3; // 单次过量或累计过量
+  CombatPosition from_position = 4; // 击飞发生时目标所在位置
+}
+
+// CombatEscapeDetail 保存一次逃跑的客户端表现结果.
+message CombatEscapeDetail {
+  CombatUnitKey unit_key = 1; // 尝试逃跑的单位
+  bool succeeded = 2; // 是否成功离场
+  uint32 attempt_count = 3; // 本场战斗中该单位的逃跑尝试次数
+}
+
+// CombatEffect 是客户端按顺序播放的最小效果单元, 并携带该效果产生的状态变化.
+message CombatEffect {
+  uint32 effect_id = 1; // 事件内唯一, 从 1 开始, 按表现顺序递增
+  CombatEffectKind effect_kind = 2; // 效果表现类型
+  repeated CombatUnitKey source_unit_key_list = 10; // 本效果来源单位列表
+  repeated CombatUnitKey target_unit_key_list = 11; // 本效果目标单位列表
+  repeated CombatUnitStateDelta unit_delta_list = 20; // 本效果造成的单位状态变化
+  CombatDamageDetail damage = 21; // effect_kind=Damage 时携带
+  CombatMotionDetail motion = 22; // effect_kind=Motion 时携带
+  CombatKnockdownDetail knockdown = 23; // effect_kind=Knockdown 时携带
+  CombatKnockbackDetail knockback = 24; // effect_kind=Knockback 时携带
+  CombatEscapeDetail escape = 25; // effect_kind=Escape 时携带
+  string text = 30; // 预留文本提示; 首版客户端优先用结构化数据本地格式化
+}
+
+// CombatEvent 表示一次主动动作或衍生触发事件, 可通过 parent_event_id 组成触发链.
+message CombatEvent {
+  uint32 event_id = 1; // 本回合内唯一, 从 1 开始, 按执行顺序递增
+  uint32 parent_event_id = 2; // 0 表示顶层事件; 非 0 表示由某事件触发
+  CombatEventKind event_kind = 3; // 事件类型, 反击和状态触发链用 parent_event_id 串联
+  uint32 skill_id = 5; // 本事件执行的技能ID; 合击根事件和服务端AI基础动作允许为0
+  repeated CombatUnitKey source_unit_key_list = 10; // 事件来源方, 支持 A1+A2 联手
+  repeated CombatUnitKey target_unit_key_list = 11; // 事件目标方, 支持 A 同时命中多人
+  repeated CombatEffect effect_list = 20; // 本事件内按顺序回放的效果列表
+  uint32 counter_index = 30; // 本次主动动作后的反击序号, 非反击为 0, 合法范围 1-5
+  uint32 counter_depth = 31; // 反击触发深度, 当前与 counter_index 同步递增
+  uint32 combo_member_order = 32; // 合击成员顺序, 非合击为 0, 从 1 开始
+  uint32 combo_root_event_id = 33; // 合击成员指向所属合击根事件, 非合击为 0
+  uint32 segment_index = 34; // 多段攻击当前段号, 单段攻击为 1
+  uint32 segment_count = 35; // 本次攻击总段数, 当前普通攻击为 1
+}
+
+// CombatSettlementReward 保存战斗结算对一个单位产生的经验和资源变化.
+message CombatSettlementReward {
+  CombatUnitKey unit_key = 1; // 获得结算变化的单位
+  uint64 exp_delta = 2; // 本次获得经验
+  repeated CombatAssetDelta asset_change_list = 3; // 结算阶段产生的资源变化
+}
+
+// CombatBattleSettlement 保存战斗结束原因、胜负单位和最终奖励结果.
+message CombatBattleSettlement {
+  CombatBattleEndReason end_reason = 1; // 战斗结束原因
+  repeated CombatUnitKey winner_unit_key_list = 2; // 胜利方单位
+  repeated CombatUnitKey loser_unit_key_list = 3; // 失败方单位
+  repeated CombatSettlementReward reward_list = 10; // 结算奖励或资源变化; 首版为空
+}
+
+// CombatAutoEncounterSetReq 请求修改指定在线角色的内存级自动遇敌开关.
+//0x100001#client->gateway#设置自动遇敌-请求
+message CombatAutoEncounterSetReq {
+  bool enabled = 1; // 是否开启自动遇敌
+  uint64 character_uuid = 2; // 目标角色 UUID, 必须属于当前账号且处于在线状态
+}
+
+// CombatAutoEncounterSetRes 返回服务端最终接受的角色自动遇敌状态, 也用于服务端主动重置状态.
+//0x100002#gateway->client#设置自动遇敌-回复
+message CombatAutoEncounterSetRes {
+  bool enabled = 1; // 服务端确认后的自动遇敌状态
+  int64 server_timestamp_ms = 2; // 服务端回复时间戳, 单位毫秒
+  uint64 character_uuid = 3; // 已更新自动遇敌状态的角色 UUID
+}
+
+// CombatBattleStartNotify 通知战斗参与者创建战斗场景并进入首回合.
+//0x100004#gateway->client#战斗开始-通知
+message CombatBattleStartNotify {
+  CombatBattleStart battle_start = 1; // 开战快照, 只包含战斗 ID 和初始可见单位
+  uint32 round = 2; // 当前回合号, 首回合固定为 1
+}
+
+// CombatAttackSkillArgument 只携带攻击技能声明的敌方目标.
+message CombatAttackSkillArgument {
+  CombatUnitKey target_key = 1; // 必须是本场战斗中存活的敌方单位
+}
+
+// CombatDefenseSkillArgument 显式表示本次技能不需要额外参数.
+message CombatDefenseSkillArgument {
+}
+
+// CombatStandbySkillArgument 显式表示宠物选择“什么也不做”的待机技能.
+message CombatStandbySkillArgument {
+}
+
+// CombatEscapeSkillArgument 显式表示角色尝试逃离战斗.
+message CombatEscapeSkillArgument {
+}
+
+// CombatNoGuardSkillArgument 显式表示宠物选择8.5的不防守战法.
+// 技能的闪避、反击和保留但未生效的会心百分比均由服务端pet.skill.yaml决定,
+// 请求不携带这些数值, 服务端结算也不从客户端输入读取战斗修正.
+message CombatNoGuardSkillArgument {
+}
+
+// CombatNoTargetSkillArgument显式表示主动技能不接受客户端目标.
+// 这类技能仍会执行真实战斗行为, 不能复用待机参数. 例如8.5针刺外皮的target=0,
+// 服务端会在技能执行时按BATTLE_TargetAdjust规则自动选择一个存活敌方单位.
+message CombatNoTargetSkillArgument {
+}
+
+// CombatSkillAction 是角色和宠物统一使用的回合技能输入.
+message CombatSkillAction {
+  uint32 skill_id = 1; // 必须属于出手单位并与argument类型匹配
+  oneof argument {
+    CombatAttackSkillArgument attack = 2; // 攻击技能参数
+    CombatDefenseSkillArgument defense = 3; // 防御技能空参数
+    CombatStandbySkillArgument standby = 4; // 宠物待机技能空参数
+    CombatEscapeSkillArgument escape = 5; // 角色逃离技能空参数
+    CombatNoGuardSkillArgument no_guard = 6; // 宠物不防守战法空参数
+    CombatNoTargetSkillArgument no_target = 7; // 不接受客户端目标的主动技能空参数
+  }
+}
+
+// CombatRoundActionReq 提交一个玩家可控单位在指定战斗回合中的技能选择.
+//0x100005#client->gateway#战斗回合出手-请求
+message CombatRoundActionReq {
+  string battle_id = 1; // 战斗唯一 UUID 字符串
+  uint32 round = 2; // 客户端提交的回合号
+  CombatUnitKey unit_key = 3; // 本次提交技能的出手单位
+  CombatSkillAction action = 4; // 技能ID和与该技能匹配的参数
+}
+
+// CombatRoundActionRes 确认服务端已接受指定单位在当前回合的动作.
+//0x100006#gateway->client#战斗回合出手-广播给战斗房间的所有角色-回复
+message CombatRoundActionRes {
+  string battle_id = 1; // 战斗唯一 UUID 字符串
+  uint32 round = 2; // 已接收的回合号
+  CombatUnitKey unit_key = 3; // 已接收动作的出手单位
+}
+
+// CombatRoundResultNotify 下发本回合完整执行结果, 战斗结束时同时携带结算数据.
+//0x100008#gateway->client#战斗回合结果-通知
+message CombatRoundResultNotify {
+  string battle_id = 1; // 战斗唯一 UUID 字符串
+  uint32 round = 2; // 已结算的回合号
+  repeated CombatEvent event_list = 10; // 客户端按列表和事件内效果顺序播放的完整本回合表现
+  bool battle_finished = 20; // 本回合结算后战斗是否已经结束
+  CombatBattleSettlement settlement = 21; // battle_finished=true 时携带战斗结算数据
+}
+
+// CombatFlowCompleteReq 表示客户端已播放全部战斗动画并回到可继续遇敌的非战斗场景.
+//0x100009#client->gateway#战斗流程完成-请求
+message CombatFlowCompleteReq {
+  uint64 character_uuid = 1; // 已完成客户端战斗流程的玩家角色 UUID
+}
+
+// CombatFlowCompleteRes 确认服务端已接受客户端战斗流程完成状态并执行后续处理.
+//0x1000010#gateway->client#战斗流程完成-回复
+message CombatFlowCompleteRes {
+  uint64 character_uuid = 1; // 服务端已确认流程完成的玩家角色 UUID
+}
