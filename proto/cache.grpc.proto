@@ -3,7 +3,7 @@ syntax = "proto3";
 package cache;
 option go_package = "server/proto/pb;pb";
 import "options.proto";
-import "account.record.proto";
+import "msg.account.proto";
 
 service CacheService {
   option (proto.serviceOpt) = {
