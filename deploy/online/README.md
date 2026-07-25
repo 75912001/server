@@ -4,7 +4,7 @@
 
 镜像内时区为 `Asia/Shanghai`，容器日志时间与宿主机本地时间保持一致。
 
-online 启动时会先加载共享游戏配置. 镜像构建会把仓库 `config/` 复制到 `/app/config`, `deploy/online/*.yaml` 使用 `custom.gameConfigDir: /app/config`. 共享配置包含 `scene.yaml`, 用于按角色当前场景选择自动遇敌敌人组. server 只校验服务端消费字段和跨表引用; 角色展示字段, 宠物展示字段, 客户端 PNG, `.tpsheet` 和 frame 资源仍由 sa.desktop 校验.
+online 启动时会先加载共享游戏配置. 镜像构建会把仓库 `config/` 整体复制到 `/app/config`, `deploy/online/*.yaml` 使用 `custom.gameConfigDir: /app/config`. 单角色 PVE 自动遇敌使用 `scene.yaml -> enemy.group.yaml -> enemy.yaml -> pet.yaml` 引用链: 场景选择敌人组, 敌人组引用独立敌人记录, 独立敌人记录再引用现代宠物模板. server 只校验服务端消费字段和跨表引用; 角色展示字段, 宠物展示字段, 客户端 PNG, `.tpsheet` 和 frame 资源仍由 sa.desktop 校验.
 
 ## 准备目录
 
