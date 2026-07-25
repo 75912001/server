@@ -7,6 +7,11 @@ import "equipment.proto";
 
 // 消息范围 [0x003000, 0x003fff]
 
+message ItemElement {
+  uint32 asset_id = 1; // 道具资源 ID
+  uint64 count = 2; // 道具数量
+}
+
 // ItemContainerRecord 保存不关心位置的道具和装备集合.
 message ItemContainerRecord {
   map<uint32, uint64> item_count_map = 1; // 可堆叠道具总数, key 为道具资源 ID, value 为持有数量
