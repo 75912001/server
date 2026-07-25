@@ -4,7 +4,7 @@ package account;
 option go_package = "server/proto/pb;pb";
 import "msg.pet.proto";
 
-// 消息范围 [0x001000, 0x001fff]
+// 消息范围 [0x00f000, 0x00ffff]
 
 // GMItemAddCommand 表示给发起命令的角色自身增加道具.
 message GMItemAddCommand {
@@ -32,7 +32,7 @@ message GMPetAddResult {
   PetGrade pet_grade = 3; // 已增加宠物的品阶
 }
 
-//0x001000#client->gateway#执行GM命令-请求
+//0x00f000#client->gateway#执行GM命令-请求
 message GMCommandReq {
   uint64 character_uuid = 1; // 发起命令并接收结果的当前账号在线角色 UUID
   oneof command {
@@ -41,7 +41,7 @@ message GMCommandReq {
   }
 }
 
-//0x001001#gateway->client#执行GM命令-回复
+//0x00f001#gateway->client#执行GM命令-回复
 message GMCommandRes {
   uint64 character_uuid = 1; // 已执行命令的角色 UUID
   oneof result {
