@@ -103,6 +103,10 @@ func (p *Redis) createAccountAfterLock(ctx context.Context, account string) (*pb
 		CreateTimestampMs:     now,
 		CharacterRecordList:   characterRecords,
 		PetWarehouseRecordMap: make(map[uint64]*pb.PetRecord),
+		ItemWarehouse: &pb.ItemContainerRecord{
+			ItemCountMap:       make(map[uint32]uint64),
+			EquipmentRecordMap: make(map[uint64]*pb.EquipmentRecord),
+		},
 	}
 	if err = p.SetAccountRecord(ctx, aid, accountRecord); err != nil {
 		return nil, false, err
