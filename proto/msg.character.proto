@@ -1,0 +1,157 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+
+import "record.proto";
+import "equipment.proto";
+import "msg.item.proto";
+import "msg.pet.proto";
+
+// 消息范围 [0x003000, 0x003fff]
+
+enum CharacterAction {
+  CharacterAction_Unknow = 0;
+  CharacterAction_Attack = 1;
+  CharacterAction_Wave = 2;
+  CharacterAction_Faint = 3;
+  CharacterAction_Hurt = 4;
+  CharacterAction_Defense = 5;
+  CharacterAction_Sad = 6;
+  CharacterAction_Angry = 7;
+  CharacterAction_Sit = 8;
+  CharacterAction_Stand = 9;
+  CharacterAction_Throw = 10;
+  CharacterAction_Nod = 11;
+  CharacterAction_Walk = 12;
+  CharacterAction_Happy = 13;
+  CharacterAction_Max = 14;
+}
+
+message ElementalPoints // todo menglc 优化-移除, 扁平化
+{
+  uint32 earth = 1; // 地元素点数, 0-10
+  uint32 water = 2; // 水元素点数, 0-10
+  uint32 fire = 3; // 火元素点数, 0-10
+  uint32 wind = 4; // 风元素点数, 0-10
+}
+
+message CharacterAttributePoints // todo menglc 优化-移除, 扁平化
+{
+  uint32 vitality = 1; // 体力点数, 0-20
+  uint32 strength = 2; // 腕力点数, 0-20
+  uint32 toughness = 3; // 耐力点数, 0-20
+  uint32 dexterity = 4; // 速度点数, 0-20
+}
+
+enum CharacterLimit {
+  CharacterLimit_Unspecified = 0; // 未指定角色限制, proto3 enum 默认值
+  CharacterLimit_CreateAttributeTotalPoint = 20; // 创建角色时体力腕力耐力速度总点数
+  CharacterLimit_MaxItemBagCount = 30; // 角色随身背包最多可容纳的道具种类和装备实例总数
+  CharacterLimit_MagicPointMax = 100; // 角色每场战斗的初始魔法值和魔法值上限
+  CharacterLimit_MaxDuelPoint = 100000000; // 角色决斗点(DP)持久化上限
+}
+
+// CharacterLuckState 保存角色持久化的基础运气及其最近一次LS日自动刷新时间.
+// 装备修正和有效运气是运行期派生值, 不写入角色档案.
+message CharacterLuckState {
+  uint32 base_luck = 1; // 0仅表示首次登录尚未刷新; 正常持久化范围为1-5
+  int64 last_refresh_timestamp_ms = 2; // 最近一次自动LS日刷新时间, 单位毫秒
+}
+
+// CharacterBaseRecord 表示不包含道具、扩展记录和宠物集合的角色基础权威快照.
+message CharacterBaseRecord {
+  uint64 uuid = 1; // 角色 UUID, 在所属 AccountRecord.aid 作用域内唯一
+  string nick = 2; // 角色昵称
+  uint64 asset_id = 3; // 角色资源 ID
+  uint64 exp = 4; // 经验值
+  uint32 earth = 5; // 角色地元素点数
+  uint32 water = 6; // 角色水元素点数
+  uint32 fire = 7; // 角色火元素点数
+  uint32 wind = 8; // 角色风元素点数
+  uint32 available_point = 9; // 角色可分配属性点
+  uint32 vitality = 10; // 角色体力点数
+  uint32 strength = 11; // 角色腕力点数
+  uint32 toughness = 12; // 角色耐力点数
+  uint32 dexterity = 13; // 角色速度点数
+  int64 last_login_timestamp_ms = 14; // 角色最后登录时间戳, 单位毫秒
+  int64 last_logout_timestamp_ms = 15; // 角色最后登出时间戳, 单位毫秒
+  int64 create_timestamp_ms = 16; // 角色创建时间戳, 单位毫秒
+  uint64 rebirth_count = 17; // 角色转生次数
+  uint32 scene_id = 18; // 角色当前场景 ID
+  CharacterLuckState luck_state = 19; // 角色基础运气和 LS 日自动刷新状态
+  uint32 duel_point = 21; // 角色决斗点(DP)
+  uint32 charm = 22; // 角色魅力
+  uint32 become_pig_remaining_seconds = 25; // 乌力化剩余在线秒数CHAR_BECOMEPIG; 0表示当前未处于乌力化 // todo menglc
+  uint32 become_pig_image_id = 26; // 乌力化服务器形象CHAR_BECOMEPIG_BBI; 未处于乌力化时必须为0 // todo menglc
+}
+
+message CharacterRecord {
+  CharacterBaseRecord base = 1; // 角色基础权威数据; 完整角色 key 为 AccountRecord.aid + base.uuid
+
+  uint32 stone = 10; // 石币
+  uint32 shell = 11; // 贝壳
+  uint32 diamond = 12; // 钻石
+
+  //map<uint32, uint64> asset_map = 20; // 资产表, key 为 asset_id, value 为数值
+  ItemContainerRecord item_bag = 30; // 角色随身物品背包, 最多容纳 30 种道具或装备实例
+  CharacterEquipmentRecord equipment = 40; // 角色当前穿戴装备; 新角色初始化为空消息, 未穿戴部位保持未设置
+  //map<uint64, RecordPrimary> record_map = 1000; // 角色临时扩展记录表
+  repeated PetRecord pet_record_list = 2000; // 角色当前随身携带宠物记录列表, 按携带顺序排列, 数量不超过 PetRecordLimit_MaxCarryCount
+}
+
+// 协议号范围: 0x003000 - 0x003fff
+//0x003000#client->gateway#创建角色-请求
+message CharacterCreateReq
+{
+  uint32 character_slot_index = 1; // 角色创建槽位索引, 从 0 开始; 该槽位已有有效角色时创建失败
+  uint32 character_id = 2; // 角色资源 ID; 0 表示使用默认角色资源, 非 0 时必须是可创建玩家角色
+  string character_nick = 3; // 角色昵称; 去除首尾空白后 1-12 个字符, 空字符串表示使用默认昵称
+  ElementalPoints character_elemental = 4; // 角色地水火风元素点数; 必须提交且由 online 校验合法性
+  CharacterAttributePoints character_attribute = 5; // 角色体力腕力耐力速度点数; 必须提交且由 online 校验合法性
+}
+
+//0x003001#gateway->client#创建角色-回复
+message CharacterCreateRes
+{
+  CharacterRecord character_record = 1; // 新创建的完整角色档案
+}
+
+//0x003002#client->gateway#角色上线-请求
+message CharacterOnlineReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号且尚未上线
+}
+
+//0x003003#gateway->client#角色上线-回复
+message CharacterOnlineRes {
+  uint64 character_uuid = 1; // 已上线的角色 UUID
+  CharacterLuckState luck_state = 2; // 本次登录完成LS日刷新后的权威基础运气状态
+}
+
+//0x003004#client->gateway#角色下线-请求
+message CharacterOfflineReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号且当前已上线
+}
+
+//0x003005#gateway->client#角色下线-回复
+message CharacterOfflineRes {
+  uint64 character_uuid = 1; // 已下线的角色 UUID
+}
+
+//0x003006#client->gateway#进入场景-请求
+message CharacterSceneEnterReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号且当前已上线
+  uint32 scene_id = 2; // 目标场景 ID, 必须存在于 scene.yaml
+}
+
+//0x003007#gateway->client#进入场景-回复
+message CharacterSceneEnterRes {
+  uint64 character_uuid = 1; // 已进入场景的角色 UUID
+  uint32 scene_id = 2; // 已进入的场景 ID
+  int64 server_timestamp_ms = 3; // 服务端回复时间戳, 单位毫秒
+}
+
+//0x003008#gateway->client#角色基础数据变化-通知
+message CharacterBaseChangedNotify {
+  CharacterBaseRecord character_base_record = 1; // cache持久化成功后的角色基础权威快照
+}
