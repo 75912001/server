@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+
+import "equipment.proto";
+
+// 消息范围 [0x003000, 0x003fff]
+
+// ItemContainerRecord 保存不关心位置的道具和装备集合.
+message ItemContainerRecord {
+  map<uint32, uint64> item_count_map = 1; // 可堆叠道具总数, key 为道具资源 ID, value 为持有数量
+  map<uint64, EquipmentRecord> equipment_record_map = 2; // 装备实例, key 为账号级装备 UUID
+}
+
+// ItemStackTransfer 表示一次实际完成的可堆叠道具迁移.
+message ItemStackTransfer {
+  uint32 asset_id = 1; // 道具资源 ID
+  uint64 count = 2; // 本次实际迁移数量
+}
+
+//0x003000#client->gateway#使用角色道具-请求
+message ItemUseReq {
+  uint64 character_uuid = 1; // 道具所属角色 UUID
+  uint32 item_id = 2; // 使用的道具资源 ID
+  uint64 target_pet_uuid = 3; // 宠物目标 UUID; 角色目标道具必须为0
+}
+
+//0x003001#gateway->client#使用角色道具-回复
+message ItemUseRes {
+  uint64 character_uuid = 1; // 道具所属角色 UUID
+  uint32 item_id = 2; // 已使用的道具资源 ID
+  uint64 target_pet_uuid = 3; // 实际作用的宠物 UUID; 角色目标为0
+}
+
+//0x003002#gateway->client#角色道具变化-通知
+message CharacterItemChangedNotify {
+  uint64 character_uuid = 1; // 道具所属角色 UUID
+  map<uint32, uint64> item_count_map = 2; // 变化道具的最终数量, 0 表示已耗尽
+}
+
+//0x003003#client->gateway#将角色背包物品存入账号仓库-请求
+message ItemWarehouseDepositReq {
+  uint64 character_uuid = 1; // 物品当前所属角色 UUID
+  oneof item {
+    ItemStackTransfer stack = 10; // 需要存入的道具 ID 和数量
+    uint64 equipment_uuid = 11; // 需要存入的装备 UUID
+  }
+}
+
+//0x003004#gateway->client#将角色背包物品存入账号仓库-回复
+message ItemWarehouseDepositRes {
+  uint64 character_uuid = 1; // 物品原所属角色 UUID
+  oneof item {
+    ItemStackTransfer stack = 10; // 实际存入的道具 ID 和数量
+    uint64 equipment_uuid = 11; // 实际存入的装备 UUID
+  }
+}
+
+//0x003005#client->gateway#将账号仓库物品取入角色背包-请求
+message ItemWarehouseWithdrawReq {
+  uint64 character_uuid = 1; // 接收物品的目标角色 UUID
+  oneof item {
+    ItemStackTransfer stack = 10; // 需要取出的道具 ID 和数量
+    uint64 equipment_uuid = 11; // 需要取出的装备 UUID
+  }
+}
+
+//0x003006#gateway->client#将账号仓库物品取入角色背包-回复
+message ItemWarehouseWithdrawRes {
+  uint64 character_uuid = 1; // 接收物品的目标角色 UUID
+  oneof item {
+    ItemStackTransfer stack = 10; // 实际取出的道具 ID 和数量
+    uint64 equipment_uuid = 11; // 实际取出的装备 UUID
+  }
+}

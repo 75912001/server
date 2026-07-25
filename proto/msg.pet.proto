@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+
+import "record.proto";
+
+// 消息范围 [0x002000, 0x002fff]
+
+enum PetAction {
+  PetAction_Unknow = 0;
+  PetAction_Attack = 1;
+  PetAction_Faint = 2;
+  PetAction_Hurt = 3;
+  PetAction_Defense = 4;
+  PetAction_Stand = 5;
+  PetAction_Walk = 6;
+  PetAction_AttackShort = 7;
+  PetAction_Max = 8;
+}
+
+// PetRarity 表示宠物稀有度, 主要来自宠物资源配置 pet[].rarity.
+// 业务有效值为 Common 到 Mythic; Unknow 仅作为 proto3 默认值和非法/未初始化占位, Max 仅作为枚举边界占位.
+enum PetRarity {
+  PetRarity_Unknow = 0; // 未知稀有度, proto3 默认值; 正常业务配置和已创建宠物不应使用; 客户端显示色: 灰色 #9AA0A6
+  PetRarity_Common = 1; // 普通等级, 基础宠物资源分层; 客户端显示色: 白色 #F2F2F2
+  PetRarity_Rare = 2; // 稀有等级, 高于普通的宠物资源分层; 客户端显示色: 蓝色 #45A7FF
+  PetRarity_Epic = 3; // 史诗等级, 高于稀有的宠物资源分层; 客户端显示色: 紫色 #B56CFF
+  PetRarity_Legendary = 4; // 传说等级, 高于史诗的宠物资源分层; 客户端显示色: 橙色 #FF9F43
+  PetRarity_Mythic = 5; // 神话等级, 当前最高业务稀有度; 客户端显示色: 红色 #FF4A6E
+  PetRarity_Max = 6; // 稀有度枚举边界, 用于范围判断或扩展占位; 不作为业务值存储或显示
+}
+
+// PetGrade 表示宠物品阶, 用于描述宠物养成或评级体系中的等级分层.
+// 业务有效值为 Common 到 Mythic; Unknow 仅作为 proto3 默认值和非法/未初始化占位, Max 仅作为枚举边界占位.
+enum PetGrade {
+  PetGrade_Unknow = 0; // 未知品阶, proto3 默认值; 正常业务配置和已创建宠物不应使用; 客户端显示色: 灰色 #9AA0A6
+  PetGrade_Common = 1; // 普通品阶, 基础宠物品阶分层; 客户端显示色: 白色 #F2F2F2
+  PetGrade_Rare = 2; // 稀有品阶, 高于普通的宠物品阶分层; 客户端显示色: 蓝色 #45A7FF
+  PetGrade_Epic = 3; // 史诗品阶, 高于稀有的宠物品阶分层; 客户端显示色: 紫色 #B56CFF
+  PetGrade_Legendary = 4; // 传说品阶, 高于史诗的宠物品阶分层; 客户端显示色: 橙色 #FF9F43
+  PetGrade_Mythic = 5; // 神话品阶, 当前最高业务品阶; 客户端显示色: 红色 #FF4A6E
+  PetGrade_Max = 6; // 品阶枚举边界, 用于范围判断或扩展占位; 不作为业务值存储或显示
+}
+
+enum PetRecordLimit {
+  PetRecordLimit_Unspecified = 0; // 未指定宠物档案限制, proto3 enum 默认值
+  PetRecordLimit_MaxCarryCount = 5; // 单个角色最多可随身携带宠物数量
+}
+
+enum PetCarryStatus {
+  PetCarryStatus_Unknow = 0; // 未指定携带状态, 旧档案或非法默认值
+  PetCarryStatus_Rest = 1; // 休息, 不可参与战斗; 仓库内宠物固定为该状态; 客户端状态色: 白色 #FFFFFF
+  PetCarryStatus_Battle = 2; // 战斗, 角色战斗首发宠物; 单个角色最多一只; 客户端状态色: 红色 #FF4A4A
+  PetCarryStatus_Wait = 3; // 等待, 战斗中可以替换上场; 客户端状态色: 蓝色 #45A7FF
+  PetCarryStatus_Mount = 4; // 骑乘, 角色当前骑乘宠物; 单个角色最多一只, 需要骑乘权限且忠诚度 100%; 客户端状态色: 黄色 #FFD84A
+  PetCarryStatus_Max = 5;
+}
+
+message PetRecord {
+  uint64 uuid = 1; // 宠物 UUID, 在所属 AccountRecord.aid 作用域内唯一
+  uint32 asset_id = 2; // 宠物资产 ID, 对应宠物配置 ID
+  string nick = 3; // 用户自定义宠物昵称; 空字符串表示未设置, 客户端显示宠物配置名称
+  uint64 exp = 4; // 经验值, 用于升级或养成
+  uint32 loyalty = 5; // 宠物忠诚度; 创建默认值当前为 100
+  int64 create_timestamp_ms = 6; // 宠物创建时间戳, 单位毫秒
+  uint32 rebirth_count = 7; // 宠物转生次数
+  PetCarryStatus carry_status = 8; // 宠物携带状态; 只有角色随身携带时参与战斗/骑乘语义, 仓库内宠物固定为 Rest
+
+  PetGrade grade = 100; // 宠物品阶, 决定创建时 SavedBase 成长偏移
+  uint32 saved_base_vitality = 101; // 宠物实例基础体力成长值; 创建时由配置 growth.baseVital 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
+  uint32 saved_base_strength = 102; // 宠物实例基础腕力成长值; 创建时由配置 growth.baseStr 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
+  uint32 saved_base_toughness = 103; // 宠物实例基础耐力成长值; 创建时由配置 growth.baseTough 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
+  uint32 saved_base_dexterity = 104; // 宠物实例基础速度成长值; 创建时由配置 growth.baseDex 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
+  uint32 raw_vitality = 105; // 宠物当前原始体力值; 创建和升级时累加生成, 战斗运行期 HP 等派生属性由该值参与换算
+  uint32 raw_strength = 106; // 宠物当前原始腕力值; 创建和升级时累加生成, 战斗运行期攻击等派生属性由该值参与换算
+  uint32 raw_toughness = 107; // 宠物当前原始耐力值; 创建和升级时累加生成, 战斗运行期防御等派生属性由该值参与换算
+  uint32 raw_dexterity = 108; // 宠物当前原始速度值; 创建和升级时累加生成, 战斗运行期敏捷等派生属性由该值参与换算
+  uint32 growth_baseline_hp = 109; // 成长率基准 HP 上限; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_attack = 110; // 成长率基准攻击力; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_defense = 111; // 成长率基准防御力; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_agility = 112; // 成长率基准敏捷; 无 1 级记录时使用首次获得时的当前值
+  uint32 growth_baseline_level = 113; // 成长率基准对应等级; 1 表示真实 1 级记录, 高等级首次获得时记录当前等级
+
+  //map<uint32, uint64> asset_record_base_map = 1000; // 宠物基础数值记录
+  //map<uint64, RecordPrimary> record_map = 2000; // 宠物扩展记录表
+}
+
+// PetCarryStatusChange 表示服务端已持久化的一项宠物携带状态变更.
+message PetCarryStatusChange {
+  uint64 pet_uuid = 1; // 宠物 UUID, 必须属于响应 character_uuid 对应的随身宠物
+  PetCarryStatus carry_status = 2; // 服务端最终确认的携带状态
+}
+
+//0x002000#client->gateway#修改随身宠物状态-请求
+message PetCarryStatusSetReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号
+  PetCarryStatusChange change = 2; // 目标随身宠物状态变更
+}
+
+//0x002001#gateway->client#修改随身宠物状态-回复
+message PetCarryStatusSetRes {
+  uint64 character_uuid = 1; // 已修改随身宠物状态的角色 UUID
+  repeated PetCarryStatusChange change_list = 2; // 本次原子操作实际修改的状态列表, 包含被替换的战斗或骑乘宠物
+}
+
+//0x002002#gateway->client#角色随身宠物变化-通知
+message CharacterPetChangedNotify {
+  uint64 character_uuid = 1; // 宠物所属角色 UUID
+  repeated PetRecord pet_record_list = 2; // 每项为变化后的完整随身宠物记录
+}
+
+//0x002003#client->gateway#将随身宠物存入仓库-请求
+message PetWarehouseDepositReq {
+  uint64 character_uuid = 1; // 宠物当前所属角色 UUID
+  uint64 pet_uuid = 2; // 需要从角色随身列表移入账号宠物仓库的宠物 UUID
+}
+
+//0x002004#gateway->client#将随身宠物存入仓库-回复
+message PetWarehouseDepositRes {
+  uint64 character_uuid = 1; // 宠物原所属角色 UUID
+  uint64 pet_uuid = 2; // 已从角色随身列表移入账号宠物仓库的宠物 UUID
+}
+
+//0x002005#client->gateway#将仓库宠物取出-请求
+message PetWarehouseWithdrawReq {
+  uint64 character_uuid = 1; // 接收宠物的目标角色 UUID
+  uint64 pet_uuid = 2; // 需要从账号宠物仓库移入角色随身列表的宠物 UUID
+}
+
+//0x002006#gateway->client#将仓库宠物取出-回复
+message PetWarehouseWithdrawRes {
+  uint64 character_uuid = 1; // 接收宠物的目标角色 UUID
+  uint64 pet_uuid = 2; // 已从账号宠物仓库移入角色随身列表的宠物 UUID
+}
+
+//0x002007#client->gateway#修改随身宠物昵称-请求
+message PetNickSetReq {
+  uint64 character_uuid = 1; // 宠物所属角色 UUID
+  uint64 pet_uuid = 2; // 需要修改昵称的随身宠物 UUID
+  string nick = 3; // 去除首尾空白后的自定义昵称; 空字符串表示清除昵称并恢复显示配置名称
+}
+
+//0x002008#gateway->client#修改随身宠物昵称-回复
+message PetNickSetRes {
+  uint64 character_uuid = 1; // 宠物所属角色 UUID
+  uint64 pet_uuid = 2; // 已修改昵称的随身宠物 UUID
+  string nick = 3; // 已持久化的最终自定义昵称; 空字符串表示已清除昵称
+}

@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+import "msg.pet.proto";
+
+// 消息范围 [0x001000, 0x001fff]
+
+// GMItemAddCommand 表示给发起命令的角色自身增加道具.
+message GMItemAddCommand {
+  uint32 item_id = 1; // 道具资源 ID, 必须存在于 item.yaml
+  uint64 count = 2; // 增加数量, 必须大于 0 且增加后不得发生 uint64 溢出
+}
+
+// GMItemAddResult 表示服务端已持久化的道具增加结果.
+message GMItemAddResult {
+  uint32 item_id = 1; // 已增加的道具资源 ID
+  uint64 added_count = 2; // 本次实际增加数量
+  reserved 3;
+}
+
+// GMPetAddCommand 表示给发起命令的角色自身增加一只 1 级随身宠物.
+message GMPetAddCommand {
+  uint32 pet_id = 1; // 宠物资源 ID, 必须存在于 pet.yaml
+  PetGrade pet_grade = 2; // 宠物品阶, 只允许 Common 到 Mythic
+}
+
+// GMPetAddResult 表示服务端已持久化的随身宠物增加结果.
+message GMPetAddResult {
+  uint64 pet_uuid = 1; // 新宠物的账号级唯一 UUID
+  uint32 pet_id = 2; // 已增加的宠物资源 ID
+  PetGrade pet_grade = 3; // 已增加宠物的品阶
+}
+
+//0x001000#client->gateway#执行GM命令-请求
+message GMCommandReq {
+  uint64 character_uuid = 1; // 发起命令并接收结果的当前账号在线角色 UUID
+  oneof command {
+    GMItemAddCommand item_add = 10; // 对应客户端文本命令 gm item add <id> <cnt>
+    GMPetAddCommand pet_add = 11; // 对应客户端文本命令 gm pet add <petid> <petGrade>
+  }
+}
+
+//0x001001#gateway->client#执行GM命令-回复
+message GMCommandRes {
+  uint64 character_uuid = 1; // 已执行命令的角色 UUID
+  oneof result {
+    GMItemAddResult item_add = 10; // 已持久化的道具增加结果
+    GMPetAddResult pet_add = 11; // 已持久化的随身宠物增加结果
+  }
+}
