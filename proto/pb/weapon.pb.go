@@ -24,11 +24,11 @@ type CharacterWeaponType int32
 
 const (
 	CharacterWeaponType_CharacterWeaponType_Unknow  CharacterWeaponType = 0
-	CharacterWeaponType_CharacterWeaponType_Unarmed CharacterWeaponType = 1
-	CharacterWeaponType_CharacterWeaponType_Axe     CharacterWeaponType = 2
-	CharacterWeaponType_CharacterWeaponType_Bow     CharacterWeaponType = 3
-	CharacterWeaponType_CharacterWeaponType_Spear   CharacterWeaponType = 4
-	CharacterWeaponType_CharacterWeaponType_Stick   CharacterWeaponType = 5
+	CharacterWeaponType_CharacterWeaponType_Unarmed CharacterWeaponType = 1 // 空手/爪/投掷斧/回旋镖/石头
+	CharacterWeaponType_CharacterWeaponType_Axe     CharacterWeaponType = 2 // 斧头
+	CharacterWeaponType_CharacterWeaponType_Bow     CharacterWeaponType = 3 // 弓
+	CharacterWeaponType_CharacterWeaponType_Spear   CharacterWeaponType = 4 // 长枪
+	CharacterWeaponType_CharacterWeaponType_Stick   CharacterWeaponType = 5 // 棍棒
 	CharacterWeaponType_CharacterWeaponType_Max     CharacterWeaponType = 6
 )
 

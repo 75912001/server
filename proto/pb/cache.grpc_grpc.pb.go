@@ -33,11 +33,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CacheServiceClient interface {
-	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 写入账号档案。
 	// 以 aid 做 RingHash 分片, 账号档案创建完成和账号档案更新都会走这个接口。
 	CacheSetAccountRecord(ctx context.Context, in *CacheSetAccountRecordReq, opts ...grpc.CallOption) (*CacheSetAccountRecordRes, error)
-	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 读取账号档案。
 	// 以 aid 做 RingHash 分片，返回当前 aid 对应的 AccountRecord。
 	CacheGetAccountRecord(ctx context.Context, in *CacheGetAccountRecordReq, opts ...grpc.CallOption) (*CacheGetAccountRecordRes, error)
@@ -153,11 +151,9 @@ func (c *cacheServiceClient) CacheRefreshAccountSessionCAS(ctx context.Context, 
 // All implementations must embed UnimplementedCacheServiceServer
 // for forward compatibility.
 type CacheServiceServer interface {
-	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 写入账号档案。
 	// 以 aid 做 RingHash 分片, 账号档案创建完成和账号档案更新都会走这个接口。
 	CacheSetAccountRecord(context.Context, *CacheSetAccountRecordReq) (*CacheSetAccountRecordRes, error)
-	// todo menglc 使用unary RPC 方式实现，不能保证数据一致性，后续考虑改成stream RPC方式实现，保证数据一致性
 	// 读取账号档案。
 	// 以 aid 做 RingHash 分片，返回当前 aid 对应的 AccountRecord。
 	CacheGetAccountRecord(context.Context, *CacheGetAccountRecordReq) (*CacheGetAccountRecordRes, error)
