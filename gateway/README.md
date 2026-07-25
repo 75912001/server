@@ -115,6 +115,8 @@ client TCP
 
 非登录包必须在 Account 绑定 online 后才允许转发。未验证或 online 缺失时，gateway 会断开连接或返回错误。
 
+online 下行 `OnlineClientPacket.result_id == xerror.Disconnect.Code()` 表示当前会话不得继续. gateway 必须先尝试将该错误包送给客户端, 再以服务端异常原因进入统一断线流程, 依次触发 `OnlineUnbindAccount` 和 cache accountSession 清理. 普通结果码不会触发断线.
+
 ## 一致性约定
 
 - `account:{aid}:session` 由 gateway 写入、删除和续期。
