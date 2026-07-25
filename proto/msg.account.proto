@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+import "account.record.proto";
+
+// 消息范围 [0x000000, 0x000fff]
+
+// ===================================================================
+// 消息体定义 — 客户端 ↔ Gateway TCP 协议层
+// ===================================================================
+
+//0x000001#client->gateway#账号登录验证-请求
+message AccountVerifyReq
+{
+  uint64 aid = 1; // aid, 账号唯一标识, 由 login 服务下发, 客户端登录 Gateway 时携带
+  string connect_ticket = 2; // connectTicket, login 签发的短期连接票据, 客户端登录 Gateway 时携带
+}
+
+//0x000002#gateway->client#账号登录验证-回复
+message AccountVerifyRes
+{
+  int64  server_timestamp_ms = 1;   // 服务器当前时间戳，单位毫秒（用于客户端对时）
+  string heartbeat_session = 2; // heartbeatSession, 客户端后续心跳携带的心跳认证凭证
+}
+
+//0x000003#client->gateway#账号主动下线-请求
+message AccountOfflineReq
+{
+  uint32 reason = 1;   // 1=账号主动离线
+}
+
+//0x000011#client->gateway#心跳-请求
+message AccountHeartbeatReq {
+  string last_heartbeat_session = 1;   // 上次 Gateway 下发的 heartbeatSession
+}
+
+//0x0000012#gateway->client#心跳-回复
+message AccountHeartbeatRes {
+  int64 server_timestamp_ms  = 1;   // 服务器时间毫秒
+  string next_heartbeat_session = 2;   // 客户端下次心跳必须使用的 heartbeatSession
+}
+
+//0x000013#client->gateway#请求账号档案-请求
+message AccountRecordReq {
+}
+
+//0x000014#gateway->client#请求账号档案-回复
+message AccountRecordRes {
+  AccountRecord account_record = 1; // 账号档案
+}
+
+//0x000017#client->gateway#机器人压测-请求
+message AccountRobotPingReq
+{
+  uint64 seq = 1; // 客户端递增序号
+  int64 client_timestamp_ms = 2; // 客户端发送时间戳，单位毫秒
+  string payload = 3; // 压测透传数据
+}
+
+//0x000018#gateway->client#机器人压测-回复
+message AccountRobotPingRes
+{
+  uint64 seq = 1; // 对应请求中的客户端递增序号
+  int64 client_timestamp_ms = 2; // 对应请求中的客户端发送时间戳，单位毫秒
+  int64 server_timestamp_ms = 3; // 服务端回复时间戳，单位毫秒
+  string payload = 4; // 对应请求中的压测透传数据
+}
+
