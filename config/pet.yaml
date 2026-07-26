@@ -4,7 +4,7 @@
 ############################################################
 # pet 宠物
 ############################################################
-# enemyId: 关联pet_growth_8_0.csv中的enemyId todo menglc 从中获取的数据
+# enemyId: 关联 pet_growth_8_0.csv 中的 enemyId todo menglc 从中获取的数据
 # rarity 稀有度: 1-普通, 2-稀有, 3-史诗, 4-传说, 5-神话
 # elemental 元素属性: earth-土, water-水, fire-火, wind-风 [默认:0] (整数, 范围[0,10], 总和必须等于10) (要么是单元素, 要么是两个元素相邻, 可以首尾相邻)
 # attribute 属性: 允许负数
@@ -35,14 +35,20 @@
 #     allOpponents: 所有仍存活且未逃跑的敌对角色和宠物
 #     playerCharacters: 所有仍存活且未逃跑的敌对玩家角色, 不包含玩家宠物
 #     playerPets: 所有仍存活且未逃跑的敌对玩家宠物, 不包含角色
-#     partyLeader: 开战单位顺序中的首个仍存活敌对玩家角色
+#     partyLeader: position最小的存活玩家角色视为当前队长并必定加入候选;
+#       其他每个存活单位分别执行RAND(0,2), 结果0时也加入候选
+#   playerCharacters/playerPets/partyLeader本轮没有候选时, 按8.5回退allOpponents重新收集
 #   targetSelection在targetScope候选中选择最终目标, 可选值及规则:
 #     random: 使用本场确定性随机流等概率选择
 #     highestHp/lowestHp: 按当前战斗HP选择最高/最低者
-#     highestAttack: 按开战战斗攻击力选择最高者
-#     highestAgility/lowestAgility: 按开战战斗敏捷选择最高/最低者
-#     elementalSubdue: 用当前双方元素按8.5物理元素矩阵计算100点基准伤害, 选择最高者
-#   非random方式出现并列时保留开战单位顺序中的首个候选. 指定范围没有候选目标时本回合退化为防御
+#     highestAttack: 按原始四维腕力CHAR_STR选择最高者, 不读取技能修正后的战斗攻击
+#     highestAgility/lowestAgility: 按原始四维速度CHAR_DEX选择最高/最低者, 不读取FIX敏捷
+#     elementalSubdue: 按8.5 GetSubdueAttribute决策树取得克制目标元素, 再选择该元素值最高者
+#   非random策略必须配置targetRandomRollMax, 精确对应8.5 rn:
+#     先执行RAND(0,targetRandomRollMax), 结果0时再随机选择候选, 其余结果使用上述最优目标
+#     1表示50%随机/50%最优; 0表示每次随机, 但仍先执行一次RAND(0,0)再执行候选随机
+#   random策略直接随机一次, 不读取targetRandomRollMax, 因此禁止配置这个无效字段
+#   非random方式出现并列时保留position最小的首个候选. allOpponents也没有目标时本回合退化为防御
 #   权重使用8.0 enemy1.txt的at/gu/es数据, 按8.5 battle_ai.c语义映射; targetScope和targetSelection分别对应at的第2和第3个参数
 # habitat: 栖息地
 # level1Spawn: 1级出生地
@@ -7703,6 +7709,7 @@ pet:
         escapeWeight: 1
         targetScope: allOpponents
         targetSelection: lowestHp
+        targetRandomRollMax: 1
       habitat: 未知
       level1Spawn: 未知
       description: 未知
