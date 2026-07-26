@@ -82,8 +82,6 @@ message CharacterBaseRecord {
   CharacterLuckState luck_state = 19; // 角色基础运气和 LS 日自动刷新状态
   uint32 duel_point = 21; // 角色决斗点(DP)
   uint32 charm = 22; // 角色魅力
-  uint32 become_pig_remaining_seconds = 25; // 乌力化剩余在线秒数CHAR_BECOMEPIG; 0表示当前未处于乌力化 // todo menglc
-  uint32 become_pig_image_id = 26; // 乌力化服务器形象CHAR_BECOMEPIG_BBI; 未处于乌力化时必须为0 // todo menglc
 }
 
 message CharacterRecord {
