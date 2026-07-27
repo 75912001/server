@@ -1,0 +1,79 @@
+# 角色技能-配置
+# 任何修改此文件的行为都需要通知客户端和服务端开发人员
+
+# 技能共用范围 [8000000,9999999]
+
+skill:
+  - id: 8000001
+    name: 攻击
+    description: 通常攻击
+  - id: 8000002
+    name: 防御
+    description: 通常防御
+  - id: 8000003
+    name: 逃跑
+    description: 尝试逃离战斗
+  - id: 8000004
+    name: 捕获
+    description: 尝试捕获目标宠物
+  - id: 8000005
+    name: 换宠
+    description: 更换出战宠物
+  - id: 8000006
+    name: 使用道具
+    description: 使用道具
+  - id: 8000007
+    name: 更换装备
+    description: 更换装备
+  ##########
+  - id: 8100000
+    name: 待机
+    description: 待机
+  - id: 8100003
+    name: 破除防御
+    description: 破除防御
+  - id: 8100010
+    name: 连续攻击
+    description: 连续攻击
+    continuationAttack:
+      segmentCount: 2
+  - id: 8100011
+    name: 三段攻击
+    description: 三段攻击
+    continuationAttack:
+      segmentCount: 3
+  - id: 8100012
+    name: 四段攻击
+    description: T四段攻击
+    continuationAttack:
+      segmentCount: 4
+  - id: 8100013
+    name: 五段攻击
+    description: T五段攻击
+    continuationAttack:
+      segmentCount: 5
+  - id: 8100014
+    name: 六段攻击
+    description: 六段攻击
+    continuationAttack:
+      segmentCount: 6
+  - id: 8100015
+    name: 七段攻击
+    description: T七段攻击
+    continuationAttack:
+      segmentCount: 7
+  - id: 8100016
+    name: 八段攻击
+    description: T八段攻击
+    continuationAttack:
+      segmentCount: 8
+  - id: 8100017
+    name: 九段攻击
+    description: T九段攻击
+    continuationAttack:
+      segmentCount: 9
+  - id: 8100018
+    name: 十段攻击
+    description: T十段攻击
+    continuationAttack:
+      segmentCount: 10
