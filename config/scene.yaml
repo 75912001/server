@@ -2,13 +2,13 @@
 # 任何修改此文件的行为都需要通知客户端和服务端开发人员
 
 # enemyGroups[].id 引用 enemy.group.yaml 中的敌人组 ID.
-# enemyGroups[].weight 为自动遇敌选择敌人组的权重, 必须大于 0.
+# enemyGroups[].weight 为自动遇敌选择敌人组的权重; 0不占随机区间, 场景总权重必须大于0.
 
 scenes:
   - id: 2000001
     name: 场景一
     enemyGroups:
-      - id: 1
+      - id: 5
         weight: 100
 
   - id: 2000002
