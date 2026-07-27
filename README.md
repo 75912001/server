@@ -7,10 +7,10 @@
 To generate all files in `./proto/pb` (including `*.pb.go`, `*_grpc.pb.go`, and `*_grpc.x.pb.go`):
 
 ```bash
-python gen.py
+python 1.gen.py
 ```
 
-`gen.py` 会先汇总全部源 proto 中的 `//0xHEX#...` 注释, 校验命令值和消息名全局唯一, 再统一生成 `proto/cmd.proto` 中的 `MsgID` 枚举. 生成的 CMD 枚举值使用十进制数字, 注释保留原始十六进制命令号, 以同时兼容 `protoc` 和 sa.desktop 使用的 Godobuf 解析器.
+`1.gen.py` 会先汇总全部源 proto 中的 `//0xHEX#...` 注释, 校验命令值和消息名全局唯一, 再统一生成 `proto/cmd.proto` 中的 `MsgID` 枚举. 生成的 CMD 枚举值使用十进制数字, 注释保留原始十六进制命令号, 以同时兼容 `protoc` 和 sa.desktop 使用的 Godobuf 解析器.
 
 ```bash
 go get github.com/75912001/xlib@latest
