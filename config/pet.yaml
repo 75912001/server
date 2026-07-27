@@ -6,6 +6,7 @@
 ############################################################
 # enemyId: 关联 pet_growth_8_0.csv 中的 enemyId todo menglc 从中获取的数据
 # rarity 稀有度: 1-普通, 2-稀有, 3-史诗, 4-传说, 5-神话
+# bestiary 图鉴
 # elemental 元素属性: earth-土, water-水, fire-火, wind-风 [默认:0] (整数, 范围[0,10], 总和必须等于10) (要么是单元素, 要么是两个元素相邻, 可以首尾相邻)
 # attribute 属性: 允许负数
   ## poisonResist - 毒抗性
@@ -148,6 +149,7 @@ pet:
       sprite: 277
       enemyId: 54
       rarity: 2
+      bestiary: 7285
       elemental:
         earth: 10
       attribute:
@@ -184,6 +186,7 @@ pet:
       sprite: 278
       enemyId: 55
       rarity: 2
+      bestiary: 7286
       elemental:
         water: 3
         fire: 7
@@ -3121,6 +3124,7 @@ pet:
       sprite: 276
       enemyId: 53
       rarity: 1
+      bestiary: 7284
       elemental:
         earth: 8
         wind: 2
@@ -3193,6 +3197,7 @@ pet:
       sprite: 356
       enemyId: 478
       rarity: 1
+      bestiary: 126067
       elemental:
         earth: 5
         water: 5
