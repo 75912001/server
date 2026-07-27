@@ -270,19 +270,16 @@ message CombatEvent {
   uint32 segment_count = 35; // 本次攻击总段数, 当前普通攻击为 1
 }
 
-// CombatSettlementReward 保存战斗结算对一个单位产生的经验和资源变化.
-message CombatSettlementReward {
-  CombatUnitKey unit_key = 1; // 获得结算变化的单位
-  uint64 exp_delta = 2; // 本次获得经验
-  repeated CombatAssetDelta asset_change_list = 3; // 结算阶段产生的资源变化
+// CombatSettlementExpReward 保存一个单位实际获得的经验.
+message CombatSettlementExpReward {
+  CombatUnitKey unit_key = 1; // 获得经验的角色或宠物
+  uint64 exp_delta = 2; // 持久化后实际增加的经验; 必须大于 0
 }
 
-// CombatBattleSettlement 保存战斗结束原因、胜负单位和最终奖励结果.
+// CombatBattleSettlement 保存最终胜负和当前接收角色的经验奖励摘要.
 message CombatBattleSettlement {
-  CombatBattleEndReason end_reason = 1; // 战斗结束原因
-  repeated CombatUnitKey winner_unit_key_list = 2; // 胜利方单位
-  repeated CombatUnitKey loser_unit_key_list = 3; // 失败方单位
-  repeated CombatSettlementReward reward_list = 10; // 结算奖励或资源变化; 首版为空
+  CombatBattleResult battle_result = 1; // 最终胜负结果; 正式结算不得为 Unknown
+  repeated CombatSettlementExpReward exp_reward_list = 2; // 当前接收角色及其宠物的经验摘要; 仅用于展示
 }
 
 // CombatAutoEncounterSetReq 请求修改指定在线角色的内存级自动遇敌开关.
@@ -300,53 +297,11 @@ message CombatAutoEncounterSetRes {
   uint64 character_uuid = 3; // 已更新自动遇敌状态的角色 UUID
 }
 
-// CombatBattleStartNotify 通知战斗参与者创建战斗场景并进入首回合.
+// CombatBattleStartNotify 通知战斗参与者创建战斗场景.
 //0x100004#gateway->client#战斗开始-通知
 message CombatBattleStartNotify {
-  CombatBattleStart battle_start = 1; // 开战快照, 只包含战斗 ID 和初始可见单位
-  uint32 round = 2; // 当前回合号, 首回合固定为 1
-}
-
-// CombatAttackSkillArgument 只携带攻击技能声明的敌方目标.
-message CombatAttackSkillArgument {
-  CombatUnitKey target_key = 1; // 必须是本场战斗中存活的敌方单位
-}
-
-// CombatDefenseSkillArgument 显式表示本次技能不需要额外参数.
-message CombatDefenseSkillArgument {
-}
-
-// CombatStandbySkillArgument 显式表示宠物选择“什么也不做”的待机技能.
-message CombatStandbySkillArgument {
-}
-
-// CombatEscapeSkillArgument 显式表示角色尝试逃离战斗.
-message CombatEscapeSkillArgument {
-}
-
-// CombatNoGuardSkillArgument 显式表示宠物选择8.5的不防守战法.
-// 技能的闪避、反击和保留但未生效的会心百分比均由服务端pet.skill.yaml决定,
-// 请求不携带这些数值, 服务端结算也不从客户端输入读取战斗修正.
-message CombatNoGuardSkillArgument {
-}
-
-// CombatNoTargetSkillArgument显式表示主动技能不接受客户端目标.
-// 这类技能仍会执行真实战斗行为, 不能复用待机参数. 例如8.5针刺外皮的target=0,
-// 服务端会在技能执行时按BATTLE_TargetAdjust规则自动选择一个存活敌方单位.
-message CombatNoTargetSkillArgument {
-}
-
-// CombatSkillAction 是角色和宠物统一使用的回合技能输入.
-message CombatSkillAction {
-  uint32 skill_id = 1; // 必须属于出手单位并与argument类型匹配
-  oneof argument {
-    CombatAttackSkillArgument attack = 2; // 攻击技能参数
-    CombatDefenseSkillArgument defense = 3; // 防御技能空参数
-    CombatStandbySkillArgument standby = 4; // 宠物待机技能空参数
-    CombatEscapeSkillArgument escape = 5; // 角色逃离技能空参数
-    CombatNoGuardSkillArgument no_guard = 6; // 宠物不防守战法空参数
-    CombatNoTargetSkillArgument no_target = 7; // 不接受客户端目标的主动技能空参数
-  }
+  string battle_id = 1; // 战斗唯一 UUID 字符串
+  repeated CombatUnit unit_list = 10; // 开战时场上可见单位列表
 }
 
 // CombatRoundActionReq 提交一个玩家可控单位在指定战斗回合中的技能选择.
@@ -355,7 +310,11 @@ message CombatRoundActionReq {
   string battle_id = 1; // 战斗唯一 UUID 字符串
   uint32 round = 2; // 客户端提交的回合号
   CombatUnitKey unit_key = 3; // 本次提交技能的出手单位
-  CombatSkillAction action = 4; // 技能ID和与该技能匹配的参数
+  uint32 skill_id = 4; // 必须属于出手单位, 服务端按技能ID解析参数
+  CombatUnitKey arg_target_unit = 5; // 技能-需要单位目标时填写
+  CombatCamp arg_target_camp = 6; // 技能-需要阵营目标时填写
+  EquipmentType arg_equipment_type = 7; // 技能换装-操作的装备部位
+  uint64 arg_equipment_uuid = 8; // 技能换装-使用的背包装备实例 UUID; 0 表示仅卸装
 }
 
 // CombatRoundActionRes 确认服务端已接受指定单位在当前回合的动作.
@@ -370,10 +329,9 @@ message CombatRoundActionRes {
 //0x100008#gateway->client#战斗回合结果-通知
 message CombatRoundResultNotify {
   string battle_id = 1; // 战斗唯一 UUID 字符串
-  uint32 round = 2; // 已结算的回合号
+  uint32 round = 2; // 结算的回合号
   repeated CombatEvent event_list = 10; // 客户端按列表和事件内效果顺序播放的完整本回合表现
-  bool battle_finished = 20; // 本回合结算后战斗是否已经结束
-  CombatBattleSettlement settlement = 21; // battle_finished=true 时携带战斗结算数据
+  CombatBattleSettlement settlement = 21; // 仅战斗结束时携带; 字段存在即表示战斗结束
 }
 
 // CombatFlowCompleteReq 表示客户端已播放全部战斗动画并回到可继续遇敌的非战斗场景.
