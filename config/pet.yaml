@@ -180,7 +180,6 @@ pet:
       habitat: 琉璃洞窟 6X等. 无名洞地下3楼 8X等
       level1Spawn: 五兄弟任务取得、琉璃洞窟13楼
       description: 绿人龙，作梦都想偷走蓝人龙的戒指，坚称自己的利则恩首饰才是超热门的抢手货
-  ############################################################
     - id: 4000278
       name: 扬奇洛斯
       sprite: 278
@@ -218,12 +217,12 @@ pet:
       habitat: 达那村外 4X等. 漆黑洞窟 8X等
       level1Spawn: 五兄弟任务取得. 扬奇洛斯乘礼盒. 吉鲁岛(490.78)~(529.108)
       description: 蓝人龙，骑宠，虽然跟蓝正龙只差一个字，但蓝人龙相信自己肯定比蓝正龙帅
-  ############################################################
     - id: 4000279
       name: 邦浦洛斯
       sprite: 279
       enemyId: 56
       rarity: 2
+      bestiary: 7287
       elemental:
         fire: 5
         wind: 5
@@ -255,12 +254,12 @@ pet:
       habitat: 福尔德村上方 4X等. 漆黑洞窟 9X等
       level1Spawn: 五兄弟任务取得
       description: 为了追上黄人龙的音乐技巧，每天都努力的吹奏浦洛斯的笛，但因为很难听常常被骂...
-   ############################################################
     - id: 4000280
       name: 邦奇诺
       sprite: 280
       enemyId: 57
       rarity: 2
+      bestiary: 7288
       elemental:
         fire: 10
       attribute:
@@ -291,12 +290,12 @@ pet:
       habitat: 达那村外 4X等. 无名洞地下2楼 8X等
       level1Spawn: 五兄弟任务取得、吉鲁岛(441.104)(448.105)
       description: 红人龙，五兄弟之中攻击力最高的一个，专门打飞不长眼，最喜欢把自己的手环拿来玩套圈圈
-          ############################################################
     - id: 4000360
       name: 布鲁顿
       sprite: 360
       enemyId: 481
       rarity: 2
+      bestiary: 7289
       elemental:
         fire: 2
         wind: 8
@@ -328,12 +327,12 @@ pet:
       habitat: 达那村外 4X等. 无名洞地下2楼 8X等
       level1Spawn: 五兄弟任务取得
       description: 黄人龙,最喜欢做的事情是玩音乐,虽然现在大多数人都玩吉他,BASS但黄人龙依然喜欢最竖琴
-  ############################################################
     - id: 4000613
       name: 邦诺斯娜
       sprite: 613
       enemyId: 1588
       rarity: 2
+      bestiary: 126302
       elemental:
         fire: 8
         wind: 2
@@ -365,12 +364,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-  ############################################################
     - id: 4000614
       name: 杨格斯
       sprite: 614
       enemyId: 1660
       rarity: 2
+      bestiary: 126303
       elemental:
         fire: 8
         wind: 2
@@ -402,12 +401,12 @@ pet:
       habitat: 伊甸园火城火山洞窑四楼(29,14)
       level1Spawn: 黑色魅惑箱II(绝版)
       description: 黑人龙，平常最喜欢做的事情就是比中指，不解释自看图
-  ############################################################
     - id: 4000615
       name: 迪基格斯
       sprite: 615
       enemyId: 1589
       rarity: 2
+      bestiary: 126304
       elemental:
         earth: 2
         water: 8
@@ -439,12 +438,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4001503
       name: 帖伊诺斯
       sprite: 1503
       enemyId: 2546
       rarity: 4
+      bestiary: 343595
       elemental:
         fire: 5
         wind: 5
@@ -476,12 +475,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4001504
       name: 利则诺顿改
       sprite: 1504
       enemyId: 2670
       rarity: 3
+      bestiary: 343596
       elemental:
         earth: 10
       attribute:
@@ -512,13 +511,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
-    ############################################################
     - id: 4001505
       name: 扬奇洛斯改
       sprite: 1505
       enemyId: 2671
       rarity: 3
+      bestiary: 343597
       elemental:
         water: 3
         fire: 7
@@ -550,12 +548,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4001506
       name: 邦奇诺改
       sprite: 1506
       enemyId: 2673
       rarity: 3
+      bestiary: 343598
       elemental:
         fire: 10
       attribute:
@@ -586,12 +584,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4001507
       name: 布鲁顿改
       sprite: 1507
       enemyId: 2674
       rarity: 3
+      bestiary: 343599
       elemental:
         fire: 2
         wind: 8
@@ -623,12 +621,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4001564
       name: 邦浦洛斯改
       sprite: 1564
       enemyId: 2672
       rarity: 3
+      bestiary: 349333
       elemental:
         fire: 5
         wind: 5
@@ -669,6 +667,7 @@ pet:
       sprite: 301
       enemyId: 307
       rarity: 2
+      bestiary: 7311
       elemental:
         earth: 6
         water: 4
@@ -700,12 +699,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000302
       name: 贝鲁伊卡
       sprite: 302
       enemyId: 308
       rarity: 2
+      bestiary: 7312
       elemental:
         fire: 3
         wind: 7
@@ -737,12 +736,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000303
       name: 格鲁西斯
       sprite: 303
       enemyId: 309
       rarity: 2
+      bestiary: 7313
       elemental:
         fire: 8
         wind: 2
@@ -774,12 +773,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000304
       name: 金格萨贝鲁
       sprite: 304
       enemyId: 310
       rarity: 3
+      bestiary: 7314
       elemental:
         earth: 3
         wind: 7
@@ -811,12 +810,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000635
       name: 普鲁夏
       sprite: 635
       enemyId: 1609
       rarity: 2
+      bestiary: 126324
       elemental:
         earth: 3
         water: 7
@@ -848,12 +847,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000636
       name: 佩露夏
       sprite: 636
       enemyId: 1610
       rarity: 5
+      bestiary: 126325
       elemental:
         water: 10
       attribute:
@@ -884,12 +883,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000637
       name: 萨格鲁
       sprite: 637
       enemyId: 1611
       rarity: 2
+      bestiary: 126326
       elemental:
         water: 5
         fire: 5
@@ -921,12 +920,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000638
       name: 玛斯贝卡
       sprite: 638
       enemyId: 1612
       rarity: 2
+      bestiary: 126327
       elemental:
         fire: 5
         wind: 5
@@ -967,6 +966,7 @@ pet:
       sprite: 337
       enemyId: 350
       rarity: 2
+      bestiary: 7348
       elemental:
         earth: 6
         water: 4
@@ -998,12 +998,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000338
       name: 左迪洛斯
       sprite: 338
       enemyId: 351
       rarity: 3
+      bestiary: 7349
       elemental:
         water: 8
         fire: 2
@@ -1035,12 +1035,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000339
       name: 巴朵兰恩
       sprite: 339
       enemyId: 352
       rarity: 3
+      bestiary: 7350
       elemental:
         water: 2
         fire: 8
@@ -1072,12 +1072,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000340
       name: 帖拉所伊朵
       sprite: 340
       enemyId: 353
       rarity: 4
+      bestiary: 7351
       elemental:
         fire: 5
         wind: 5
@@ -1109,12 +1109,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000670
       name: 朵巴奈特
       sprite: 670
       enemyId: 1644
       rarity: 3
+      bestiary: 126359
       elemental:
         fire: 4
         wind: 6
@@ -1146,12 +1146,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000671
       name: 斑尼迪克
       sprite: 671
       enemyId: 1645
       rarity: 4
+      bestiary: 126360
       elemental:
         fire: 1
         wind: 9
@@ -1183,12 +1183,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000672
       name: 阿米朵
       sprite: 672
       enemyId: 1646
       rarity: 3
+      bestiary: 126361
       elemental:
         earth: 4
         wind: 6
@@ -1220,12 +1220,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
     - id: 4000673
       name: 邦司凉朵
       sprite: 673
       enemyId: 1647
       rarity: 3
+      bestiary: 126362
       elemental:
         water: 10
       attribute:
@@ -1256,7 +1256,6 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-    ############################################################
 
   # 加美系
   加美系:
@@ -1266,6 +1265,7 @@ pet:
       sprite: 249
       enemyId: 21
       rarity: 1
+      bestiary: 7256
       elemental:
         fire: 6
         wind: 4
@@ -1302,6 +1302,7 @@ pet:
       sprite: 250
       enemyId: 25
       rarity: 1
+      bestiary: 7257
       elemental:
         earth: 5
         wind: 5
@@ -1338,6 +1339,7 @@ pet:
       sprite: 251
       enemyId: 26
       rarity: 1
+      bestiary: 7258
       elemental:
         wind: 10
       attribute:
@@ -1373,6 +1375,7 @@ pet:
       sprite: 252
       enemyId: 27
       rarity: 1
+      bestiary: 7259
       elemental:
         fire: 3
         wind: 7
@@ -1409,6 +1412,7 @@ pet:
       sprite: 590
       enemyId: 1564
       rarity: 1
+      bestiary: 126279
       elemental:
         earth: 6
         water: 4
@@ -1445,6 +1449,7 @@ pet:
       sprite: 591
       enemyId: 1565
       rarity: 1
+      bestiary: 126280
       elemental:
         fire: 8
         wind: 2
@@ -1481,6 +1486,7 @@ pet:
       sprite: 592
       enemyId: 1566
       rarity: 1
+      bestiary: 126281
       elemental:
         water: 6
         fire: 4
@@ -1517,6 +1523,7 @@ pet:
       sprite: 593
       enemyId: 1568
       rarity: 1
+      bestiary: 126282
       elemental:
         earth: 4
         water: 6
@@ -1557,6 +1564,7 @@ pet:
       sprite: 253
       enemyId: 28
       rarity: 1
+      bestiary: 7260
       elemental:
         earth: 3
         wind: 7
@@ -1593,6 +1601,7 @@ pet:
       sprite: 254
       enemyId: 29
       rarity: 1
+      bestiary: 7261
       elemental:
         fire: 6
         wind: 4
@@ -1629,6 +1638,7 @@ pet:
       sprite: 255
       enemyId: 30
       rarity: 1
+      bestiary: 7262
       elemental:
         earth: 3
         water: 7
@@ -1665,6 +1675,7 @@ pet:
       sprite: 256
       enemyId: 4
       rarity: 1
+      bestiary: 7263
       elemental:
         earth: 6
         wind: 4
@@ -1701,6 +1712,7 @@ pet:
       sprite: 594
       enemyId: 1569
       rarity: 1
+      bestiary: 126283
       elemental:
         fire: 8
         wind: 2
@@ -1737,6 +1749,7 @@ pet:
       sprite: 595
       enemyId: 1570
       rarity: 1
+      bestiary: 126284
       elemental:
         water: 8
         fire: 2
@@ -1773,6 +1786,7 @@ pet:
       sprite: 596
       enemyId: 1571
       rarity: 1
+      bestiary: 126285
       elemental:
         fire: 3
         wind: 7
@@ -1809,6 +1823,7 @@ pet:
       sprite: 597
       enemyId: 1572
       rarity: 1
+      bestiary: 126286
       elemental:
         earth: 9
         wind: 1
@@ -1849,6 +1864,7 @@ pet:
       sprite: 257
       enemyId: 32
       rarity: 1
+      bestiary: 7264
       elemental:
         water: 10
       attribute:
@@ -1884,6 +1900,7 @@ pet:
       sprite: 258
       enemyId: 33
       rarity: 1
+      bestiary: 7265
       elemental:
         earth: 7
         water: 3
@@ -1920,6 +1937,7 @@ pet:
       sprite: 259
       enemyId: 34
       rarity: 1
+      bestiary: 7266
       elemental:
         earth: 3
         water: 7
@@ -1956,6 +1974,7 @@ pet:
       sprite: 260
       enemyId: 35
       rarity: 1
+      bestiary: 7267
       elemental:
         water: 3
         fire: 7
@@ -1992,6 +2011,7 @@ pet:
       sprite: 598
       enemyId: 1573
       rarity: 1
+      bestiary: 126287
       elemental:
         fire: 4
         wind: 6
@@ -2023,12 +2043,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000599
       name: 贝洛格
       sprite: 599
       enemyId: 1574
       rarity: 1
+      bestiary: 126288
       elemental:
         earth: 8
         water: 2
@@ -2065,6 +2085,7 @@ pet:
       sprite: 600
       enemyId: 1575
       rarity: 1
+      bestiary: 126289
       elemental:
         earth: 7
         wind: 3
@@ -2101,6 +2122,7 @@ pet:
       sprite: 601
       enemyId: 1576
       rarity: 1
+      bestiary: 126290
       elemental:
         water: 5
         fire: 5
@@ -2141,6 +2163,7 @@ pet:
       sprite: 261
       enemyId: 36
       rarity: 1
+      bestiary: 7268
       elemental:
         earth: 3
         wind: 7
@@ -2177,6 +2200,7 @@ pet:
       sprite: 262
       enemyId: 37
       rarity: 1
+      bestiary: 7269
       elemental:
         earth: 6
         wind: 4
@@ -2213,6 +2237,7 @@ pet:
       sprite: 263
       enemyId: 38
       rarity: 1
+      bestiary: 7270
       elemental:
         fire: 8
         wind: 2
@@ -2249,6 +2274,7 @@ pet:
       sprite: 264
       enemyId: 39
       rarity: 1
+      bestiary: 7271
       elemental:
         earth: 9
         wind: 1
@@ -2285,6 +2311,7 @@ pet:
       sprite: 602
       enemyId: 1577
       rarity: 1
+      bestiary: 126291
       elemental:
         water: 10
       attribute:
@@ -2320,6 +2347,7 @@ pet:
       sprite: 603
       enemyId: 1578
       rarity: 1
+      bestiary: 126292
       elemental:
         earth: 7
         wind: 3
@@ -2356,6 +2384,7 @@ pet:
       sprite: 604
       enemyId: 1579
       rarity: 1
+      bestiary: 126293
       elemental:
         fire: 4
         wind: 6
@@ -2387,12 +2416,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000605
       name: 卡拉龟
       sprite: 605
       enemyId: 1580
       rarity: 1
+      bestiary: 126294
       elemental:
         earth: 4
         water: 6
@@ -2433,6 +2462,7 @@ pet:
       sprite: 265
       enemyId: 42
       rarity: 1
+      bestiary: 7273
       elemental:
         water: 3
         fire: 7
@@ -2464,12 +2494,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000266
       name: 尼可斯
       sprite: 266
       enemyId: 43
       rarity: 1
+      bestiary: 7272
       elemental:
         earth: 4
         water: 6
@@ -2506,6 +2536,7 @@ pet:
       sprite: 267
       enemyId: 44
       rarity: 1
+      bestiary: 7274
       elemental:
         earth: 7
         wind: 3
@@ -2542,6 +2573,7 @@ pet:
       sprite: 268
       enemyId: 45
       rarity: 1
+      bestiary: 7275
       elemental:
         water: 8
         fire: 2
@@ -2578,6 +2610,7 @@ pet:
       sprite: 359
       enemyId: 476
       rarity: 1
+      bestiary: 7276
       elemental:
         fire: 2
         wind: 8
@@ -2614,6 +2647,7 @@ pet:
       sprite: 606
       enemyId: 1581
       rarity: 1
+      bestiary: 126295
       elemental:
         earth: 4
         wind: 6
@@ -2650,6 +2684,7 @@ pet:
       sprite: 607
       enemyId: 1582
       rarity: 1
+      bestiary: 126296
       elemental:
         earth: 7
         water: 3
@@ -2686,6 +2721,7 @@ pet:
       sprite: 608
       enemyId: 1583
       rarity: 1
+      bestiary: 126297
       elemental:
         water: 5
         fire: 5
@@ -2726,6 +2762,7 @@ pet:
       sprite: 269
       enemyId: 46
       rarity: 1
+      bestiary: 7277
       elemental:
         fire: 10
       attribute:
@@ -2761,6 +2798,7 @@ pet:
       sprite: 270
       enemyId: 47
       rarity: 1
+      bestiary: 7278
       elemental:
         fire: 6
         wind: 4
@@ -2797,6 +2835,7 @@ pet:
       sprite: 271
       enemyId: 48
       rarity: 1
+      bestiary: 7279
       elemental:
         earth: 6
         wind: 4
@@ -2833,6 +2872,7 @@ pet:
       sprite: 272
       enemyId: 49
       rarity: 1
+      bestiary: 7280
       elemental:
         earth: 10
       attribute:
@@ -2868,6 +2908,7 @@ pet:
       sprite: 609
       enemyId: 1584
       rarity: 1
+      bestiary: 126298
       elemental:
         water: 8
         fire: 2
@@ -2904,6 +2945,7 @@ pet:
       sprite: 610
       enemyId: 1585
       rarity: 1
+      bestiary: 126299
       elemental:
         fire: 3
         wind: 7
@@ -2940,6 +2982,7 @@ pet:
       sprite: 611
       enemyId: 1586
       rarity: 1
+      bestiary: 126300
       elemental:
         earth: 8
         water: 2
@@ -2971,12 +3014,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000612
       name: 拉奇斯斯
       sprite: 612
       enemyId: 1587
       rarity: 1
+      bestiary: 126301
       elemental:
         earth: 3
         wind: 7
@@ -3017,6 +3060,7 @@ pet:
       sprite: 273
       enemyId: 50
       rarity: 1
+      bestiary: 7281
       elemental:
         earth: 10
       attribute:
@@ -3052,6 +3096,7 @@ pet:
       sprite: 274
       enemyId: 51
       rarity: 1
+      bestiary: 7282
       elemental:
         earth: 8
         water: 2
@@ -3088,6 +3133,7 @@ pet:
       sprite: 275
       enemyId: 52
       rarity: 1
+      bestiary: 7283
       elemental:
         water: 4
         fire: 6
@@ -3161,6 +3207,7 @@ pet:
       sprite: 355
       enemyId: 477
       rarity: 1
+      bestiary: 126222
       elemental:
         earth: 5
         wind: 5
@@ -3229,12 +3276,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000357
       name: 格洛格鲁
       sprite: 357
       enemyId: 479
       rarity: 1
+      bestiary: 126224
       elemental:
         water: 6
         fire: 4
@@ -3271,6 +3318,7 @@ pet:
       sprite: 358
       enemyId: 480
       rarity: 1
+      bestiary: 126225
       elemental:
         earth: 2
         wind: 8
@@ -3311,6 +3359,7 @@ pet:
       sprite: 281
       enemyId: 58
       rarity: 1
+      bestiary: 7290
       elemental:
         earth: 6
         water: 4
@@ -3347,6 +3396,7 @@ pet:
       sprite: 282
       enemyId: 3
       rarity: 1
+      bestiary: 7291
       elemental:
         water: 7
         fire: 3
@@ -3383,6 +3433,7 @@ pet:
       sprite: 283
       enemyId: 60
       rarity: 1
+      bestiary: 7292
       elemental:
         water: 4
         fire: 6
@@ -3419,6 +3470,7 @@ pet:
       sprite: 284
       enemyId: 61
       rarity: 1
+      bestiary: 7293
       elemental:
         earth: 2
         water: 8
@@ -3450,12 +3502,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000616
       name: 克拉尔
       sprite: 616
       enemyId: 1590
       rarity: 1
+      bestiary: 126305
       elemental:
         fire: 2
         wind: 8
@@ -3492,6 +3544,7 @@ pet:
       sprite: 617
       enemyId: 1591
       rarity: 1
+      bestiary: 126306
       elemental:
         fire: 6
         wind: 4
@@ -3528,6 +3581,7 @@ pet:
       sprite: 618
       enemyId: 1592
       rarity: 1
+      bestiary: 126307
       elemental:
         water: 10
       attribute:
@@ -3563,6 +3617,7 @@ pet:
       sprite: 619
       enemyId: 1593
       rarity: 1
+      bestiary: 126308
       elemental:
         earth: 6
         wind: 4
@@ -3603,6 +3658,7 @@ pet:
       sprite: 285
       enemyId: 62
       rarity: 1
+      bestiary: 7294
       elemental:
         fire: 7
         wind: 3
@@ -3639,6 +3695,7 @@ pet:
       sprite: 286
       enemyId: 2
       rarity: 1
+      bestiary: 7295
       elemental:
         earth: 2
         wind: 8
@@ -3675,6 +3732,7 @@ pet:
       sprite: 287
       enemyId: 64
       rarity: 1
+      bestiary: 7296
       elemental:
         fire: 5
         wind: 5
@@ -3711,6 +3769,7 @@ pet:
       sprite: 288
       enemyId: 65
       rarity: 1
+      bestiary: 7297
       elemental:
         wind: 10
       attribute:
@@ -3746,6 +3805,7 @@ pet:
       sprite: 620
       enemyId: 1594
       rarity: 1
+      bestiary: 126309
       elemental:
         earth: 2
         water: 8
@@ -3782,6 +3842,7 @@ pet:
       sprite: 621
       enemyId: 1595
       rarity: 1
+      bestiary: 126310
       elemental:
         earth: 6
         water: 4
@@ -3818,6 +3879,7 @@ pet:
       sprite: 622
       enemyId: 1596
       rarity: 1
+      bestiary: 126311
       elemental:
         fire: 8
         wind: 2
@@ -3849,12 +3911,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000623
       name: 可卡特
       sprite: 623
       enemyId: 1597
       rarity: 1
+      bestiary: 126312
       elemental:
         earth: 8
         wind: 2
@@ -3895,6 +3957,7 @@ pet:
       sprite: 289
       enemyId: 75
       rarity: 1
+      bestiary: 7298
       elemental:
         earth: 10
       attribute:
@@ -3930,6 +3993,7 @@ pet:
       sprite: 290
       enemyId: 76
       rarity: 1
+      bestiary: 7299
       elemental:
         earth: 8
         water: 2
@@ -3966,6 +4030,7 @@ pet:
       sprite: 291
       enemyId: 77
       rarity: 1
+      bestiary: 7300
       elemental:
         water: 3
         fire: 7
@@ -3997,12 +4062,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000292
       name: 格尔格
       sprite: 292
       enemyId: 78
       rarity: 1
+      bestiary: 7301
       elemental:
         fire: 9
         wind: 1
@@ -4039,6 +4104,7 @@ pet:
       sprite: 624
       enemyId: 1598
       rarity: 1
+      bestiary: 126313
       elemental:
         earth: 7
         water: 3
@@ -4075,6 +4141,7 @@ pet:
       sprite: 625
       enemyId: 1599
       rarity: 1
+      bestiary: 126314
       elemental:
         water: 8
         fire: 2
@@ -4111,6 +4178,7 @@ pet:
       sprite: 626
       enemyId: 1600
       rarity: 1
+      bestiary: 126315
       elemental:
         earth: 10
       attribute:
@@ -4146,6 +4214,7 @@ pet:
       sprite: 627
       enemyId: 1601
       rarity: 1
+      bestiary: 126316
       elemental:
         fire: 2
         wind: 8
@@ -4186,6 +4255,7 @@ pet:
       sprite: 293
       enemyId: 93
       rarity: 1
+      bestiary: 7302
       elemental:
         earth: 8
         water: 2
@@ -4222,6 +4292,7 @@ pet:
       sprite: 294
       enemyId: 94
       rarity: 1
+      bestiary: 7303
       elemental:
         earth: 3
         water: 7
@@ -4258,6 +4329,7 @@ pet:
       sprite: 295
       enemyId: 95
       rarity: 1
+      bestiary: 7304
       elemental:
         water: 5
         fire: 5
@@ -4294,6 +4366,7 @@ pet:
       sprite: 296
       enemyId: 96
       rarity: 1
+      bestiary: 7305
       elemental:
         water: 3
         fire: 7
@@ -4330,6 +4403,7 @@ pet:
       sprite: 361
       enemyId: 482
       rarity: 1
+      bestiary: 7306
       elemental:
         fire: 4
         wind: 6
@@ -4366,6 +4440,7 @@ pet:
       sprite: 628
       enemyId: 1602
       rarity: 1
+      bestiary: 126317
       elemental:
         water: 10
       attribute:
@@ -4396,12 +4471,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000629
       name: 瑞德宝
       sprite: 629
       enemyId: 1603
       rarity: 1
+      bestiary: 126318
       elemental:
         fire: 10
       attribute:
@@ -4437,6 +4512,7 @@ pet:
       sprite: 630
       enemyId: 1604
       rarity: 1
+      bestiary: 126319
       elemental:
         earth: 3
         wind: 7
@@ -4477,6 +4553,7 @@ pet:
       sprite: 297
       enemyId: 303
       rarity: 1
+      bestiary: 7307
       elemental:
         earth: 3
         water: 7
@@ -4513,6 +4590,7 @@ pet:
       sprite: 298
       enemyId: 304
       rarity: 1
+      bestiary: 7308
       elemental:
         fire: 4
         wind: 6
@@ -4549,6 +4627,7 @@ pet:
       sprite: 299
       enemyId: 305
       rarity: 1
+      bestiary: 7309
       elemental:
         earth: 2
         wind: 8
@@ -4580,12 +4659,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000300
       name: 卡拉卡利
       sprite: 300
       enemyId: 306
       rarity: 1
+      bestiary: 7310
       elemental:
         earth: 7
         wind: 3
@@ -4622,6 +4701,7 @@ pet:
       sprite: 631
       enemyId: 1605
       rarity: 1
+      bestiary: 126320
       elemental:
         fire: 6
         wind: 4
@@ -4658,6 +4738,7 @@ pet:
       sprite: 632
       enemyId: 1606
       rarity: 1
+      bestiary: 126321
       elemental:
         earth: 5
         water: 5
@@ -4694,6 +4775,7 @@ pet:
       sprite: 633
       enemyId: 1607
       rarity: 1
+      bestiary: 126322
       elemental:
         fire: 10
       attribute:
@@ -4729,6 +4811,7 @@ pet:
       sprite: 634
       enemyId: 1608
       rarity: 1
+      bestiary: 126323
       elemental:
         earth: 9
         water: 1
@@ -4769,6 +4852,7 @@ pet:
       sprite: 305
       enemyId: 315
       rarity: 1
+      bestiary: 7315
       elemental:
         water: 3
         fire: 7
@@ -4805,6 +4889,7 @@ pet:
       sprite: 306
       enemyId: 316
       rarity: 1
+      bestiary: 7316
       elemental:
         earth: 2
         water: 8
@@ -4841,6 +4926,7 @@ pet:
       sprite: 307
       enemyId: 317
       rarity: 1
+      bestiary: 7317
       elemental:
         earth: 7
         water: 3
@@ -4877,6 +4963,7 @@ pet:
       sprite: 308
       enemyId: 318
       rarity: 1
+      bestiary: 7318
       elemental:
         earth: 10
       attribute:
@@ -4912,6 +4999,7 @@ pet:
       sprite: 639
       enemyId: 1613
       rarity: 1
+      bestiary: 126328
       elemental:
         water: 5
         fire: 5
@@ -4943,12 +5031,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000640
       name: 加耶布斯
       sprite: 640
       enemyId: 1614
       rarity: 1
+      bestiary: 126329
       elemental:
         wind: 10
       attribute:
@@ -4984,6 +5072,7 @@ pet:
       sprite: 641
       enemyId: 1615
       rarity: 1
+      bestiary: 126330
       elemental:
         water: 10
       attribute:
@@ -5019,6 +5108,7 @@ pet:
       sprite: 642
       enemyId: 1616
       rarity: 1
+      bestiary: 126331
       elemental:
         earth: 6
         wind: 4
@@ -5059,6 +5149,7 @@ pet:
       sprite: 309
       enemyId: 319
       rarity: 1
+      bestiary: 7319
       elemental:
         earth: 4
         water: 6
@@ -5095,6 +5186,7 @@ pet:
       sprite: 310
       enemyId: 320
       rarity: 1
+      bestiary: 7320
       elemental:
         water: 5
         fire: 5
@@ -5131,6 +5223,7 @@ pet:
       sprite: 311
       enemyId: 321
       rarity: 1
+      bestiary: 7321
       elemental:
         water: 10
       attribute:
@@ -5166,6 +5259,7 @@ pet:
       sprite: 312
       enemyId: 322
       rarity: 1
+      bestiary: 7322
       elemental:
         earth: 2
         water: 8
@@ -5197,12 +5291,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000643
       name: 迪加
       sprite: 643
       enemyId: 1617
       rarity: 1
+      bestiary: 126332
       elemental:
         water: 8
         fire: 2
@@ -5239,6 +5333,7 @@ pet:
       sprite: 644
       enemyId: 1618
       rarity: 1
+      bestiary: 126333
       elemental:
         water: 2
         fire: 8
@@ -5275,6 +5370,7 @@ pet:
       sprite: 645
       enemyId: 1619
       rarity: 1
+      bestiary: 126334
       elemental:
         earth: 8
         water: 2
@@ -5311,6 +5407,7 @@ pet:
       sprite: 646
       enemyId: 1620
       rarity: 1
+      bestiary: 126335
       elemental:
         fire: 2
         wind: 8
@@ -5351,6 +5448,7 @@ pet:
       sprite: 313
       enemyId: 323
       rarity: 1
+      bestiary: 7323
       elemental:
         earth: 3
         wind: 7
@@ -5387,6 +5485,7 @@ pet:
       sprite: 314
       enemyId: 324
       rarity: 1
+      bestiary: 7324
       elemental:
         earth: 4
         water: 6
@@ -5423,6 +5522,7 @@ pet:
       sprite: 315
       enemyId: 367
       rarity: 1
+      bestiary: 7325
       elemental:
         fire: 3
         wind: 7
@@ -5459,6 +5559,7 @@ pet:
       sprite: 316
       enemyId: 325
       rarity: 1
+      bestiary: 7326
       elemental:
         water: 2
         fire: 8
@@ -5495,6 +5596,7 @@ pet:
       sprite: 647
       enemyId: 1621
       rarity: 1
+      bestiary: 126336
       elemental:
         earth: 7
         water: 3
@@ -5531,6 +5633,7 @@ pet:
       sprite: 648
       enemyId: 1622
       rarity: 1
+      bestiary: 126337
       elemental:
         earth: 5
         wind: 5
@@ -5567,6 +5670,7 @@ pet:
       sprite: 649
       enemyId: 1623
       rarity: 1
+      bestiary: 126338
       elemental:
         earth: 2
         wind: 8
@@ -5603,6 +5707,7 @@ pet:
       sprite: 650
       enemyId: 1624
       rarity: 1
+      bestiary: 126339
       elemental:
         earth: 10
       attribute:
@@ -5642,6 +5747,7 @@ pet:
       sprite: 317
       enemyId: 326
       rarity: 1
+      bestiary: 7327
       elemental:
         water: 8
         fire: 2
@@ -5673,12 +5779,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000318
       name: 姆伊
       sprite: 318
       enemyId: 301
       rarity: 1
+      bestiary: 7328
       elemental:
         water: 10
       attribute:
@@ -5714,6 +5820,7 @@ pet:
       sprite: 319
       enemyId: 328
       rarity: 1
+      bestiary: 7329
       elemental:
         earth: 2
         water: 8
@@ -5750,6 +5857,7 @@ pet:
       sprite: 320
       enemyId: 329
       rarity: 1
+      bestiary: 7330
       elemental:
         water: 5
         fire: 5
@@ -5786,6 +5894,7 @@ pet:
       sprite: 651
       enemyId: 1625
       rarity: 1
+      bestiary: 126340
       elemental:
         earth: 8
         wind: 2
@@ -5822,6 +5931,7 @@ pet:
       sprite: 652
       enemyId: 1626
       rarity: 1
+      bestiary: 126341
       elemental:
         water: 7
         fire: 3
@@ -5858,6 +5968,7 @@ pet:
       sprite: 653
       enemyId: 1627
       rarity: 1
+      bestiary: 126342
       elemental:
         earth: 7
         water: 3
@@ -5894,6 +6005,7 @@ pet:
       sprite: 654
       enemyId: 1628
       rarity: 1
+      bestiary: 126343
       elemental:
         fire: 6
         wind: 4
@@ -5934,6 +6046,7 @@ pet:
       sprite: 321
       enemyId: 330
       rarity: 1
+      bestiary: 7331
       elemental:
         earth: 9
         water: 1
@@ -5970,6 +6083,7 @@ pet:
       sprite: 322
       enemyId: 331
       rarity: 1
+      bestiary: 7332
       elemental:
         earth: 3
         water: 7
@@ -6006,6 +6120,7 @@ pet:
       sprite: 323
       enemyId: 332
       rarity: 1
+      bestiary: 7333
       elemental:
         water: 2
         fire: 8
@@ -6042,6 +6157,7 @@ pet:
       sprite: 324
       enemyId: 333
       rarity: 1
+      bestiary: 7334
       elemental:
         earth: 5
         water: 5
@@ -6078,6 +6194,7 @@ pet:
       sprite: 362
       enemyId: 483
       rarity: 1
+      bestiary: 7335
       elemental:
         fire: 2
         wind: 8
@@ -6109,12 +6226,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000655
       name: 嘎吱拉
       sprite: 655
       enemyId: 1629
       rarity: 1
+      bestiary: 126344
       elemental:
         earth: 5
         water: 5
@@ -6151,6 +6268,7 @@ pet:
       sprite: 656
       enemyId: 1630
       rarity: 1
+      bestiary: 126345
       elemental:
         earth: 8
         wind: 2
@@ -6187,6 +6305,7 @@ pet:
       sprite: 657
       enemyId: 1631
       rarity: 1
+      bestiary: 126346
       elemental:
         earth: 5
         wind: 5
@@ -6227,6 +6346,7 @@ pet:
       sprite: 325
       enemyId: 334
       rarity: 1
+      bestiary: 7336
       elemental:
         earth: 9
         water: 1
@@ -6263,6 +6383,7 @@ pet:
       sprite: 326
       enemyId: 335
       rarity: 1
+      bestiary: 7337
       elemental:
         water: 2
         fire: 8
@@ -6299,6 +6420,7 @@ pet:
       sprite: 327
       enemyId: 336
       rarity: 1
+      bestiary: 7338
       elemental:
         earth: 7
         water: 3
@@ -6330,12 +6452,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000328
       name: 玛恩摩洛斯
       sprite: 328
       enemyId: 337
       rarity: 1
+      bestiary: 7339
       elemental:
         water: 5
         fire: 5
@@ -6372,6 +6494,7 @@ pet:
       sprite: 658
       enemyId: 1632
       rarity: 1
+      bestiary: 126347
       elemental:
         earth: 8
         wind: 2
@@ -6408,6 +6531,7 @@ pet:
       sprite: 659
       enemyId: 1633
       rarity: 1
+      bestiary: 126348
       elemental:
         earth: 2
         water: 8
@@ -6444,6 +6568,7 @@ pet:
       sprite: 660
       enemyId: 1634
       rarity: 1
+      bestiary: 126349
       elemental:
         earth: 10
       attribute:
@@ -6479,6 +6604,7 @@ pet:
       sprite: 661
       enemyId: 1635
       rarity: 1
+      bestiary: 126350
       elemental:
         earth: 5
         water: 5
@@ -6519,6 +6645,7 @@ pet:
       sprite: 329
       enemyId: 338
       rarity: 1
+      bestiary: 7340
       elemental:
         fire: 2
         wind: 8
@@ -6555,6 +6682,7 @@ pet:
       sprite: 330
       enemyId: 339
       rarity: 1
+      bestiary: 7341
       elemental:
         fire: 8
         wind: 2
@@ -6591,6 +6719,7 @@ pet:
       sprite: 331
       enemyId: 340
       rarity: 1
+      bestiary: 7342
       elemental:
         earth: 5
         wind: 5
@@ -6627,6 +6756,7 @@ pet:
       sprite: 332
       enemyId: 341
       rarity: 1
+      bestiary: 7343
       elemental:
         wind: 10
       attribute:
@@ -6662,6 +6792,7 @@ pet:
       sprite: 662
       enemyId: 1636
       rarity: 1
+      bestiary: 126351
       elemental:
         water: 8
         fire: 2
@@ -6698,6 +6829,7 @@ pet:
       sprite: 663
       enemyId: 1637
       rarity: 1
+      bestiary: 126352
       elemental:
         earth: 5
         water: 5
@@ -6734,6 +6866,7 @@ pet:
       sprite: 664
       enemyId: 1638
       rarity: 1
+      bestiary: 126353
       elemental:
         earth: 8
         wind: 2
@@ -6770,6 +6903,7 @@ pet:
       sprite: 665
       enemyId: 1639
       rarity: 1
+      bestiary: 126354
       elemental:
         earth: 1
         water: 9
@@ -6810,6 +6944,7 @@ pet:
       sprite: 333
       enemyId: 190
       rarity: 1
+      bestiary: 7344
       elemental:
         fire: 3
         wind: 7
@@ -6846,6 +6981,7 @@ pet:
       sprite: 334
       enemyId: 347
       rarity: 1
+      bestiary: 7345
       elemental:
         wind: 10
       attribute:
@@ -6881,6 +7017,7 @@ pet:
       sprite: 335
       enemyId: 348
       rarity: 1
+      bestiary: 7346
       elemental:
         earth: 3
         wind: 7
@@ -6912,12 +7049,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000336
       name: 奇宝
       sprite: 336
       enemyId: 194
       rarity: 1
+      bestiary: 7347
       elemental:
         fire: 8
         wind: 2
@@ -6954,6 +7091,7 @@ pet:
       sprite: 666
       enemyId: 1640
       rarity: 1
+      bestiary: 126355
       elemental:
         earth: 7
         wind: 3
@@ -6990,6 +7128,7 @@ pet:
       sprite: 667
       enemyId: 1641
       rarity: 1
+      bestiary: 126356
       elemental:
         earth: 2
         water: 8
@@ -7026,6 +7165,7 @@ pet:
       sprite: 668
       enemyId: 1642
       rarity: 1
+      bestiary: 126357
       elemental:
         earth: 6
         wind: 4
@@ -7062,6 +7202,7 @@ pet:
       sprite: 669
       enemyId: 1643
       rarity: 1
+      bestiary: 126358
       elemental:
         fire: 5
         wind: 5
@@ -7102,6 +7243,7 @@ pet:
       sprite: 341
       enemyId: 354
       rarity: 1
+      bestiary: 7352
       elemental:
         earth: 2
         wind: 8
@@ -7138,6 +7280,7 @@ pet:
       sprite: 342
       enemyId: 355
       rarity: 1
+      bestiary: 7353
       elemental:
         wind: 10
       attribute:
@@ -7173,6 +7316,7 @@ pet:
       sprite: 343
       enemyId: 356
       rarity: 1
+      bestiary: 7354
       elemental:
         fire: 8
         wind: 2
@@ -7209,6 +7353,7 @@ pet:
       sprite: 344
       enemyId: 357
       rarity: 1
+      bestiary: 7355
       elemental:
         earth: 5
         water: 5
@@ -7245,6 +7390,7 @@ pet:
       sprite: 393
       enemyId: 484
       rarity: 1
+      bestiary: 7356
       elemental:
         fire: 5
         wind: 5
@@ -7276,12 +7422,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000674
       name: 布莱兹
       sprite: 674
       enemyId: 1648
       rarity: 1
+      bestiary: 126363
       elemental:
         earth: 3
         water: 7
@@ -7318,6 +7464,7 @@ pet:
       sprite: 675
       enemyId: 1649
       rarity: 1
+      bestiary: 126364
       elemental:
         fire: 3
         wind: 7
@@ -7354,6 +7501,7 @@ pet:
       sprite: 676
       enemyId: 1650
       rarity: 1
+      bestiary: 126365
       elemental:
         earth: 7
         wind: 3
@@ -7394,6 +7542,7 @@ pet:
       sprite: 345
       enemyId: 358
       rarity: 1
+      bestiary: 7357
       elemental:
         earth: 2
         water: 8
@@ -7430,6 +7579,7 @@ pet:
       sprite: 346
       enemyId: 359
       rarity: 1
+      bestiary: 7358
       elemental:
         water: 10
       attribute:
@@ -7465,6 +7615,7 @@ pet:
       sprite: 347
       enemyId: 360
       rarity: 1
+      bestiary: 7359
       elemental:
         earth: 5
         water: 5
@@ -7496,12 +7647,12 @@ pet:
       habitat: 未知
       level1Spawn: 未知
       description: 未知
-
     - id: 4000348
       name: 达伊诺洛斯
       sprite: 348
       enemyId: 361
       rarity: 1
+      bestiary: 7360
       elemental:
         water: 5
         fire: 5
@@ -7538,6 +7689,7 @@ pet:
       sprite: 349
       enemyId: 362
       rarity: 1
+      bestiary: 7361
       elemental:
         water: 7
         fire: 3
@@ -7574,6 +7726,7 @@ pet:
       sprite: 677
       enemyId: 1651
       rarity: 1
+      bestiary: 126366
       elemental:
         earth: 6
         wind: 4
@@ -7610,6 +7763,7 @@ pet:
       sprite: 678
       enemyId: 1652
       rarity: 1
+      bestiary: 126367
       elemental:
         earth: 7
         water: 3
@@ -7646,6 +7800,7 @@ pet:
       sprite: 679
       enemyId: 1653
       rarity: 1
+      bestiary: 126368
       elemental:
         earth: 1
         water: 9
@@ -7686,6 +7841,7 @@ pet:
       sprite: 350
       enemyId: 152
       rarity: 1
+      bestiary: 7362
       elemental:
         earth: 4
         water: 6
@@ -7723,6 +7879,7 @@ pet:
       sprite: 351
       enemyId: 364
       rarity: 1
+      bestiary: 7363
       elemental:
         water: 7
         fire: 3
@@ -7759,6 +7916,7 @@ pet:
       sprite: 352
       enemyId: 365
       rarity: 1
+      bestiary: 7364
       elemental:
         earth: 7
         water: 3
@@ -7795,6 +7953,7 @@ pet:
       sprite: 353
       enemyId: 366
       rarity: 1
+      bestiary: 7365
       elemental:
         fire: 9
         wind: 1
@@ -7831,6 +7990,7 @@ pet:
       sprite: 680
       enemyId: 1654
       rarity: 1
+      bestiary: 126369
       elemental:
         earth: 5
         wind: 5
@@ -7867,6 +8027,7 @@ pet:
       sprite: 681
       enemyId: 1655
       rarity: 1
+      bestiary: 126370
       elemental:
         water: 5
         fire: 5
@@ -7903,6 +8064,7 @@ pet:
       sprite: 682
       enemyId: 1656
       rarity: 1
+      bestiary: 126371
       elemental:
         fire: 3
         wind: 7
@@ -7939,6 +8101,7 @@ pet:
       sprite: 683
       enemyId: 1657
       rarity: 1
+      bestiary: 126372
       elemental:
         earth: 5
         water: 5
