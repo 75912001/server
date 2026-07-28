@@ -19,6 +19,15 @@ character:
       stick: 2
       spear: 3
       bow: 4
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000005
     name: "吉米"
@@ -31,6 +40,15 @@ character:
       stick: 7
       spear: 8
       bow: 9
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000010
     name: "吉米"
@@ -43,6 +61,15 @@ character:
       stick: 12
       spear: 13
       bow: 14
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000015
     name: "吉米"
@@ -55,6 +82,15 @@ character:
       stick: 17
       spear: 18
       bow: 19
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
   # todo menglc  该角色的空手攻击,四个颜色不用. 可能需要适配修改.
   - id: 1000020
@@ -68,6 +104,15 @@ character:
       stick: 22
       spear: 23
       bow: 24
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000025
     name: "罗伦斯"
@@ -80,6 +125,15 @@ character:
       stick: 27
       spear: 28
       bow: 29
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000030
     name: "罗伦斯"
@@ -92,6 +146,15 @@ character:
       stick: 32
       spear: 33
       bow: 34
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000035
     name: "罗伦斯"
@@ -104,6 +167,15 @@ character:
       stick: 37
       spear: 38
       bow: 39
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
   - id: 1000040
     name: "强普"
@@ -116,6 +188,15 @@ character:
       stick: 42
       spear: 43
       bow: 44
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000045
     name: "强普"
@@ -128,6 +209,15 @@ character:
       stick: 47
       spear: 48
       bow: 49
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000050
     name: "强普"
@@ -140,6 +230,15 @@ character:
       stick: 52
       spear: 53
       bow: 54
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000055
     name: "强普"
@@ -152,6 +251,15 @@ character:
       stick: 57
       spear: 58
       bow: 59
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
   - id: 1000060
     name: "库比"
@@ -164,6 +272,15 @@ character:
       stick: 62
       spear: 63
       bow: 64
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000065
     name: "库比"
@@ -176,6 +293,15 @@ character:
       stick: 67
       spear: 68
       bow: 69
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000070
     name: "库比"
@@ -188,6 +314,15 @@ character:
       stick: 72
       spear: 73
       bow: 74
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000075
     name: "库比"
@@ -200,6 +335,15 @@ character:
       stick: 77
       spear: 78
       bow: 79
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
   - id: 1000080
     name: "卡伯菲"
@@ -212,6 +356,15 @@ character:
       stick: 82
       spear: 83
       bow: 84
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000085
     name: "卡伯菲"
@@ -224,6 +377,15 @@ character:
       stick: 87
       spear: 88
       bow: 89
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000090
     name: "卡伯菲"
@@ -236,6 +398,15 @@ character:
       stick: 92
       spear: 93
       bow: 94
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000095
     name: "卡伯菲"
@@ -248,6 +419,15 @@ character:
       stick: 97
       spear: 98
       bow: 99
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
   - id: 1000100
     name: "酋力安"
@@ -260,6 +440,15 @@ character:
       stick: 102
       spear: 103
       bow: 104
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000105
     name: "酋力安"
@@ -272,6 +461,15 @@ character:
       stick: 107
       spear: 108
       bow: 109
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000110
     name: "酋力安"
@@ -284,6 +482,15 @@ character:
       stick: 112
       spear: 113
       bow: 114
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000115
     name: "酋力安"
@@ -296,6 +503,15 @@ character:
       stick: 117
       spear: 118
       bow: 119
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
   - id: 1000120
     name: "爱伦"
@@ -308,6 +524,15 @@ character:
       stick: 122
       spear: 123
       bow: 124
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000125
     name: "爱伦"
@@ -320,6 +545,15 @@ character:
       stick: 127
       spear: 128
       bow: 129
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000130
     name: "爱伦"
@@ -332,6 +566,15 @@ character:
       stick: 132
       spear: 133
       bow: 134
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000135
     name: "爱伦"
@@ -344,6 +587,15 @@ character:
       stick: 137
       spear: 138
       bow: 139
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
   - id: 1000140
     name: "玛蕾菲雅"
@@ -356,6 +608,15 @@ character:
       stick: 142
       spear: 143
       bow: 144
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000145
     name: "玛蕾菲雅"
@@ -368,6 +629,15 @@ character:
       stick: 147
       spear: 148
       bow: 149
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000150
     name: "玛蕾菲雅"
@@ -380,6 +650,15 @@ character:
       stick: 152
       spear: 153
       bow: 154
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000155
     name: "玛蕾菲雅"
@@ -392,6 +671,15 @@ character:
       stick: 157
       spear: 158
       bow: 159
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
   - id: 1000160
     name: "希希亚"
@@ -404,6 +692,15 @@ character:
       stick: 162
       spear: 163
       bow: 164
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000165
     name: "希希亚"
@@ -416,6 +713,15 @@ character:
       stick: 167
       spear: 168
       bow: 169
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000170
     name: "希希亚"
@@ -428,6 +734,15 @@ character:
       stick: 172
       spear: 173
       bow: 174
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000175
     name: "希希亚"
@@ -440,6 +755,15 @@ character:
       stick: 177
       spear: 178
       bow: 179
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
   - id: 1000180
     name: "菲莉雅"
@@ -452,6 +776,15 @@ character:
       stick: 182
       spear: 183
       bow: 184
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000185
     name: "菲莉雅"
@@ -464,6 +797,15 @@ character:
       stick: 187
       spear: 188
       bow: 189
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000190
     name: "菲莉雅"
@@ -476,6 +818,15 @@ character:
       stick: 192
       spear: 193
       bow: 194
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000195
     name: "菲莉雅"
@@ -488,6 +839,15 @@ character:
       stick: 197
       spear: 198
       bow: 199
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
   - id: 1000200
     name: "米亚"
@@ -500,6 +860,15 @@ character:
       stick: 202
       spear: 203
       bow: 204
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000205
     name: "米亚"
@@ -512,6 +881,15 @@ character:
       stick: 207
       spear: 208
       bow: 209
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000210
     name: "米亚"
@@ -524,6 +902,15 @@ character:
       stick: 212
       spear: 213
       bow: 214
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000215
     name: "米亚"
@@ -536,6 +923,15 @@ character:
       stick: 217
       spear: 218
       bow: 219
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
   - id: 1000220
     name: "露露"
@@ -548,6 +944,15 @@ character:
       stick: 222
       spear: 223
       bow: 224
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000225
     name: "露露"
@@ -560,6 +965,15 @@ character:
       stick: 227
       spear: 228
       bow: 229
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000230
     name: "露露"
@@ -572,6 +986,15 @@ character:
       stick: 232
       spear: 233
       bow: 234
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ######
   - id: 1000235
     name: "露露"
@@ -584,4 +1007,13 @@ character:
       stick: 237
       spear: 238
       bow: 239
+    mounts:
+      - petId: 0 # 老虎
+        spriteId: 0
+      - petId: 0 # 雷龙
+        spriteId: 0
+      - petId: 0 # 巴朵兰恩
+        spriteId: 0
+      - petId: 0 # 左迪洛斯
+        spriteId: 0
 ############################################################
