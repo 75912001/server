@@ -71,3 +71,17 @@ enemyGroups:
         level: 12
       - id: 4000280
         level: 12
+
+  - id: 5
+    name: 威威长老会
+    isBoss: true
+    enemies:
+      - id: 4000254
+        level: 1
+
+  - id: 6
+    name: 布林帖斯长老会
+    isBoss: true
+    enemies:
+      - id: 4000322
+        level: 1
