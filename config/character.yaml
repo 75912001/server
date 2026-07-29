@@ -20,14 +20,30 @@ character:
       spear: 3
       bow: 4
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 688
+      - petId: 4000322 #布林帖斯-蓝雷
+        spriteId: 684
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 693
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 692
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 865
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 866
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 867
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 868
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 869
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 870
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 871
+      - petId: 4000292 # 格尔格
+        spriteId: 872
 ######
   - id: 1000005
     name: "吉米"
@@ -41,14 +57,30 @@ character:
       spear: 8
       bow: 9
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 689
+      - petId: 4000322 #布林帖斯-蓝雷
+        spriteId: 685
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 693
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 692
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 865
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 866
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 867
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 868
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 869
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 870
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 871
+      - petId: 4000292 # 格尔格
+        spriteId: 872
 ######
   - id: 1000010
     name: "吉米"
@@ -62,14 +94,30 @@ character:
       spear: 13
       bow: 14
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 690
+      - petId: 4000322 #布林帖斯-蓝雷
+        spriteId: 686
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 693
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 692
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 865
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 866
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 867
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 868
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 869
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 870
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 871
+      - petId: 4000292 # 格尔格
+        spriteId: 872
 ######
   - id: 1000015
     name: "吉米"
@@ -83,14 +131,30 @@ character:
       spear: 18
       bow: 19
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 691
+      - petId: 4000322 #布林帖斯-蓝雷
+        spriteId: 687
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 693
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 692
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 865
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 866
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 867
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 868
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 869
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 870
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 871
+      - petId: 4000292 # 格尔格
+        spriteId: 872
 ############################################################
   # todo menglc  该角色的空手攻击,四个颜色不用. 可能需要适配修改.
   - id: 1000020
@@ -105,14 +169,30 @@ character:
       spear: 23
       bow: 24
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 698
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 694
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 703
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 702
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 873
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 874
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 875
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 876
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 877
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 878
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 879
+      - petId: 4000292 # 格尔格
+        spriteId: 880
 ######
   - id: 1000025
     name: "罗伦斯"
@@ -126,14 +206,30 @@ character:
       spear: 28
       bow: 29
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 699
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 695
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 703
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 702
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 873
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 874
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 875
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 876
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 877
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 878
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 879
+      - petId: 4000292 # 格尔格
+        spriteId: 880
 ######
   - id: 1000030
     name: "罗伦斯"
@@ -147,14 +243,30 @@ character:
       spear: 33
       bow: 34
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 700
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 696
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 703
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 702
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 873
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 874
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 875
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 876
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 877
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 878
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 879
+      - petId: 4000292 # 格尔格
+        spriteId: 880
 ######
   - id: 1000035
     name: "罗伦斯"
@@ -168,14 +280,30 @@ character:
       spear: 38
       bow: 39
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 701
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 697
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 703
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 702
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 873
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 874
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 875
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 876
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 877
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 878
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 879
+      - petId: 4000292 # 格尔格
+        spriteId: 880
 ############################################################
   - id: 1000040
     name: "强普"
@@ -189,14 +317,30 @@ character:
       spear: 43
       bow: 44
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 708
+      - petId: 4000321 #布洛多斯-灰雷
+        spriteId: 704
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 713
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 712
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 881
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 882
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 883
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 884
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 885
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 886
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 887
+      - petId: 4000292 # 格尔格
+        spriteId: 888
 ######
   - id: 1000045
     name: "强普"
@@ -210,14 +354,30 @@ character:
       spear: 48
       bow: 49
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 709
+      - petId: 4000321 #布洛多斯-灰雷
+        spriteId: 705
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 713
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 712
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 881
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 882
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 883
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 884
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 885
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 886
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 887
+      - petId: 4000292 # 格尔格
+        spriteId: 888
 ######
   - id: 1000050
     name: "强普"
@@ -231,14 +391,30 @@ character:
       spear: 53
       bow: 54
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 710
+      - petId: 4000321 #布洛多斯-灰雷
+        spriteId: 706
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 713
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 712
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 881
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 882
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 883
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 884
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 885
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 886
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 887
+      - petId: 4000292 # 格尔格
+        spriteId: 888
 ######
   - id: 1000055
     name: "强普"
@@ -252,14 +428,30 @@ character:
       spear: 58
       bow: 59
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 711
+      - petId: 4000321 #布洛多斯-灰雷
+        spriteId: 707
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 713
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 712
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 881
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 882
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 883
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 884
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 885
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 886
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 887
+      - petId: 4000292 # 格尔格
+        spriteId: 888
 ############################################################
   - id: 1000060
     name: "库比"
@@ -273,14 +465,30 @@ character:
       spear: 63
       bow: 64
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 718
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 714
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 723
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 722
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 889
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 890
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 891
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 892
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 893
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 894
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 895
+      - petId: 4000292 # 格尔格
+        spriteId: 896
 ######
   - id: 1000065
     name: "库比"
@@ -294,14 +502,30 @@ character:
       spear: 68
       bow: 69
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 719
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 715
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 723
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 722
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 889
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 890
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 891
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 892
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 893
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 894
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 895
+      - petId: 4000292 # 格尔格
+        spriteId: 896
 ######
   - id: 1000070
     name: "库比"
@@ -315,14 +539,30 @@ character:
       spear: 73
       bow: 74
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 720
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 716
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 723
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 722
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 889
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 890
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 891
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 892
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 893
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 894
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 895
+      - petId: 4000292 # 格尔格
+        spriteId: 896
 ######
   - id: 1000075
     name: "库比"
@@ -336,14 +576,30 @@ character:
       spear: 78
       bow: 79
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 721
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 717
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 723
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 722
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 889
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 890
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 891
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 892
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 893
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 894
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 895
+      - petId: 4000292 # 格尔格
+        spriteId: 896
 ############################################################
   - id: 1000080
     name: "卡伯菲"
@@ -357,14 +613,30 @@ character:
       spear: 83
       bow: 84
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 728
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 724
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 733
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 732
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 897
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 898
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 899
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 900
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 901
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 902
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 903
+      - petId: 4000292 # 格尔格
+        spriteId: 904
 ######
   - id: 1000085
     name: "卡伯菲"
@@ -378,14 +650,30 @@ character:
       spear: 88
       bow: 89
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 729
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 725
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 733
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 732
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 897
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 898
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 899
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 900
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 901
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 902
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 903
+      - petId: 4000292 # 格尔格
+        spriteId: 904
 ######
   - id: 1000090
     name: "卡伯菲"
@@ -399,14 +687,30 @@ character:
       spear: 93
       bow: 94
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 730
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 726
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 733
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 732
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 897
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 898
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 899
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 900
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 901
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 902
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 903
+      - petId: 4000292 # 格尔格
+        spriteId: 904
 ######
   - id: 1000095
     name: "卡伯菲"
@@ -420,14 +724,30 @@ character:
       spear: 98
       bow: 99
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 731
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 727
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 733
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 732
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 897
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 898
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 899
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 900
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 901
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 902
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 903
+      - petId: 4000292 # 格尔格
+        spriteId: 904
 ############################################################
   - id: 1000100
     name: "酋力安"
@@ -441,14 +761,30 @@ character:
       spear: 103
       bow: 104
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 738
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 734
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 743
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 742
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 905
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 906
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 907
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 908
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 909
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 910
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 911
+      - petId: 4000292 # 格尔格
+        spriteId: 912
 ######
   - id: 1000105
     name: "酋力安"
@@ -462,14 +798,30 @@ character:
       spear: 108
       bow: 109
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 739
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 735
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 743
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 742
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 905
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 906
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 907
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 908
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 909
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 910
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 911
+      - petId: 4000292 # 格尔格
+        spriteId: 912
 ######
   - id: 1000110
     name: "酋力安"
@@ -483,14 +835,30 @@ character:
       spear: 113
       bow: 114
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 740
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 736
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 743
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 742
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 905
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 906
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 907
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 908
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 909
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 910
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 911
+      - petId: 4000292 # 格尔格
+        spriteId: 912
 ######
   - id: 1000115
     name: "酋力安"
@@ -504,14 +872,30 @@ character:
       spear: 118
       bow: 119
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 741
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 737
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 743
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 742
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 905
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 906
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 907
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 908
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 909
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 910
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 911
+      - petId: 4000292 # 格尔格
+        spriteId: 912
 ############################################################
   - id: 1000120
     name: "爱伦"
@@ -525,14 +909,30 @@ character:
       spear: 123
       bow: 124
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 748
+      - petId: 4000324 #斯天多斯-绿雷
+        spriteId: 744
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 753
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 752
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 913
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 914
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 915
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 916
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 917
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 918
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 919
+      - petId: 4000292 # 格尔格
+        spriteId: 920
 ######
   - id: 1000125
     name: "爱伦"
@@ -546,14 +946,30 @@ character:
       spear: 128
       bow: 129
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 749
+      - petId: 4000324 #斯天多斯-绿雷
+        spriteId: 745
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 753
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 752
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 913
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 914
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 915
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 916
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 917
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 918
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 919
+      - petId: 4000292 # 格尔格
+        spriteId: 920
 ######
   - id: 1000130
     name: "爱伦"
@@ -567,14 +983,30 @@ character:
       spear: 133
       bow: 134
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 750
+      - petId: 4000324 #斯天多斯-绿雷
+        spriteId: 746
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 753
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 752
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 913
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 914
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 915
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 916
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 917
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 918
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 919
+      - petId: 4000292 # 格尔格
+        spriteId: 920
 ######
   - id: 1000135
     name: "爱伦"
@@ -588,14 +1020,30 @@ character:
       spear: 138
       bow: 139
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 751
+      - petId: 4000324 #斯天多斯-绿雷
+        spriteId: 747
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 753
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 752
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 913
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 914
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 915
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 916
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 917
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 918
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 919
+      - petId: 4000292 # 格尔格
+        spriteId: 920
 ############################################################
   - id: 1000140
     name: "玛蕾菲雅"
@@ -609,14 +1057,30 @@ character:
       spear: 143
       bow: 144
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 758
+      - petId: 4000324 #斯天多斯-绿雷
+        spriteId: 754
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 763
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 762
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 921
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 922
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 923
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 924
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 925
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 926
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 927
+      - petId: 4000292 # 格尔格
+        spriteId: 928
 ######
   - id: 1000145
     name: "玛蕾菲雅"
@@ -630,14 +1094,30 @@ character:
       spear: 148
       bow: 149
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 759
+      - petId: 4000324 #斯天多斯-绿雷
+        spriteId: 755
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 763
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 762
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 921
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 922
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 923
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 924
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 925
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 926
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 927
+      - petId: 4000292 # 格尔格
+        spriteId: 928
 ######
   - id: 1000150
     name: "玛蕾菲雅"
@@ -651,14 +1131,30 @@ character:
       spear: 153
       bow: 154
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 760
+      - petId: 4000324 #斯天多斯-绿雷
+        spriteId: 756
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 763
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 762
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 921
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 922
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 923
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 924
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 925
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 926
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 927
+      - petId: 4000292 # 格尔格
+        spriteId: 928
 ######
   - id: 1000155
     name: "玛蕾菲雅"
@@ -672,14 +1168,30 @@ character:
       spear: 158
       bow: 159
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 761
+      - petId: 4000324 #斯天多斯-绿雷
+        spriteId: 757
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 763
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 762
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 921
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 922
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 923
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 924
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 925
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 926
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 927
+      - petId: 4000292 # 格尔格
+        spriteId: 928
 ############################################################
   - id: 1000160
     name: "希希亚"
@@ -693,14 +1205,30 @@ character:
       spear: 163
       bow: 164
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 768
+      - petId: 4000322 #布林帖斯-蓝雷
+        spriteId: 764
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 773
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 772
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 929
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 930
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 931
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 932
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 933
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 934
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 935
+      - petId: 4000292 # 格尔格
+        spriteId: 936
 ######
   - id: 1000165
     name: "希希亚"
@@ -714,14 +1242,30 @@ character:
       spear: 168
       bow: 169
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 769
+      - petId: 4000322 #布林帖斯-蓝雷
+        spriteId: 765
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 773
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 772
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 929
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 930
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 931
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 932
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 933
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 934
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 935
+      - petId: 4000292 # 格尔格
+        spriteId: 936
 ######
   - id: 1000170
     name: "希希亚"
@@ -735,14 +1279,30 @@ character:
       spear: 173
       bow: 174
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 770
+      - petId: 4000322 #布林帖斯-蓝雷
+        spriteId: 766
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 773
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 772
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 929
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 930
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 931
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 932
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 933
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 934
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 935
+      - petId: 4000292 # 格尔格
+        spriteId: 936
 ######
   - id: 1000175
     name: "希希亚"
@@ -756,14 +1316,30 @@ character:
       spear: 178
       bow: 179
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 770
+      - petId: 4000322 #布林帖斯-蓝雷
+        spriteId: 767
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 773
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 772
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 929
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 930
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 931
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 932
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 933
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 934
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 935
+      - petId: 4000292 # 格尔格
+        spriteId: 936
 ############################################################
   - id: 1000180
     name: "菲莉雅"
@@ -777,14 +1353,30 @@ character:
       spear: 183
       bow: 184
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 778
+      - petId: 4000321 #布洛多斯-灰雷
+        spriteId: 774
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 783
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 782
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 937
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 938
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 939
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 940
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 941
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 942
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 943
+      - petId: 4000292 # 格尔格
+        spriteId: 944
 ######
   - id: 1000185
     name: "菲莉雅"
@@ -798,14 +1390,30 @@ character:
       spear: 188
       bow: 189
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 779
+      - petId: 4000321 #布洛多斯-灰雷
+        spriteId: 775
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 783
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 782
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 937
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 938
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 939
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 940
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 941
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 942
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 943
+      - petId: 4000292 # 格尔格
+        spriteId: 944
 ######
   - id: 1000190
     name: "菲莉雅"
@@ -819,19 +1427,35 @@ character:
       spear: 193
       bow: 194
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 780
+      - petId: 4000321 #布洛多斯-灰雷
+        spriteId: 776
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 783
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 782
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 937
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 938
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 939
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 940
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 941
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 942
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 943
+      - petId: 4000292 # 格尔格
+        spriteId: 944
 ######
   - id: 1000195
     name: "菲莉雅"
     isRole: true
-    description: "菲莉雅-蓝"
+    description: "菲莉雅-绿"
     color: "green"
     sprite: #[68877,70404] 1528 个文件
       unarmed: 195
@@ -840,14 +1464,30 @@ character:
       spear: 198
       bow: 199
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 781
+      - petId: 4000321 #布洛多斯-灰雷
+        spriteId: 777
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 783
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 782
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 937
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 938
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 939
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 940
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 941
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 942
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 943
+      - petId: 4000292 # 格尔格
+        spriteId: 944
 ############################################################
   - id: 1000200
     name: "米亚"
@@ -861,19 +1501,35 @@ character:
       spear: 203
       bow: 204
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 788
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 784
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 793
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 792
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 945
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 946
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 947
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 948
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 949
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 950
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 951
+      - petId: 4000292 # 格尔格
+        spriteId: 952
 ######
   - id: 1000205
     name: "米亚"
     isRole: true
-    description: "米亚-橙"
+    description: "米亚-黄"
     color: "yellow"
     sprite: #[71933,73460] 1528 个文件
       unarmed: 205
@@ -882,14 +1538,30 @@ character:
       spear: 208
       bow: 209
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 789
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 785
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 793
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 792
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 945
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 946
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 947
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 948
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 949
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 950
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 951
+      - petId: 4000292 # 格尔格
+        spriteId: 952
 ######
   - id: 1000210
     name: "米亚"
@@ -903,14 +1575,30 @@ character:
       spear: 213
       bow: 214
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 790
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 786
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 793
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 792
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 945
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 946
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 947
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 948
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 949
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 950
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 951
+      - petId: 4000292 # 格尔格
+        spriteId: 952
 ######
   - id: 1000215
     name: "米亚"
@@ -924,14 +1612,30 @@ character:
       spear: 218
       bow: 219
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 791
+      - petId: 4000323 #布拉奇多斯-红雷
+        spriteId: 787
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 793
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 792
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 945
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 946
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 947
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 948
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 949
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 950
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 951
+      - petId: 4000292 # 格尔格
+        spriteId: 952
 ############################################################
   - id: 1000220
     name: "露露"
@@ -945,14 +1649,30 @@ character:
       spear: 223
       bow: 224
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000304 #金格萨贝鲁-金虎
+        spriteId: 798
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 794
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 803
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 802
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 953
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 954
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 955
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 956
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 957
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 958
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 959
+      - petId: 4000292 # 格尔格
+        spriteId: 960
 ######
   - id: 1000225
     name: "露露"
@@ -966,14 +1686,30 @@ character:
       spear: 228
       bow: 229
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000301 #贝鲁卡-绿虎
+        spriteId: 799
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 795
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 803
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 802
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 953
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 954
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 955
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 956
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 957
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 958
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 959
+      - petId: 4000292 # 格尔格
+        spriteId: 960
 ######
   - id: 1000230
     name: "露露"
@@ -987,14 +1723,30 @@ character:
       spear: 233
       bow: 234
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000303 #格鲁西斯-红虎
+        spriteId: 800
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 796
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 803
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 802
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 953
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 954
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 955
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 956
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 957
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 958
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 959
+      - petId: 4000292 # 格尔格
+        spriteId: 960
 ######
   - id: 1000235
     name: "露露"
@@ -1008,12 +1760,28 @@ character:
       spear: 238
       bow: 239
     mounts:
-      - petId: 0 # 老虎
-        spriteId: 0
-      - petId: 0 # 雷龙
-        spriteId: 0
-      - petId: 0 # 巴朵兰恩
-        spriteId: 0
-      - petId: 0 # 左迪洛斯
-        spriteId: 0
+      - petId: 4000302 #贝鲁伊卡-黄虎
+        spriteId: 801
+      - petId: 4000362 #邦恩多斯-金雷
+        spriteId: 797
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 803
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 802
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 953
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 954
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 955
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 956
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 957
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 958
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 959
+      - petId: 4000292 # 格尔格
+        spriteId: 960
 ############################################################
