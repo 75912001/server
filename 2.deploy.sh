@@ -194,7 +194,7 @@ main() {
     fi
     print_success "check Docker daemon successfully."
 
-    run_required "generate protobuf code" python gen.py
+    run_required "generate protobuf code" python 1.gen.py
 
     # 先启动依赖服务, 再启动入口服务.
     local services=(cache online gateway login)
