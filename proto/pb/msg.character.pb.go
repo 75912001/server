@@ -365,29 +365,27 @@ type CharacterBaseRecord struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uuid                      uint64              `protobuf:"varint,1,opt,name=uuid,proto3" json:"uuid,omitempty"`                                                                                 // 角色 UUID, 在所属 AccountRecord.aid 作用域内唯一
-	Nick                      string              `protobuf:"bytes,2,opt,name=nick,proto3" json:"nick,omitempty"`                                                                                  // 角色昵称
-	AssetId                   uint64              `protobuf:"varint,3,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`                                                            // 角色资源 ID
-	Exp                       uint64              `protobuf:"varint,4,opt,name=exp,proto3" json:"exp,omitempty"`                                                                                   // 经验值
-	Earth                     uint32              `protobuf:"varint,5,opt,name=earth,proto3" json:"earth,omitempty"`                                                                               // 角色地元素点数
-	Water                     uint32              `protobuf:"varint,6,opt,name=water,proto3" json:"water,omitempty"`                                                                               // 角色水元素点数
-	Fire                      uint32              `protobuf:"varint,7,opt,name=fire,proto3" json:"fire,omitempty"`                                                                                 // 角色火元素点数
-	Wind                      uint32              `protobuf:"varint,8,opt,name=wind,proto3" json:"wind,omitempty"`                                                                                 // 角色风元素点数
-	AvailablePoint            uint32              `protobuf:"varint,9,opt,name=available_point,json=availablePoint,proto3" json:"available_point,omitempty"`                                       // 角色可分配属性点
-	Vitality                  uint32              `protobuf:"varint,10,opt,name=vitality,proto3" json:"vitality,omitempty"`                                                                        // 角色体力点数
-	Strength                  uint32              `protobuf:"varint,11,opt,name=strength,proto3" json:"strength,omitempty"`                                                                        // 角色腕力点数
-	Toughness                 uint32              `protobuf:"varint,12,opt,name=toughness,proto3" json:"toughness,omitempty"`                                                                      // 角色耐力点数
-	Dexterity                 uint32              `protobuf:"varint,13,opt,name=dexterity,proto3" json:"dexterity,omitempty"`                                                                      // 角色速度点数
-	LastLoginTimestampMs      int64               `protobuf:"varint,14,opt,name=last_login_timestamp_ms,json=lastLoginTimestampMs,proto3" json:"last_login_timestamp_ms,omitempty"`                // 角色最后登录时间戳, 单位毫秒
-	LastLogoutTimestampMs     int64               `protobuf:"varint,15,opt,name=last_logout_timestamp_ms,json=lastLogoutTimestampMs,proto3" json:"last_logout_timestamp_ms,omitempty"`             // 角色最后登出时间戳, 单位毫秒
-	CreateTimestampMs         int64               `protobuf:"varint,16,opt,name=create_timestamp_ms,json=createTimestampMs,proto3" json:"create_timestamp_ms,omitempty"`                           // 角色创建时间戳, 单位毫秒
-	RebirthCount              uint64              `protobuf:"varint,17,opt,name=rebirth_count,json=rebirthCount,proto3" json:"rebirth_count,omitempty"`                                            // 角色转生次数
-	SceneId                   uint32              `protobuf:"varint,18,opt,name=scene_id,json=sceneId,proto3" json:"scene_id,omitempty"`                                                           // 角色当前场景 ID
-	LuckState                 *CharacterLuckState `protobuf:"bytes,19,opt,name=luck_state,json=luckState,proto3" json:"luck_state,omitempty"`                                                      // 角色基础运气和 LS 日自动刷新状态
-	DuelPoint                 uint32              `protobuf:"varint,21,opt,name=duel_point,json=duelPoint,proto3" json:"duel_point,omitempty"`                                                     // 角色决斗点(DP)
-	Charm                     uint32              `protobuf:"varint,22,opt,name=charm,proto3" json:"charm,omitempty"`                                                                              // 角色魅力
-	BecomePigRemainingSeconds uint32              `protobuf:"varint,25,opt,name=become_pig_remaining_seconds,json=becomePigRemainingSeconds,proto3" json:"become_pig_remaining_seconds,omitempty"` // 乌力化剩余在线秒数CHAR_BECOMEPIG; 0表示当前未处于乌力化 // todo menglc
-	BecomePigImageId          uint32              `protobuf:"varint,26,opt,name=become_pig_image_id,json=becomePigImageId,proto3" json:"become_pig_image_id,omitempty"`                            // 乌力化服务器形象CHAR_BECOMEPIG_BBI; 未处于乌力化时必须为0 // todo menglc
+	Uuid                  uint64              `protobuf:"varint,1,opt,name=uuid,proto3" json:"uuid,omitempty"`                                                                     // 角色 UUID, 在所属 AccountRecord.aid 作用域内唯一
+	Nick                  string              `protobuf:"bytes,2,opt,name=nick,proto3" json:"nick,omitempty"`                                                                      // 角色昵称
+	AssetId               uint64              `protobuf:"varint,3,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`                                                // 角色资源 ID
+	Exp                   uint64              `protobuf:"varint,4,opt,name=exp,proto3" json:"exp,omitempty"`                                                                       // 经验值
+	Earth                 uint32              `protobuf:"varint,5,opt,name=earth,proto3" json:"earth,omitempty"`                                                                   // 角色地元素点数
+	Water                 uint32              `protobuf:"varint,6,opt,name=water,proto3" json:"water,omitempty"`                                                                   // 角色水元素点数
+	Fire                  uint32              `protobuf:"varint,7,opt,name=fire,proto3" json:"fire,omitempty"`                                                                     // 角色火元素点数
+	Wind                  uint32              `protobuf:"varint,8,opt,name=wind,proto3" json:"wind,omitempty"`                                                                     // 角色风元素点数
+	AvailablePoint        uint32              `protobuf:"varint,9,opt,name=available_point,json=availablePoint,proto3" json:"available_point,omitempty"`                           // 角色可分配属性点
+	Vitality              uint32              `protobuf:"varint,10,opt,name=vitality,proto3" json:"vitality,omitempty"`                                                            // 角色体力点数
+	Strength              uint32              `protobuf:"varint,11,opt,name=strength,proto3" json:"strength,omitempty"`                                                            // 角色腕力点数
+	Toughness             uint32              `protobuf:"varint,12,opt,name=toughness,proto3" json:"toughness,omitempty"`                                                          // 角色耐力点数
+	Dexterity             uint32              `protobuf:"varint,13,opt,name=dexterity,proto3" json:"dexterity,omitempty"`                                                          // 角色速度点数
+	LastLoginTimestampMs  int64               `protobuf:"varint,14,opt,name=last_login_timestamp_ms,json=lastLoginTimestampMs,proto3" json:"last_login_timestamp_ms,omitempty"`    // 角色最后登录时间戳, 单位毫秒
+	LastLogoutTimestampMs int64               `protobuf:"varint,15,opt,name=last_logout_timestamp_ms,json=lastLogoutTimestampMs,proto3" json:"last_logout_timestamp_ms,omitempty"` // 角色最后登出时间戳, 单位毫秒
+	CreateTimestampMs     int64               `protobuf:"varint,16,opt,name=create_timestamp_ms,json=createTimestampMs,proto3" json:"create_timestamp_ms,omitempty"`               // 角色创建时间戳, 单位毫秒
+	RebirthCount          uint64              `protobuf:"varint,17,opt,name=rebirth_count,json=rebirthCount,proto3" json:"rebirth_count,omitempty"`                                // 角色转生次数
+	SceneId               uint32              `protobuf:"varint,18,opt,name=scene_id,json=sceneId,proto3" json:"scene_id,omitempty"`                                               // 角色当前场景 ID
+	LuckState             *CharacterLuckState `protobuf:"bytes,19,opt,name=luck_state,json=luckState,proto3" json:"luck_state,omitempty"`                                          // 角色基础运气和 LS 日自动刷新状态
+	DuelPoint             uint32              `protobuf:"varint,21,opt,name=duel_point,json=duelPoint,proto3" json:"duel_point,omitempty"`                                         // 角色决斗点(DP)
+	Charm                 uint32              `protobuf:"varint,22,opt,name=charm,proto3" json:"charm,omitempty"`                                                                  // 角色魅力
 }
 
 func (x *CharacterBaseRecord) Reset() {
@@ -565,20 +563,6 @@ func (x *CharacterBaseRecord) GetDuelPoint() uint32 {
 func (x *CharacterBaseRecord) GetCharm() uint32 {
 	if x != nil {
 		return x.Charm
-	}
-	return 0
-}
-
-func (x *CharacterBaseRecord) GetBecomePigRemainingSeconds() uint32 {
-	if x != nil {
-		return x.BecomePigRemainingSeconds
-	}
-	return 0
-}
-
-func (x *CharacterBaseRecord) GetBecomePigImageId() uint32 {
-	if x != nil {
-		return x.BecomePigImageId
 	}
 	return 0
 }
@@ -1207,7 +1191,7 @@ var file_msg_character_proto_rawDesc = []byte{
 	0x72, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
 	0x70, 0x5f, 0x6d, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x16, 0x6c, 0x61, 0x73, 0x74,
 	0x52, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
-	0x4d, 0x73, 0x22, 0x9c, 0x06, 0x0a, 0x13, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72,
+	0x4d, 0x73, 0x22, 0xac, 0x05, 0x0a, 0x13, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72,
 	0x42, 0x61, 0x73, 0x65, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x75,
 	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x04, 0x75, 0x75, 0x69, 0x64, 0x12, 0x12,
 	0x0a, 0x04, 0x6e, 0x69, 0x63, 0x6b, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x69,
@@ -1250,14 +1234,7 @@ var file_msg_character_proto_rawDesc = []byte{
 	0x64, 0x75, 0x65, 0x6c, 0x5f, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x18, 0x15, 0x20, 0x01, 0x28, 0x0d,
 	0x52, 0x09, 0x64, 0x75, 0x65, 0x6c, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x63,
 	0x68, 0x61, 0x72, 0x6d, 0x18, 0x16, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x05, 0x63, 0x68, 0x61, 0x72,
-	0x6d, 0x12, 0x3f, 0x0a, 0x1c, 0x62, 0x65, 0x63, 0x6f, 0x6d, 0x65, 0x5f, 0x70, 0x69, 0x67, 0x5f,
-	0x72, 0x65, 0x6d, 0x61, 0x69, 0x6e, 0x69, 0x6e, 0x67, 0x5f, 0x73, 0x65, 0x63, 0x6f, 0x6e, 0x64,
-	0x73, 0x18, 0x19, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x19, 0x62, 0x65, 0x63, 0x6f, 0x6d, 0x65, 0x50,
-	0x69, 0x67, 0x52, 0x65, 0x6d, 0x61, 0x69, 0x6e, 0x69, 0x6e, 0x67, 0x53, 0x65, 0x63, 0x6f, 0x6e,
-	0x64, 0x73, 0x12, 0x2d, 0x0a, 0x13, 0x62, 0x65, 0x63, 0x6f, 0x6d, 0x65, 0x5f, 0x70, 0x69, 0x67,
-	0x5f, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x1a, 0x20, 0x01, 0x28, 0x0d, 0x52,
-	0x10, 0x62, 0x65, 0x63, 0x6f, 0x6d, 0x65, 0x50, 0x69, 0x67, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x49,
-	0x64, 0x22, 0xc0, 0x02, 0x0a, 0x0f, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x52,
+	0x6d, 0x22, 0xc0, 0x02, 0x0a, 0x0f, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x52,
 	0x65, 0x63, 0x6f, 0x72, 0x64, 0x12, 0x30, 0x0a, 0x04, 0x62, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x2e, 0x43, 0x68,
 	0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x42, 0x61, 0x73, 0x65, 0x52, 0x65, 0x63, 0x6f, 0x72,

@@ -20,6 +20,61 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type ItemElement struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	AssetId uint32 `protobuf:"varint,1,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"` // 道具资源 ID
+	Count   uint64 `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`                    // 道具数量
+}
+
+func (x *ItemElement) Reset() {
+	*x = ItemElement{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_msg_item_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ItemElement) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ItemElement) ProtoMessage() {}
+
+func (x *ItemElement) ProtoReflect() protoreflect.Message {
+	mi := &file_msg_item_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ItemElement.ProtoReflect.Descriptor instead.
+func (*ItemElement) Descriptor() ([]byte, []int) {
+	return file_msg_item_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *ItemElement) GetAssetId() uint32 {
+	if x != nil {
+		return x.AssetId
+	}
+	return 0
+}
+
+func (x *ItemElement) GetCount() uint64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
 // ItemContainerRecord 保存不关心位置的道具和装备集合.
 type ItemContainerRecord struct {
 	state         protoimpl.MessageState
@@ -33,7 +88,7 @@ type ItemContainerRecord struct {
 func (x *ItemContainerRecord) Reset() {
 	*x = ItemContainerRecord{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_item_proto_msgTypes[0]
+		mi := &file_msg_item_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -46,7 +101,7 @@ func (x *ItemContainerRecord) String() string {
 func (*ItemContainerRecord) ProtoMessage() {}
 
 func (x *ItemContainerRecord) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_item_proto_msgTypes[0]
+	mi := &file_msg_item_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +114,7 @@ func (x *ItemContainerRecord) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ItemContainerRecord.ProtoReflect.Descriptor instead.
 func (*ItemContainerRecord) Descriptor() ([]byte, []int) {
-	return file_msg_item_proto_rawDescGZIP(), []int{0}
+	return file_msg_item_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ItemContainerRecord) GetItemCountMap() map[uint32]uint64 {
@@ -89,7 +144,7 @@ type ItemStackTransfer struct {
 func (x *ItemStackTransfer) Reset() {
 	*x = ItemStackTransfer{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_item_proto_msgTypes[1]
+		mi := &file_msg_item_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -102,7 +157,7 @@ func (x *ItemStackTransfer) String() string {
 func (*ItemStackTransfer) ProtoMessage() {}
 
 func (x *ItemStackTransfer) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_item_proto_msgTypes[1]
+	mi := &file_msg_item_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -115,7 +170,7 @@ func (x *ItemStackTransfer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ItemStackTransfer.ProtoReflect.Descriptor instead.
 func (*ItemStackTransfer) Descriptor() ([]byte, []int) {
-	return file_msg_item_proto_rawDescGZIP(), []int{1}
+	return file_msg_item_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ItemStackTransfer) GetAssetId() uint32 {
@@ -146,7 +201,7 @@ type ItemUseReq struct {
 func (x *ItemUseReq) Reset() {
 	*x = ItemUseReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_item_proto_msgTypes[2]
+		mi := &file_msg_item_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -159,7 +214,7 @@ func (x *ItemUseReq) String() string {
 func (*ItemUseReq) ProtoMessage() {}
 
 func (x *ItemUseReq) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_item_proto_msgTypes[2]
+	mi := &file_msg_item_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -172,7 +227,7 @@ func (x *ItemUseReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ItemUseReq.ProtoReflect.Descriptor instead.
 func (*ItemUseReq) Descriptor() ([]byte, []int) {
-	return file_msg_item_proto_rawDescGZIP(), []int{2}
+	return file_msg_item_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ItemUseReq) GetCharacterUuid() uint64 {
@@ -210,7 +265,7 @@ type ItemUseRes struct {
 func (x *ItemUseRes) Reset() {
 	*x = ItemUseRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_item_proto_msgTypes[3]
+		mi := &file_msg_item_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -223,7 +278,7 @@ func (x *ItemUseRes) String() string {
 func (*ItemUseRes) ProtoMessage() {}
 
 func (x *ItemUseRes) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_item_proto_msgTypes[3]
+	mi := &file_msg_item_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -236,7 +291,7 @@ func (x *ItemUseRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ItemUseRes.ProtoReflect.Descriptor instead.
 func (*ItemUseRes) Descriptor() ([]byte, []int) {
-	return file_msg_item_proto_rawDescGZIP(), []int{3}
+	return file_msg_item_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ItemUseRes) GetCharacterUuid() uint64 {
@@ -273,7 +328,7 @@ type CharacterItemChangedNotify struct {
 func (x *CharacterItemChangedNotify) Reset() {
 	*x = CharacterItemChangedNotify{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_item_proto_msgTypes[4]
+		mi := &file_msg_item_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -286,7 +341,7 @@ func (x *CharacterItemChangedNotify) String() string {
 func (*CharacterItemChangedNotify) ProtoMessage() {}
 
 func (x *CharacterItemChangedNotify) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_item_proto_msgTypes[4]
+	mi := &file_msg_item_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -299,7 +354,7 @@ func (x *CharacterItemChangedNotify) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CharacterItemChangedNotify.ProtoReflect.Descriptor instead.
 func (*CharacterItemChangedNotify) Descriptor() ([]byte, []int) {
-	return file_msg_item_proto_rawDescGZIP(), []int{4}
+	return file_msg_item_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CharacterItemChangedNotify) GetCharacterUuid() uint64 {
@@ -333,7 +388,7 @@ type ItemWarehouseDepositReq struct {
 func (x *ItemWarehouseDepositReq) Reset() {
 	*x = ItemWarehouseDepositReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_item_proto_msgTypes[5]
+		mi := &file_msg_item_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -346,7 +401,7 @@ func (x *ItemWarehouseDepositReq) String() string {
 func (*ItemWarehouseDepositReq) ProtoMessage() {}
 
 func (x *ItemWarehouseDepositReq) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_item_proto_msgTypes[5]
+	mi := &file_msg_item_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -359,7 +414,7 @@ func (x *ItemWarehouseDepositReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ItemWarehouseDepositReq.ProtoReflect.Descriptor instead.
 func (*ItemWarehouseDepositReq) Descriptor() ([]byte, []int) {
-	return file_msg_item_proto_rawDescGZIP(), []int{5}
+	return file_msg_item_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ItemWarehouseDepositReq) GetCharacterUuid() uint64 {
@@ -423,7 +478,7 @@ type ItemWarehouseDepositRes struct {
 func (x *ItemWarehouseDepositRes) Reset() {
 	*x = ItemWarehouseDepositRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_item_proto_msgTypes[6]
+		mi := &file_msg_item_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -436,7 +491,7 @@ func (x *ItemWarehouseDepositRes) String() string {
 func (*ItemWarehouseDepositRes) ProtoMessage() {}
 
 func (x *ItemWarehouseDepositRes) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_item_proto_msgTypes[6]
+	mi := &file_msg_item_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -449,7 +504,7 @@ func (x *ItemWarehouseDepositRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ItemWarehouseDepositRes.ProtoReflect.Descriptor instead.
 func (*ItemWarehouseDepositRes) Descriptor() ([]byte, []int) {
-	return file_msg_item_proto_rawDescGZIP(), []int{6}
+	return file_msg_item_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ItemWarehouseDepositRes) GetCharacterUuid() uint64 {
@@ -513,7 +568,7 @@ type ItemWarehouseWithdrawReq struct {
 func (x *ItemWarehouseWithdrawReq) Reset() {
 	*x = ItemWarehouseWithdrawReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_item_proto_msgTypes[7]
+		mi := &file_msg_item_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -526,7 +581,7 @@ func (x *ItemWarehouseWithdrawReq) String() string {
 func (*ItemWarehouseWithdrawReq) ProtoMessage() {}
 
 func (x *ItemWarehouseWithdrawReq) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_item_proto_msgTypes[7]
+	mi := &file_msg_item_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -539,7 +594,7 @@ func (x *ItemWarehouseWithdrawReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ItemWarehouseWithdrawReq.ProtoReflect.Descriptor instead.
 func (*ItemWarehouseWithdrawReq) Descriptor() ([]byte, []int) {
-	return file_msg_item_proto_rawDescGZIP(), []int{7}
+	return file_msg_item_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ItemWarehouseWithdrawReq) GetCharacterUuid() uint64 {
@@ -603,7 +658,7 @@ type ItemWarehouseWithdrawRes struct {
 func (x *ItemWarehouseWithdrawRes) Reset() {
 	*x = ItemWarehouseWithdrawRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_item_proto_msgTypes[8]
+		mi := &file_msg_item_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -616,7 +671,7 @@ func (x *ItemWarehouseWithdrawRes) String() string {
 func (*ItemWarehouseWithdrawRes) ProtoMessage() {}
 
 func (x *ItemWarehouseWithdrawRes) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_item_proto_msgTypes[8]
+	mi := &file_msg_item_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -629,7 +684,7 @@ func (x *ItemWarehouseWithdrawRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ItemWarehouseWithdrawRes.ProtoReflect.Descriptor instead.
 func (*ItemWarehouseWithdrawRes) Descriptor() ([]byte, []int) {
-	return file_msg_item_proto_rawDescGZIP(), []int{8}
+	return file_msg_item_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ItemWarehouseWithdrawRes) GetCharacterUuid() uint64 {
@@ -681,7 +736,11 @@ var File_msg_item_proto protoreflect.FileDescriptor
 var file_msg_item_proto_rawDesc = []byte{
 	0x0a, 0x0e, 0x6d, 0x73, 0x67, 0x2e, 0x69, 0x74, 0x65, 0x6d, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x12, 0x07, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x1a, 0x0f, 0x65, 0x71, 0x75, 0x69, 0x70,
-	0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xf5, 0x02, 0x0a, 0x13, 0x49,
+	0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x3e, 0x0a, 0x0b, 0x49, 0x74,
+	0x65, 0x6d, 0x45, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x61, 0x73, 0x73,
+	0x65, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x07, 0x61, 0x73, 0x73,
+	0x65, 0x74, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x04, 0x52, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0xf5, 0x02, 0x0a, 0x13, 0x49,
 	0x74, 0x65, 0x6d, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x52, 0x65, 0x63, 0x6f,
 	0x72, 0x64, 0x12, 0x54, 0x0a, 0x0e, 0x69, 0x74, 0x65, 0x6d, 0x5f, 0x63, 0x6f, 0x75, 0x6e, 0x74,
 	0x5f, 0x6d, 0x61, 0x70, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2e, 0x2e, 0x61, 0x63, 0x63,
@@ -797,31 +856,32 @@ func file_msg_item_proto_rawDescGZIP() []byte {
 	return file_msg_item_proto_rawDescData
 }
 
-var file_msg_item_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_msg_item_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_msg_item_proto_goTypes = []any{
-	(*ItemContainerRecord)(nil),        // 0: account.ItemContainerRecord
-	(*ItemStackTransfer)(nil),          // 1: account.ItemStackTransfer
-	(*ItemUseReq)(nil),                 // 2: account.ItemUseReq
-	(*ItemUseRes)(nil),                 // 3: account.ItemUseRes
-	(*CharacterItemChangedNotify)(nil), // 4: account.CharacterItemChangedNotify
-	(*ItemWarehouseDepositReq)(nil),    // 5: account.ItemWarehouseDepositReq
-	(*ItemWarehouseDepositRes)(nil),    // 6: account.ItemWarehouseDepositRes
-	(*ItemWarehouseWithdrawReq)(nil),   // 7: account.ItemWarehouseWithdrawReq
-	(*ItemWarehouseWithdrawRes)(nil),   // 8: account.ItemWarehouseWithdrawRes
-	nil,                                // 9: account.ItemContainerRecord.ItemCountMapEntry
-	nil,                                // 10: account.ItemContainerRecord.EquipmentRecordMapEntry
-	nil,                                // 11: account.CharacterItemChangedNotify.ItemCountMapEntry
-	(*EquipmentRecord)(nil),            // 12: account.EquipmentRecord
+	(*ItemElement)(nil),                // 0: account.ItemElement
+	(*ItemContainerRecord)(nil),        // 1: account.ItemContainerRecord
+	(*ItemStackTransfer)(nil),          // 2: account.ItemStackTransfer
+	(*ItemUseReq)(nil),                 // 3: account.ItemUseReq
+	(*ItemUseRes)(nil),                 // 4: account.ItemUseRes
+	(*CharacterItemChangedNotify)(nil), // 5: account.CharacterItemChangedNotify
+	(*ItemWarehouseDepositReq)(nil),    // 6: account.ItemWarehouseDepositReq
+	(*ItemWarehouseDepositRes)(nil),    // 7: account.ItemWarehouseDepositRes
+	(*ItemWarehouseWithdrawReq)(nil),   // 8: account.ItemWarehouseWithdrawReq
+	(*ItemWarehouseWithdrawRes)(nil),   // 9: account.ItemWarehouseWithdrawRes
+	nil,                                // 10: account.ItemContainerRecord.ItemCountMapEntry
+	nil,                                // 11: account.ItemContainerRecord.EquipmentRecordMapEntry
+	nil,                                // 12: account.CharacterItemChangedNotify.ItemCountMapEntry
+	(*EquipmentRecord)(nil),            // 13: account.EquipmentRecord
 }
 var file_msg_item_proto_depIdxs = []int32{
-	9,  // 0: account.ItemContainerRecord.item_count_map:type_name -> account.ItemContainerRecord.ItemCountMapEntry
-	10, // 1: account.ItemContainerRecord.equipment_record_map:type_name -> account.ItemContainerRecord.EquipmentRecordMapEntry
-	11, // 2: account.CharacterItemChangedNotify.item_count_map:type_name -> account.CharacterItemChangedNotify.ItemCountMapEntry
-	1,  // 3: account.ItemWarehouseDepositReq.stack:type_name -> account.ItemStackTransfer
-	1,  // 4: account.ItemWarehouseDepositRes.stack:type_name -> account.ItemStackTransfer
-	1,  // 5: account.ItemWarehouseWithdrawReq.stack:type_name -> account.ItemStackTransfer
-	1,  // 6: account.ItemWarehouseWithdrawRes.stack:type_name -> account.ItemStackTransfer
-	12, // 7: account.ItemContainerRecord.EquipmentRecordMapEntry.value:type_name -> account.EquipmentRecord
+	10, // 0: account.ItemContainerRecord.item_count_map:type_name -> account.ItemContainerRecord.ItemCountMapEntry
+	11, // 1: account.ItemContainerRecord.equipment_record_map:type_name -> account.ItemContainerRecord.EquipmentRecordMapEntry
+	12, // 2: account.CharacterItemChangedNotify.item_count_map:type_name -> account.CharacterItemChangedNotify.ItemCountMapEntry
+	2,  // 3: account.ItemWarehouseDepositReq.stack:type_name -> account.ItemStackTransfer
+	2,  // 4: account.ItemWarehouseDepositRes.stack:type_name -> account.ItemStackTransfer
+	2,  // 5: account.ItemWarehouseWithdrawReq.stack:type_name -> account.ItemStackTransfer
+	2,  // 6: account.ItemWarehouseWithdrawRes.stack:type_name -> account.ItemStackTransfer
+	13, // 7: account.ItemContainerRecord.EquipmentRecordMapEntry.value:type_name -> account.EquipmentRecord
 	8,  // [8:8] is the sub-list for method output_type
 	8,  // [8:8] is the sub-list for method input_type
 	8,  // [8:8] is the sub-list for extension type_name
@@ -837,7 +897,7 @@ func file_msg_item_proto_init() {
 	file_equipment_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_msg_item_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*ItemContainerRecord); i {
+			switch v := v.(*ItemElement); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -849,7 +909,7 @@ func file_msg_item_proto_init() {
 			}
 		}
 		file_msg_item_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*ItemStackTransfer); i {
+			switch v := v.(*ItemContainerRecord); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -861,7 +921,7 @@ func file_msg_item_proto_init() {
 			}
 		}
 		file_msg_item_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*ItemUseReq); i {
+			switch v := v.(*ItemStackTransfer); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -873,7 +933,7 @@ func file_msg_item_proto_init() {
 			}
 		}
 		file_msg_item_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*ItemUseRes); i {
+			switch v := v.(*ItemUseReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -885,7 +945,7 @@ func file_msg_item_proto_init() {
 			}
 		}
 		file_msg_item_proto_msgTypes[4].Exporter = func(v any, i int) any {
-			switch v := v.(*CharacterItemChangedNotify); i {
+			switch v := v.(*ItemUseRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -897,7 +957,7 @@ func file_msg_item_proto_init() {
 			}
 		}
 		file_msg_item_proto_msgTypes[5].Exporter = func(v any, i int) any {
-			switch v := v.(*ItemWarehouseDepositReq); i {
+			switch v := v.(*CharacterItemChangedNotify); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -909,7 +969,7 @@ func file_msg_item_proto_init() {
 			}
 		}
 		file_msg_item_proto_msgTypes[6].Exporter = func(v any, i int) any {
-			switch v := v.(*ItemWarehouseDepositRes); i {
+			switch v := v.(*ItemWarehouseDepositReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -921,7 +981,7 @@ func file_msg_item_proto_init() {
 			}
 		}
 		file_msg_item_proto_msgTypes[7].Exporter = func(v any, i int) any {
-			switch v := v.(*ItemWarehouseWithdrawReq); i {
+			switch v := v.(*ItemWarehouseDepositRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -933,6 +993,18 @@ func file_msg_item_proto_init() {
 			}
 		}
 		file_msg_item_proto_msgTypes[8].Exporter = func(v any, i int) any {
+			switch v := v.(*ItemWarehouseWithdrawReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_msg_item_proto_msgTypes[9].Exporter = func(v any, i int) any {
 			switch v := v.(*ItemWarehouseWithdrawRes); i {
 			case 0:
 				return &v.state
@@ -945,19 +1017,19 @@ func file_msg_item_proto_init() {
 			}
 		}
 	}
-	file_msg_item_proto_msgTypes[5].OneofWrappers = []any{
+	file_msg_item_proto_msgTypes[6].OneofWrappers = []any{
 		(*ItemWarehouseDepositReq_Stack)(nil),
 		(*ItemWarehouseDepositReq_EquipmentUuid)(nil),
 	}
-	file_msg_item_proto_msgTypes[6].OneofWrappers = []any{
+	file_msg_item_proto_msgTypes[7].OneofWrappers = []any{
 		(*ItemWarehouseDepositRes_Stack)(nil),
 		(*ItemWarehouseDepositRes_EquipmentUuid)(nil),
 	}
-	file_msg_item_proto_msgTypes[7].OneofWrappers = []any{
+	file_msg_item_proto_msgTypes[8].OneofWrappers = []any{
 		(*ItemWarehouseWithdrawReq_Stack)(nil),
 		(*ItemWarehouseWithdrawReq_EquipmentUuid)(nil),
 	}
-	file_msg_item_proto_msgTypes[8].OneofWrappers = []any{
+	file_msg_item_proto_msgTypes[9].OneofWrappers = []any{
 		(*ItemWarehouseWithdrawRes_Stack)(nil),
 		(*ItemWarehouseWithdrawRes_EquipmentUuid)(nil),
 	}
@@ -967,7 +1039,7 @@ func file_msg_item_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_msg_item_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
