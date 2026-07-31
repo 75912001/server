@@ -4,13 +4,13 @@ package account;
 
 option go_package = "server/proto/pb;pb";
 
-// 本文件是8.5战斗系统的最终协议规格, 与 docs/战斗规则.md 共同构成实现权威.
+// 本文件是8.5战斗规则研究和服务端审计结构草案, 与 docs/战斗规则.md 共同说明规则来源.
 // 机制、公式、判定顺序、整数截断、随机边界和兼容怪癖严格以8.5源码当前启用宏分支为准.
 // Actor、Gateway、Online和客户端边界沿用当前项目; 不移植旧服进程模型和BB/BD/BE字符串协议.
-// 本文件独立做protoc语法检查; 生产在线消息的字段必须与 server/proto/combat.proto 保持一致.
-// 其余完整规则、状态、技能和判定结构用于服务端实现、测试及AI开发说明, 不会自动成为客户端字段.
+// 生产在线消息以 server/proto/msg.combat.proto 为唯一协议权威. 本文件中的完整规则、
+// 状态、技能、判定和审计事件结构仅用于服务端实现、测试及AI开发说明, 不会自动成为客户端字段.
 // 正常网络协议只发送客户端动作ID、服务端有序事件/效果及必要差量, 不发送意图、随机种子、概率、公式输入或回放档案.
-// 客户端只按 event_list 中的 CombatEffect 顺序播放并应用差量, 不重算命中、伤害、暴击、
+// 客户端只按生产event_list中的CombatEvent -> CombatActionStep -> CombatEffect顺序播放并应用差量, 不重算命中、伤害、暴击、
 // 反击、状态、目标、逃跑、捕获或胜负. 不发送回合末完整快照, 不存在独立表现步骤流.
 
 // 旧服依据:
@@ -22,8 +22,8 @@ option go_package = "server/proto/pb;pb";
 
 // CombatCamp 标识战斗单位所属阵营.
 enum CombatCamp {
-  CombatCamp_Initiator = 0; // 发起战斗的一方; 与现有server/proto/combat.proto保持一致
-  CombatCamp_Defender = 1; // 接受挑战或被遇到的一方; 与现有server/proto/combat.proto保持一致
+  CombatCamp_Initiator = 0; // 发起战斗的一方; 与现有server/proto/msg.combat.proto保持一致
+  CombatCamp_Defender = 1; // 接受挑战或被遇到的一方; 与现有server/proto/msg.combat.proto保持一致
   CombatCamp_Neutral = 2; // 中立单位或场地召唤物; 不能作为正常胜负阵营
 }
 
@@ -76,13 +76,13 @@ enum CombatUnitKind {
   CombatUnitKind_Mount = 6; // 作为独立受击单位表现的骑宠
 }
 
-// CombatActionType 标识单位选择或执行的主动动作类型.
+// CombatActionType 仅用于8.5命令覆盖、服务端内部规则审计和测试结构, 不进入生产客户端协议.
 enum CombatActionType {
   CombatActionType_Unknown = 0; // 未指定或无法识别的动作
   CombatActionType_Attack = 1; // 普通物理攻击或武器攻击
   CombatActionType_Defense = 2; // 本回合防御
   CombatActionType_Skill = 3; // 使用角色技能、宠物技能或普通精灵魔法; skill_id由出手单位上下文解释
-  CombatActionType_Wait = 4; // 主动等待、无可用动作或被状态阻止行动
+  CombatActionType_Wait = 4; // 旧内部等待分类; 生产协议由skill_id=9000001表达待机且不生成事件
   CombatActionType_Escape = 5; // 尝试逃离战斗
   CombatActionType_Capture = 6; // 尝试捕获目标
   CombatActionType_SwitchPet = 7; // 召回、换上或换下宠物
@@ -117,13 +117,13 @@ enum CombatEventKind {
   CombatEventKind_Unknown = 0; // 未指定事件
   CombatEventKind_ActionBegin = 1; // 一个主动动作开始
   CombatEventKind_AttackSegment = 2; // 普通攻击或多段技能中的一段攻击
-  CombatEventKind_Defense = 3; // 防御动作生效
+  CombatEventKind_Defense = 3; // 独立防御动作表现, 对应8.5 BATTLE_Guard生成的bg|entry|
   CombatEventKind_Magic = 4; // 魔法结算
   CombatEventKind_Item = 5; // 道具使用结算
   CombatEventKind_Escape = 6; // 逃跑判定
   CombatEventKind_Capture = 7; // 捕获判定
   CombatEventKind_SwitchPet = 8; // 宠物进场、离场或替换
-  CombatEventKind_Wait = 9; // 等待或不能行动
+  CombatEventKind_Wait = 9; // 旧内部审计模型预留值; 生产协议不定义Wait效果
   CombatEventKind_Counter = 10; // 反击; counter_depth 可表达反击的反击
   CombatEventKind_Combo = 11; // 多单位合击
   CombatEventKind_LoyalGuard = 12; // 忠犬或忠诚宠物替原目标承受攻击
@@ -147,6 +147,9 @@ enum CombatEventKind {
 
 // CombatEffectKind 标识事件中的最小逻辑效果类型.
 enum CombatEffectKind {
+  reserved 26;
+  reserved "CombatEffectKind_Text";
+
   CombatEffectKind_Unknown = 0; // 未指定效果
   CombatEffectKind_Damage = 1; // 造成伤害
   CombatEffectKind_Heal = 2; // 恢复 HP、MP 或其他资源
@@ -155,7 +158,7 @@ enum CombatEffectKind {
   CombatEffectKind_Move = 5; // 单位移动或站位变化
   CombatEffectKind_Miss = 6; // 未命中或没有有效目标
   CombatEffectKind_Dodge = 7; // 目标闪避
-  CombatEffectKind_Guard = 8; // 防御或格挡
+  CombatEffectKind_Guard = 8; // 独立防御动作表现, 或受击事件中的Guard标记
   CombatEffectKind_GuardBreak = 9; // 破除防御或格挡
   CombatEffectKind_Protect = 10; // 忠犬、守护者或其他单位代替承伤
   CombatEffectKind_Reflect = 11; // 镜子精灵等反射伤害或魔法
@@ -173,7 +176,6 @@ enum CombatEffectKind {
   CombatEffectKind_ItemConsume = 23; // 道具消耗
   CombatEffectKind_Field = 24; // 场地状态变化
   CombatEffectKind_Transform = 25; // 变身或形象变化
-  CombatEffectKind_Text = 26; // 服务端文本提示; 客户端应优先按结构化数据本地化
   CombatEffectKind_AttributeChange = 27; // 攻防敏、抗性、元素或战斗修正变化
   CombatEffectKind_EquipmentChange = 28; // 装备耐久下降、破损、移除、偷窃或修复
   CombatEffectKind_InventoryChange = 29; // 捕获前置物品、投掷物或偷窃导致的背包变化
@@ -191,7 +193,7 @@ enum CombatActionResult {
   CombatActionResult_InvalidTarget = 4; // 目标非法
   CombatActionResult_SourceDefeated = 5; // 出手前已经被击倒或死亡
   CombatActionResult_Interrupted = 6; // 被反击、击倒、异常状态等中断
-  CombatActionResult_BlockedByStatus = 7; // 石化、睡眠、麻痹等状态阻止行动
+  CombatActionResult_BlockedByStatus = 7; // 服务端内部状态阻止原因; 不生成或下发该单位的失败事件
   CombatActionResult_Immune = 8; // 目标免疫
   CombatActionResult_Resisted = 9; // 目标抵抗
   CombatActionResult_Escaped = 10; // 成功逃跑
@@ -460,13 +462,13 @@ enum CombatRoundPhase {
 enum CombatIntentRewriteReason {
   CombatIntentRewriteReason_None = 0; // 动作未被改写
   CombatIntentRewriteReason_CommandTimeoutForcedExit = 1; // 旧服命令超时会强制离场, 不是自动普通攻击
-  CombatIntentRewriteReason_BlockedByStatus = 2; // 麻痹、石化、睡眠、魔障、晕眩、天罗地网等改为等待
+  CombatIntentRewriteReason_BlockedByStatus = 2; // 麻痹、石化、睡眠等在服务端内部取消动作; 不生成IntentRewrite或失败事件
   CombatIntentRewriteReason_PetLoyaltyRandomTarget = 3; // 忠诚不足导致随机改目标
   CombatIntentRewriteReason_PetLoyaltyRandomSkill = 4; // 忠诚不足导致随机技能
   CombatIntentRewriteReason_PetLoyaltyOwnerAttack = 5; // 极低忠诚导致攻击主人
   CombatIntentRewriteReason_PetLoyaltyEnemyAttack = 6; // 忠诚分支强制普通攻击随机敌人
   CombatIntentRewriteReason_PetLoyaltyEscape = 7; // 极低忠诚导致宠物逃跑
-  CombatIntentRewriteReason_TransformRestriction = 8; // 狐狸或乌力变身禁止魔法/职业技能并改为等待或防御
+  CombatIntentRewriteReason_TransformRestriction = 8; // 狐狸非法动作改为None且不生成动作事件; 乌力非法动作改为Guard
   CombatIntentRewriteReason_WeaponActionConversion = 9; // 普通攻击按回力标、弓或投掷武器转换为专用动作
   CombatIntentRewriteReason_ComboCreated = 10; // 相邻同目标普通攻击被合并为合击
   CombatIntentRewriteReason_ComboCancelled = 11; // 合击后续成员失效, 当前成员恢复为普通攻击
@@ -541,19 +543,11 @@ enum CombatFieldChangeType {
   CombatFieldChangeType_Expire = 4; // 场地状态自然到期
 }
 
-// CombatBattleEndReason 标识战斗结束原因.
-enum CombatBattleEndReason {
-  CombatBattleEndReason_Unknown = 0; // 尚未结束或原因未知
-  CombatBattleEndReason_InitiatorWin = 1; // 发起方胜利
-  CombatBattleEndReason_DefenderWin = 2; // 防守方胜利; 双方同一边界同时为0时也取本值
-  reserved 3; // 不定义平局: 双方同时归零按发起方负、防守方胜处理
-  CombatBattleEndReason_Escape = 4; // 一方成功逃跑
-  CombatBattleEndReason_Capture = 5; // 捕获导致战斗结束
-  CombatBattleEndReason_RoundLimit = 6; // 达到最大回合数后的脚本/配置结算
-  CombatBattleEndReason_Aborted = 7; // 服务端中止或房间被关闭
-  CombatBattleEndReason_CommandTimeout = 8; // 仅记录8.5旧超时强制离场差异, 现代超时不结束战斗
-  CombatBattleEndReason_NoCombatant = 9; // 一侧有效存活数为0
-  CombatBattleEndReason_ForcedScript = 10; // NPC脚本或特殊胜负回调强制结束
+// CombatBattleResult 标识战斗最终胜负.
+enum CombatBattleResult {
+  CombatBattleResult_Unknown = 0; // 默认值; 正式结算中非法
+  CombatBattleResult_InitiatorWin = 1; // 发起方胜利
+  CombatBattleResult_DefenderWin = 2; // 防守方胜利; 双方同一边界同时为0时也取本值
 }
 
 // LegacyBattleStatus 与旧服 include/battle_event.h 的 BATTLE_ST_* 顺序完全一致.
@@ -572,24 +566,24 @@ enum LegacyBattleStatus {
   LegacyBattleStatus_NoCast = 10; // 沉默; 由 MAGIC_Nocast 或 PETSKILL_Nocast 产生, MAGIC_DirectUse 会直接拒绝施法
   LegacyBattleStatus_Sars = 11; // 毒煞; 由 PETSKILL_Sars 产生, 使用独立 CHAR_WORKSARS/抗性并按配置状态和回合传播
   LegacyBattleStatus_Dizzy = 12; // 晕眩; 主要由职业盾击产生, 命中且状态判定成功后立即取消目标当前动作
-  LegacyBattleStatus_Entwine = 13; // 树根缠绕; 由职业樹根纏繞产生, 阻止行动并按技能等级降低敏捷
+  LegacyBattleStatus_Entwine = 13; // 树根缠绕; 施加成功时取消目标当前动作并按技能等级降低敏捷, 后续回合不持续阻止行动
   LegacyBattleStatus_Dragnet = 14; // 天罗地网; 由同名职业技能产生, 阻止行动并取消世界末日等正在蓄力的动作
   LegacyBattleStatus_IceCrack = 15; // 冰爆第1工作槽; 当前正常技能只登记BattleArray延迟项且执行器被整段注释, 因此不会写入本槽; 若由旧内部函数直接写入, 倒计时3到0后仅第1槽能爆炸
   LegacyBattleStatus_Oblivion = 16; // 遗忘; 由同名职业技能产生, 按技能等级临时隐藏/禁用目标宠物技能
-  LegacyBattleStatus_IceArrow = 17; // 冰箭; 由职业冰箭术产生, 命中后阻止目标行动
+  LegacyBattleStatus_IceArrow = 17; // 冰箭; 施加成功时取消目标当前动作并按回合降低敏捷, 后续回合不持续阻止行动
   LegacyBattleStatus_BloodWorms = 18; // 嗜血蛊; 由职业嗜血蛊产生, 在职业状态序列中持续结算
-  LegacyBattleStatus_Sign = 19; // 一针见血; 由同名职业技能产生, 作为后续伤害/职业结算标记
+  LegacyBattleStatus_Sign = 19; // 一针见血状态槽; 当前启用_PROFESSION_ADDSKILL时同名技能不写本槽; 若外部写入, 状态序列仍按等级扣目标HP/MP并恢复施术者
   LegacyBattleStatus_Instigate = 20; // 挑拨; 由职业挑拨产生, 同时降低目标攻击、防御和敏捷并改变其行为
   LegacyBattleStatus_FireEnclose = 21; // 火附体; 由职业火附体产生, 关联火属性修正和火魔法熟练度成长
   LegacyBattleStatus_IceEnclose = 22; // 冰附体; 由职业冰附体产生, 关联冰属性修正和冰魔法熟练度成长
   LegacyBattleStatus_ThunderEnclose = 23; // 雷附体; 由职业雷附体产生, 关联雷属性修正和雷魔法熟练度成长
-  LegacyBattleStatus_Focus = 24; // 专注战斗; 由同名勇士技能产生, 在持续期间提供职业配置定义的战斗修正
+  LegacyBattleStatus_Focus = 24; // 专注战斗休眠槽; 同名命令不写本槽, 且本槽对应的自动攻击和不能行动代码均被注释
   LegacyBattleStatus_ResistFire = 25; // 火抗; 由单体/群体火抗和自然威能产生, 同步提高 CHAR_WORK_F_RESIST
   LegacyBattleStatus_ResistIce = 26; // 冰抗; 由单体/群体冰抗和自然威能产生, 同步提高 CHAR_WORK_I_RESIST
   LegacyBattleStatus_ResistThunder = 27; // 雷抗; 由单体/群体雷抗和自然威能产生, 同步提高 CHAR_WORK_T_RESIST
-  LegacyBattleStatus_FireEncloseSecond = 28; // 火附体第二内部状态; 保存职业火附体的技能等级/追加修正
-  LegacyBattleStatus_IceEncloseSecond = 29; // 冰附体第二内部状态; 保存职业冰附体的技能等级/追加修正
-  LegacyBattleStatus_ThunderEncloseSecond = 30; // 雷附体第二内部状态; 保存职业雷附体的技能等级/追加修正
+  LegacyBattleStatus_FireEncloseSecond = 28; // 火附体施术者的持续回合槽; 技能等级另存于对应MOD槽, 正伤害攻击时尝试给目标施加FireEnclose
+  LegacyBattleStatus_IceEncloseSecond = 29; // 冰附体施术者的持续回合槽; 技能等级另存于对应MOD槽, 正伤害攻击时尝试给目标施加IceEnclose
+  LegacyBattleStatus_ThunderEncloseSecond = 30; // 雷附体施术者的持续回合槽; 技能等级另存于对应MOD槽, 正伤害攻击时尝试给目标施加ThunderEnclose
   LegacyBattleStatus_ResistAll = 31; // 自然威能的请求状态码, 不写入StatusTbl[31]; 判定成功后同时把25/26/27三个单抗槽写为turn+1
   LegacyBattleStatus_WaterEnclose = 32; // 水附体; 追加职业系统使用的水属性附体状态
   LegacyBattleStatus_Annex = 33; // 附身; 由职业附身术产生, 使用 CHAR_WORKANNEX 保存持续状态
@@ -649,13 +643,13 @@ enum LegacyPetSkillHandler {
   LegacyPetSkillHandler_Mighty = 8; // 背水/强力攻击: option 给出伤害倍率和闪避修正, 通过全局伤害/命中修正进入普通物理管线
   LegacyPetSkillHandler_StatusChange = 9; // 状态攻击: option 选择 LegacyBattleStatus、持续回合和可选攻防修正, 命中后按状态成功率施加
   LegacyPetSkillHandler_EarthRound = 10; // 地球一周: 第一阶段隐藏并避开普通选取, 下一阶段从背后攻击且按 option 增加伤害
-  LegacyPetSkillHandler_GuardBreak = 11; // 破除防御: 使用可配置攻击加成执行专用破防攻击
-  LegacyPetSkillHandler_GuardBreakSecond = 12; // 破除防御 2: 目标防御时伤害乘 130%, 未防御时仅为 70%
+  LegacyPetSkillHandler_GuardBreak = 11; // 第一种破除防御: 先执行完整AttackSeq; 目标Guard且未混乱时跳过GuardAdjust并应用完整伤害, 否则丢弃本次结果并强制MISS0
+  LegacyPetSkillHandler_GuardBreakSecond = 12; // 破除防御2: 普通/暴击伤害完成后, Guard目标先按C double乘1.3并向零截断, 随后仍执行普通GuardAdjust; 非Guard目标乘0.7. 当前现代9000011使用独立guardBreak2处理器, 不与9000004第一种破防共用逻辑
   LegacyPetSkillHandler_Abduct = 13; // 诱拐/旅途伙伴: 施术者只能是敌人或宠物且目标不能是玩家; 普通率per=max(int((目标等级-施术者等级)*0.6+30),50), 命中条件RAND(1,100)<per; option正整数对宠物改为FIXAI<option即必成; WinFunc战斗必败; 施术者无论成败都离场
   LegacyPetSkillHandler_Steal = 14; // 偷窃: 仅玩家目标有机会, RAND(1,100)<50即实际49%; 成功后再以49%走石币分支、51%走背包道具分支; 石币扣目标当前值的8%-12%但不加给施术者, 道具从目标移除后直接销毁; 真正取得东西时施术者离场
   LegacyPetSkillHandler_Merge = 15; // 合成: 非战斗技能, 调用 ITEM_mergeItem_merge; 主人处于战斗时拒绝
   LegacyPetSkillHandler_Alchemist = 16; // 炼金: Merge 的炼金模式别名, 非战斗技能且当前注册表实际复用 PETSKILL_Merge
-  LegacyPetSkillHandler_NoGuard = 17; // 不防守: 本回合主动阶段只执行NoAction; 作为防守姿态时option避%直接加到普通闪避率, 非玩家反击判定读取击%的有符号高字节修正且允许该姿态发起反击; 心%虽被保存但当前8.5源码没有读取点
+  LegacyPetSkillHandler_NoGuard = 17; // 不防守: 本回合主动阶段只执行NoAction; 作为防守姿态时option避%直接加到普通闪避率; 非玩家反击判定读取COM3低16位的bit 8-15, 值大于127时直接乘-1后加入反击率, 并允许该姿态发起反击; 心%虽被保存但当前8.5源码没有读取点
   LegacyPetSkillHandler_Inslay = 18; // 精工/镶嵌: 非战斗技能, 最多选择一件装备和材料并消耗材料修改装备
   LegacyPetSkillHandler_FixItem = 19; // 修复装备: 非战斗技能, 选择一件装备和一件材料执行耐久修复
   LegacyPetSkillHandler_MagicStatusChange = 20; // 魔法状态变化: 施加魔抗、铁壁或元素魔抗等 LegacyMagicStatus
@@ -668,18 +662,18 @@ enum LegacyPetSkillHandler {
   LegacyPetSkillHandler_BattleTimidSecond = 27; // 狂狮怒吼/怯战2: option正号按FIX+FIX*百分比、负号却错误写成FIX*百分比而非减法; 物理伤害>1后按命%以rand()%100<值判定, 仅宠物目标被收回
   LegacyPetSkillHandler_AntiInterference = 28; // 抗干扰: 旧主循环仅在目标是HP<=0的宠物时结算; 强制死亡/击飞标志并令该宠物退出, 其他目标没有攻击效果
   LegacyPetSkillHandler_BattleProperty = 29; // 力固四方/魔之诅咒: 非玩家施术者把option函数名注册为自己的CHAR_BATTLEPROPERTY; 当前配置为PET_PetskillPropertyEvent, 后续物理伤害计算把自身攻击属性改成目标四属性各自的克制属性
-  LegacyPetSkillHandler_TearDamage = 30; // 撕裂伤口: 本次使用 90% 攻击、80% 防御并进入撕裂专用伤害逻辑
+  LegacyPetSkillHandler_TearDamage = 30; // 撕裂伤口: 使用90%攻击、80%防御; DODGE跳过追加, 否则按C float追加目标缺失HP*option%, 缺失HP为0时整次伤害归零. 当前现代9000014/9000015/9000053/9000054/9000055/9000178精确映射旧配置615/616/655/656/657/1056号20%/50%/70%/120%/150%/100%, 已完成非骑乘、无受击反应PVE服务器逻辑; 骑乘目标缺失HP合计、受击反应/光镜守和客户端专用表现待开发
   LegacyPetSkillHandler_LightTake = 31; // 采光术: 本次使用 70% 攻击、50% 防御并进入采光专用结算
-  LegacyPetSkillHandler_AttackCrazed = 32; // 疯狂暴走: 使用 80% 攻击、70% 防御, option 指定攻击次数; 旧主循环未设置 gDamageDiv, 每段不是平均分摊总伤害
-  LegacyPetSkillHandler_AttackShoot = 33; // 丢栗子: 段数RAND(option最小,最大)并按段数分摊伤害且双方禁止反击; FIXAI>=100时另有RAND(1,300)>299的1/300概率, 或当前HP绝对值<20且RAND(1,50)>49的1/50概率, 强制改为8段
+  LegacyPetSkillHandler_AttackCrazed = 32; // 疯狂暴走: 使用80%攻击、70%防御, option指定攻击次数; 旧主循环未设置gDamageDiv, 每段不是平均分摊总伤害. 当前现代9000012/9000174分别精确映射旧配置613号狂乱暴走和1052号疯狂状态, 已完成3/15段攻击前目标抽取、首段原目标与第0次弃用抽取、完整伤害和行动开始后转ATTACK反击资格的PVE服务器逻辑
+  LegacyPetSkillHandler_AttackShoot = 33; // 丢栗子: 先RAND(option最小,最大)取段数; 仅FIXAI>=100时依次检查RAND(1,300)>299, 未命中且当前绝对HP<20时再检查RAND(1,50)>49, 命中任一分支都强制8段. 全部目标在首段前预抽, 伤害按段数以C float分摊; 每段正伤害先唤醒旧Sleep, 再以RAND(1,5)>4直接覆盖Sleep=3并取消目标当前命令. 任一方使用AttackShoot时反击检查直接失败. 当前现代9000013精确映射旧配置614号栗子连激, 已完成服务器PVE逻辑
   LegacyPetSkillHandler_MPDamage = 34; // MP伤害: option第1段的整数除法atoi/100使小于100的值变为0, 因而通常不降低攻击; 仅玩家目标且无光镜守时再扣int(当前MP*段2/100), 敌人/宠物不扣MP
   LegacyPetSkillHandler_ToothCrush = 35; // 啮齿: 伤害仍走普通物理管线并输出BCF_TOOTH; 仅玩家目标会随机选一件可损坏装备, 按当前/最大耐久比把耐久直接降到最大值的70%、30%、10%或0, 到0删除装备
   LegacyPetSkillHandler_SetDuck = 36; // 闪避术: 只能对自己施放, option=回合|数值; 已有闪避槽时不覆盖; 每次受普通闪避检查时rand()%100<=数值即直接闪避, 实际概率为(数值+1)%; 同时把未递增的魔法宠次数计数重置为0
-  LegacyPetSkillHandler_SetMagicPet = 37; // 魔法宠技能: option=回合|数值|HP/STR/TGH/DEX; HP立即按固定值恢复, 属性槽与闪避/其他三属性槽互斥且已有任一槽时跳过; 源码检查单场3次但计数从未递增, 实际不受3次限制
+  LegacyPetSkillHandler_SetMagicPet = 37; // 魔法宠技能: option=回合|数值|HP/STR/TGH/DEX; HP按每目标RAND(数值*0.9,数值*1.1)立即恢复, 满HP仍抽数, 属性槽与闪避/其他三属性槽互斥且已有任一槽时跳过, HP分支则在槽位检查前执行; 源码检查单场3次但计数从未递增, 实际不受3次限制. 当前现代14个参数实例共用同一处理器, 其中9000180精确映射1058圣灵滋润的3|900|HP和己方整营; 骑乘拆分、连接级账号中毒、宠物关系值副作用和专用表现待开发
   LegacyPetSkillHandler_ModifyAttack = 38; // 属性强化攻击: 进入 BATTLE_COM_S_MODIFYATT, 具体属性强化参数来自技能 option
   LegacyPetSkillHandler_ModifyAttackElement = 39; // 攻击属性转化: option 指定地/水/火/风及数值, 本段物理攻击临时使用该属性
   LegacyPetSkillHandler_Vary = 40; // 狼变身: 仅特定 pet ID 可用, 按 option 提高攻/敏并切换形象, 持续状态由回合逻辑维护
-  LegacyPetSkillHandler_WildViolentAttack = 41; // 狂暴攻击: 随机 3-10 段, 按段数分摊伤害, option 可修正攻、防和命中
+  LegacyPetSkillHandler_WildViolentAttack = 41; // 狂暴攻击: 随机3-10段并按段数分摊; option攻%/防%按FIX+int(C float(FIX)*p/100)修改本回合工作值, 不修改敏捷; 避值增加每个主动段的目标闪避率, 反击前清零. 当前现代9000007/9000050/9000063/9000069/9000172共用参数化处理器; 9000172精确映射1050蛮牛暴击的+233/-66/50、敌方单体锚点、失效后改选和末段反击PVE规则
   LegacyPetSkillHandler_SpeedyAttack = 42; // 疾速攻击: 使用专用高速攻击动作, option 可修正防御
   LegacyPetSkillHandler_Sacrifice = 43; // 救援/牺牲: 自身HP必须严格大于最大HP*20%; 执行时先把自身HP设为int(当前HP*0.5), 再以这个“减半后的HP”作为目标固定治疗量并受目标最大HP截断
   LegacyPetSkillHandler_Refresh = 44; // 解除异常: 在option中扫描aszStatus的首个两字节状态标记, 再对配置目标调用MultiStatusRecovery; option全映射0且只通配清除ID1-6; 每目标只检查当前最高ID状态; 返回值误查施术者而非目标, 不表示实际恢复结果
@@ -688,22 +682,22 @@ enum LegacyPetSkillHandler {
   LegacyPetSkillHandler_Barrier = 47; // 魔障: 施加 LegacyBattleStatus_Barrier
   LegacyPetSkillHandler_NoCast = 48; // 沉默: 施加 LegacyBattleStatus_NoCast
   LegacyPetSkillHandler_Roar = 49; // 大吼: 不造成伤害; 目标不能是自己, 取玩家=-1或宠物/敌人的PETID, 若ID存在于option竖线列表则立即BATTLE_Exit; 宠物目标还清除其主人的DEFAULTPET, 非列表目标无效果
-  LegacyPetSkillHandler_Sars = 50; // 毒煞蔓延: option 选择状态和持续回合, 进入 BATTLE_COM_S_SARS 传播对应异常
-  LegacyPetSkillHandler_Sonic = 51; // 音波攻击: 先按普通物理管线攻击所选目标; 若目标在宠物后排5-9或15-19, 再攻击其前方主人位target-5, 第二击重新命中/暴击/光镜守判定且最终物理伤害乘0.5
-  LegacyPetSkillHandler_Regret = 52; // 悔恨攻击: option按FIX值增加攻防; 先攻击所选目标, 若其为后排宠物位再攻击target-5主人且主人伤害乘0.8; 两击各用option命%作为Dizzy状态公式基础值, 成功写2回合并清目标动作
-  LegacyPetSkillHandler_Gyrate = 53; // 回旋攻击: 对所选目标所在5格单排的每个存活单位逐个调用完整普通BATTLE_Attack; option攻%实现以初值0相乘, 因而实际不会改变攻击力; 整排攻击结束后才进入共用后处理
+  LegacyPetSkillHandler_Sars = 50; // 毒煞蔓延: option选择煞状态并默认turn=3, 普通物理正伤害后按四维/等级/毒抗判定; 主状态3次当前HP 10%扣除并按tibuf邻位60%传播, 传播状态只扣2次. 当前现代9000016已完成非骑乘PVE服务器逻辑; 玩家MP、骑宠承伤和客户端专用表现待开发
+  LegacyPetSkillHandler_Sonic = 51; // 音波攻击: 先按普通物理管线攻击所选目标; 若目标在宠物后排5-9或15-19, 首段前锁定target-5并重新执行命中/暴击/光镜守, 第二段在GuardAdjust前乘0.5. 当前现代9000017/9000176已完成技能618/1054的PVE服务器结算; 光镜守输入和客户端专用表现待开发
+  LegacyPetSkillHandler_Regret = 52; // 悔恨攻击: option按FIX值增加可匹配的攻防; 先攻击所选目标, 若其为后排宠物位再攻击target-5主人且第二段伤害乘0.8; 两击各用option命%作为Dizzy基础值, 先抽数再检查存活/状态并严格小于阈值时写2次行动. 当前现代9000039/9000064/9000115/9000170已完成640/666/718/1048的PVE服务器逻辑; `防-50/-40/-50/-90%`均因不匹配`防%`而不修改施术者防御, 骑乘、守护/光镜守、敌方AI和客户端专用表现待开发
+  LegacyPetSkillHandler_Gyrate = 53; // 回旋攻击: 技能提交时按FIXSTR+int(FIXSTR*攻%/100)覆盖攻击; 对所选目标所在5格单排按槽位升序预选存活单位并逐个调用完整BATTLE_Attack, 快照目标段前死亡则静默跳过且不TargetAdjust, 不进入合击或反击链. 当前现代9000018/9000051/9000065/9000169已完成619/653/667/1047的PVE服务器逻辑; 骑乘、守护/光镜守、敌方AI和客户端专用表现待开发
   LegacyPetSkillHandler_Acupuncture = 54; // 针刺外皮: 建立一次性反伤; 奇数原伤先加1, 目标承受补偶后全伤; 无骑宠攻击者承受damage/2, 有骑宠时按防御比例拆分、各补偶后分别除2; 然后状态清零
-  LegacyPetSkillHandler_Retrace = 55; // 追迹攻击: 先普通攻击; 仅返回DODGE时以RAND(1,100)<80判定, 实际79%概率把攻击设为FIXSTR+int(FIXSTR*0.2)并对同目标再走一次完整普通攻击
-  LegacyPetSkillHandler_Hector = 56; // 威吓: option按FIX值提高攻/敏; 主循环先以PROFESSION_BATTLE_StatusAttackCheck(...Paralysis,60)判定并直接写1回合麻痹, 随后因case贯穿继续执行普通攻击, 即状态判定发生在伤害前
+  LegacyPetSkillHandler_Retrace = 55; // 追迹攻击: 先普通攻击; 仅返回DODGE时以RAND(1,100)<80判定, 实际79%概率把攻击设为FIXSTR+int(FIXSTR*0.2)并对同目标再走一次完整普通攻击; 第二击返回值不覆盖首击ContFlg. 当前现代9000020已完成PVE服务器结算; 敌方AI和客户端专用表现待开发
+  LegacyPetSkillHandler_Hector = 56; // 威吓: option按正负百分比分别执行FIXSTR+int(FIXSTR*p/100)和FIXDEX+int(FIXDEX*p/100); 主循环对原Entry先消费RAND(1,100), 再检查死亡/普通状态互斥并以严格<60判定Paralysis=1, 随后贯穿普通攻击并提升为ATTACK. 当前现代9000019/9000072/9000158/9000167/9000175/9000186已完成技能620/674/1035/1045/1053/1064的PVE服务器结算; 1053的`罗 turn 2`和1064的`麻 turn 2`均未被旧处理器读取, 实际仍是麻痹1次行动. 技能表首条1068“众神の击”被后行同ID“雷尔总动员”覆盖而不可达, 不分配现代ID; 其他状态互斥、敌方AI和客户端专用表现待开发
   LegacyPetSkillHandler_FireKill = 57; // 火线猎杀: 自动修正失效目标, 用 80% 物攻进行不受光镜守反应的专用物理伤害, 再追加固定火属性魔法伤害
-  LegacyPetSkillHandler_DamageToHPSecond = 58; // 暗月狂狼: 攻击时令perCri=perCri+int(perCri*0.3), 攻击=FIXSTR+int(FIXSTR*0.2), 敏捷=FIXDEX+int(FIXDEX*0.2), 再以整个option为吸血百分比结算
-  LegacyPetSkillHandler_BecomeFox = 59; // 媚惑术: 有效物理命中后对非玩家且WORK_PETFLG非0目标以rand()%100<31判定; 成功变形3个战斗回合、攻防敏取FIX值80%、只能攻防待机并强制落马
+  LegacyPetSkillHandler_DamageToHPSecond = 58; // 浴血狂袭: 技能表的HP50限制没有可执行检查; DexCalc以(敏捷+20)*1.2直接排序且不抽RAND; 闪避后把基础会心阈值加30%, 再把攻击设为FIXSTR+20%计算伤害; 无受击反应且正伤害时以C float按整个option恢复最终显示伤害百分比, 独立命令不进入合击反击. 当前现代9000022已完成非骑乘PVE和针刺反应回退; 其他受击反应、骑乘、敌方AI和客户端专用表现待开发
+  LegacyPetSkillHandler_BecomeFox = 59; // 媚惑术: 有效物理命中后先抽rand()%100, 再检查目标非玩家且WORK_PETFLG非0; 严格<31时记录施加回合, 目标每次自身动作阶段把攻防敏取FIX值80%, 回合差>2的动作阶段结束后恢复, 只能Attack/Guard/None并强制落马
   LegacyPetSkillHandler_BecomePig = 60; // 乌力化: 普通攻击命中且目标为存活敌方玩家时变身; 源码用pszOption=="\\0"指针比较导致正常非空option固定采用100%、60秒、形象100250; 重复命中把60秒累加, 并清道具/NPC/狐狸变身、强制落马、禁魔法与职业技能
-  LegacyPetSkillHandler_ShowMercy = 61; // 手下留情: 若本次伤害足以击杀, 将实际伤害截断为使目标保留 1 HP
+  LegacyPetSkillHandler_ShowMercy = 61; // 手下留情: DamageSub入口正伤害足以击杀时先截成目标当前HP-1, 随后仍执行针刺等反应; 因此2HP针刺目标仍可能死亡, 1HP截零后针刺仍会被消耗
   LegacyPetSkillHandler_Combined = 62; // 难得糊涂/综合魔法: 从 option 最多 10 个 magic ID 中随机一个, 然后按普通魔法动作执行
   LegacyPetSkillHandler_BatFly = 63; // 群蝠四窜: 对敌方全体按当前HP吸血; 无活骑宠扣人物floor(HP/10), 有活骑宠则人物和骑宠各扣floor(HP/20), 商为0仍强制扣1且可致死/落马; 总扣血加给施术者, 但超过最大HP时源码设满后把上报治疗量错误置0
   LegacyPetSkillHandler_DivideAttack = 64; // 分身地裂: 先令敌方玩家MP扣floor(MP/2); 再对敌方全体扣当前HP, 无活骑宠扣人物floor(HP/5), 有活骑宠则人物和骑宠各扣floor(HP/10), 商为0仍扣1且可致死/落马; 不走命中、暴击、反击和光镜守
-  LegacyPetSkillHandler_BattleModel = 65; // 通用战斗模型: option依次为类型位图|攻击物件数|状态|回合|基础命中|攻防敏修正|1-4动作图; 物件数<=0随机1-10、>10截为10; 位0决定少物件时是否覆盖全体, 位2决定物理承伤/忠犬/光镜守; 每个物件独立攻击并可重复随机目标
+  LegacyPetSkillHandler_BattleModel = 65; // 通用战斗模型: option依次为类型位图|攻击物件数|状态|回合|基础命中|攻防敏修正|1-4动作图; 物件数<=0随机1-10、>10截为10; 位0决定少物件时是否覆盖全体, 位2决定物理承伤/忠犬/光镜守; 每个物件独立攻击并可重复随机目标. 当前现代9000168/9000171/9000173/9000177/9000179/9000181/9000182/9000183/9000184/9000185已完成1046八卦六十四掌、1049牛气冲天、1051九尾分身、1055血染霜天、1057 VIP极速之豹、1059 VIP机豹撕杀、1060乌宝宝全家福、1061凤凰二重奏、1062威威和宝宝和1063树大招风的非骑乘PVE服务器结算. 1063锁定3对象、type 3的true/false、Dizzy 1、基础45及攻%-1; 目标不超过3个时先按position覆盖再逐对象随机复用, 目标超过3个时复用对象确定性覆盖余下目标. type 3仍执行物理伤害, 但不触发或消耗针刺等普通物理受击反应. 正伤害先唤醒旧Sleep, Dizzy命中时保留姿态并在下一次真实行动开始才清, 该次行动取消后只返回Status Remove. 单张100468仅为客户端表现. 忠犬/光镜守、骑乘、其他受击反应、敌方AI和PVP待开发
 }
 
 // LegacyMagicHandler 枚举旧服 MAGIC_functbl 中全部已注册的魔法处理器.
@@ -726,7 +720,7 @@ enum LegacyMagicHandler {
   LegacyMagicHandler_DeepPoison = 14; // 剧毒精灵: 通过 StatusChange2 施加 LegacyBattleStatus_DeepPoison
   LegacyMagicHandler_Barrier = 15; // 魔障精灵: 施加 LegacyBattleStatus_Barrier
   LegacyMagicHandler_NoCast = 16; // 沉默精灵: 施加 LegacyBattleStatus_NoCast 并阻止 MAGIC_DirectUse
-  LegacyMagicHandler_CallDragon = 17; // 召龙: 不创建战场单位; 扣MP后按option=image|power创建临时等级100/幸运1/攻击power的计算角色, 每目标先魔法闪避再用普通DamageCalc直伤; FieldAttr固定-1, 骑乘固定人物/宠物各半且23/24、25/26同行代码各自实际展开同一整侧
+  LegacyMagicHandler_CallDragon = 17; // 召龙: 不创建战场单位; 扣MP后按option=image|power创建形象100354的临时计算角色. CHAR_createCharacter第二实参100是floor而非等级; 缺少100354模板时回退defaultPlayer, 实际等级1、幸运1、攻击power. 每目标先魔法闪避再用普通DamageCalc直伤; FieldAttr固定-1, 骑乘固定人物/宠物各半且23/24、25/26同行代码各自实际展开同一整侧
 }
 
 // LegacyBattleItemHandler 枚举 battle_item.c 中所有战斗内道具处理入口.
@@ -770,16 +764,16 @@ enum LegacyProfessionSkillHandler {
   LegacyProfessionSkillHandler_SummonThunder = 4; // 巫师召雷术: 单体雷属性攻击魔法
   LegacyProfessionSkillHandler_Current = 5; // 巫师电流术: 整侧雷属性攻击魔法
   LegacyProfessionSkillHandler_Storm = 6; // 巫师暴风雨: 整侧范围攻击魔法
-  LegacyProfessionSkillHandler_IceArrow = 7; // 巫师冰箭术: 单体冰伤并关联 LegacyBattleStatus_IceArrow, 成功后阻止行动
+  LegacyProfessionSkillHandler_IceArrow = 7; // 巫师冰箭术: 单体冰伤并关联 LegacyBattleStatus_IceArrow, 状态成功时取消目标当前动作并施加减敏, 后续回合不持续阻止行动
   LegacyProfessionSkillHandler_IceCrack = 8; // 巫师冰爆术: 当前主分发只写BattleArray的20项延迟队列、ice_bout=2并把本次动作改为NoAction; 队列初始化和回合执行代码均被注释, 所以技能不会产生伤害或IceCrack状态
   LegacyProfessionSkillHandler_IceMirror = 9; // 巫师冰镜术: 冰属性攻击/镜像表现, 具体范围和倍率由职业魔法配置计算
   LegacyProfessionSkillHandler_Doom = 10; // 巫师世界末日: 整侧高阶魔法, 可进入 CHAR_DOOMTIME 蓄力, 蓄力可被天罗地网取消
   LegacyProfessionSkillHandler_Blood = 11; // 巫师嗜血成性: 强制以自己为目标, 在职业魔法流程中处理 HP/攻击相关效果
   LegacyProfessionSkillHandler_BloodWorms = 12; // 巫师嗜血蛊: 单体攻击并施加 LegacyBattleStatus_BloodWorms
-  LegacyProfessionSkillHandler_Sign = 13; // 巫师一针见血: 整侧范围魔法并施加 LegacyBattleStatus_Sign
-  LegacyProfessionSkillHandler_FireEnclose = 14; // 巫师火附体: 施加 FireEnclose/FireEncloseSecond 并推动火魔法熟练度
-  LegacyProfessionSkillHandler_IceEnclose = 15; // 巫师冰附体: 施加 IceEnclose/IceEncloseSecond 并推动冰魔法熟练度
-  LegacyProfessionSkillHandler_ThunderEnclose = 16; // 巫师雷附体: 施加 ThunderEnclose/ThunderEncloseSecond 并推动雷魔法熟练度
+  LegacyProfessionSkillHandler_Sign = 13; // 巫师一针见血: 最多10目标的职业魔法, 保留主魔法结算和10%附加恢复逻辑, 但当前启用_PROFESSION_ADDSKILL时不写LegacyBattleStatus_Sign
+  LegacyProfessionSkillHandler_FireEnclose = 14; // 巫师火附体先写自身Second持续回合和MOD技能等级, 后续正伤害攻击尝试给目标施加FireEnclose; 保留火魔法熟练度成长
+  LegacyProfessionSkillHandler_IceEnclose = 15; // 巫师冰附体先写自身Second持续回合和MOD技能等级, 后续正伤害攻击尝试给目标施加IceEnclose; 保留冰魔法熟练度成长
+  LegacyProfessionSkillHandler_ThunderEnclose = 16; // 巫师雷附体先写自身Second持续回合和MOD技能等级, 后续正伤害攻击尝试给目标施加ThunderEnclose; 保留雷魔法熟练度成长
   LegacyProfessionSkillHandler_FirePractice = 17; // 巫师火魔法熟练度: 被动技能, 使用火系职业技能时成长, 本身不生成主动战斗事件
   LegacyProfessionSkillHandler_IcePractice = 18; // 巫师冰魔法熟练度: 被动技能, 使用冰系职业技能时成长
   LegacyProfessionSkillHandler_ThunderPractice = 19; // 巫师雷魔法熟练度: 被动技能, 使用雷系职业技能时成长
@@ -794,7 +788,7 @@ enum LegacyProfessionSkillHandler {
   LegacyProfessionSkillHandler_Scapegoat = 28; // 勇士舍己为友: 自降防御并成为主人宠物、全体宠物或全队的 guardian, 范围由技能等级决定
   LegacyProfessionSkillHandler_Enrage = 29; // 勇士激化攻击: 在持续回合内提高攻击并以防御等代价换取输出, 数值来自技能等级/option
   LegacyProfessionSkillHandler_EnergyCollect = 30; // 勇士能量聚集: 建立蓄力/能力提升状态, 在后续职业攻击中消费
-  LegacyProfessionSkillHandler_Focus = 31; // 勇士专注战斗: 施加 LegacyBattleStatus_Focus 并提供持续战斗修正
+  LegacyProfessionSkillHandler_Focus = 31; // 勇士专注战斗: 写CHAR_MYSKILLHIT=2和CHAR_MYSKILLHIT_NUM=100, 不写LegacyBattleStatus_Focus且未先增加CHAR_WORKHITRIGHT; 倒计时归零时会从CHAR_WORKHITRIGHT减100
   LegacyProfessionSkillHandler_ShieldAttack = 32; // 勇士盾击: 必须装备盾; 非满级攻击力减半, 命中后按配置和等级概率施加晕眩并取消目标动作
   LegacyProfessionSkillHandler_DualWeapon = 33; // 勇士二刀流: 被动技能, 武器攻击时参与伤害/熟练度成长
   LegacyProfessionSkillHandler_Deflect = 34; // 勇士格挡: 建立职业格挡状态, 被攻击时可返回 Arrange/Block 表现并推动熟练度
@@ -809,7 +803,7 @@ enum LegacyProfessionSkillHandler {
   LegacyProfessionSkillHandler_Trap = 43; // 猎人陷阱: 建立一次性 LegacyDamageReaction_Trap, 近战攻击者承受预存伤害后状态清零
   LegacyProfessionSkillHandler_EnragePet = 44; // 猎人激怒宠物: 对己方宠物施加 3-5 回合、等级*2%+10% 的攻击提升, 技能本身不造成伤害
   LegacyProfessionSkillHandler_Dragnet = 45; // 猎人天罗地网: 施加 Dragnet, 阻止行动并清除目标世界末日/火龙枪蓄力数据
-  LegacyProfessionSkillHandler_Entwine = 46; // 猎人树根缠绕: 施加 Entwine, 阻止行动并按等级和 option 降低敏捷
+  LegacyProfessionSkillHandler_Entwine = 46; // 猎人树根缠绕: 施加成功时取消目标当前动作并按等级和 option 降低敏捷, 后续回合不持续阻止行动
   LegacyProfessionSkillHandler_Autarky = 47; // 猎人自给自足: 被动技能, 本处理器不生成主动战斗动作
   LegacyProfessionSkillHandler_Plunder = 48; // 猎人尸体掠夺: 仅允许已死亡敌人, 从该侧敌人物品中取得一件并让目标退出战斗
   LegacyProfessionSkillHandler_ToxinWeapon = 49; // 猎人毒素武器: 按当前武器范围攻击并对每个有效命中目标判定施加 Poison
@@ -892,12 +886,12 @@ enum LegacyBattleRule {
   LegacyBattleRule_Unknown = 0; // 未指定规则
   LegacyBattleRule_ActionOrderRandomAgility = 1; // 每回合按当前敏捷+20后减去 0%-30% 随机值计算顺序, 不是直接按面板敏捷
   LegacyBattleRule_ActionOrderEquipmentSequence = 2; // _EQUIT_SEQUENCE 开启时装备顺序值与随机敏捷值相加后降序排列
-  LegacyBattleRule_ActionOrderTieUnstable = 3; // qsort 比较值相同返回 0, 源码没有稳定的槽位或阵营次级排序保证
+  LegacyBattleRule_ActionOrderTieUnstable = 3; // 8.5 qsort比较值相同返回0且顺序无保证; 现代确定性适配稳定保留原始入场顺序, 不增加次级键或随机抽取
   LegacyBattleRule_ItemActionOrderBonus = 4; // 道具行动值=int(work-RAND(0,int(work*0.3))+work*0.15), 在普通随机敏捷表达式中追加15%work后整体截断
   LegacyBattleRule_SkillSpecificActionOrder = 5; // 攻击魔法和职业技能按不同 0%-60% 随机区间计算顺序, 必须记录最终 order_value
   LegacyBattleRule_StatusTickBeforeOwnAction = 6; // 普通状态在单位轮到出手时先结算, 不是所有单位统一在回合末结算
   LegacyBattleRule_StatusTickOrder = 7; // 单位出手前依次执行 BATTLE_StatusSeq、BATTLE_MagicStatusSeq、BATTLE_ProfessionStatusSeq
-  LegacyBattleRule_StatusTickCanCancelAction = 8; // 持续伤害致死或不能行动状态会把本次动作改为 None
+  LegacyBattleRule_StatusTickCanCancelAction = 8; // 持续伤害致死或不能行动状态会把本次动作改为None; 当前event_list不生成未执行动作事件
   LegacyBattleRule_ModifierDecayBetweenRounds = 9; // 下一轮命令阶段把攻击、防御、敏捷、魅力等临时 mod 乘以 0.8
   LegacyBattleRule_ElementReverseBetweenRounds = 10; // Reverse 标记每轮交换地<->火、水<->风的当前属性
   LegacyBattleRule_GuardianLinkResetEachRound = 11; // 每轮命令阶段先清空 entry.guardian 和 GUARDIAN 标记, 必须由本轮动作重新建立
@@ -909,7 +903,7 @@ enum LegacyBattleRule {
   LegacyBattleRule_RandomMultiTargetPerSegment = 17; // 疯狂暴走/栗子等技能可为每段从存活敌人中重新随机目标
   LegacyBattleRule_PetLoyaltyActionRewrite = 18; // 宠物忠诚不足可改目标、随机技能、攻击主人、攻击敌人、等待或逃跑
   LegacyBattleRule_PetLoyaltyBypassOnSurprise = 19; // 所属阵营处于 Surprise 时该轮跳过 BATTLE_PetLoyalCheck
-  LegacyBattleRule_TransformActionRestriction = 20; // 狐狸只允许攻击、防御、等待, 其他动作改为None; 乌力允许攻击、防御、None、道具、逃跑、捕获、等待和宠物进出, 其他动作改为Guard; 两者都强制徒手
+  LegacyBattleRule_TransformActionRestriction = 20; // 狐狸只允许Attack、Guard、None, 其他动作改为None; 乌力允许Attack、Guard、None、Item、Escape、Get、Wait和宠物进出, 其他动作改为Guard; 两者都强制徒手
   LegacyBattleRule_OrdinaryStatusGlobalExclusive = 21; // 通用BATTLE_StatusAttackCheck及普通职业状态扫描全部BATTLE_ST_*, 已有任意状态就拒绝新状态; 自然威能使用专用例外
   LegacyBattleRule_OrdinaryStatusReapplyKeepsCurrent = 22; // 石化 5 再施加石化 3 会失败并保留当前剩余值, 不累加、不覆盖、不取最大
   LegacyBattleRule_OrdinaryStatusAnimationBeforeConflict = 23; // BATTLE_MultiStatusChange 先发魔法效果再检查冲突, 所以可有动画但状态未新增
@@ -976,7 +970,7 @@ enum LegacyBattleRule {
   LegacyBattleRule_ProfessionDirectAttackNoFriendlyTarget = 84; // 多数职业直攻技能先检查同阵营目标, 同队目标直接变为 NoAction
   LegacyBattleRule_AttackMagicServerTargetTable = 85; // 宠物攻击魔法按服务端 TargetIndex 表把单体目标改写为指定排或全体
   LegacyBattleRule_PetCannotUsePlayerEscapeCommand = 86; // 普通 Escape/CompelEscape 分支仅处理非宠物; 低忠诚宠物逃跑使用 LostEscape 专用技能
-  LegacyBattleRule_RandInclusiveBoundary = 87; // RAND(min,max)按闭区间抽取; 每处仍须保留源码<或<=比较符
+  LegacyBattleRule_RandInclusiveBoundary = 87; // RAND(min,max)按rand()/(RAND_MAX+1.0)浮点缩放到闭区间, 不等于rand()%N的直接取模; 每处仍须保留源码<或<=比较符
   LegacyBattleRule_IntegerTruncationOrder = 88; // C语言int赋值和复合运算按源码位置向零截断, 不得把整条公式改为浮点末尾一次取整
   LegacyBattleRule_PhysicalDamagePiecewise = 89; // _BATTLE_NEWPOWER物伤按防御>攻击、攻击<防御*8/7、攻击>=防御*8/7三段公式计算
   LegacyBattleRule_NpcRandomParenthesisQuirk = 90; // 敌方攻防浮动为(value*(rand()%10)+2)/100, +2位于乘法之后, 必须保留括号怪癖
@@ -1366,7 +1360,7 @@ enum LegacyConfiguredPetSkillId {
   LegacyConfiguredPetSkillId_Id1061_Line327 = 1061; // 凤凰二重奏 | 3D凤凰技能 攻击力上升，全体眩晕3回合 | function=PETSKILL_BattleModel | option='5|5|晕|3|30|攻%-1|131021 103121' | free='' | kind='' | field=1 | target=3 | use_type=3 | cost='10000' | code='PETSKILL_NONE'
   LegacyConfiguredPetSkillId_Id1062_Line328 = 1062; // 威威和宝宝 | 威威和宝宝技能 攻击力上升 全体眩晕3回合 | function=PETSKILL_BattleModel | option='5|5|晕|3|30|攻%-1|100830 100831 100832 100266 100263' | free='' | kind='' | field=1 | target=3 | use_type=3 | cost='10000' | code='PETSKILL_NONE' | raw_trailing_whitespace=option:\x20
   LegacyConfiguredPetSkillId_Id1063_Line329 = 1063; // 树大招风 | 树的技能 攻击力上升-30% 全体眩晕1回合 | function=PETSKILL_BattleModel | option='3|3|晕|1|45|攻%-1|100468' | free='' | kind='' | field=1 | target=3 | use_type=3 | cost='10000' | code='PETSKILL_NONE'
-  LegacyConfiguredPetSkillId_Id1068_Line330 = 1068; // 眾神の击 | 攻击力提高50% 敏捷上升50% 有60%的机率使对手麻痹两回合 | function=PETSKILL_Hector | option='麻 turn 3 攻%50 敏%50' | free='' | kind='' | field=1 | target=1 | use_type=2 | cost='5000' | code='PETSKILL_NONE'
+  LegacyConfiguredPetSkillId_Id1068_Line330 = 1068; // 众神の击 | 攻击力提高50% 敏捷上升50% 有60%的机率使对手麻痹两回合 | function=PETSKILL_Hector | option='麻 turn 3 攻%50 敏%50' | free='' | kind='' | field=1 | target=1 | use_type=2 | cost='5000' | code='PETSKILL_NONE'
   LegacyConfiguredPetSkillId_Id1064_Line331 = 1064; // 转转菊花爆-改 | 攻击力提高70% 敏捷上升50% 有60%的机率使对手麻痹两回合 | function=PETSKILL_Hector | option='麻 turn 2 攻%70 敏%50' | free='' | kind='' | field=1 | target=1 | use_type=2 | cost='5000' | code='PETSKILL_NONE'
   LegacyConfiguredPetSkillId_Id1065_Line332 = 1065; // 究极暗月变身 | 变身后增加200%的攻击力跟敏捷  魔法防御值-5%  有效时间五回合 | function=PETSKILL_Vary | option='攻%+200 敏%+200 魔防%-5' | free='' | kind='' | field=1 | target=5 | use_type=2 | cost='1000' | code='PETSKILL_VARY' | raw_trailing_whitespace=description:\u3000\u3000\u3000
   LegacyConfiguredPetSkillId_Id1066_Line333 = 1066; // GM转转菊花爆 | 攻击力提高500% 敏捷上升500% 有100%的机率使对手麻痹两回合 | function=PETSKILL_Hector | option='麻 turn 2 攻%500 敏%500' | free='' | kind='' | field=1 | target=1 | use_type=2 | cost='5000' | code='PETSKILL_NONE'
@@ -1626,7 +1620,7 @@ enum LegacyConfiguredMagicId {
   LegacyConfiguredMagicId_Id350_Line187 = 350; // 变幻的精灵 Lv1 | 变身成自己的宠物一分钟 | function=MAGIC_Metamo | option='60' | field=0 | target=1 | target_dead=0 | attack_magic_idx='0'
   LegacyConfiguredMagicId_Id351_Line188 = 351; // 变幻的精灵 Lv2 | 变身成自己的宠物二分钟 | function=MAGIC_Metamo | option='120' | field=0 | target=1 | target_dead=0 | attack_magic_idx='0'
   LegacyConfiguredMagicId_Id352_Line189 = 352; // 变幻的精灵 Lv3 | 变身成自己的宠物三分钟 | function=MAGIC_Metamo | option='180' | field=0 | target=1 | target_dead=0 | attack_magic_idx='0'
-  LegacyConfiguredMagicId_Id355_Line190 = 355; // 變幻的精靈 Lv10 | 變身成自己的寵物一天 | function=MAGIC_Metamo | option='86400' | field=0 | target=1 | target_dead=0 | attack_magic_idx='0'
+  LegacyConfiguredMagicId_Id355_Line190 = 355; // 变幻的精灵 Lv10 | 变身成自己的宠物一天 | function=MAGIC_Metamo | option='86400' | field=0 | target=1 | target_dead=0 | attack_magic_idx='0'
   LegacyConfiguredMagicId_Id356_Line191 = 356; // T陨石冲击 | 地魔法LV4 | function=MAGIC_AttMagic | option='地|600|5' | field=1 | target=11 | target_dead=0 | attack_magic_idx='13'
   LegacyConfiguredMagicId_Id357_Line192 = 357; // T冰天雪地 | 水魔法LV4 | function=MAGIC_AttMagic | option='水|600|5' | field=1 | target=11 | target_dead=0 | attack_magic_idx='19'
   LegacyConfiguredMagicId_Id358_Line193 = 358; // T火山爆发 | 火魔法LV4 | function=MAGIC_AttMagic | option='火|600|5' | field=1 | target=11 | target_dead=0 | attack_magic_idx='7'
@@ -1904,7 +1898,7 @@ enum LegacyConfiguredProfessionSkillId {
   LegacyConfiguredProfessionSkillId_Id73_Line73 = 73; // 法师天罗地网 | 限制敌人行动 | function=PROFESSION_DRAGNET | option='罗|成%25|效%1|回%2' | class=2 | target=1 | cost_mp=20 | use_flag=1 | kind=2 | icon=29226 | action_img=101698/101683 | cost=20000 | fix=20 | prerequisites=0,0,0,0,0,0,0,0
 }
 
-// CombatUnitKey 与当前server/proto/combat.proto保持一致, 是本场战斗内稳定单位引用.
+// CombatUnitKey 与当前server/proto/msg.combat.proto保持一致, 是本场战斗内稳定单位引用.
 message CombatUnitKey {
   uint64 aid = 1; // 账号ID; 玩家单位为AccountRecord.aid, 怪物/NPC/召唤物为0
   uint64 character_uuid = 2; // 玩家角色UUID; 玩家宠物填所属角色UUID, 非玩家单位为0
@@ -2148,9 +2142,11 @@ message CombatUnitState {
   repeated CombatModifierStatus modifier_status_list = 16; // 当前防御、忠犬、骑乘、蓄力、变身等修正
 }
 
-// CombatUnitAttribute 保留现有协议1-6字段, 并补齐8.5公式所需的服务端权威初始属性.
+// CombatUnitAttribute 保存8.5公式所需的服务端权威开战属性, 精确经验值只保留在持久化档案中.
 message CombatUnitAttribute {
-  uint64 exp = 1; // 当前经验值; 与现有协议一致
+  reserved 1;
+  reserved "exp";
+
   uint32 hp = 2; // 开战当前HP; 与现有协议一致
   uint32 attack = 3; // 开战攻击力; 与现有协议一致
   uint32 defense = 4; // 开战防御力; 与现有协议一致
@@ -2223,33 +2219,29 @@ message CombatRuleSnapshot {
   bool ordinary_status_global_exclusive = 23; // 8.5 为 true, 全部 BATTLE_ST_* 互斥
   bool magic_status_global_exclusive = 24; // 8.5 为 true, 全部 MagicTbl 状态互斥
   bool damage_reaction_reapply_replaces_count = 25; // 8.5 为 true, 同类光镜守直接覆盖次数
-  CombatActionType timeout_character_action = 26; // 现代超时默认动作固定为Defense
-  CombatActionType timeout_pet_action = 27; // 现代超时默认动作固定为Defense, action_id=9000003, 不读取宠物技能槽
-  bool pet_active_wait_allowed = 28; // true表示玩家仍可主动提交Wait, action_id=9000001; 超时不会自动选择Wait
+  uint32 timeout_character_skill_id = 26; // 现代超时固定补角色防御技能8000002
+  uint32 timeout_pet_skill_id = 27; // 现代超时固定补宠物防御技能9000003, 不读取宠物技能槽
+  bool pet_standby_skill_allowed = 28; // true表示玩家可提交待机技能9000001; 该技能和超时均不生成Wait事件
   bool victory_check_after_action_postprocess = 29; // 每个单位动作及必要后处理链完成后检查有效存活数
   bool player_pet_counts_as_effective_living = 30; // 必须为false: 玩家宠物不维持玩家阵营存活
   bool pve_enemy_counts_as_effective_living = 31; // 必须为true: PVE怪物和NPC维持敌方阵营存活
   bool simultaneous_zero_initiator_loses = 32; // 同一原子边界双方均为0时发起方先判负, 防守方胜利
 }
 
-// CombatBattleStart 是生产开战快照, 只发送客户端创建当前PVE战场需要的初始可见数据.
-message CombatBattleStart {
+// CombatBattleStartNotify 通知客户端创建战斗场景.
+message CombatBattleStartNotify {
   string battle_id = 1; // 战斗唯一UUID字符串; 与现有协议一致
   repeated CombatUnit unit_list = 10; // 全部初始可见和可引用单位; 与现有协议字段号一致
-}
-
-// CombatBattleStartNotify 沿用当前协议入口, 通知客户端创建战斗场景并进入首回合.
-message CombatBattleStartNotify {
-  CombatBattleStart battle_start = 1; // 开战快照; 与现有协议字段号一致
-  uint32 round = 2; // 当前回合号, 首回合固定为1
+  reserved 2;
+  reserved "battle_start", "round";
 }
 
 // CombatActionIntent 仅用于说明服务端内部动作模型和测试数据, 不进入生产CombatRoundResultNotify.
 message CombatActionIntent {
-  CombatUnitKey unit_key = 1; // 出手单位; 与现有协议一致
-  CombatActionType action_type = 2; // 动作类型; 与现有协议一致
-  uint32 action_id = 3; // 技能动作即skill_id, 道具动作即item_id, 与现有协议一致
-  CombatUnitKey target_key = 4; // 客户端或AI声明的主目标; 与现有协议一致
+  CombatUnitKey unit_key = 1; // 服务端内部出手单位
+  CombatActionType action_type = 2; // 服务端内部动作分类, 不进入生产协议
+  uint32 action_id = 3; // 服务端内部技能、道具或系统动作ID
+  CombatUnitKey target_key = 4; // 服务端内部解析后的主目标
   reserved 5; // 现有协议已废弃的defaulted字段
   CombatIntentSource intent_source = 6; // 玩家、超时默认、敌方AI、状态强制或系统来源
   uint64 intent_id = 7; // 本回合内唯一意图ID, 由服务端分配
@@ -2263,14 +2255,15 @@ message CombatActionIntent {
   string legacy_command_name = 15; // BATTLE_COM_*符号名, 仅用于源码映射
 }
 
-// CombatRoundActionReq 提交一个单位在指定回合中的动作选择.
+// CombatRoundActionReq 提交一个单位在指定回合中的技能选择.
 message CombatRoundActionReq {
   string battle_id = 1; // 战斗唯一 ID
   uint32 round = 2; // 客户端认为的当前回合号
   CombatUnitKey unit_key = 3; // 出手单位; 必须属于当前连接可控角色或其出战宠物
-  CombatActionType action_type = 4; // 客户端选择动作
-  uint32 action_id = 5; // 角色攻击/防御使用CharacterAction, 角色逃跑为0; 宠物待机/攻击/防御依次为9000001/9000002/9000003
-  CombatUnitKey target_key = 6; // 攻击必须指定敌方目标; 防御、等待和逃跑为空
+  uint32 skill_id = 4; // 必须属于出手单位, 服务端按技能ID解析参数
+  CombatUnitKey arg_target_unit = 5; // 技能需要单位目标时填写
+  CombatCamp arg_target_camp = 6; // 技能需要阵营目标时填写
+  reserved "action", "action_type", "action_id", "target_key";
 }
 
 // CombatRoundActionRes 确认服务端已经接受动作.
@@ -2360,7 +2353,7 @@ message CombatDamageFormulaTrace {
   sint64 random_draw = 5; // 分段基础伤害使用的RAND结果或K0
   uint32 guard_ratio_basis_points = 6; // 防御随机档位0/1000/2000/3000/4000/5000
   uint32 critical_ratio_basis_points = 7; // 仅记录暴击标志所用倍率语义; 近战实际追加值见operation_list
-  uint32 segment_damage_divisor = 8; // 连续攻击、狂暴、栗子等gDamageDiv; 疯狂暴走为1
+  uint32 segment_damage_divisor = 8; // 连续攻击、狂暴、栗子等gDamageDiv; 8.5以C float相除并赋回int, 疯狂暴走为1
   uint32 action_attack_count = 9; // 本主动动作计划物理段数
   string base_branch = 10; // defense_gt_attack、near_equal或attack_ge_defense_8_div_7
   sint64 base_damage = 11; // 分段基础公式刚完成后的int值
@@ -2540,7 +2533,7 @@ message CombatEscapeDetail {
   uint32 success_rate_basis_points = 2; // 服务端计算成功率
   uint32 random_roll_basis_points = 3; // 本次随机值
   bool success = 4; // 是否成功
-  repeated CombatUnitKey leave_unit_list = 5; // 成功后随同离场的角色、宠物或队友
+  repeated CombatUnitKey leave_unit_list = 5; // 成功后实际离场的主动单位及其配对战宠; 不自动包含同队其他角色
   uint32 attempt_count = 6; // 本场第几次逃跑尝试; 旧服会随尝试次数提高成功率
   bool pvp_forced_success = 7; // PVP 分支是否直接成功而未使用普通等级公式
   uint32 source_level = 8; // 参与公式的自身等级
@@ -2621,13 +2614,6 @@ message CombatUnitLifecycleDetail {
   CombatRecoveryFormulaTrace recovery_formula_trace = 6; // Revive时的恢复量和8.5百分号覆盖怪癖
 }
 
-// CombatTextDetail 保存服务端不可由结构化字段替代的文本提示.
-message CombatTextDetail {
-  string text_key = 1; // 客户端本地化 key
-  repeated string argument_list = 2; // 本地化参数
-  string fallback_text = 3; // 客户端没有对应 key 时使用的后备文本
-}
-
 // CombatKnockbackDetail 明确描述击飞/击退的逻辑位置和最终状态.
 message CombatKnockbackDetail {
   CombatUnitKey source_unit = 1; // 造成击飞的单位
@@ -2652,15 +2638,16 @@ message CombatKnockdownDetail {
 
 // CombatAttackSequenceDetail 汇总多段技能的物理攻击模型.
 // 三段/十段仍是多次物理攻击调用, 每段可有不同有效攻击力并独立判定命中、暴击和伤害反应.
-// 但反击循环位于整个主动动作之后, 所有段共用 max_counter_count_per_action, 不是每段各自拥有上限.
+// 当前生产实现的9000005/9000006分别执行2/3段, 每段生成独立Action事件, 只有第1段接近目标, 全部段完成后只回位一次.
+// 反击循环位于整个主动动作之后, 所有段共用max_counter_count_per_action, 是否开始反击只取最后实际段返回值.
 message CombatAttackSequenceDetail {
   uint32 planned_segment_count = 1; // 计划段数, 例如三段为 3、十段为 10
   uint32 executed_segment_count = 2; // 因死亡、失去目标或中断后实际完成段数
-  uint32 damage_divisor = 3; // 连续攻击/狂暴/栗子通常等于段数; 疯狂暴走等旧流程可能为 1
+  uint32 damage_divisor = 3; // 连续攻击/狂暴/栗子通常等于段数; 分摊按C float相除并向零截断, 正数最低1; 疯狂暴走等旧流程可能为1
   bool independent_hit_check_per_segment = 4; // 每段是否独立命中/闪避判定
   bool independent_critical_check_per_segment = 5; // 每段是否独立暴击判定
   bool independent_damage_reaction_per_segment = 6; // 每段是否重新检查并消耗光、镜、守、陷阱或针刺
-  bool counter_checked_after_whole_sequence = 7; // 旧服普通多段动作应为 true
+  bool counter_checked_after_whole_sequence = 7; // 旧服普通多段动作应为true; 当前ContinuationAttack已按最后实际段只检查一次
   repeated uint32 segment_event_id_list = 8; // 按结算顺序引用每一段 AttackSegment 事件
 }
 
@@ -2700,8 +2687,11 @@ message CombatComboDetail {
   repeated uint32 rule_decision_id_list = 10; // 合击组建、不可闪避、跳过忠犬和提前停止规则判断
 }
 
-// CombatEffect 是事件内部按 sequence 排列的最小逻辑结算单元.
+// CombatEffect 是仅供规则审计结构使用的最小逻辑结算单元, 不进入生产客户端协议.
 message CombatEffect {
+  reserved 29;
+  reserved "text";
+
   uint32 effect_id = 1; // 所属事件内唯一 ID, 从 1 开始
   uint32 sequence = 2; // 所属事件内结算顺序, 从 1 开始
   CombatEffectKind effect_kind = 3; // 效果类型
@@ -2719,7 +2709,6 @@ message CombatEffect {
     CombatItemDetail item = 26; // 道具详情
     CombatFieldDetail field = 27; // 场地详情
     CombatUnitLifecycleDetail lifecycle = 28; // 单位生命周期详情
-    CombatTextDetail text = 29; // 文本详情
     CombatKnockbackDetail knockback = 30; // 击飞/击退详情
     CombatKnockdownDetail knockdown = 31; // 击倒及“回原位后倒地”详情
     CombatRuntimeAttributeDelta attribute = 32; // 单项运行期属性变化详情
@@ -2733,21 +2722,21 @@ message CombatEffect {
   }
 }
 
-// CombatEvent 表示一次主动动作节点或由其触发的衍生事件.
+// CombatEvent 是规则审计草案中的事件节点, 不是生产协议的同名消息定义.
 message CombatEvent {
+  reserved 2, 7, 8;
+  reserved "parent_event_id", "action_type", "action_id";
+
   uint32 event_id = 1; // 本回合内唯一事件 ID, 从 1 开始
-  uint32 parent_event_id = 2; // 直接触发本事件的父事件; 顶层事件为 0
   uint32 root_event_id = 3; // 所属主动动作的根事件; 顶层事件等于自身 event_id
   uint32 sequence = 4; // 本回合全局逻辑结算顺序, 从 1 开始
   CombatEventKind event_kind = 5; // 事件业务类型
   uint64 action_instance_id = 6; // 同一个主动动作及其全部衍生事件共享的实例 ID
-  CombatActionType action_type = 7; // 主动动作类型
-  uint32 action_id = 8; // 动作、魔法、道具或技能 ID
   CombatActionResult action_result = 9; // 本事件最终执行结果
   repeated CombatUnitKey source_unit_list = 10; // 事件来源; 合击可包含多个单位
   repeated CombatUnitKey target_unit_list = 11; // 事件实际目标
-  uint32 segment_index = 12; // 多段攻击当前段序号, 从 1 开始; 非多段为 0
-  uint32 segment_count = 13; // 计划攻击总段数; 非多段为 0
+  uint32 segment_index = 12; // 攻击事件当前段序号, 从1开始; 当前生产单段攻击填写1, 多段填写1..N
+  uint32 segment_count = 13; // 本次主动攻击的计划总段数; 当前生产单段攻击填写1, 多段填写N
   uint32 counter_depth = 14; // 反击深度; 主动攻击为 0, 反击为 1, 反击的反击为 2
   uint32 counter_index = 15; // 本主动动作整条触发链中的第几次反击, 从 1 开始
   bool stop_remaining_segment = 16; // 是否终止当前主动动作剩余攻击段
@@ -2768,7 +2757,7 @@ message CombatEvent {
   string legacy_command_name = 33; // BATTLE_COM_* 符号名, 用于在源码中直接检索处理分支
 }
 
-// CombatActionSummary 汇总一个主动动作的计划段数、实际段数和反击总数.
+// CombatActionSummary 是服务端规则审计和测试汇总, 不进入生产CombatRoundResultNotify.
 message CombatActionSummary {
   uint64 action_instance_id = 1; // 主动动作实例 ID
   uint32 root_event_id = 2; // 对应根事件 ID
@@ -2816,27 +2805,44 @@ message CombatUnitReward {
   repeated CombatRewardPet pet_list = 4; // 捕获或奖励宠物
 }
 
-// CombatBattleSettlement 保存战斗最终胜负和奖励结果.
-message CombatBattleSettlement {
-  CombatBattleEndReason end_reason = 1; // 战斗结束原因
-  CombatCamp winner_camp = 2; // 胜利阵营; 平局或中止时为 Unknown
-  repeated CombatUnitKey winner_unit_list = 3; // 胜利单位
-  repeated CombatUnitKey loser_unit_list = 4; // 失败单位
-  repeated CombatUnitReward reward_list = 5; // 服务端最终确认的奖励
-  uint64 settlement_timestamp_ms = 6; // 服务端结算时间
+// CombatSettlementExpReward 保存一个单位实际获得的经验.
+message CombatSettlementExpReward {
+  CombatUnitKey unit_key = 1; // 获得经验的角色或宠物
+  uint64 exp_delta = 2; // 持久化后实际增加的经验; 必须大于 0
 }
 
-// CombatRoundResultNotify 是客户端表现并落地一个完整回合所需的唯一权威结果.
-// event_list本身就是全局播放流; 每个事件内effect_list按sequence执行, 不再存在第二套表现步骤流.
+// CombatSettlementDuelPointChange 保存当前接收角色实际持久化的DP变化.
+message CombatSettlementDuelPointChange {
+  CombatUnitKey unit_key = 1; // DP发生变化的玩家角色
+  sint64 delta = 2; // 钳制上下限后的实际变化量, 可以为负数
+  uint32 after = 3; // 持久化后的DP
+}
+
+// CombatSettlementItemReward 保存当前接收角色实际写入背包的道具奖励.
+message CombatSettlementItemReward {
+  CombatUnitKey unit_key = 1; // 获得道具的玩家角色
+  uint32 item_id = 2; // 道具配置ID
+  uint32 count = 3; // 实际获得数量; 必须大于0
+}
+
+// CombatBattleSettlement 保存最终胜负和当前接收角色的奖励摘要.
+message CombatBattleSettlement {
+  CombatBattleResult battle_result = 1; // 最终胜负结果; 正式结算不得为 Unknown
+  repeated CombatSettlementExpReward exp_reward_list = 2; // 当前接收角色及其宠物的经验摘要; 仅用于展示
+  CombatSettlementDuelPointChange duel_point_change = 3; // 当前接收角色实际发生的DP变化
+  repeated CombatSettlementItemReward item_reward_list = 4; // 当前接收角色实际获得的道具汇总
+}
+
+// CombatRoundResultNotify以下定义仅保留审计草案上下文; 生产客户端消息以
+// server/proto/msg.combat.proto中的CombatEvent -> CombatStep二级有序流为准.
 message CombatRoundResultNotify {
   reserved 3;
   reserved "intent_list";
 
   string battle_id = 1; // 战斗唯一 ID
   uint32 round = 2; // 已结算回合号; 与现有协议一致
-  bool battle_finished = 6; // 本回合是否在某个动作原子边界终止; 与现有协议字段号一致
   repeated CombatEvent event_list = 10; // 客户端按列表和事件内效果顺序播放并应用差量的唯一结果流
-  CombatBattleSettlement settlement = 20; // battle_finished=true时携带; 与现有协议字段号一致
+  CombatBattleSettlement settlement = 21; // 仅战斗结束时携带; 字段存在即表示战斗结束
 }
 
 // CombatFlowCompleteReq 沿用现有协议: 仅在整场战斗动画播放完毕后提交, 不是逐回合确认.
