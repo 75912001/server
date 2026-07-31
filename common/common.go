@@ -52,24 +52,24 @@ func IsValidElementalAllocation(points *pb.ElementalPoints) bool {
 	}
 
 	total := uint32(0)
-	activeIndexes := make([]int, 0, pb.ElementalLimit_ElementalLimit_MaxActiveTypeCount)
+	activeIndexes := make([]int, 0, pb.Constants_Constants_Elemental_Max_Active_Type_Count)
 
 	for index, value := range values {
 		total += value
 		if value == 0 {
 			continue
 		}
-		if value > uint32(pb.ElementalLimit_ElementalLimit_TotalPoint) {
+		if value > uint32(pb.Constants_Constants_Elemental_Total_Point) {
 			return false
 		}
 
 		activeIndexes = append(activeIndexes, index)
-		if len(activeIndexes) > int(pb.ElementalLimit_ElementalLimit_MaxActiveTypeCount) {
+		if len(activeIndexes) > int(pb.Constants_Constants_Elemental_Max_Active_Type_Count) {
 			return false
 		}
 	}
 
-	if total != uint32(pb.ElementalLimit_ElementalLimit_TotalPoint) {
+	if total != uint32(pb.Constants_Constants_Elemental_Total_Point) {
 		return false
 	}
 	if len(activeIndexes) == 1 {
