@@ -7,18 +7,21 @@
 scenes:
   - id: 2000001
     name: 场景一
+    enemyCountMax: 1
     enemyGroups:
       - id: 5
         weight: 100
 
   - id: 2000002
     name: 场景二
+    enemyCountMax: 10
     enemyGroups:
       - id: 2
         weight: 100
 
   - id: 2000003
     name: 场景三
+    enemyCountMax: 1
     enemyGroups:
       - id: 3
         weight: 100
