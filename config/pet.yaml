@@ -29,7 +29,7 @@
 # battleAI 敌方基础动作AI: 仅控制普通攻击、防御和PVE逃跑, 不从skill槽随机选招
 #   仅敌方怪物/NPC读取battleAI. 玩家战斗宠物的动作由客户端分别提交, 不读取这些权重
 #   attackWeight: 普通攻击相对权重, 整数范围[0,2147483647]. 例如10/1/1表示10:1:1, 不是10%/1%/1%
-#   defenseWeight: 防御相对权重, 整数范围[0,2147483647]. 防御是基础动作, 不要求skill中存在9000003
+#   defenseWeight: 防御相对权重, 整数范围[0,2147483647]. 防御是基础动作, 不要求skill中存在8000002
 #   escapeWeight: PVE逃跑相对权重, 整数范围[0,2147483647]. 逃跑是基础动作, 不是宠物技能
 #   三项权重总和范围[0,2147483647]. 总和为0时服务端直接选择防御
 #   targetScope仅在本次权重选中普通攻击时生效, 可选值及精确范围:
@@ -170,7 +170,7 @@ pet:
         baseStr: 37
         baseTough: 19
         baseDex: 17
-      skill: [9000002,9000003,0,0,0,0,0]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -207,7 +207,7 @@ pet:
         baseStr: 36
         baseTough: 16
         baseDex: 20
-      skill: [9000002,9000003,0,0,0,0,0]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -244,7 +244,7 @@ pet:
         baseStr: 37
         baseTough: 15
         baseDex: 21
-      skill: [9000002,9000003,0,0,0,0,0]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -280,7 +280,7 @@ pet:
         baseStr: 38
         baseTough: 16
         baseDex: 20
-      skill: [9000002,9000003,0,0,0,0,0]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -317,7 +317,7 @@ pet:
         baseStr: 35
         baseTough: 14
         baseDex: 24
-      skill: [9000002,9000003,0,0,0,0,0]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -354,7 +354,7 @@ pet:
         baseStr: 47
         baseTough: 20
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -391,7 +391,7 @@ pet:
         baseStr: 50
         baseTough: 18
         baseDex: 32
-      skill: [9000002,9000003,0,0,0,0,0]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -428,7 +428,7 @@ pet:
         baseStr: 37
         baseTough: 18
         baseDex: 22
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -465,7 +465,7 @@ pet:
         baseStr: 45
         baseTough: 23
         baseDex: 35
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -501,7 +501,7 @@ pet:
         baseStr: 44
         baseTough: 28
         baseDex: 34
-      skill: [ 9000002,9000003,9000007,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -538,7 +538,7 @@ pet:
         baseStr: 46
         baseTough: 23
         baseDex: 38
-      skill: [ 9000002,9000003,9000007,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -574,7 +574,7 @@ pet:
         baseStr: 48
         baseTough: 23
         baseDex: 37
-      skill: [ 9000002,9000003,9000007,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -611,7 +611,7 @@ pet:
         baseStr: 43
         baseTough: 20
         baseDex: 43
-      skill: [ 9000002,9000003,9000007,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -648,7 +648,7 @@ pet:
         baseStr: 46
         baseTough: 25
         baseDex: 35
-      skill: [ 9000002,9000003,9000007,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -689,7 +689,7 @@ pet:
         baseStr: 28
         baseTough: 16
         baseDex: 25
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -726,7 +726,7 @@ pet:
         baseStr: 30
         baseTough: 13
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -763,7 +763,7 @@ pet:
         baseStr: 30
         baseTough: 13
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -800,7 +800,7 @@ pet:
         baseStr: 29
         baseTough: 18
         baseDex: 29
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 默认有个技能 40 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -837,7 +837,7 @@ pet:
         baseStr: 37
         baseTough: 19
         baseDex: 32
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -873,7 +873,7 @@ pet:
         baseStr: 43
         baseTough: 19
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -910,7 +910,7 @@ pet:
         baseStr: 36
         baseTough: 16
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -947,7 +947,7 @@ pet:
         baseStr: 35
         baseTough: 16
         baseDex: 31
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -988,7 +988,7 @@ pet:
         baseStr: 29
         baseTough: 28
         baseDex: 20
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 默认有个技能 40 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1025,7 +1025,7 @@ pet:
         baseStr: 30
         baseTough: 22
         baseDex: 22
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 默认有个技能 40 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1062,7 +1062,7 @@ pet:
         baseStr: 37
         baseTough: 20
         baseDex: 25
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1099,7 +1099,7 @@ pet:
         baseStr: 35
         baseTough: 25
         baseDex: 21
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 默认有个技能 30 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1136,7 +1136,7 @@ pet:
         baseStr: 40
         baseTough: 24
         baseDex: 27
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1173,7 +1173,7 @@ pet:
         baseStr: 48
         baseTough: 21
         baseDex: 29
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 2
         defenseWeight: 0
@@ -1210,7 +1210,7 @@ pet:
         baseStr: 34
         baseTough: 29
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1246,7 +1246,7 @@ pet:
         baseStr: 42
         baseTough: 26
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1287,7 +1287,7 @@ pet:
         baseStr: 23
         baseTough: 19
         baseDex: 23
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1324,7 +1324,7 @@ pet:
         baseStr: 22
         baseTough: 18
         baseDex: 28
-      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 默认有个技能 60 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1360,7 +1360,7 @@ pet:
         baseStr: 22
         baseTough: 18
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1397,7 +1397,7 @@ pet:
         baseStr: 22
         baseTough: 18
         baseDex: 25
-      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 默认有个技能 90 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1434,7 +1434,7 @@ pet:
         baseStr: 25
         baseTough: 25
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1471,7 +1471,7 @@ pet:
         baseStr: 31
         baseTough: 21
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1508,7 +1508,7 @@ pet:
         baseStr: 27
         baseTough: 22
         baseDex: 25
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1545,7 +1545,7 @@ pet:
         baseStr: 25
         baseTough: 24
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1586,7 +1586,7 @@ pet:
         baseStr: 20
         baseTough: 10
         baseDex: 32
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1623,7 +1623,7 @@ pet:
         baseStr: 21
         baseTough: 7
         baseDex: 33
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1660,7 +1660,7 @@ pet:
         baseStr: 19
         baseTough: 11
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1697,7 +1697,7 @@ pet:
         baseStr: 18
         baseTough: 15
         baseDex: 29
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1734,7 +1734,7 @@ pet:
         baseStr: 28
         baseTough: 13
         baseDex: 35
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1771,7 +1771,7 @@ pet:
         baseStr: 23
         baseTough: 14
         baseDex: 31
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1808,7 +1808,7 @@ pet:
         baseStr: 24
         baseTough: 13
         baseDex: 39
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1845,7 +1845,7 @@ pet:
         baseStr: 22
         baseTough: 19
         baseDex: 33
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -1885,7 +1885,7 @@ pet:
         baseStr: 12
         baseTough: 30
         baseDex: 15
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1922,7 +1922,7 @@ pet:
         baseStr: 14
         baseTough: 32
         baseDex: 13
-      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 默认有个技能 60 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1959,7 +1959,7 @@ pet:
         baseStr: 13
         baseTough: 31
         baseDex: 14
-      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 默认有个技能 80 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -1996,7 +1996,7 @@ pet:
         baseStr: 16
         baseTough: 30
         baseDex: 15
-      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 默认有个技能 90 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2033,7 +2033,7 @@ pet:
         baseStr: 19
         baseTough: 34
         baseDex: 19
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2070,7 +2070,7 @@ pet:
         baseStr: 17
         baseTough: 39
         baseDex: 15
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2107,7 +2107,7 @@ pet:
         baseStr: 17
         baseTough: 37
         baseDex: 18
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2144,7 +2144,7 @@ pet:
         baseStr: 20
         baseTough: 35
         baseDex: 16
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2185,7 +2185,7 @@ pet:
         baseStr: 18
         baseTough: 34
         baseDex: 9
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2222,7 +2222,7 @@ pet:
         baseStr: 19
         baseTough: 35
         baseDex: 8
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2259,7 +2259,7 @@ pet:
         baseStr: 21
         baseTough: 33
         baseDex: 10
-      skill: [ 9000002,9000003,9000005,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2296,7 +2296,7 @@ pet:
         baseStr: 19
         baseTough: 41
         baseDex: 8
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 默认有个技能 80 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2332,7 +2332,7 @@ pet:
         baseStr: 24
         baseTough: 38
         baseDex: 10
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 2
         defenseWeight: 1
@@ -2369,7 +2369,7 @@ pet:
         baseStr: 22
         baseTough: 41
         baseDex: 13
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2406,7 +2406,7 @@ pet:
         baseStr: 25
         baseTough: 35
         baseDex: 13
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2443,7 +2443,7 @@ pet:
         baseStr: 21
         baseTough: 39
         baseDex: 10
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2484,7 +2484,7 @@ pet:
         baseStr: 22
         baseTough: 21
         baseDex: 18
-      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 默认有个技能 100, 30 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2521,7 +2521,7 @@ pet:
         baseStr: 20
         baseTough: 20
         baseDex: 17
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2558,7 +2558,7 @@ pet:
         baseStr: 21
         baseTough: 23
         baseDex: 17
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2595,7 +2595,7 @@ pet:
         baseStr: 22
         baseTough: 21
         baseDex: 18
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2632,7 +2632,7 @@ pet:
         baseStr: 22
         baseTough: 19
         baseDex: 23
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2669,7 +2669,7 @@ pet:
         baseStr: 25
         baseTough: 26
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2706,7 +2706,7 @@ pet:
         baseStr: 24
         baseTough: 27
         baseDex: 22
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2743,7 +2743,7 @@ pet:
         baseStr: 27
         baseTough: 24
         baseDex: 24
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2783,7 +2783,7 @@ pet:
         baseStr: 26
         baseTough: 20
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2820,7 +2820,7 @@ pet:
         baseStr: 24
         baseTough: 19
         baseDex: 27
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2857,7 +2857,7 @@ pet:
         baseStr: 24
         baseTough: 23
         baseDex: 25
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 默认有个技能 40 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2893,7 +2893,7 @@ pet:
         baseStr: 23
         baseTough: 25
         baseDex: 22
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -2930,7 +2930,7 @@ pet:
         baseStr: 27
         baseTough: 23
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -2967,7 +2967,7 @@ pet:
         baseStr: 28
         baseTough: 23
         baseDex: 31
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3004,7 +3004,7 @@ pet:
         baseStr: 25
         baseTough: 28
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3041,7 +3041,7 @@ pet:
         baseStr: 24
         baseTough: 26
         baseDex: 30
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3081,7 +3081,7 @@ pet:
         baseStr: 23
         baseTough: 40
         baseDex: 6
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3118,7 +3118,7 @@ pet:
         baseStr: 21
         baseTough: 39
         baseDex: 5
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3155,7 +3155,7 @@ pet:
         baseStr: 24
         baseTough: 37
         baseDex: 7
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3192,7 +3192,7 @@ pet:
         baseStr: 21
         baseTough: 38
         baseDex: 6
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3229,7 +3229,7 @@ pet:
         baseStr: 27
         baseTough: 43
         baseDex: 10
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3266,7 +3266,7 @@ pet:
         baseStr: 19
         baseTough: 37
         baseDex: 6
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3303,7 +3303,7 @@ pet:
         baseStr: 24
         baseTough: 31
         baseDex: 6
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3340,7 +3340,7 @@ pet:
         baseStr: 20
         baseTough: 36
         baseDex: 12
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3381,7 +3381,7 @@ pet:
         baseStr: 18
         baseTough: 20
         baseDex: 22
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3418,7 +3418,7 @@ pet:
         baseStr: 18
         baseTough: 17
         baseDex: 24
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3455,7 +3455,7 @@ pet:
         baseStr: 20
         baseTough: 18
         baseDex: 24
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3492,7 +3492,7 @@ pet:
         baseStr: 16
         baseTough: 19
         baseDex: 23
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3529,7 +3529,7 @@ pet:
         baseStr: 22
         baseTough: 21
         baseDex: 29
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3566,7 +3566,7 @@ pet:
         baseStr: 27
         baseTough: 21
         baseDex: 27
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3602,7 +3602,7 @@ pet:
         baseStr: 23
         baseTough: 21
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3639,7 +3639,7 @@ pet:
         baseStr: 22
         baseTough: 24
         baseDex: 27
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 3
         defenseWeight: 1
@@ -3680,7 +3680,7 @@ pet:
         baseStr: 19
         baseTough: 19
         baseDex: 27
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3717,7 +3717,7 @@ pet:
         baseStr: 19
         baseTough: 19
         baseDex: 27
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3754,7 +3754,7 @@ pet:
         baseStr: 20
         baseTough: 17
         baseDex: 25
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3790,7 +3790,7 @@ pet:
         baseStr: 20
         baseTough: 16
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -3827,7 +3827,7 @@ pet:
         baseStr: 21
         baseTough: 20
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3864,7 +3864,7 @@ pet:
         baseStr: 21
         baseTough: 24
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3901,7 +3901,7 @@ pet:
         baseStr: 20
         baseTough: 23
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3938,7 +3938,7 @@ pet:
         baseStr: 25
         baseTough: 19
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -3978,7 +3978,7 @@ pet:
         baseStr: 28
         baseTough: 26
         baseDex: 18
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4015,7 +4015,7 @@ pet:
         baseStr: 27
         baseTough: 23
         baseDex: 19
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4052,7 +4052,7 @@ pet:
         baseStr: 29
         baseTough: 21
         baseDex: 20
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4089,7 +4089,7 @@ pet:
         baseStr: 30
         baseTough: 20
         baseDex: 21
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4126,7 +4126,7 @@ pet:
         baseStr: 30
         baseTough: 28
         baseDex: 21
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -4163,7 +4163,7 @@ pet:
         baseStr: 42
         baseTough: 28
         baseDex: 21
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 5
         defenseWeight: 2
@@ -4199,7 +4199,7 @@ pet:
         baseStr: 30
         baseTough: 27
         baseDex: 21
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -4236,7 +4236,7 @@ pet:
         baseStr: 46
         baseTough: 24
         baseDex: 29
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 技能 543 , 尚未添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 5
         defenseWeight: 2
@@ -4277,7 +4277,7 @@ pet:
         baseStr: 28
         baseTough: 25
         baseDex: 16
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4314,7 +4314,7 @@ pet:
         baseStr: 23
         baseTough: 26
         baseDex: 14
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4351,7 +4351,7 @@ pet:
         baseStr: 26
         baseTough: 26
         baseDex: 17
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4388,7 +4388,7 @@ pet:
         baseStr: 26
         baseTough: 25
         baseDex: 16
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 技能 90 , 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4425,7 +4425,7 @@ pet:
         baseStr: 25
         baseTough: 24
         baseDex: 20
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4461,7 +4461,7 @@ pet:
         baseStr: 27
         baseTough: 26
         baseDex: 17
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -4497,7 +4497,7 @@ pet:
         baseStr: 33
         baseTough: 27
         baseDex: 18
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -4534,7 +4534,7 @@ pet:
         baseStr: 26
         baseTough: 29
         baseDex: 24
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -4575,7 +4575,7 @@ pet:
         baseStr: 21
         baseTough: 21
         baseDex: 24
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4612,7 +4612,7 @@ pet:
         baseStr: 26
         baseTough: 19
         baseDex: 27
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4649,7 +4649,7 @@ pet:
         baseStr: 23
         baseTough: 20
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4686,7 +4686,7 @@ pet:
         baseStr: 23
         baseTough: 23
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4723,7 +4723,7 @@ pet:
         baseStr: 30
         baseTough: 22
         baseDex: 31
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -4760,7 +4760,7 @@ pet:
         baseStr: 26
         baseTough: 24
         baseDex: 27
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -4796,7 +4796,7 @@ pet:
         baseStr: 32
         baseTough: 22
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -4833,7 +4833,7 @@ pet:
         baseStr: 26
         baseTough: 27
         baseDex: 27
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -4874,7 +4874,7 @@ pet:
         baseStr: 21
         baseTough: 26
         baseDex: 12
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 0
@@ -4911,7 +4911,7 @@ pet:
         baseStr: 17
         baseTough: 28
         baseDex: 11
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4948,7 +4948,7 @@ pet:
         baseStr: 18
         baseTough: 28
         baseDex: 10
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -4984,7 +4984,7 @@ pet:
         baseStr: 19
         baseTough: 29
         baseDex: 9
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 0
@@ -5021,7 +5021,7 @@ pet:
         baseStr: 25
         baseTough: 28
         baseDex: 14
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5057,7 +5057,7 @@ pet:
         baseStr: 22
         baseTough: 27
         baseDex: 19
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5093,7 +5093,7 @@ pet:
         baseStr: 21
         baseTough: 31
         baseDex: 13
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5130,7 +5130,7 @@ pet:
         baseStr: 20
         baseTough: 33
         baseDex: 16
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5171,7 +5171,7 @@ pet:
         baseStr: 27
         baseTough: 16
         baseDex: 14
-      skill: [ 9000002,0,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5208,7 +5208,7 @@ pet:
         baseStr: 30
         baseTough: 14
         baseDex: 16
-      skill: [ 9000002,0,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5244,7 +5244,7 @@ pet:
         baseStr: 27
         baseTough: 13
         baseDex: 16
-      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 技能 50 , 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5281,7 +5281,7 @@ pet:
         baseStr: 26
         baseTough: 15
         baseDex: 14
-      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 技能 100 , 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5318,7 +5318,7 @@ pet:
         baseStr: 32
         baseTough: 15
         baseDex: 18
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5355,7 +5355,7 @@ pet:
         baseStr: 36
         baseTough: 16
         baseDex: 18
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5392,7 +5392,7 @@ pet:
         baseStr: 30
         baseTough: 19
         baseDex: 17
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5429,7 +5429,7 @@ pet:
         baseStr: 41
         baseTough: 20
         baseDex: 25
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5470,7 +5470,7 @@ pet:
         baseStr: 29
         baseTough: 30
         baseDex: 18
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5507,7 +5507,7 @@ pet:
         baseStr: 28
         baseTough: 31
         baseDex: 11
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 技能 80 , 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5544,7 +5544,7 @@ pet:
         baseStr: 33
         baseTough: 28
         baseDex: 14
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 技能 61 , 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5581,7 +5581,7 @@ pet:
         baseStr: 33
         baseTough: 30
         baseDex: 12
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 技能 90 , 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5618,7 +5618,7 @@ pet:
         baseStr: 30
         baseTough: 34
         baseDex: 13
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5655,7 +5655,7 @@ pet:
         baseStr: 34
         baseTough: 31
         baseDex: 15
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5692,7 +5692,7 @@ pet:
         baseStr: 33
         baseTough: 29
         baseDex: 18
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5728,7 +5728,7 @@ pet:
         baseStr: 29
         baseTough: 34
         baseDex: 13
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5769,7 +5769,7 @@ pet:
         baseStr: 20
         baseTough: 24
         baseDex: 10
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5805,7 +5805,7 @@ pet:
         baseStr: 19
         baseTough: 22
         baseDex: 10
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 技能 110 , 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5842,7 +5842,7 @@ pet:
         baseStr: 19
         baseTough: 26
         baseDex: 9
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 技能 110 , 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5879,7 +5879,7 @@ pet:
         baseStr: 23
         baseTough: 24
         baseDex: 10
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -5916,7 +5916,7 @@ pet:
         baseStr: 23
         baseTough: 33
         baseDex: 14
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5953,7 +5953,7 @@ pet:
         baseStr: 26
         baseTough: 27
         baseDex: 12
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -5990,7 +5990,7 @@ pet:
         baseStr: 23
         baseTough: 32
         baseDex: 12
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6027,7 +6027,7 @@ pet:
         baseStr: 28
         baseTough: 27
         baseDex: 15
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6068,7 +6068,7 @@ pet:
         baseStr: 27
         baseTough: 33
         baseDex: 6
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6105,7 +6105,7 @@ pet:
         baseStr: 23
         baseTough: 32
         baseDex: 7
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6142,7 +6142,7 @@ pet:
         baseStr: 35
         baseTough: 28
         baseDex: 6
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6179,7 +6179,7 @@ pet:
         baseStr: 25
         baseTough: 35
         baseDex: 5
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6216,7 +6216,7 @@ pet:
         baseStr: 30
         baseTough: 27
         baseDex: 10
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6253,7 +6253,7 @@ pet:
         baseStr: 36
         baseTough: 42
         baseDex: 13
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 2
         defenseWeight: 0
@@ -6290,7 +6290,7 @@ pet:
         baseStr: 30
         baseTough: 36
         baseDex: 10
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6327,7 +6327,7 @@ pet:
         baseStr: 30
         baseTough: 34
         baseDex: 11
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6368,7 +6368,7 @@ pet:
         baseStr: 25
         baseTough: 15
         baseDex: 8
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6405,7 +6405,7 @@ pet:
         baseStr: 27
         baseTough: 12
         baseDex: 10
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6442,7 +6442,7 @@ pet:
         baseStr: 25
         baseTough: 12
         baseDex: 10
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6479,7 +6479,7 @@ pet:
         baseStr: 26
         baseTough: 12
         baseDex: 11
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6516,7 +6516,7 @@ pet:
         baseStr: 27
         baseTough: 19
         baseDex: 14
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6553,7 +6553,7 @@ pet:
         baseStr: 28
         baseTough: 17
         baseDex: 13
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6589,7 +6589,7 @@ pet:
         baseStr: 26
         baseTough: 21
         baseDex: 12
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6626,7 +6626,7 @@ pet:
         baseStr: 27
         baseTough: 17
         baseDex: 13
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6667,7 +6667,7 @@ pet:
         baseStr: 31
         baseTough: 23
         baseDex: 25
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6704,7 +6704,7 @@ pet:
         baseStr: 33
         baseTough: 24
         baseDex: 24
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6741,7 +6741,7 @@ pet:
         baseStr: 30
         baseTough: 24
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 技能 60, 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6777,7 +6777,7 @@ pet:
         baseStr: 31
         baseTough: 20
         baseDex: 30
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -6814,7 +6814,7 @@ pet:
         baseStr: 34
         baseTough: 20
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6851,7 +6851,7 @@ pet:
         baseStr: 38
         baseTough: 23
         baseDex: 29
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6888,7 +6888,7 @@ pet:
         baseStr: 29
         baseTough: 27
         baseDex: 29
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6925,7 +6925,7 @@ pet:
         baseStr: 30
         baseTough: 23
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -6966,7 +6966,7 @@ pet:
         baseStr: 18
         baseTough: 10
         baseDex: 33
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 0
@@ -7002,7 +7002,7 @@ pet:
         baseStr: 22
         baseTough: 10
         baseDex: 35
-      skill: [ 9000002,0,0,0,0,0,0 ] # todo menglc 技能 120 , 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7039,7 +7039,7 @@ pet:
         baseStr: 20
         baseTough: 14
         baseDex: 40
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7076,7 +7076,7 @@ pet:
         baseStr: 24
         baseTough: 11
         baseDex: 40
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 0
@@ -7113,7 +7113,7 @@ pet:
         baseStr: 20
         baseTough: 17
         baseDex: 36
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -7150,7 +7150,7 @@ pet:
         baseStr: 22
         baseTough: 14
         baseDex: 33
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -7187,7 +7187,7 @@ pet:
         baseStr: 20
         baseTough: 10
         baseDex: 36
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 技能 210, 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 5
         defenseWeight: 0
@@ -7224,7 +7224,7 @@ pet:
         baseStr: 24
         baseTough: 13
         baseDex: 38
-      skill: [ 9000002,9000003,0,0,0,0,0 ] # todo menglc 技能 210 , 待添加
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -7265,7 +7265,7 @@ pet:
         baseStr: 22
         baseTough: 25
         baseDex: 29
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7301,7 +7301,7 @@ pet:
         baseStr: 23
         baseTough: 24
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7338,7 +7338,7 @@ pet:
         baseStr: 26
         baseTough: 24
         baseDex: 29
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7375,7 +7375,7 @@ pet:
         baseStr: 25
         baseTough: 25
         baseDex: 30
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7412,7 +7412,7 @@ pet:
         baseStr: 28
         baseTough: 20
         baseDex: 32
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7449,7 +7449,7 @@ pet:
         baseStr: 31
         baseTough: 25
         baseDex: 33
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -7486,7 +7486,7 @@ pet:
         baseStr: 29
         baseTough: 26
         baseDex: 34
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -7523,7 +7523,7 @@ pet:
         baseStr: 26
         baseTough: 29
         baseDex: 32
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -7564,7 +7564,7 @@ pet:
         baseStr: 19
         baseTough: 23
         baseDex: 19
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7600,7 +7600,7 @@ pet:
         baseStr: 20
         baseTough: 23
         baseDex: 21
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7637,7 +7637,7 @@ pet:
         baseStr: 19
         baseTough: 25
         baseDex: 18
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7674,7 +7674,7 @@ pet:
         baseStr: 23
         baseTough: 22
         baseDex: 22
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7711,7 +7711,7 @@ pet:
         baseStr: 21
         baseTough: 22
         baseDex: 20
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7748,7 +7748,7 @@ pet:
         baseStr: 22
         baseTough: 28
         baseDex: 23
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -7785,7 +7785,7 @@ pet:
         baseStr: 21
         baseTough: 29
         baseDex: 20
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -7822,7 +7822,7 @@ pet:
         baseStr: 39
         baseTough: 28
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 5
         defenseWeight: 2
@@ -7863,7 +7863,7 @@ pet:
         baseStr: 19
         baseTough: 24
         baseDex: 18
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 20
         defenseWeight: 1
@@ -7901,7 +7901,7 @@ pet:
         baseStr: 21
         baseTough: 21
         baseDex: 22
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7938,7 +7938,7 @@ pet:
         baseStr: 20
         baseTough: 22
         baseDex: 20
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -7975,7 +7975,7 @@ pet:
         baseStr: 24
         baseTough: 19
         baseDex: 23
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
         defenseWeight: 1
@@ -8012,7 +8012,7 @@ pet:
         baseStr: 22
         baseTough: 27
         baseDex: 26
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -8049,7 +8049,7 @@ pet:
         baseStr: 28
         baseTough: 24
         baseDex: 24
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -8086,7 +8086,7 @@ pet:
         baseStr: 25
         baseTough: 23
         baseDex: 28
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
@@ -8123,7 +8123,7 @@ pet:
         baseStr: 22
         baseTough: 27
         baseDex: 23
-      skill: [ 9000002,9000003,0,0,0,0,0 ]
+      skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
         defenseWeight: 0
