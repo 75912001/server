@@ -91,7 +91,7 @@ cd /d/src/github.com/sa.project/server/tool/robot/bin
 - 登录成功后发送 `AccountRecordReq`; 新账号应收到包含非 0 `create_timestamp_ms`、固定 5 个 UUID 为 0 的空角色槽位和空宠物仓库的 `AccountRecord`, 登录流程不自动创建具体角色。玩家显式发送 `CharacterCreateReq` 后, 服务端才填充指定槽位并创建默认随身携带宠物。
 - 登录成功后，客户端按配置自动发送 `AccountHeartbeatReq`，服务端返回 `AccountHeartbeatRes.next_heartbeat_session`。
 - 输入业务命令时，gateway 通过当前账号绑定的 online 透传上行包。
-- online 下行包的 `ResultID == xerror.Disconnect.Code()` 时, gateway 必须先调用 remote 发送该错误包, 再断开连接并走统一 cleanup; 普通成功或业务错误结果不得断开连接.
+- online 下行包的 `ResultID` 必须原样透传给客户端, gateway 不得根据 online 返回的业务错误码断开连接.
 - 双 online 同 `availableLoad` 时，批量登录不应全部集中到 `/online/1/`，选中实例的本地负载会先扣减，后续 etcd 更新再覆盖本地估算值。
 - 输入 `AccountOfflineReq` 或由新 gateway 调用旧 gateway `GatewayKickAccountSession` 时，gateway 清理本地 account，并通知绑定的 online 下线，同时按 CAS 删除 cache accountSession。
 - gateway stream 建立后，online 能识别 `gateway_key` 并绑定下行 stream。
