@@ -1317,7 +1317,7 @@ character:
       bow: 179
     mounts:
       - petId: 4000302 #贝鲁伊卡-黄虎
-        spriteId: 770
+        spriteId: 771
       - petId: 4000322 #布林帖斯-蓝雷
         spriteId: 767
       - petId: 4000339 # 巴朵兰恩
