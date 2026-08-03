@@ -30,6 +30,8 @@
 # - 56=sae_06.wav, 57=sae_07.wav, 60=sae_10.wav, 62=sae_12.wav, 63=sae_13.wav, 64=sae_14.wav.
 # - 70=sae_20.wav, 71=sae_21.wav, 73=sae_23.wav, 74=sae_24.wav, 78=sae_28.wav, 80=sae_30.wav.
 # - 数据由原版小于10000的攻击帧事件提取; 原版播放器不接受大于500的音效ID, 因此不配置加比单方向的无效事件1000.
+# - 乌龟系sprite 261/262/263/264/602/603/604/605原版均在攻击第1帧播放ID80(sae_30.wav).
+# - 石龟实测出现异常叠音; 因同系共用相同事件, 当前统一停用. 各条目保留原版值注释, 待重复播放链路查清后再决定是否恢复.
 
 sprite:
   # 240 [95883,96114] 232 个文件
@@ -1704,8 +1706,10 @@ sprite:
       action7: 6
     attackImpactFrameNumberList: [3,6]
     attackImpactSoundIdList: [250,250]
-    attackActionSoundFrameNumberList: [1]
-    attackActionSoundIdList: [80]
+    # 原版: attackActionSoundFrameNumberList: [1]
+    # 原版: attackActionSoundIdList: [80] # sae_30.wav
+    attackActionSoundFrameNumberList: []
+    attackActionSoundIdList: []
     down: # [101451,101479] 29 个文件
       attack: [101451,101452,101453,101454,101455,101456,101457,101458]
       faint: [101459,101460,101461,101462,101463,101464]
@@ -1783,8 +1787,10 @@ sprite:
       action7: 6
     attackImpactFrameNumberList: [3,6]
     attackImpactSoundIdList: [250,250]
-    attackActionSoundFrameNumberList: [1]
-    attackActionSoundIdList: [80]
+    # 原版: attackActionSoundFrameNumberList: [1]
+    # 原版: attackActionSoundIdList: [80] # sae_30.wav
+    attackActionSoundFrameNumberList: []
+    attackActionSoundIdList: []
     down: # [101683,101711] 29 个文件
       attack: [101683,101684,101685,101686,101687,101688,101689,101690]
       faint: [101691,101692,101693,101694,101695,101696]
@@ -1862,8 +1868,10 @@ sprite:
       action7: 6
     attackImpactFrameNumberList: [3,6]
     attackImpactSoundIdList: [250,250]
-    attackActionSoundFrameNumberList: [1]
-    attackActionSoundIdList: [80]
+    # 原版: attackActionSoundFrameNumberList: [1]
+    # 原版: attackActionSoundIdList: [80] # sae_30.wav
+    attackActionSoundFrameNumberList: []
+    attackActionSoundIdList: []
     down: # [101915,101943] 29 个文件
       attack: [101915,101916,101917,101918,101919,101920,101921,101922]
       faint: [101923,101924,101925,101926,101927,101928]
@@ -1941,8 +1949,10 @@ sprite:
       action7: 6
     attackImpactFrameNumberList: [3,6]
     attackImpactSoundIdList: [250,250]
-    attackActionSoundFrameNumberList: [1]
-    attackActionSoundIdList: [80]
+    # 原版: attackActionSoundFrameNumberList: [1]
+    # 原版: attackActionSoundIdList: [80] # sae_30.wav
+    attackActionSoundFrameNumberList: []
+    attackActionSoundIdList: []
     down: # [102147,102175] 29 个文件
       attack: [102147,102148,102149,102150,102151,102152,102153,102154]
       faint: [102155,102156,102157,102158,102159,102160]
@@ -10710,8 +10720,10 @@ sprite:
       action7: 6
     attackImpactFrameNumberList: [3,6]
     attackImpactSoundIdList: [250,250]
-    attackActionSoundFrameNumberList: [1]
-    attackActionSoundIdList: [80]
+    # 原版: attackActionSoundFrameNumberList: [1]
+    # 原版: attackActionSoundIdList: [80] # sae_30.wav
+    attackActionSoundFrameNumberList: []
+    attackActionSoundIdList: []
     down: # [167657,167685] 29 个文件
       attack: [167657,167658,167659,167660,167661,167662,167663,167664]
       faint: [167665,167666,167667,167668,167669,167670]
@@ -10789,8 +10801,10 @@ sprite:
       action7: 6
     attackImpactFrameNumberList: [3,6]
     attackImpactSoundIdList: [250,250]
-    attackActionSoundFrameNumberList: [1]
-    attackActionSoundIdList: [80]
+    # 原版: attackActionSoundFrameNumberList: [1]
+    # 原版: attackActionSoundIdList: [80] # sae_30.wav
+    attackActionSoundFrameNumberList: []
+    attackActionSoundIdList: []
     down: # [167889,167917] 29 个文件
       attack: [167889,167890,167891,167892,167893,167894,167895,167896]
       faint: [167897,167898,167899,167900,167901,167902]
@@ -10868,8 +10882,10 @@ sprite:
       action7: 6
     attackImpactFrameNumberList: [3,6]
     attackImpactSoundIdList: [250,250]
-    attackActionSoundFrameNumberList: [1]
-    attackActionSoundIdList: [80]
+    # 原版: attackActionSoundFrameNumberList: [1]
+    # 原版: attackActionSoundIdList: [80] # sae_30.wav
+    attackActionSoundFrameNumberList: []
+    attackActionSoundIdList: []
     down: # [168121,168149] 29 个文件
       attack: [168121,168122,168123,168124,168125,168126,168127,168128]
       faint: [168129,168130,168131,168132,168133,168134]
@@ -10947,8 +10963,10 @@ sprite:
       action7: 6
     attackImpactFrameNumberList: [3,6]
     attackImpactSoundIdList: [250,250]
-    attackActionSoundFrameNumberList: [1]
-    attackActionSoundIdList: [80]
+    # 原版: attackActionSoundFrameNumberList: [1]
+    # 原版: attackActionSoundIdList: [80] # sae_30.wav
+    attackActionSoundFrameNumberList: []
+    attackActionSoundIdList: []
     down: # [168353,168381] 29 个文件
       attack: [168353,168354,168355,168356,168357,168358,168359,168360]
       faint: [168361,168362,168363,168364,168365,168366]
