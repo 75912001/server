@@ -152,3 +152,17 @@ message CharacterSceneEnterRes {
 message CharacterBaseChangedNotify {
   CharacterBaseRecord character_base_record = 1; // cache持久化成功后的角色基础权威快照
 }
+
+//0x001009#client->gateway#修改角色设置-请求
+message CharacterSettingSetReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号
+  bool team_enabled = 2; // 是否允许组队
+  bool duel_enabled = 3; // 是否允许决斗
+}
+
+//0x00100A#gateway->client#修改角色设置-回复
+message CharacterSettingSetRes {
+  uint64 character_uuid = 1; // 已修改设置的角色 UUID
+  bool team_enabled = 2; // 当前登录会话中是否允许组队
+  bool duel_enabled = 3; // 当前登录会话中是否允许决斗
+}

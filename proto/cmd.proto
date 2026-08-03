@@ -24,6 +24,8 @@ enum MsgID {
   CharacterSceneEnterReq_CMD = 4102; //0x001006#client->gateway#进入场景-请求
   CharacterSceneEnterRes_CMD = 4103; //0x001007#gateway->client#进入场景-回复
   CharacterBaseChangedNotify_CMD = 4104; //0x001008#gateway->client#角色基础数据变化-通知
+  CharacterSettingSetReq_CMD = 4105; //0x001009#client->gateway#修改角色设置-请求
+  CharacterSettingSetRes_CMD = 4106; //0x00100A#gateway->client#修改角色设置-回复
   CombatAutoEncounterSetReq_CMD = 1048577; //0x100001#client->gateway#设置自动遇敌-请求
   CombatAutoEncounterSetRes_CMD = 1048578; //0x100002#gateway->client#设置自动遇敌-回复
   CombatBattleStartNotify_CMD = 1048580; //0x100004#gateway->client#战斗开始-通知
