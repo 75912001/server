@@ -85,3 +85,10 @@ enemyGroups:
     enemies:
       - id: 4000322
         level: 1
+
+  - id: 4100264
+    name: 石龟-测试-防守
+    isBoss: true
+    enemies:
+      - id: 4100264
+        level: 100

@@ -26,6 +26,18 @@
 #   baseStr: [配置] 宠物模板固定基础腕力/攻击值
 #   baseTough: [配置] 宠物模板固定基础耐力/防御值
 #   baseDex: [配置] 宠物模板固定基础速度/敏捷值
+# panelReference 图鉴面板参考值: 只保存服务端预计算结果, 客户端不得包含或执行成长算法
+#   10点平均分配使用四种均衡组合: (2,3,3,2)、(2,2,3,3)、(3,2,2,3)、(3,3,2,2).
+#     每种组合分别按正式规则计算并向零截断Raw, 再对四组Raw逐项取算术平均并向零截断, 避免固定偏向某一项属性.
+#   level1CommonAverage/level1MythicAverage: 初始Raw统一使用配置initNum和上述平均分配,
+#     分别计算普通品阶偏移-2与神话品阶偏移+2的1级面板平均参考值.
+#   level140CommonAverage/level140MythicAverage: Rank成长倍率使用对应闭区间的算术平均值,
+#     在1级平均Raw基础上累计139次平均升级Raw, 分别计算普通品阶与神话品阶的140级面板平均参考值.
+#   growthRateMin/growthRateMax: 分别使用普通品阶、神话品阶的1级与140级平均面板值,
+#     按(攻击差+防御差+敏捷差)/139计算总成长上下限, 四舍五入保留3位小数; 总成长不计耐久成长.
+#   不再保存独立属性极值或极限参考; 图鉴范围固定表示普通品阶平均值到神话品阶平均值.
+#   最终按下方HP/attack/defense/agility公式换算面板整数. server启动时重新计算全部宠物并集中核验;
+#     任一配置不一致都会输出宠物ID、名称、实际值和可直接复制的正确YAML, 然后阻止服务启动.
 # battleAI 敌方基础动作AI: 仅控制普通攻击、防御和PVE逃跑, 不从skill槽随机选招
 #   仅敌方怪物/NPC读取battleAI. 玩家战斗宠物的动作由客户端分别提交, 不读取这些权重
 #   attackWeight: 普通攻击相对权重, 整数范围[0,2147483647]. 例如10/1/1表示10:1:1, 不是10%/1%/1%
@@ -61,11 +73,13 @@
 #   lvup_point = float(lvupPointSource)
 #
 # 宠物个体自己的成长基础四维:
-#   grade_offset 由 PetGrade 决定: Common=-2, Rare=-1, Epic=0, Legendary=1, Mythic=2
-#   saved_base_vital = baseVital + grade_offset
-#   saved_base_str = baseStr + grade_offset
-#   saved_base_tough = baseTough + grade_offset
-#   saved_base_dex = baseDex + grade_offset
+#   输入 Common 到 Mythic 时, 四维使用同一个品阶偏移: Common=-2, Rare=-1, Epic=0, Legendary=1, Mythic=2
+#   输入 Unknow 时, 四维分别独立等概率随机整数偏移[-2,2], 再按总偏移确定实际品阶并保存:
+#     Common=-8~0(56.80%), Rare=1~2(23.68%), Epic=3~4(13.92%), Legendary=5~6(4.80%), Mythic=7~8(0.80%)
+#   saved_base_vital = baseVital + vital_offset
+#   saved_base_str = baseStr + str_offset
+#   saved_base_tough = baseTough + tough_offset
+#   saved_base_dex = baseDex + dex_offset
 
 # 再随机分配 10 点到四维, 只影响初始 raw 属性:
 #   final_base_vital = saved_base_vital
@@ -170,6 +184,13 @@ pet:
         baseStr: 37
         baseTough: 19
         baseDex: 17
+      panelReference:
+        level1CommonAverage: {hp: 40, attack: 9, defense: 5, agility: 3}
+        level1MythicAverage: {hp: 46, attack: 10, defense: 7, agility: 4}
+        level140CommonAverage: {hp: 1251, attack: 292, defense: 182, agility: 117}
+        level140MythicAverage: {hp: 1442, attack: 326, defense: 216, agility: 145}
+        growthRateMin: 4.129
+        growthRateMax: 4.791
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -207,6 +228,13 @@ pet:
         baseStr: 36
         baseTough: 16
         baseDex: 20
+      panelReference:
+        level1CommonAverage: {hp: 53, attack: 12, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 61, attack: 13, defense: 8, agility: 7}
+        level140CommonAverage: {hp: 1306, attack: 299, defense: 170, agility: 146}
+        level140MythicAverage: {hp: 1508, attack: 335, defense: 206, agility: 173}
+        growthRateMin: 4.259
+        growthRateMax: 4.935
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -244,6 +272,13 @@ pet:
         baseStr: 37
         baseTough: 15
         baseDex: 21
+      panelReference:
+        level1CommonAverage: {hp: 47, attack: 11, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 55, attack: 12, defense: 7, agility: 6}
+        level140CommonAverage: {hp: 1251, attack: 303, defense: 162, agility: 151}
+        level140MythicAverage: {hp: 1452, attack: 338, defense: 198, agility: 180}
+        growthRateMin: 4.273
+        growthRateMax: 4.971
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -280,6 +315,13 @@ pet:
         baseStr: 38
         baseTough: 16
         baseDex: 20
+      panelReference:
+        level1CommonAverage: {hp: 45, attack: 11, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 52, attack: 12, defense: 7, agility: 6}
+        level140CommonAverage: {hp: 1229, attack: 310, defense: 168, agility: 145}
+        level140MythicAverage: {hp: 1428, attack: 344, defense: 204, agility: 173}
+        growthRateMin: 4.324
+        growthRateMax: 5.007
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -317,6 +359,13 @@ pet:
         baseStr: 35
         baseTough: 14
         baseDex: 24
+      panelReference:
+        level1CommonAverage: {hp: 44, attack: 10, defense: 5, agility: 6}
+        level1MythicAverage: {hp: 51, attack: 11, defense: 6, agility: 7}
+        level140CommonAverage: {hp: 1247, attack: 289, defense: 154, agility: 172}
+        level140MythicAverage: {hp: 1449, attack: 325, defense: 190, agility: 201}
+        growthRateMin: 4.273
+        growthRateMax: 4.978
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -354,6 +403,13 @@ pet:
         baseStr: 47
         baseTough: 20
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 68, attack: 17, defense: 9, agility: 9}
+        level1MythicAverage: {hp: 77, attack: 19, defense: 11, agility: 10}
+        level140CommonAverage: {hp: 1426, attack: 371, defense: 203, agility: 197}
+        level140MythicAverage: {hp: 1620, attack: 406, defense: 237, agility: 224}
+        growthRateMin: 5.295
+        growthRateMax: 5.950
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -391,6 +447,13 @@ pet:
         baseStr: 50
         baseTough: 18
         baseDex: 32
+      panelReference:
+        level1CommonAverage: {hp: 57, attack: 15, defense: 7, agility: 8}
+        level1MythicAverage: {hp: 64, attack: 16, defense: 8, agility: 9}
+        level140CommonAverage: {hp: 1447, attack: 388, defense: 190, agility: 222}
+        level140MythicAverage: {hp: 1639, attack: 422, defense: 224, agility: 250}
+        growthRateMin: 5.540
+        growthRateMax: 6.209
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -428,6 +491,13 @@ pet:
         baseStr: 37
         baseTough: 18
         baseDex: 22
+      panelReference:
+        level1CommonAverage: {hp: 53, attack: 11, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 60, attack: 12, defense: 8, agility: 6}
+        level140CommonAverage: {hp: 1395, attack: 297, defense: 180, agility: 153}
+        level140MythicAverage: {hp: 1588, attack: 331, defense: 214, agility: 180}
+        growthRateMin: 4.374
+        growthRateMax: 5.029
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -465,6 +535,13 @@ pet:
         baseStr: 45
         baseTough: 23
         baseDex: 35
+      panelReference:
+        level1CommonAverage: {hp: 75, attack: 18, defense: 11, agility: 12}
+        level1MythicAverage: {hp: 85, attack: 20, defense: 13, agility: 14}
+        level140CommonAverage: {hp: 1457, attack: 362, defense: 224, agility: 246}
+        level140MythicAverage: {hp: 1652, attack: 396, defense: 259, agility: 274}
+        growthRateMin: 5.691
+        growthRateMax: 6.345
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -501,6 +578,13 @@ pet:
         baseStr: 44
         baseTough: 28
         baseDex: 34
+      panelReference:
+        level1CommonAverage: {hp: 70, attack: 16, defense: 12, agility: 11}
+        level1MythicAverage: {hp: 79, attack: 18, defense: 13, agility: 12}
+        level140CommonAverage: {hp: 1528, attack: 358, defense: 259, agility: 237}
+        level140MythicAverage: {hp: 1722, attack: 393, defense: 293, agility: 265}
+        growthRateMin: 5.863
+        growthRateMax: 6.532
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -538,6 +622,13 @@ pet:
         baseStr: 46
         baseTough: 23
         baseDex: 38
+      panelReference:
+        level1CommonAverage: {hp: 68, attack: 17, defense: 10, agility: 12}
+        level1MythicAverage: {hp: 77, attack: 18, defense: 12, agility: 13}
+        level140CommonAverage: {hp: 1476, attack: 368, defense: 225, agility: 265}
+        level140MythicAverage: {hp: 1670, attack: 402, defense: 259, agility: 292}
+        growthRateMin: 5.892
+        growthRateMax: 6.547
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -574,6 +665,13 @@ pet:
         baseStr: 48
         baseTough: 23
         baseDex: 37
+      panelReference:
+        level1CommonAverage: {hp: 68, attack: 17, defense: 10, agility: 12}
+        level1MythicAverage: {hp: 77, attack: 19, defense: 12, agility: 13}
+        level140CommonAverage: {hp: 1483, attack: 382, defense: 226, agility: 258}
+        level140MythicAverage: {hp: 1677, attack: 417, defense: 261, agility: 285}
+        growthRateMin: 5.950
+        growthRateMax: 6.612
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -611,6 +709,13 @@ pet:
         baseStr: 43
         baseTough: 20
         baseDex: 43
+      panelReference:
+        level1CommonAverage: {hp: 65, attack: 16, defense: 9, agility: 13}
+        level1MythicAverage: {hp: 74, attack: 17, defense: 11, agility: 15}
+        level140CommonAverage: {hp: 1418, attack: 346, defense: 203, agility: 300}
+        level140MythicAverage: {hp: 1612, attack: 380, defense: 237, agility: 327}
+        growthRateMin: 5.835
+        growthRateMax: 6.482
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -648,6 +753,13 @@ pet:
         baseStr: 46
         baseTough: 25
         baseDex: 35
+      panelReference:
+        level1CommonAverage: {hp: 69, attack: 17, defense: 11, agility: 11}
+        level1MythicAverage: {hp: 78, attack: 18, defense: 12, agility: 12}
+        level140CommonAverage: {hp: 1498, attack: 369, defense: 238, agility: 244}
+        level140MythicAverage: {hp: 1692, attack: 403, defense: 272, agility: 272}
+        growthRateMin: 5.842
+        growthRateMax: 6.511
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -689,6 +801,13 @@ pet:
         baseStr: 28
         baseTough: 16
         baseDex: 25
+      panelReference:
+        level1CommonAverage: {hp: 39, attack: 8, defense: 5, agility: 6}
+        level1MythicAverage: {hp: 46, attack: 9, defense: 6, agility: 7}
+        level140CommonAverage: {hp: 1207, attack: 248, defense: 168, agility: 186}
+        level140MythicAverage: {hp: 1416, attack: 284, defense: 205, agility: 216}
+        growthRateMin: 4.194
+        growthRateMax: 4.914
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -726,6 +845,13 @@ pet:
         baseStr: 30
         baseTough: 13
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 36, attack: 8, defense: 4, agility: 6}
+        level1MythicAverage: {hp: 42, attack: 9, defense: 5, agility: 7}
+        level140CommonAverage: {hp: 1163, attack: 260, defense: 147, agility: 209}
+        level140MythicAverage: {hp: 1366, attack: 297, defense: 183, agility: 238}
+        growthRateMin: 4.302
+        growthRateMax: 5.014
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -763,6 +889,13 @@ pet:
         baseStr: 30
         baseTough: 13
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 32, attack: 7, defense: 4, agility: 5}
+        level1MythicAverage: {hp: 38, attack: 8, defense: 5, agility: 6}
+        level140CommonAverage: {hp: 1131, attack: 258, defense: 146, agility: 208}
+        level140MythicAverage: {hp: 1333, attack: 295, defense: 182, agility: 237}
+        growthRateMin: 4.288
+        growthRateMax: 5.000
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -800,6 +933,13 @@ pet:
         baseStr: 29
         baseTough: 18
         baseDex: 29
+      panelReference:
+        level1CommonAverage: {hp: 38, attack: 8, defense: 6, agility: 7}
+        level1MythicAverage: {hp: 45, attack: 9, defense: 7, agility: 8}
+        level140CommonAverage: {hp: 1102, attack: 246, defense: 176, agility: 208}
+        level140MythicAverage: {hp: 1296, attack: 282, defense: 210, agility: 237}
+        growthRateMin: 4.381
+        growthRateMax: 5.072
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -837,6 +977,13 @@ pet:
         baseStr: 37
         baseTough: 19
         baseDex: 32
+      panelReference:
+        level1CommonAverage: {hp: 48, attack: 10, defense: 6, agility: 8}
+        level1MythicAverage: {hp: 55, attack: 12, defense: 8, agility: 9}
+        level140CommonAverage: {hp: 1331, attack: 297, defense: 187, agility: 222}
+        level140MythicAverage: {hp: 1523, attack: 332, defense: 221, agility: 249}
+        growthRateMin: 4.906
+        growthRateMax: 5.561
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -873,6 +1020,13 @@ pet:
         baseStr: 43
         baseTough: 19
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 60, attack: 14, defense: 8, agility: 8}
+        level1MythicAverage: {hp: 68, attack: 16, defense: 9, agility: 9}
+        level140CommonAverage: {hp: 1385, attack: 341, defense: 192, agility: 196}
+        level140MythicAverage: {hp: 1578, attack: 375, defense: 226, agility: 223}
+        growthRateMin: 5.029
+        growthRateMax: 5.683
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -910,6 +1064,13 @@ pet:
         baseStr: 36
         baseTough: 16
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 47, attack: 10, defense: 6, agility: 6}
+        level1MythicAverage: {hp: 54, attack: 11, defense: 7, agility: 7}
+        level140CommonAverage: {hp: 1292, attack: 288, defense: 165, agility: 180}
+        level140MythicAverage: {hp: 1484, attack: 322, defense: 199, agility: 207}
+        growthRateMin: 4.396
+        growthRateMax: 5.058
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -947,6 +1108,13 @@ pet:
         baseStr: 35
         baseTough: 16
         baseDex: 31
+      panelReference:
+        level1CommonAverage: {hp: 44, attack: 9, defense: 5, agility: 7}
+        level1MythicAverage: {hp: 51, attack: 11, defense: 7, agility: 8}
+        level140CommonAverage: {hp: 1260, attack: 281, defense: 164, agility: 214}
+        level140MythicAverage: {hp: 1452, attack: 315, defense: 198, agility: 242}
+        growthRateMin: 4.590
+        growthRateMax: 5.245
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -988,6 +1156,13 @@ pet:
         baseStr: 29
         baseTough: 28
         baseDex: 20
+      panelReference:
+        level1CommonAverage: {hp: 46, attack: 9, defense: 8, agility: 5}
+        level1MythicAverage: {hp: 53, attack: 10, defense: 10, agility: 6}
+        level140CommonAverage: {hp: 1256, attack: 245, defense: 239, agility: 139}
+        level140MythicAverage: {hp: 1448, attack: 279, defense: 274, agility: 167}
+        growthRateMin: 4.324
+        growthRateMax: 4.993
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1025,6 +1200,13 @@ pet:
         baseStr: 30
         baseTough: 22
         baseDex: 22
+      panelReference:
+        level1CommonAverage: {hp: 49, attack: 9, defense: 7, agility: 5}
+        level1MythicAverage: {hp: 56, attack: 10, defense: 8, agility: 6}
+        level140CommonAverage: {hp: 1294, attack: 250, defense: 201, agility: 153}
+        level140MythicAverage: {hp: 1486, attack: 284, defense: 235, agility: 180}
+        growthRateMin: 4.194
+        growthRateMax: 4.856
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1062,6 +1244,13 @@ pet:
         baseStr: 37
         baseTough: 20
         baseDex: 25
+      panelReference:
+        level1CommonAverage: {hp: 47, attack: 11, defense: 7, agility: 6}
+        level1MythicAverage: {hp: 55, attack: 13, defense: 8, agility: 7}
+        level140CommonAverage: {hp: 1212, attack: 294, defense: 190, agility: 173}
+        level140MythicAverage: {hp: 1405, attack: 329, defense: 225, agility: 201}
+        growthRateMin: 4.554
+        growthRateMax: 5.230
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1099,6 +1288,13 @@ pet:
         baseStr: 35
         baseTough: 25
         baseDex: 21
+      panelReference:
+        level1CommonAverage: {hp: 49, attack: 11, defense: 9, agility: 6}
+        level1MythicAverage: {hp: 57, attack: 13, defense: 10, agility: 7}
+        level140CommonAverage: {hp: 1207, attack: 284, defense: 221, agility: 146}
+        level140MythicAverage: {hp: 1400, attack: 318, defense: 256, agility: 173}
+        growthRateMin: 4.496
+        growthRateMax: 5.158
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1136,6 +1332,13 @@ pet:
         baseStr: 40
         baseTough: 24
         baseDex: 27
+      panelReference:
+        level1CommonAverage: {hp: 54, attack: 12, defense: 8, agility: 7}
+        level1MythicAverage: {hp: 62, attack: 14, defense: 10, agility: 8}
+        level140CommonAverage: {hp: 1386, attack: 322, defense: 223, agility: 188}
+        level140MythicAverage: {hp: 1578, attack: 357, defense: 258, agility: 215}
+        growthRateMin: 5.079
+        growthRateMax: 5.741
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1173,6 +1376,13 @@ pet:
         baseStr: 48
         baseTough: 21
         baseDex: 29
+      panelReference:
+        level1CommonAverage: {hp: 61, attack: 16, defense: 9, agility: 8}
+        level1MythicAverage: {hp: 70, attack: 17, defense: 10, agility: 10}
+        level140CommonAverage: {hp: 1409, attack: 377, defense: 208, agility: 202}
+        level140MythicAverage: {hp: 1603, attack: 411, defense: 243, agility: 229}
+        growthRateMin: 5.424
+        growthRateMax: 6.086
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 2
@@ -1210,6 +1420,13 @@ pet:
         baseStr: 34
         baseTough: 29
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 53, attack: 11, defense: 9, agility: 7}
+        level1MythicAverage: {hp: 60, attack: 12, defense: 11, agility: 8}
+        level140CommonAverage: {hp: 1341, attack: 283, defense: 251, agility: 180}
+        level140MythicAverage: {hp: 1533, attack: 317, defense: 286, agility: 208}
+        growthRateMin: 4.942
+        growthRateMax: 5.612
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1246,6 +1463,13 @@ pet:
         baseStr: 42
         baseTough: 26
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 64, attack: 14, defense: 10, agility: 7}
+        level1MythicAverage: {hp: 72, attack: 15, defense: 11, agility: 8}
+        level140CommonAverage: {hp: 1519, attack: 340, defense: 241, agility: 181}
+        level140MythicAverage: {hp: 1712, attack: 375, defense: 275, agility: 209}
+        growthRateMin: 5.259
+        growthRateMax: 5.935
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1287,6 +1511,13 @@ pet:
         baseStr: 23
         baseTough: 19
         baseDex: 23
+      panelReference:
+        level1CommonAverage: {hp: 34, attack: 6, defense: 5, agility: 5}
+        level1MythicAverage: {hp: 40, attack: 7, defense: 6, agility: 6}
+        level140CommonAverage: {hp: 1193, attack: 219, defense: 192, agility: 178}
+        level140MythicAverage: {hp: 1404, attack: 257, defense: 230, agility: 208}
+        growthRateMin: 4.122
+        growthRateMax: 4.863
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1324,6 +1555,13 @@ pet:
         baseStr: 22
         baseTough: 18
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 5, defense: 4, agility: 5}
+        level1MythicAverage: {hp: 36, attack: 6, defense: 5, agility: 6}
+        level140CommonAverage: {hp: 1179, attack: 212, defense: 184, agility: 216}
+        level140MythicAverage: {hp: 1396, attack: 250, defense: 223, agility: 246}
+        growthRateMin: 4.302
+        growthRateMax: 5.050
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1360,6 +1598,13 @@ pet:
         baseStr: 22
         baseTough: 18
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 28, attack: 5, defense: 4, agility: 5}
+        level1MythicAverage: {hp: 33, attack: 5, defense: 5, agility: 5}
+        level140CommonAverage: {hp: 1161, attack: 204, defense: 177, agility: 208}
+        level140MythicAverage: {hp: 1369, attack: 241, defense: 214, agility: 236}
+        growthRateMin: 4.137
+        growthRateMax: 4.863
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1397,6 +1642,13 @@ pet:
         baseStr: 22
         baseTough: 18
         baseDex: 25
+      panelReference:
+        level1CommonAverage: {hp: 24, attack: 4, defense: 3, agility: 4}
+        level1MythicAverage: {hp: 28, attack: 5, defense: 4, agility: 4}
+        level140CommonAverage: {hp: 1150, attack: 210, defense: 182, agility: 193}
+        level140MythicAverage: {hp: 1366, attack: 247, defense: 220, agility: 222}
+        growthRateMin: 4.129
+        growthRateMax: 4.863
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1434,6 +1686,13 @@ pet:
         baseStr: 25
         baseTough: 25
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 39, attack: 6, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 45, attack: 7, defense: 7, agility: 6}
+        level140CommonAverage: {hp: 1269, attack: 216, defense: 216, agility: 179}
+        level140MythicAverage: {hp: 1460, attack: 251, defense: 251, agility: 206}
+        growthRateMin: 4.273
+        growthRateMax: 4.950
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1471,6 +1730,13 @@ pet:
         baseStr: 31
         baseTough: 21
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 41, attack: 8, defense: 6, agility: 6}
+        level1MythicAverage: {hp: 47, attack: 9, defense: 7, agility: 7}
+        level140CommonAverage: {hp: 1221, attack: 255, defense: 193, agility: 194}
+        level140MythicAverage: {hp: 1412, attack: 289, defense: 227, agility: 221}
+        growthRateMin: 4.475
+        growthRateMax: 5.137
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1508,6 +1774,13 @@ pet:
         baseStr: 27
         baseTough: 22
         baseDex: 25
+      panelReference:
+        level1CommonAverage: {hp: 40, attack: 7, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 46, attack: 8, defense: 7, agility: 6}
+        level140CommonAverage: {hp: 1308, attack: 230, defense: 199, agility: 172}
+        level140MythicAverage: {hp: 1499, attack: 264, defense: 233, agility: 199}
+        growthRateMin: 4.194
+        growthRateMax: 4.856
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1545,6 +1818,13 @@ pet:
         baseStr: 25
         baseTough: 24
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 42, attack: 7, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 48, attack: 8, defense: 7, agility: 6}
+        level140CommonAverage: {hp: 1317, attack: 218, defense: 212, agility: 179}
+        level140MythicAverage: {hp: 1508, attack: 252, defense: 246, agility: 206}
+        growthRateMin: 4.252
+        growthRateMax: 4.914
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1586,6 +1866,13 @@ pet:
         baseStr: 20
         baseTough: 10
         baseDex: 32
+      panelReference:
+        level1CommonAverage: {hp: 17, attack: 3, defense: 2, agility: 4}
+        level1MythicAverage: {hp: 20, attack: 3, defense: 2, agility: 4}
+        level140CommonAverage: {hp: 1077, attack: 201, defense: 128, agility: 262}
+        level140MythicAverage: {hp: 1305, attack: 241, defense: 169, agility: 295}
+        growthRateMin: 4.187
+        growthRateMax: 5.007
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1623,6 +1910,13 @@ pet:
         baseStr: 21
         baseTough: 7
         baseDex: 33
+      panelReference:
+        level1CommonAverage: {hp: 20, attack: 3, defense: 1, agility: 5}
+        level1MythicAverage: {hp: 24, attack: 4, defense: 2, agility: 5}
+        level140CommonAverage: {hp: 1107, attack: 208, defense: 106, agility: 271}
+        level140MythicAverage: {hp: 1335, attack: 249, defense: 147, agility: 304}
+        growthRateMin: 4.144
+        growthRateMax: 4.957
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1660,6 +1954,13 @@ pet:
         baseStr: 19
         baseTough: 11
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 25, attack: 4, defense: 2, agility: 4}
+        level1MythicAverage: {hp: 30, attack: 4, defense: 3, agility: 5}
+        level140CommonAverage: {hp: 1235, attack: 198, defense: 139, agility: 215}
+        level140MythicAverage: {hp: 1463, attack: 239, defense: 180, agility: 248}
+        growthRateMin: 3.899
+        growthRateMax: 4.712
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1697,6 +1998,13 @@ pet:
         baseStr: 18
         baseTough: 15
         baseDex: 29
+      panelReference:
+        level1CommonAverage: {hp: 26, attack: 4, defense: 4, agility: 5}
+        level1MythicAverage: {hp: 32, attack: 5, defense: 5, agility: 6}
+        level140CommonAverage: {hp: 1088, attack: 190, defense: 168, agility: 240}
+        level140MythicAverage: {hp: 1318, attack: 230, defense: 209, agility: 273}
+        growthRateMin: 4.209
+        growthRateMax: 5.007
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1734,6 +2042,13 @@ pet:
         baseStr: 28
         baseTough: 13
         baseDex: 35
+      panelReference:
+        level1CommonAverage: {hp: 30, attack: 6, defense: 3, agility: 6}
+        level1MythicAverage: {hp: 35, attack: 7, defense: 4, agility: 7}
+        level140CommonAverage: {hp: 1199, attack: 238, defense: 143, agility: 249}
+        level140MythicAverage: {hp: 1399, attack: 273, defense: 178, agility: 278}
+        growthRateMin: 4.424
+        growthRateMax: 5.115
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1771,6 +2086,13 @@ pet:
         baseStr: 23
         baseTough: 14
         baseDex: 31
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 5, defense: 3, agility: 5}
+        level1MythicAverage: {hp: 36, attack: 5, defense: 4, agility: 6}
+        level140CommonAverage: {hp: 1312, attack: 205, defense: 149, agility: 220}
+        level140MythicAverage: {hp: 1511, attack: 241, defense: 184, agility: 249}
+        growthRateMin: 4.036
+        growthRateMax: 4.741
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1808,6 +2130,13 @@ pet:
         baseStr: 24
         baseTough: 13
         baseDex: 39
+      panelReference:
+        level1CommonAverage: {hp: 28, attack: 5, defense: 3, agility: 6}
+        level1MythicAverage: {hp: 33, attack: 5, defense: 4, agility: 7}
+        level140CommonAverage: {hp: 1169, attack: 209, defense: 140, agility: 277}
+        level140MythicAverage: {hp: 1367, attack: 245, defense: 176, agility: 304}
+        growthRateMin: 4.403
+        growthRateMax: 5.101
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1845,6 +2174,13 @@ pet:
         baseStr: 22
         baseTough: 19
         baseDex: 33
+      panelReference:
+        level1CommonAverage: {hp: 29, attack: 4, defense: 4, agility: 5}
+        level1MythicAverage: {hp: 33, attack: 5, defense: 4, agility: 6}
+        level140CommonAverage: {hp: 1218, attack: 193, defense: 175, agility: 224}
+        level140MythicAverage: {hp: 1408, attack: 226, defense: 208, agility: 252}
+        growthRateMin: 4.165
+        growthRateMax: 4.827
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -1885,6 +2221,13 @@ pet:
         baseStr: 12
         baseTough: 30
         baseDex: 15
+      panelReference:
+        level1CommonAverage: {hp: 43, attack: 4, defense: 8, agility: 3}
+        level1MythicAverage: {hp: 50, attack: 5, defense: 9, agility: 4}
+        level140CommonAverage: {hp: 1374, attack: 147, defense: 271, agility: 117}
+        level140MythicAverage: {hp: 1594, attack: 185, defense: 310, agility: 149}
+        growthRateMin: 3.741
+        growthRateMax: 4.504
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1922,6 +2265,13 @@ pet:
         baseStr: 14
         baseTough: 32
         baseDex: 13
+      panelReference:
+        level1CommonAverage: {hp: 33, attack: 4, defense: 7, agility: 2}
+        level1MythicAverage: {hp: 39, attack: 5, defense: 8, agility: 3}
+        level140CommonAverage: {hp: 1352, attack: 161, defense: 285, agility: 101}
+        level140MythicAverage: {hp: 1564, attack: 199, defense: 322, agility: 132}
+        growthRateMin: 3.842
+        growthRateMax: 4.583
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1959,6 +2309,13 @@ pet:
         baseStr: 13
         baseTough: 31
         baseDex: 14
+      panelReference:
+        level1CommonAverage: {hp: 41, attack: 4, defense: 8, agility: 3}
+        level1MythicAverage: {hp: 48, attack: 5, defense: 9, agility: 4}
+        level140CommonAverage: {hp: 1381, attack: 154, defense: 279, agility: 110}
+        level140MythicAverage: {hp: 1599, attack: 193, defense: 317, agility: 140}
+        growthRateMin: 3.799
+        growthRateMax: 4.547
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -1996,6 +2353,13 @@ pet:
         baseStr: 16
         baseTough: 30
         baseDex: 15
+      panelReference:
+        level1CommonAverage: {hp: 39, attack: 5, defense: 7, agility: 3}
+        level1MythicAverage: {hp: 45, attack: 6, defense: 8, agility: 4}
+        level140CommonAverage: {hp: 1322, attack: 170, defense: 262, agility: 113}
+        level140MythicAverage: {hp: 1533, attack: 207, defense: 300, agility: 143}
+        growthRateMin: 3.813
+        growthRateMax: 4.547
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2033,6 +2397,13 @@ pet:
         baseStr: 19
         baseTough: 34
         baseDex: 19
+      panelReference:
+        level1CommonAverage: {hp: 42, attack: 5, defense: 8, agility: 4}
+        level1MythicAverage: {hp: 48, attack: 6, defense: 9, agility: 4}
+        level140CommonAverage: {hp: 1381, attack: 184, defense: 275, agility: 131}
+        level140MythicAverage: {hp: 1572, attack: 218, defense: 309, agility: 159}
+        growthRateMin: 4.122
+        growthRateMax: 4.799
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -2070,6 +2441,13 @@ pet:
         baseStr: 17
         baseTough: 39
         baseDex: 15
+      panelReference:
+        level1CommonAverage: {hp: 39, attack: 4, defense: 8, agility: 2}
+        level1MythicAverage: {hp: 45, attack: 5, defense: 9, agility: 3}
+        level140CommonAverage: {hp: 1421, attack: 172, defense: 307, agility: 104}
+        level140MythicAverage: {hp: 1611, attack: 206, defense: 341, agility: 131}
+        growthRateMin: 4.094
+        growthRateMax: 4.755
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -2107,6 +2485,13 @@ pet:
         baseStr: 17
         baseTough: 37
         baseDex: 18
+      panelReference:
+        level1CommonAverage: {hp: 41, attack: 5, defense: 8, agility: 3}
+        level1MythicAverage: {hp: 47, attack: 6, defense: 9, agility: 4}
+        level140CommonAverage: {hp: 1400, attack: 171, defense: 294, agility: 124}
+        level140MythicAverage: {hp: 1591, attack: 205, defense: 328, agility: 151}
+        growthRateMin: 4.122
+        growthRateMax: 4.784
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -2144,6 +2529,13 @@ pet:
         baseStr: 20
         baseTough: 35
         baseDex: 16
+      panelReference:
+        level1CommonAverage: {hp: 50, attack: 6, defense: 9, agility: 3}
+        level1MythicAverage: {hp: 56, attack: 7, defense: 10, agility: 4}
+        level140CommonAverage: {hp: 1488, attack: 194, defense: 286, agility: 112}
+        level140MythicAverage: {hp: 1680, attack: 228, defense: 320, agility: 139}
+        growthRateMin: 4.129
+        growthRateMax: 4.791
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -2185,6 +2577,13 @@ pet:
         baseStr: 18
         baseTough: 34
         baseDex: 9
+      panelReference:
+        level1CommonAverage: {hp: 20, attack: 3, defense: 5, agility: 1}
+        level1MythicAverage: {hp: 24, attack: 4, defense: 6, agility: 1}
+        level140CommonAverage: {hp: 1128, attack: 191, defense: 304, agility: 73}
+        level140MythicAverage: {hp: 1346, attack: 230, defense: 343, agility: 104}
+        growthRateMin: 4.022
+        growthRateMax: 4.791
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2222,6 +2621,13 @@ pet:
         baseStr: 19
         baseTough: 35
         baseDex: 8
+      panelReference:
+        level1CommonAverage: {hp: 19, attack: 3, defense: 5, agility: 1}
+        level1MythicAverage: {hp: 23, attack: 4, defense: 6, agility: 1}
+        level140CommonAverage: {hp: 1106, attack: 199, defense: 311, agility: 65}
+        level140MythicAverage: {hp: 1327, attack: 238, defense: 351, agility: 97}
+        growthRateMin: 4.072
+        growthRateMax: 4.856
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2259,6 +2665,13 @@ pet:
         baseStr: 21
         baseTough: 33
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 17, attack: 3, defense: 4, agility: 1}
+        level1MythicAverage: {hp: 21, attack: 3, defense: 5, agility: 1}
+        level140CommonAverage: {hp: 1149, attack: 214, defense: 298, agility: 81}
+        level140MythicAverage: {hp: 1366, attack: 252, defense: 336, agility: 112}
+        growthRateMin: 4.209
+        growthRateMax: 4.971
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2296,6 +2709,13 @@ pet:
         baseStr: 19
         baseTough: 41
         baseDex: 8
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 5, defense: 9, agility: 1}
+        level1MythicAverage: {hp: 36, attack: 6, defense: 10, agility: 2}
+        level140CommonAverage: {hp: 1179, attack: 199, defense: 349, agility: 64}
+        level140MythicAverage: {hp: 1396, attack: 237, defense: 388, agility: 94}
+        growthRateMin: 4.295
+        growthRateMax: 5.043
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2332,6 +2752,13 @@ pet:
         baseStr: 24
         baseTough: 38
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 29, attack: 4, defense: 6, agility: 1}
+        level1MythicAverage: {hp: 34, attack: 5, defense: 7, agility: 2}
+        level140CommonAverage: {hp: 1340, attack: 215, defense: 299, agility: 69}
+        level140MythicAverage: {hp: 1529, attack: 249, defense: 333, agility: 96}
+        growthRateMin: 4.115
+        growthRateMax: 4.777
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 2
@@ -2369,6 +2796,13 @@ pet:
         baseStr: 22
         baseTough: 41
         baseDex: 13
+      panelReference:
+        level1CommonAverage: {hp: 26, attack: 4, defense: 7, agility: 2}
+        level1MythicAverage: {hp: 31, attack: 5, defense: 8, agility: 2}
+        level140CommonAverage: {hp: 1166, attack: 205, defense: 326, agility: 93}
+        level140MythicAverage: {hp: 1365, attack: 241, defense: 361, agility: 122}
+        growthRateMin: 4.396
+        growthRateMax: 5.101
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -2406,6 +2840,13 @@ pet:
         baseStr: 25
         baseTough: 35
         baseDex: 13
+      panelReference:
+        level1CommonAverage: {hp: 21, attack: 4, defense: 5, agility: 1}
+        level1MythicAverage: {hp: 25, attack: 4, defense: 5, agility: 2}
+        level140CommonAverage: {hp: 1170, attack: 222, defense: 286, agility: 93}
+        level140MythicAverage: {hp: 1368, attack: 258, defense: 321, agility: 121}
+        growthRateMin: 4.252
+        growthRateMax: 4.957
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -2443,6 +2884,13 @@ pet:
         baseStr: 21
         baseTough: 39
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 27, attack: 4, defense: 6, agility: 1}
+        level1MythicAverage: {hp: 31, attack: 5, defense: 7, agility: 2}
+        level140CommonAverage: {hp: 1294, attack: 200, defense: 315, agility: 72}
+        level140MythicAverage: {hp: 1491, attack: 235, defense: 349, agility: 100}
+        growthRateMin: 4.144
+        growthRateMax: 4.820
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -2484,6 +2932,13 @@ pet:
         baseStr: 22
         baseTough: 21
         baseDex: 18
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 5, defense: 5, agility: 3}
+        level1MythicAverage: {hp: 36, attack: 6, defense: 6, agility: 4}
+        level140CommonAverage: {hp: 1233, attack: 219, defense: 213, agility: 145}
+        level140MythicAverage: {hp: 1453, attack: 258, defense: 252, agility: 176}
+        growthRateMin: 4.058
+        growthRateMax: 4.820
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2521,6 +2976,13 @@ pet:
         baseStr: 20
         baseTough: 20
         baseDex: 17
+      panelReference:
+        level1CommonAverage: {hp: 28, attack: 4, defense: 4, agility: 3}
+        level1MythicAverage: {hp: 33, attack: 5, defense: 5, agility: 3}
+        level140CommonAverage: {hp: 1226, attack: 202, defense: 202, agility: 136}
+        level140MythicAverage: {hp: 1446, attack: 242, defense: 242, agility: 169}
+        growthRateMin: 3.806
+        growthRateMax: 4.604
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2558,6 +3020,13 @@ pet:
         baseStr: 21
         baseTough: 23
         baseDex: 17
+      panelReference:
+        level1CommonAverage: {hp: 26, attack: 4, defense: 4, agility: 2}
+        level1MythicAverage: {hp: 31, attack: 5, defense: 5, agility: 3}
+        level140CommonAverage: {hp: 1228, attack: 212, defense: 226, agility: 136}
+        level140MythicAverage: {hp: 1449, attack: 251, defense: 266, agility: 169}
+        growthRateMin: 4.058
+        growthRateMax: 4.842
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2595,6 +3064,13 @@ pet:
         baseStr: 22
         baseTough: 21
         baseDex: 18
+      panelReference:
+        level1CommonAverage: {hp: 28, attack: 5, defense: 4, agility: 3}
+        level1MythicAverage: {hp: 33, attack: 5, defense: 5, agility: 4}
+        level140CommonAverage: {hp: 1213, attack: 212, defense: 204, agility: 139}
+        level140MythicAverage: {hp: 1430, attack: 250, defense: 243, agility: 170}
+        growthRateMin: 3.906
+        growthRateMax: 4.669
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2632,6 +3108,13 @@ pet:
         baseStr: 22
         baseTough: 19
         baseDex: 23
+      panelReference:
+        level1CommonAverage: {hp: 28, attack: 5, defense: 4, agility: 4}
+        level1MythicAverage: {hp: 34, attack: 6, defense: 5, agility: 5}
+        level140CommonAverage: {hp: 1147, attack: 211, defense: 190, agility: 178}
+        level140MythicAverage: {hp: 1362, attack: 248, defense: 228, agility: 208}
+        growthRateMin: 4.072
+        growthRateMax: 4.806
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2669,6 +3152,13 @@ pet:
         baseStr: 25
         baseTough: 26
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 35, attack: 6, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 40, attack: 7, defense: 7, agility: 5}
+        level140CommonAverage: {hp: 1244, attack: 216, defense: 222, agility: 178}
+        level140MythicAverage: {hp: 1434, attack: 250, defense: 256, agility: 205}
+        growthRateMin: 4.309
+        growthRateMax: 4.978
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -2706,6 +3196,13 @@ pet:
         baseStr: 24
         baseTough: 27
         baseDex: 22
+      panelReference:
+        level1CommonAverage: {hp: 38, attack: 6, defense: 6, agility: 4}
+        level1MythicAverage: {hp: 44, attack: 7, defense: 7, agility: 5}
+        level140CommonAverage: {hp: 1300, attack: 212, defense: 230, agility: 151}
+        level140MythicAverage: {hp: 1491, attack: 246, defense: 264, agility: 179}
+        growthRateMin: 4.151
+        growthRateMax: 4.820
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -2743,6 +3240,13 @@ pet:
         baseStr: 27
         baseTough: 24
         baseDex: 24
+      panelReference:
+        level1CommonAverage: {hp: 44, attack: 7, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 50, attack: 8, defense: 8, agility: 6}
+        level140CommonAverage: {hp: 1376, attack: 233, defense: 215, agility: 166}
+        level140MythicAverage: {hp: 1567, attack: 267, defense: 249, agility: 193}
+        growthRateMin: 4.288
+        growthRateMax: 4.942
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -2783,6 +3287,13 @@ pet:
         baseStr: 26
         baseTough: 20
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 37, attack: 7, defense: 6, agility: 6}
+        level1MythicAverage: {hp: 44, attack: 8, defense: 7, agility: 7}
+        level140CommonAverage: {hp: 1201, attack: 236, defense: 196, agility: 195}
+        level140MythicAverage: {hp: 1407, attack: 272, defense: 232, agility: 223}
+        growthRateMin: 4.374
+        growthRateMax: 5.072
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2820,6 +3331,13 @@ pet:
         baseStr: 24
         baseTough: 19
         baseDex: 27
+      panelReference:
+        level1CommonAverage: {hp: 38, attack: 7, defense: 6, agility: 6}
+        level1MythicAverage: {hp: 45, attack: 8, defense: 7, agility: 7}
+        level140CommonAverage: {hp: 1186, attack: 220, defense: 188, agility: 202}
+        level140MythicAverage: {hp: 1395, attack: 258, defense: 224, agility: 231}
+        growthRateMin: 4.252
+        growthRateMax: 4.971
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2857,6 +3375,13 @@ pet:
         baseStr: 24
         baseTough: 23
         baseDex: 25
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 5, defense: 5, agility: 4}
+        level1MythicAverage: {hp: 37, attack: 6, defense: 6, agility: 5}
+        level140CommonAverage: {hp: 1171, attack: 213, defense: 206, agility: 178}
+        level140MythicAverage: {hp: 1371, attack: 248, defense: 242, agility: 207}
+        growthRateMin: 4.194
+        growthRateMax: 4.892
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2893,6 +3418,13 @@ pet:
         baseStr: 23
         baseTough: 25
         baseDex: 22
+      panelReference:
+        level1CommonAverage: {hp: 36, attack: 6, defense: 6, agility: 4}
+        level1MythicAverage: {hp: 42, attack: 7, defense: 7, agility: 5}
+        level140CommonAverage: {hp: 1210, attack: 216, defense: 228, agility: 164}
+        level140MythicAverage: {hp: 1421, attack: 253, defense: 266, agility: 194}
+        growthRateMin: 4.259
+        growthRateMax: 4.993
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -2930,6 +3462,13 @@ pet:
         baseStr: 27
         baseTough: 23
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 53, attack: 8, defense: 8, agility: 7}
+        level1MythicAverage: {hp: 60, attack: 10, defense: 9, agility: 8}
+        level140CommonAverage: {hp: 1404, attack: 235, defense: 210, agility: 195}
+        level140MythicAverage: {hp: 1596, attack: 269, defense: 244, agility: 222}
+        growthRateMin: 4.439
+        growthRateMax: 5.094
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -2967,6 +3506,13 @@ pet:
         baseStr: 28
         baseTough: 23
         baseDex: 31
+      panelReference:
+        level1CommonAverage: {hp: 44, attack: 8, defense: 7, agility: 7}
+        level1MythicAverage: {hp: 51, attack: 9, defense: 8, agility: 8}
+        level140CommonAverage: {hp: 1260, attack: 238, defense: 207, agility: 214}
+        level140MythicAverage: {hp: 1452, attack: 272, defense: 241, agility: 242}
+        growthRateMin: 4.583
+        growthRateMax: 5.252
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3004,6 +3550,13 @@ pet:
         baseStr: 25
         baseTough: 28
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 43, attack: 7, defense: 8, agility: 6}
+        level1MythicAverage: {hp: 50, attack: 8, defense: 9, agility: 7}
+        level140CommonAverage: {hp: 1294, attack: 219, defense: 239, agility: 179}
+        level140MythicAverage: {hp: 1486, attack: 253, defense: 273, agility: 207}
+        growthRateMin: 4.432
+        growthRateMax: 5.101
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3041,6 +3594,13 @@ pet:
         baseStr: 24
         baseTough: 26
         baseDex: 30
+      panelReference:
+        level1CommonAverage: {hp: 43, attack: 7, defense: 7, agility: 7}
+        level1MythicAverage: {hp: 49, attack: 8, defense: 8, agility: 7}
+        level140CommonAverage: {hp: 1273, attack: 213, defense: 224, agility: 207}
+        level140MythicAverage: {hp: 1464, attack: 247, defense: 259, agility: 234}
+        growthRateMin: 4.482
+        growthRateMax: 5.158
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3081,6 +3641,13 @@ pet:
         baseStr: 23
         baseTough: 40
         baseDex: 6
+      panelReference:
+        level1CommonAverage: {hp: 37, attack: 6, defense: 10, agility: 1}
+        level1MythicAverage: {hp: 44, attack: 7, defense: 11, agility: 2}
+        level140CommonAverage: {hp: 1262, attack: 222, defense: 336, agility: 47}
+        level140MythicAverage: {hp: 1470, attack: 260, defense: 372, agility: 75}
+        growthRateMin: 4.230
+        growthRateMax: 4.942
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3118,6 +3685,13 @@ pet:
         baseStr: 21
         baseTough: 39
         baseDex: 5
+      panelReference:
+        level1CommonAverage: {hp: 37, attack: 6, defense: 9, agility: 1}
+        level1MythicAverage: {hp: 43, attack: 7, defense: 10, agility: 2}
+        level140CommonAverage: {hp: 1232, attack: 207, defense: 327, agility: 38}
+        level140MythicAverage: {hp: 1440, attack: 243, defense: 363, agility: 68}
+        growthRateMin: 4.000
+        growthRateMax: 4.712
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3155,6 +3729,13 @@ pet:
         baseStr: 24
         baseTough: 37
         baseDex: 7
+      panelReference:
+        level1CommonAverage: {hp: 29, attack: 5, defense: 7, agility: 1}
+        level1MythicAverage: {hp: 34, attack: 6, defense: 8, agility: 1}
+        level140CommonAverage: {hp: 1279, attack: 227, defense: 313, agility: 54}
+        level140MythicAverage: {hp: 1481, attack: 264, defense: 350, agility: 82}
+        growthRateMin: 4.180
+        growthRateMax: 4.899
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3192,6 +3773,13 @@ pet:
         baseStr: 21
         baseTough: 38
         baseDex: 6
+      panelReference:
+        level1CommonAverage: {hp: 38, attack: 6, defense: 10, agility: 1}
+        level1MythicAverage: {hp: 45, attack: 7, defense: 11, agility: 2}
+        level140CommonAverage: {hp: 1234, attack: 207, defense: 319, agility: 47}
+        level140MythicAverage: {hp: 1442, attack: 243, defense: 356, agility: 76}
+        growthRateMin: 4.000
+        growthRateMax: 4.712
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3229,6 +3817,13 @@ pet:
         baseStr: 27
         baseTough: 43
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 6, defense: 9, agility: 2}
+        level1MythicAverage: {hp: 37, attack: 7, defense: 10, agility: 2}
+        level140CommonAverage: {hp: 1121, attack: 241, defense: 342, agility: 72}
+        level140MythicAverage: {hp: 1316, attack: 276, defense: 378, agility: 101}
+        growthRateMin: 4.590
+        growthRateMax: 5.295
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3266,6 +3861,13 @@ pet:
         baseStr: 19
         baseTough: 37
         baseDex: 6
+      panelReference:
+        level1CommonAverage: {hp: 38, attack: 5, defense: 9, agility: 1}
+        level1MythicAverage: {hp: 44, attack: 6, defense: 10, agility: 2}
+        level140CommonAverage: {hp: 1319, attack: 200, defense: 324, agility: 48}
+        level140MythicAverage: {hp: 1535, attack: 238, defense: 362, agility: 78}
+        growthRateMin: 4.007
+        growthRateMax: 4.748
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3303,6 +3905,13 @@ pet:
         baseStr: 24
         baseTough: 31
         baseDex: 6
+      panelReference:
+        level1CommonAverage: {hp: 38, attack: 6, defense: 8, agility: 1}
+        level1MythicAverage: {hp: 44, attack: 7, defense: 9, agility: 2}
+        level140CommonAverage: {hp: 1345, attack: 234, defense: 283, agility: 48}
+        level140MythicAverage: {hp: 1557, attack: 273, defense: 320, agility: 78}
+        growthRateMin: 3.957
+        growthRateMax: 4.698
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3340,6 +3949,13 @@ pet:
         baseStr: 20
         baseTough: 36
         baseDex: 12
+      panelReference:
+        level1CommonAverage: {hp: 34, attack: 5, defense: 8, agility: 2}
+        level1MythicAverage: {hp: 39, attack: 6, defense: 9, agility: 3}
+        level140CommonAverage: {hp: 1250, attack: 199, defense: 305, agility: 90}
+        level140MythicAverage: {hp: 1459, attack: 235, defense: 342, agility: 120}
+        growthRateMin: 4.165
+        growthRateMax: 4.885
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3381,6 +3997,13 @@ pet:
         baseStr: 18
         baseTough: 20
         baseDex: 22
+      panelReference:
+        level1CommonAverage: {hp: 26, attack: 4, defense: 4, agility: 4}
+        level1MythicAverage: {hp: 31, attack: 5, defense: 5, agility: 5}
+        level140CommonAverage: {hp: 1138, attack: 192, defense: 206, agility: 183}
+        level140MythicAverage: {hp: 1367, attack: 233, defense: 247, agility: 216}
+        growthRateMin: 4.094
+        growthRateMax: 4.899
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3418,6 +4041,13 @@ pet:
         baseStr: 18
         baseTough: 17
         baseDex: 24
+      panelReference:
+        level1CommonAverage: {hp: 28, attack: 4, defense: 4, agility: 4}
+        level1MythicAverage: {hp: 34, attack: 5, defense: 5, agility: 5}
+        level140CommonAverage: {hp: 1159, attack: 191, defense: 184, agility: 199}
+        level140MythicAverage: {hp: 1389, attack: 232, defense: 225, agility: 232}
+        growthRateMin: 4.043
+        growthRateMax: 4.849
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3455,6 +4085,13 @@ pet:
         baseStr: 20
         baseTough: 18
         baseDex: 24
+      panelReference:
+        level1CommonAverage: {hp: 24, attack: 4, defense: 4, agility: 4}
+        level1MythicAverage: {hp: 29, attack: 5, defense: 5, agility: 5}
+        level140CommonAverage: {hp: 1078, attack: 199, defense: 185, agility: 192}
+        level140MythicAverage: {hp: 1297, attack: 238, defense: 224, agility: 223}
+        growthRateMin: 4.058
+        growthRateMax: 4.820
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3492,6 +4129,13 @@ pet:
         baseStr: 16
         baseTough: 19
         baseDex: 23
+      panelReference:
+        level1CommonAverage: {hp: 23, attack: 3, defense: 4, agility: 3}
+        level1MythicAverage: {hp: 28, attack: 4, defense: 4, agility: 4}
+        level140CommonAverage: {hp: 1120, attack: 174, defense: 197, agility: 191}
+        level140MythicAverage: {hp: 1348, attack: 215, defense: 238, agility: 224}
+        growthRateMin: 3.971
+        growthRateMax: 4.784
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3529,6 +4173,13 @@ pet:
         baseStr: 22
         baseTough: 21
         baseDex: 29
+      panelReference:
+        level1CommonAverage: {hp: 29, attack: 5, defense: 4, agility: 5}
+        level1MythicAverage: {hp: 34, attack: 6, defense: 5, agility: 6}
+        level140CommonAverage: {hp: 1191, attack: 206, defense: 200, agility: 215}
+        level140MythicAverage: {hp: 1399, attack: 243, defense: 236, agility: 245}
+        growthRateMin: 4.367
+        growthRateMax: 5.086
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3566,6 +4217,13 @@ pet:
         baseStr: 27
         baseTough: 21
         baseDex: 27
+      panelReference:
+        level1CommonAverage: {hp: 28, attack: 5, defense: 4, agility: 4}
+        level1MythicAverage: {hp: 33, attack: 6, defense: 5, agility: 5}
+        level140CommonAverage: {hp: 1111, attack: 231, defense: 193, agility: 192}
+        level140MythicAverage: {hp: 1305, attack: 267, defense: 228, agility: 221}
+        growthRateMin: 4.338
+        growthRateMax: 5.036
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3602,6 +4260,13 @@ pet:
         baseStr: 23
         baseTough: 21
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 32, attack: 5, defense: 5, agility: 4}
+        level1MythicAverage: {hp: 37, attack: 6, defense: 5, agility: 5}
+        level140CommonAverage: {hp: 1269, attack: 207, defense: 194, agility: 185}
+        level140MythicAverage: {hp: 1469, attack: 243, defense: 230, agility: 213}
+        growthRateMin: 4.115
+        growthRateMax: 4.820
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3639,6 +4304,13 @@ pet:
         baseStr: 22
         baseTough: 24
         baseDex: 27
+      panelReference:
+        level1CommonAverage: {hp: 28, attack: 5, defense: 5, agility: 4}
+        level1MythicAverage: {hp: 33, attack: 6, defense: 6, agility: 5}
+        level140CommonAverage: {hp: 1170, attack: 207, defense: 220, agility: 200}
+        level140MythicAverage: {hp: 1372, attack: 244, defense: 257, agility: 229}
+        growthRateMin: 4.410
+        growthRateMax: 5.129
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 3
@@ -3680,6 +4352,13 @@ pet:
         baseStr: 19
         baseTough: 19
         baseDex: 27
+      panelReference:
+        level1CommonAverage: {hp: 22, attack: 4, defense: 4, agility: 4}
+        level1MythicAverage: {hp: 27, attack: 5, defense: 5, agility: 5}
+        level140CommonAverage: {hp: 1014, attack: 198, defense: 198, agility: 224}
+        level140MythicAverage: {hp: 1243, attack: 238, defense: 238, agility: 257}
+        growthRateMin: 4.374
+        growthRateMax: 5.165
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3717,6 +4396,13 @@ pet:
         baseStr: 19
         baseTough: 19
         baseDex: 27
+      panelReference:
+        level1CommonAverage: {hp: 24, attack: 4, defense: 4, agility: 5}
+        level1MythicAverage: {hp: 30, attack: 5, defense: 5, agility: 6}
+        level140CommonAverage: {hp: 1017, attack: 198, defense: 198, agility: 225}
+        level140MythicAverage: {hp: 1246, attack: 239, defense: 239, agility: 257}
+        growthRateMin: 4.374
+        growthRateMax: 5.173
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3754,6 +4440,13 @@ pet:
         baseStr: 20
         baseTough: 17
         baseDex: 25
+      panelReference:
+        level1CommonAverage: {hp: 17, attack: 3, defense: 3, agility: 3}
+        level1MythicAverage: {hp: 21, attack: 4, defense: 4, agility: 4}
+        level140CommonAverage: {hp: 950, attack: 201, defense: 179, agility: 206}
+        level140MythicAverage: {hp: 1178, attack: 241, defense: 220, agility: 239}
+        growthRateMin: 4.151
+        growthRateMax: 4.950
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3790,6 +4483,13 @@ pet:
         baseStr: 20
         baseTough: 16
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 24, attack: 4, defense: 4, agility: 5}
+        level1MythicAverage: {hp: 30, attack: 5, defense: 5, agility: 6}
+        level140CommonAverage: {hp: 1032, attack: 198, defense: 169, agility: 223}
+        level140MythicAverage: {hp: 1253, attack: 237, defense: 209, agility: 256}
+        growthRateMin: 4.151
+        growthRateMax: 4.935
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -3827,6 +4527,13 @@ pet:
         baseStr: 21
         baseTough: 20
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 32, attack: 5, defense: 5, agility: 5}
+        level1MythicAverage: {hp: 38, attack: 6, defense: 6, agility: 6}
+        level140CommonAverage: {hp: 1172, attack: 204, defense: 198, agility: 201}
+        level140MythicAverage: {hp: 1389, attack: 243, defense: 236, agility: 231}
+        growthRateMin: 4.230
+        growthRateMax: 4.978
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3864,6 +4571,13 @@ pet:
         baseStr: 21
         baseTough: 24
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 28, attack: 5, defense: 5, agility: 5}
+        level1MythicAverage: {hp: 34, attack: 6, defense: 6, agility: 6}
+        level140CommonAverage: {hp: 1053, attack: 198, defense: 217, agility: 208}
+        level140MythicAverage: {hp: 1260, attack: 234, defense: 254, agility: 237}
+        growthRateMin: 4.374
+        growthRateMax: 5.086
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3901,6 +4615,13 @@ pet:
         baseStr: 20
         baseTough: 23
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 5, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 37, attack: 6, defense: 7, agility: 6}
+        level140CommonAverage: {hp: 1130, attack: 198, defense: 219, agility: 201}
+        level140MythicAverage: {hp: 1340, attack: 236, defense: 256, agility: 231}
+        growthRateMin: 4.331
+        growthRateMax: 5.065
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3938,6 +4659,13 @@ pet:
         baseStr: 25
         baseTough: 19
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 32, attack: 6, defense: 5, agility: 6}
+        level1MythicAverage: {hp: 38, attack: 7, defense: 6, agility: 7}
+        level140CommonAverage: {hp: 1077, attack: 224, defense: 185, agility: 209}
+        level140MythicAverage: {hp: 1285, attack: 261, defense: 221, agility: 237}
+        growthRateMin: 4.324
+        growthRateMax: 5.029
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -3978,6 +4706,13 @@ pet:
         baseStr: 28
         baseTough: 26
         baseDex: 18
+      panelReference:
+        level1CommonAverage: {hp: 52, attack: 9, defense: 9, agility: 5}
+        level1MythicAverage: {hp: 60, attack: 11, defense: 10, agility: 6}
+        level140CommonAverage: {hp: 1285, attack: 239, defense: 226, agility: 126}
+        level140MythicAverage: {hp: 1478, attack: 274, defense: 261, agility: 153}
+        growthRateMin: 4.086
+        growthRateMax: 4.755
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4015,6 +4750,13 @@ pet:
         baseStr: 27
         baseTough: 23
         baseDex: 19
+      panelReference:
+        level1CommonAverage: {hp: 42, attack: 7, defense: 6, agility: 4}
+        level1MythicAverage: {hp: 48, attack: 8, defense: 8, agility: 5}
+        level140CommonAverage: {hp: 1301, attack: 237, defense: 211, agility: 137}
+        level140MythicAverage: {hp: 1501, attack: 273, defense: 247, agility: 165}
+        growthRateMin: 4.086
+        growthRateMax: 4.777
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4052,6 +4794,13 @@ pet:
         baseStr: 29
         baseTough: 21
         baseDex: 20
+      panelReference:
+        level1CommonAverage: {hp: 50, attack: 9, defense: 7, agility: 5}
+        level1MythicAverage: {hp: 57, attack: 10, defense: 8, agility: 6}
+        level140CommonAverage: {hp: 1316, attack: 252, defense: 200, agility: 145}
+        level140MythicAverage: {hp: 1517, attack: 288, defense: 236, agility: 173}
+        growthRateMin: 4.144
+        growthRateMax: 4.842
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4089,6 +4838,13 @@ pet:
         baseStr: 30
         baseTough: 20
         baseDex: 21
+      panelReference:
+        level1CommonAverage: {hp: 47, attack: 9, defense: 7, agility: 5}
+        level1MythicAverage: {hp: 54, attack: 11, defense: 8, agility: 6}
+        level140CommonAverage: {hp: 1236, attack: 256, defense: 193, agility: 151}
+        level140MythicAverage: {hp: 1437, attack: 292, defense: 227, agility: 180}
+        growthRateMin: 4.165
+        growthRateMax: 4.849
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4126,6 +4882,13 @@ pet:
         baseStr: 30
         baseTough: 28
         baseDex: 21
+      panelReference:
+        level1CommonAverage: {hp: 51, attack: 9, defense: 8, agility: 5}
+        level1MythicAverage: {hp: 58, attack: 10, defense: 10, agility: 6}
+        level140CommonAverage: {hp: 1408, attack: 256, defense: 244, agility: 145}
+        level140MythicAverage: {hp: 1600, attack: 290, defense: 278, agility: 173}
+        growthRateMin: 4.482
+        growthRateMax: 5.144
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -4163,6 +4926,13 @@ pet:
         baseStr: 42
         baseTough: 28
         baseDex: 21
+      panelReference:
+        level1CommonAverage: {hp: 53, attack: 13, defense: 9, agility: 5}
+        level1MythicAverage: {hp: 61, attack: 14, defense: 11, agility: 6}
+        level140CommonAverage: {hp: 1355, attack: 335, defense: 249, agility: 146}
+        level140MythicAverage: {hp: 1548, attack: 370, defense: 284, agility: 173}
+        growthRateMin: 5.058
+        growthRateMax: 5.727
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 5
@@ -4199,6 +4969,13 @@ pet:
         baseStr: 30
         baseTough: 27
         baseDex: 21
+      panelReference:
+        level1CommonAverage: {hp: 52, attack: 9, defense: 8, agility: 5}
+        level1MythicAverage: {hp: 59, attack: 10, defense: 9, agility: 6}
+        level140CommonAverage: {hp: 1429, attack: 256, defense: 237, agility: 145}
+        level140MythicAverage: {hp: 1621, attack: 290, defense: 272, agility: 173}
+        growthRateMin: 4.432
+        growthRateMax: 5.108
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -4236,6 +5013,13 @@ pet:
         baseStr: 46
         baseTough: 24
         baseDex: 29
+      panelReference:
+        level1CommonAverage: {hp: 57, attack: 14, defense: 9, agility: 8}
+        level1MythicAverage: {hp: 65, attack: 16, defense: 10, agility: 9}
+        level140CommonAverage: {hp: 1413, attack: 363, defense: 228, agility: 201}
+        level140MythicAverage: {hp: 1605, attack: 398, defense: 262, agility: 229}
+        growthRateMin: 5.475
+        growthRateMax: 6.144
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 5
@@ -4277,6 +5061,13 @@ pet:
         baseStr: 28
         baseTough: 25
         baseDex: 16
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 6, defense: 5, agility: 2}
+        level1MythicAverage: {hp: 36, attack: 7, defense: 6, agility: 3}
+        level140CommonAverage: {hp: 1235, attack: 241, defense: 222, agility: 115}
+        level140MythicAverage: {hp: 1435, attack: 277, defense: 258, agility: 144}
+        growthRateMin: 4.065
+        growthRateMax: 4.770
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4314,6 +5105,13 @@ pet:
         baseStr: 23
         baseTough: 26
         baseDex: 14
+      panelReference:
+        level1CommonAverage: {hp: 33, attack: 5, defense: 6, agility: 2}
+        level1MythicAverage: {hp: 39, attack: 6, defense: 7, agility: 3}
+        level140CommonAverage: {hp: 1304, attack: 216, defense: 237, agility: 105}
+        level140MythicAverage: {hp: 1505, attack: 253, defense: 273, agility: 134}
+        growthRateMin: 3.921
+        growthRateMax: 4.633
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4351,6 +5149,13 @@ pet:
         baseStr: 26
         baseTough: 26
         baseDex: 17
+      panelReference:
+        level1CommonAverage: {hp: 44, attack: 8, defense: 8, agility: 4}
+        level1MythicAverage: {hp: 51, attack: 9, defense: 9, agility: 5}
+        level140CommonAverage: {hp: 1247, attack: 230, defense: 230, agility: 123}
+        level140MythicAverage: {hp: 1448, attack: 266, defense: 266, agility: 151}
+        growthRateMin: 4.050
+        growthRateMax: 4.748
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4388,6 +5193,13 @@ pet:
         baseStr: 26
         baseTough: 25
         baseDex: 16
+      panelReference:
+        level1CommonAverage: {hp: 35, attack: 6, defense: 6, agility: 3}
+        level1MythicAverage: {hp: 41, attack: 7, defense: 7, agility: 4}
+        level140CommonAverage: {hp: 1245, attack: 237, defense: 230, agility: 120}
+        level140MythicAverage: {hp: 1453, attack: 273, defense: 267, agility: 150}
+        growthRateMin: 4.115
+        growthRateMax: 4.835
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4425,6 +5237,13 @@ pet:
         baseStr: 25
         baseTough: 24
         baseDex: 20
+      panelReference:
+        level1CommonAverage: {hp: 32, attack: 6, defense: 6, agility: 4}
+        level1MythicAverage: {hp: 38, attack: 7, defense: 7, agility: 4}
+        level140CommonAverage: {hp: 1200, attack: 228, defense: 221, agility: 150}
+        level140MythicAverage: {hp: 1409, attack: 265, defense: 259, agility: 178}
+        growthRateMin: 4.194
+        growthRateMax: 4.921
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4461,6 +5280,13 @@ pet:
         baseStr: 27
         baseTough: 26
         baseDex: 17
+      panelReference:
+        level1CommonAverage: {hp: 47, attack: 7, defense: 7, agility: 4}
+        level1MythicAverage: {hp: 53, attack: 9, defense: 8, agility: 4}
+        level140CommonAverage: {hp: 1394, attack: 233, defense: 227, agility: 118}
+        level140MythicAverage: {hp: 1585, attack: 267, defense: 261, agility: 145}
+        growthRateMin: 4.029
+        growthRateMax: 4.691
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -4497,6 +5323,13 @@ pet:
         baseStr: 33
         baseTough: 27
         baseDex: 18
+      panelReference:
+        level1CommonAverage: {hp: 48, attack: 10, defense: 8, agility: 4}
+        level1MythicAverage: {hp: 55, attack: 11, defense: 9, agility: 5}
+        level140CommonAverage: {hp: 1320, attack: 272, defense: 236, agility: 125}
+        level140MythicAverage: {hp: 1512, attack: 306, defense: 270, agility: 152}
+        growthRateMin: 4.396
+        growthRateMax: 5.058
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -4534,6 +5367,13 @@ pet:
         baseStr: 26
         baseTough: 29
         baseDex: 24
+      panelReference:
+        level1CommonAverage: {hp: 41, attack: 7, defense: 7, agility: 5}
+        level1MythicAverage: {hp: 47, attack: 8, defense: 9, agility: 6}
+        level140CommonAverage: {hp: 1264, attack: 225, defense: 243, agility: 166}
+        level140MythicAverage: {hp: 1455, attack: 259, defense: 278, agility: 193}
+        growthRateMin: 4.424
+        growthRateMax: 5.086
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -4575,6 +5415,13 @@ pet:
         baseStr: 21
         baseTough: 21
         baseDex: 24
+      panelReference:
+        level1CommonAverage: {hp: 26, attack: 4, defense: 4, agility: 4}
+        level1MythicAverage: {hp: 31, attack: 5, defense: 5, agility: 5}
+        level140CommonAverage: {hp: 1130, attack: 203, defense: 203, agility: 185}
+        level140MythicAverage: {hp: 1344, attack: 242, defense: 242, agility: 216}
+        growthRateMin: 4.165
+        growthRateMax: 4.928
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4612,6 +5459,13 @@ pet:
         baseStr: 26
         baseTough: 19
         baseDex: 27
+      panelReference:
+        level1CommonAverage: {hp: 28, attack: 6, defense: 5, agility: 5}
+        level1MythicAverage: {hp: 34, attack: 7, defense: 6, agility: 6}
+        level140CommonAverage: {hp: 1089, attack: 239, defense: 192, agility: 208}
+        level140MythicAverage: {hp: 1300, attack: 277, defense: 229, agility: 239}
+        growthRateMin: 4.482
+        growthRateMax: 5.223
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4649,6 +5503,13 @@ pet:
         baseStr: 23
         baseTough: 20
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 23, attack: 4, defense: 4, agility: 4}
+        level1MythicAverage: {hp: 28, attack: 5, defense: 5, agility: 5}
+        level140CommonAverage: {hp: 1043, attack: 216, defense: 195, agility: 216}
+        level140MythicAverage: {hp: 1258, attack: 253, defense: 233, agility: 245}
+        growthRateMin: 4.424
+        growthRateMax: 5.151
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4686,6 +5547,13 @@ pet:
         baseStr: 23
         baseTough: 23
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 23, attack: 4, defense: 4, agility: 4}
+        level1MythicAverage: {hp: 27, attack: 5, defense: 5, agility: 5}
+        level140CommonAverage: {hp: 1022, attack: 217, defense: 217, agility: 200}
+        level140MythicAverage: {hp: 1237, attack: 254, defense: 254, agility: 230}
+        growthRateMin: 4.475
+        growthRateMax: 5.201
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4723,6 +5591,13 @@ pet:
         baseStr: 30
         baseTough: 22
         baseDex: 31
+      panelReference:
+        level1CommonAverage: {hp: 30, attack: 6, defense: 5, agility: 5}
+        level1MythicAverage: {hp: 36, attack: 7, defense: 6, agility: 6}
+        level140CommonAverage: {hp: 1096, attack: 244, defense: 196, agility: 213}
+        level140MythicAverage: {hp: 1287, attack: 278, defense: 229, agility: 240}
+        growthRateMin: 4.583
+        growthRateMax: 5.237
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -4760,6 +5635,13 @@ pet:
         baseStr: 26
         baseTough: 24
         baseDex: 27
+      panelReference:
+        level1CommonAverage: {hp: 36, attack: 6, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 42, attack: 7, defense: 7, agility: 6}
+        level140CommonAverage: {hp: 1247, attack: 222, defense: 211, agility: 186}
+        level140MythicAverage: {hp: 1438, attack: 256, defense: 245, agility: 213}
+        growthRateMin: 4.331
+        growthRateMax: 4.993
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -4796,6 +5678,13 @@ pet:
         baseStr: 32
         baseTough: 22
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 7, defense: 5, agility: 5}
+        level1MythicAverage: {hp: 36, attack: 8, defense: 6, agility: 6}
+        level140CommonAverage: {hp: 1119, attack: 258, defense: 197, agility: 193}
+        level140MythicAverage: {hp: 1309, attack: 292, defense: 231, agility: 220}
+        growthRateMin: 4.540
+        growthRateMax: 5.201
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -4833,6 +5722,13 @@ pet:
         baseStr: 26
         baseTough: 27
         baseDex: 27
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 6, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 37, attack: 7, defense: 7, agility: 5}
+        level140CommonAverage: {hp: 1128, attack: 221, defense: 227, agility: 185}
+        level140MythicAverage: {hp: 1318, attack: 255, defense: 261, agility: 213}
+        growthRateMin: 4.432
+        growthRateMax: 5.108
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -4874,6 +5770,13 @@ pet:
         baseStr: 21
         baseTough: 26
         baseDex: 12
+      panelReference:
+        level1CommonAverage: {hp: 19, attack: 3, defense: 3, agility: 1}
+        level1MythicAverage: {hp: 23, attack: 3, defense: 4, agility: 1}
+        level140CommonAverage: {hp: 1250, attack: 205, defense: 239, agility: 93}
+        level140MythicAverage: {hp: 1459, attack: 244, defense: 277, agility: 122}
+        growthRateMin: 3.813
+        growthRateMax: 4.568
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4911,6 +5814,13 @@ pet:
         baseStr: 17
         baseTough: 28
         baseDex: 11
+      panelReference:
+        level1CommonAverage: {hp: 27, attack: 3, defense: 5, agility: 1}
+        level1MythicAverage: {hp: 31, attack: 4, defense: 6, agility: 2}
+        level140CommonAverage: {hp: 1339, attack: 185, defense: 263, agility: 89}
+        level140MythicAverage: {hp: 1566, attack: 225, defense: 303, agility: 120}
+        growthRateMin: 3.799
+        growthRateMax: 4.576
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4948,6 +5858,13 @@ pet:
         baseStr: 18
         baseTough: 28
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 30, attack: 4, defense: 6, agility: 1}
+        level1MythicAverage: {hp: 35, attack: 5, defense: 6, agility: 2}
+        level140CommonAverage: {hp: 1315, attack: 193, defense: 263, agility: 82}
+        level140MythicAverage: {hp: 1536, attack: 232, defense: 304, agility: 113}
+        growthRateMin: 3.791
+        growthRateMax: 4.576
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -4984,6 +5901,13 @@ pet:
         baseStr: 19
         baseTough: 29
         baseDex: 9
+      panelReference:
+        level1CommonAverage: {hp: 23, attack: 3, defense: 4, agility: 1}
+        level1MythicAverage: {hp: 26, attack: 4, defense: 5, agility: 1}
+        level140CommonAverage: {hp: 1283, attack: 200, defense: 270, agility: 73}
+        level140MythicAverage: {hp: 1507, attack: 239, defense: 309, agility: 104}
+        growthRateMin: 3.849
+        growthRateMax: 4.619
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5021,6 +5945,13 @@ pet:
         baseStr: 25
         baseTough: 28
         baseDex: 14
+      panelReference:
+        level1CommonAverage: {hp: 39, attack: 6, defense: 6, agility: 2}
+        level1MythicAverage: {hp: 44, attack: 7, defense: 7, agility: 3}
+        level140CommonAverage: {hp: 1394, attack: 219, defense: 238, agility: 97}
+        level140MythicAverage: {hp: 1584, attack: 253, defense: 272, agility: 124}
+        growthRateMin: 3.885
+        growthRateMax: 4.547
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5057,6 +5988,13 @@ pet:
         baseStr: 22
         baseTough: 27
         baseDex: 19
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 4, defense: 5, agility: 3}
+        level1MythicAverage: {hp: 36, attack: 5, defense: 6, agility: 3}
+        level140CommonAverage: {hp: 1312, attack: 203, defense: 235, agility: 136}
+        level140MythicAverage: {hp: 1510, attack: 238, defense: 271, agility: 163}
+        growthRateMin: 4.043
+        growthRateMax: 4.734
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5093,6 +6031,13 @@ pet:
         baseStr: 21
         baseTough: 31
         baseDex: 13
+      panelReference:
+        level1CommonAverage: {hp: 34, attack: 4, defense: 6, agility: 2}
+        level1MythicAverage: {hp: 39, attack: 5, defense: 7, agility: 2}
+        level140CommonAverage: {hp: 1433, attack: 200, defense: 264, agility: 94}
+        level140MythicAverage: {hp: 1632, attack: 236, defense: 300, agility: 122}
+        growthRateMin: 3.928
+        growthRateMax: 4.633
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5130,6 +6075,13 @@ pet:
         baseStr: 20
         baseTough: 33
         baseDex: 16
+      panelReference:
+        level1CommonAverage: {hp: 30, attack: 4, defense: 6, agility: 2}
+        level1MythicAverage: {hp: 34, attack: 5, defense: 7, agility: 3}
+        level140CommonAverage: {hp: 1318, attack: 193, defense: 275, agility: 115}
+        level140MythicAverage: {hp: 1516, attack: 227, defense: 310, agility: 143}
+        growthRateMin: 4.108
+        growthRateMax: 4.784
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5171,6 +6123,13 @@ pet:
         baseStr: 27
         baseTough: 16
         baseDex: 14
+      panelReference:
+        level1CommonAverage: {hp: 30, attack: 5, defense: 4, agility: 2}
+        level1MythicAverage: {hp: 35, attack: 6, defense: 4, agility: 3}
+        level140CommonAverage: {hp: 1324, attack: 256, defense: 178, agility: 113}
+        level140MythicAverage: {hp: 1543, attack: 295, defense: 217, agility: 145}
+        growthRateMin: 3.856
+        growthRateMax: 4.633
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5208,6 +6167,13 @@ pet:
         baseStr: 30
         baseTough: 14
         baseDex: 16
+      panelReference:
+        level1CommonAverage: {hp: 36, attack: 7, defense: 4, agility: 3}
+        level1MythicAverage: {hp: 43, attack: 8, defense: 5, agility: 4}
+        level140CommonAverage: {hp: 1273, attack: 269, defense: 159, agility: 124}
+        level140MythicAverage: {hp: 1487, attack: 308, defense: 197, agility: 156}
+        growthRateMin: 3.871
+        growthRateMax: 4.633
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5244,6 +6210,13 @@ pet:
         baseStr: 27
         baseTough: 13
         baseDex: 16
+      panelReference:
+        level1CommonAverage: {hp: 41, attack: 7, defense: 4, agility: 3}
+        level1MythicAverage: {hp: 47, attack: 8, defense: 5, agility: 4}
+        level140CommonAverage: {hp: 1364, attack: 248, defense: 152, agility: 124}
+        level140MythicAverage: {hp: 1585, attack: 288, defense: 191, agility: 156}
+        growthRateMin: 3.669
+        growthRateMax: 4.446
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5281,6 +6254,13 @@ pet:
         baseStr: 26
         baseTough: 15
         baseDex: 14
+      panelReference:
+        level1CommonAverage: {hp: 27, attack: 5, defense: 3, agility: 2}
+        level1MythicAverage: {hp: 31, attack: 5, defense: 4, agility: 2}
+        level140CommonAverage: {hp: 1332, attack: 247, defense: 169, agility: 113}
+        level140MythicAverage: {hp: 1559, attack: 287, defense: 209, agility: 144}
+        growthRateMin: 3.734
+        growthRateMax: 4.525
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5318,6 +6298,13 @@ pet:
         baseStr: 32
         baseTough: 15
         baseDex: 18
+      panelReference:
+        level1CommonAverage: {hp: 44, attack: 7, defense: 4, agility: 3}
+        level1MythicAverage: {hp: 49, attack: 8, defense: 5, agility: 4}
+        level140CommonAverage: {hp: 1492, attack: 263, defense: 158, agility: 124}
+        level140MythicAverage: {hp: 1682, attack: 297, defense: 192, agility: 151}
+        growthRateMin: 3.820
+        growthRateMax: 4.482
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5355,6 +6342,13 @@ pet:
         baseStr: 36
         baseTough: 16
         baseDex: 18
+      panelReference:
+        level1CommonAverage: {hp: 41, attack: 8, defense: 4, agility: 3}
+        level1MythicAverage: {hp: 46, attack: 9, defense: 5, agility: 4}
+        level140CommonAverage: {hp: 1389, attack: 287, defense: 165, agility: 124}
+        level140MythicAverage: {hp: 1579, attack: 321, defense: 199, agility: 151}
+        growthRateMin: 4.036
+        growthRateMax: 4.698
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5392,6 +6386,13 @@ pet:
         baseStr: 30
         baseTough: 19
         baseDex: 17
+      panelReference:
+        level1CommonAverage: {hp: 38, attack: 6, defense: 5, agility: 3}
+        level1MythicAverage: {hp: 43, attack: 7, defense: 6, agility: 4}
+        level140CommonAverage: {hp: 1417, attack: 257, defense: 188, agility: 122}
+        level140MythicAverage: {hp: 1614, attack: 293, defense: 222, agility: 150}
+        growthRateMin: 3.978
+        growthRateMax: 4.662
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5429,6 +6430,13 @@ pet:
         baseStr: 41
         baseTough: 20
         baseDex: 25
+      panelReference:
+        level1CommonAverage: {hp: 62, attack: 14, defense: 8, agility: 7}
+        level1MythicAverage: {hp: 71, attack: 15, defense: 10, agility: 8}
+        level140CommonAverage: {hp: 1437, attack: 328, defense: 199, agility: 174}
+        level140MythicAverage: {hp: 1630, attack: 363, defense: 233, agility: 202}
+        growthRateMin: 4.835
+        growthRateMax: 5.504
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5470,6 +6478,13 @@ pet:
         baseStr: 29
         baseTough: 30
         baseDex: 18
+      panelReference:
+        level1CommonAverage: {hp: 53, attack: 10, defense: 10, agility: 5}
+        level1MythicAverage: {hp: 61, attack: 11, defense: 11, agility: 6}
+        level140CommonAverage: {hp: 1318, attack: 248, defense: 254, agility: 126}
+        level140MythicAverage: {hp: 1511, attack: 282, defense: 289, agility: 153}
+        growthRateMin: 4.338
+        growthRateMax: 5.007
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5507,6 +6522,13 @@ pet:
         baseStr: 28
         baseTough: 31
         baseDex: 11
+      panelReference:
+        level1CommonAverage: {hp: 49, attack: 8, defense: 9, agility: 2}
+        level1MythicAverage: {hp: 56, attack: 9, defense: 10, agility: 3}
+        level140CommonAverage: {hp: 1397, attack: 242, defense: 260, agility: 77}
+        level140MythicAverage: {hp: 1589, attack: 276, defense: 294, agility: 105}
+        growthRateMin: 4.029
+        growthRateMax: 4.698
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5544,6 +6566,13 @@ pet:
         baseStr: 33
         baseTough: 28
         baseDex: 14
+      panelReference:
+        level1CommonAverage: {hp: 47, attack: 9, defense: 8, agility: 3}
+        level1MythicAverage: {hp: 54, attack: 11, defense: 10, agility: 4}
+        level140CommonAverage: {hp: 1299, attack: 271, defense: 241, agility: 98}
+        level140MythicAverage: {hp: 1491, attack: 306, defense: 276, agility: 125}
+        growthRateMin: 4.245
+        growthRateMax: 4.906
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5581,6 +6610,13 @@ pet:
         baseStr: 33
         baseTough: 30
         baseDex: 12
+      panelReference:
+        level1CommonAverage: {hp: 51, attack: 10, defense: 9, agility: 3}
+        level1MythicAverage: {hp: 58, attack: 11, defense: 11, agility: 4}
+        level140CommonAverage: {hp: 1354, attack: 274, defense: 255, agility: 85}
+        level140MythicAverage: {hp: 1546, attack: 308, defense: 290, agility: 112}
+        growthRateMin: 4.259
+        growthRateMax: 4.921
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5618,6 +6654,13 @@ pet:
         baseStr: 30
         baseTough: 34
         baseDex: 13
+      panelReference:
+        level1CommonAverage: {hp: 51, attack: 8, defense: 9, agility: 3}
+        level1MythicAverage: {hp: 58, attack: 9, defense: 10, agility: 4}
+        level140CommonAverage: {hp: 1527, attack: 260, defense: 284, agility: 90}
+        level140MythicAverage: {hp: 1719, attack: 294, defense: 318, agility: 118}
+        growthRateMin: 4.417
+        growthRateMax: 5.086
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5655,6 +6698,13 @@ pet:
         baseStr: 34
         baseTough: 31
         baseDex: 15
+      panelReference:
+        level1CommonAverage: {hp: 49, attack: 9, defense: 8, agility: 3}
+        level1MythicAverage: {hp: 55, attack: 10, defense: 10, agility: 4}
+        level140CommonAverage: {hp: 1463, attack: 283, defense: 265, agility: 105}
+        level140MythicAverage: {hp: 1654, attack: 318, defense: 299, agility: 132}
+        growthRateMin: 4.554
+        growthRateMax: 5.216
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5692,6 +6742,13 @@ pet:
         baseStr: 33
         baseTough: 29
         baseDex: 18
+      panelReference:
+        level1CommonAverage: {hp: 47, attack: 8, defense: 8, agility: 4}
+        level1MythicAverage: {hp: 53, attack: 10, defense: 9, agility: 4}
+        level140CommonAverage: {hp: 1459, attack: 275, defense: 251, agility: 125}
+        level140MythicAverage: {hp: 1650, attack: 310, defense: 285, agility: 152}
+        growthRateMin: 4.540
+        growthRateMax: 5.209
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5728,6 +6785,13 @@ pet:
         baseStr: 29
         baseTough: 34
         baseDex: 13
+      panelReference:
+        level1CommonAverage: {hp: 57, attack: 9, defense: 10, agility: 3}
+        level1MythicAverage: {hp: 64, attack: 10, defense: 11, agility: 4}
+        level140CommonAverage: {hp: 1577, attack: 254, defense: 286, agility: 90}
+        level140MythicAverage: {hp: 1768, attack: 289, defense: 320, agility: 118}
+        growthRateMin: 4.374
+        growthRateMax: 5.050
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5769,6 +6833,13 @@ pet:
         baseStr: 20
         baseTough: 24
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 42, attack: 5, defense: 6, agility: 2}
+        level1MythicAverage: {hp: 48, attack: 7, defense: 7, agility: 3}
+        level140CommonAverage: {hp: 1474, attack: 204, defense: 231, agility: 78}
+        level140MythicAverage: {hp: 1687, attack: 242, defense: 271, agility: 110}
+        growthRateMin: 3.597
+        growthRateMax: 4.360
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5805,6 +6876,13 @@ pet:
         baseStr: 19
         baseTough: 22
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 39, attack: 5, defense: 5, agility: 2}
+        level1MythicAverage: {hp: 45, attack: 6, defense: 6, agility: 2}
+        level140CommonAverage: {hp: 1506, attack: 197, defense: 217, agility: 78}
+        level140MythicAverage: {hp: 1723, attack: 234, defense: 255, agility: 109}
+        growthRateMin: 3.453
+        growthRateMax: 4.201
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5842,6 +6920,13 @@ pet:
         baseStr: 19
         baseTough: 26
         baseDex: 9
+      panelReference:
+        level1CommonAverage: {hp: 40, attack: 5, defense: 6, agility: 1}
+        level1MythicAverage: {hp: 46, attack: 6, defense: 7, agility: 2}
+        level140CommonAverage: {hp: 1473, attack: 198, defense: 246, agility: 71}
+        level140MythicAverage: {hp: 1683, attack: 236, defense: 283, agility: 101}
+        growthRateMin: 3.619
+        growthRateMax: 4.353
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5879,6 +6964,13 @@ pet:
         baseStr: 23
         baseTough: 24
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 46, attack: 7, defense: 7, agility: 2}
+        level1MythicAverage: {hp: 52, attack: 8, defense: 8, agility: 3}
+        level140CommonAverage: {hp: 1416, attack: 218, defense: 225, agility: 76}
+        level140MythicAverage: {hp: 1622, attack: 256, defense: 262, agility: 106}
+        growthRateMin: 3.619
+        growthRateMax: 4.353
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -5916,6 +7008,13 @@ pet:
         baseStr: 23
         baseTough: 33
         baseDex: 14
+      panelReference:
+        level1CommonAverage: {hp: 44, attack: 6, defense: 8, agility: 3}
+        level1MythicAverage: {hp: 50, attack: 7, defense: 9, agility: 3}
+        level140CommonAverage: {hp: 1447, attack: 210, defense: 271, agility: 97}
+        level140MythicAverage: {hp: 1638, attack: 244, defense: 305, agility: 124}
+        growthRateMin: 4.036
+        growthRateMax: 4.705
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5953,6 +7052,13 @@ pet:
         baseStr: 26
         baseTough: 27
         baseDex: 12
+      panelReference:
+        level1CommonAverage: {hp: 49, attack: 7, defense: 7, agility: 2}
+        level1MythicAverage: {hp: 55, attack: 8, defense: 8, agility: 3}
+        level140CommonAverage: {hp: 1525, attack: 229, defense: 235, agility: 84}
+        level140MythicAverage: {hp: 1716, attack: 263, defense: 269, agility: 112}
+        growthRateMin: 3.827
+        growthRateMax: 4.496
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -5990,6 +7096,13 @@ pet:
         baseStr: 23
         baseTough: 32
         baseDex: 12
+      panelReference:
+        level1CommonAverage: {hp: 45, attack: 6, defense: 8, agility: 2}
+        level1MythicAverage: {hp: 51, attack: 7, defense: 9, agility: 3}
+        level140CommonAverage: {hp: 1480, attack: 210, defense: 266, agility: 84}
+        level140MythicAverage: {hp: 1671, attack: 244, defense: 300, agility: 111}
+        growthRateMin: 3.914
+        growthRateMax: 4.576
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6027,6 +7140,13 @@ pet:
         baseStr: 28
         baseTough: 27
         baseDex: 15
+      panelReference:
+        level1CommonAverage: {hp: 51, attack: 8, defense: 8, agility: 3}
+        level1MythicAverage: {hp: 57, attack: 9, defense: 9, agility: 4}
+        level140CommonAverage: {hp: 1455, attack: 242, defense: 236, agility: 105}
+        level140MythicAverage: {hp: 1646, attack: 276, defense: 270, agility: 132}
+        growthRateMin: 4.058
+        growthRateMax: 4.719
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6068,6 +7188,13 @@ pet:
         baseStr: 27
         baseTough: 33
         baseDex: 6
+      panelReference:
+        level1CommonAverage: {hp: 54, attack: 8, defense: 10, agility: 1}
+        level1MythicAverage: {hp: 61, attack: 9, defense: 11, agility: 2}
+        level140CommonAverage: {hp: 1480, attack: 238, defense: 274, agility: 43}
+        level140MythicAverage: {hp: 1672, attack: 272, defense: 308, agility: 70}
+        growthRateMin: 3.856
+        growthRateMax: 4.518
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6105,6 +7232,13 @@ pet:
         baseStr: 23
         baseTough: 32
         baseDex: 7
+      panelReference:
+        level1CommonAverage: {hp: 58, attack: 8, defense: 10, agility: 1}
+        level1MythicAverage: {hp: 65, attack: 9, defense: 11, agility: 2}
+        level140CommonAverage: {hp: 1543, attack: 212, defense: 268, agility: 50}
+        level140MythicAverage: {hp: 1735, attack: 247, defense: 303, agility: 78}
+        growthRateMin: 3.676
+        growthRateMax: 4.360
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6142,6 +7276,13 @@ pet:
         baseStr: 35
         baseTough: 28
         baseDex: 6
+      panelReference:
+        level1CommonAverage: {hp: 51, attack: 10, defense: 8, agility: 1}
+        level1MythicAverage: {hp: 57, attack: 11, defense: 9, agility: 2}
+        level140CommonAverage: {hp: 1447, attack: 287, defense: 245, agility: 43}
+        level140MythicAverage: {hp: 1639, attack: 322, defense: 279, agility: 70}
+        growthRateMin: 4.000
+        growthRateMax: 4.669
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6179,6 +7320,13 @@ pet:
         baseStr: 25
         baseTough: 35
         baseDex: 5
+      panelReference:
+        level1CommonAverage: {hp: 63, attack: 9, defense: 11, agility: 1}
+        level1MythicAverage: {hp: 71, attack: 10, defense: 13, agility: 2}
+        level140CommonAverage: {hp: 1566, attack: 227, defense: 290, agility: 36}
+        level140MythicAverage: {hp: 1759, attack: 262, defense: 324, agility: 63}
+        growthRateMin: 3.827
+        growthRateMax: 4.489
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6216,6 +7364,13 @@ pet:
         baseStr: 30
         baseTough: 27
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 61, attack: 10, defense: 9, agility: 2}
+        level1MythicAverage: {hp: 69, attack: 11, defense: 11, agility: 4}
+        level140CommonAverage: {hp: 1494, attack: 256, defense: 238, agility: 71}
+        level140MythicAverage: {hp: 1686, attack: 291, defense: 272, agility: 98}
+        growthRateMin: 3.914
+        growthRateMax: 4.568
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6253,6 +7408,13 @@ pet:
         baseStr: 36
         baseTough: 42
         baseDex: 13
+      panelReference:
+        level1CommonAverage: {hp: 56, attack: 12, defense: 13, agility: 3}
+        level1MythicAverage: {hp: 64, attack: 13, defense: 15, agility: 4}
+        level140CommonAverage: {hp: 1386, attack: 303, defense: 339, agility: 91}
+        level140MythicAverage: {hp: 1579, attack: 337, defense: 374, agility: 118}
+        growthRateMin: 5.072
+        growthRateMax: 5.734
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 2
@@ -6290,6 +7452,13 @@ pet:
         baseStr: 30
         baseTough: 36
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 58, attack: 9, defense: 11, agility: 2}
+        level1MythicAverage: {hp: 65, attack: 10, defense: 12, agility: 3}
+        level140CommonAverage: {hp: 1607, attack: 263, defense: 300, agility: 70}
+        level140MythicAverage: {hp: 1799, attack: 297, defense: 335, agility: 98}
+        growthRateMin: 4.396
+        growthRateMax: 5.072
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6327,6 +7496,13 @@ pet:
         baseStr: 30
         baseTough: 34
         baseDex: 11
+      panelReference:
+        level1CommonAverage: {hp: 60, attack: 10, defense: 10, agility: 2}
+        level1MythicAverage: {hp: 68, attack: 11, defense: 12, agility: 4}
+        level140CommonAverage: {hp: 1602, attack: 262, defense: 287, agility: 78}
+        level140MythicAverage: {hp: 1794, attack: 296, defense: 321, agility: 105}
+        growthRateMin: 4.353
+        growthRateMax: 5.000
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6368,6 +7544,13 @@ pet:
         baseStr: 25
         baseTough: 15
         baseDex: 8
+      panelReference:
+        level1CommonAverage: {hp: 67, attack: 8, defense: 6, agility: 2}
+        level1MythicAverage: {hp: 75, attack: 10, defense: 7, agility: 3}
+        level140CommonAverage: {hp: 1788, attack: 230, defense: 166, agility: 59}
+        level140MythicAverage: {hp: 1990, attack: 266, defense: 202, agility: 88}
+        growthRateMin: 3.158
+        growthRateMax: 3.856
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6405,6 +7588,13 @@ pet:
         baseStr: 27
         baseTough: 12
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 58, attack: 8, defense: 4, agility: 2}
+        level1MythicAverage: {hp: 65, attack: 9, defense: 6, agility: 3}
+        level140CommonAverage: {hp: 1730, attack: 241, defense: 145, agility: 73}
+        level140MythicAverage: {hp: 1932, attack: 277, defense: 181, agility: 102}
+        growthRateMin: 3.201
+        growthRateMax: 3.899
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6442,6 +7632,13 @@ pet:
         baseStr: 25
         baseTough: 12
         baseDex: 10
+      panelReference:
+        level1CommonAverage: {hp: 66, attack: 8, defense: 5, agility: 2}
+        level1MythicAverage: {hp: 73, attack: 9, defense: 6, agility: 3}
+        level140CommonAverage: {hp: 1807, attack: 229, defense: 146, agility: 73}
+        level140MythicAverage: {hp: 2009, attack: 265, defense: 182, agility: 102}
+        growthRateMin: 3.115
+        growthRateMax: 3.820
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6479,6 +7676,13 @@ pet:
         baseStr: 26
         baseTough: 12
         baseDex: 11
+      panelReference:
+        level1CommonAverage: {hp: 64, attack: 8, defense: 5, agility: 2}
+        level1MythicAverage: {hp: 71, attack: 9, defense: 6, agility: 3}
+        level140CommonAverage: {hp: 1751, attack: 227, defense: 142, agility: 77}
+        level140MythicAverage: {hp: 1943, attack: 262, defense: 176, agility: 105}
+        growthRateMin: 3.101
+        growthRateMax: 3.777
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6516,6 +7720,13 @@ pet:
         baseStr: 27
         baseTough: 19
         baseDex: 14
+      panelReference:
+        level1CommonAverage: {hp: 73, attack: 9, defense: 7, agility: 3}
+        level1MythicAverage: {hp: 80, attack: 10, defense: 8, agility: 4}
+        level140CommonAverage: {hp: 1860, attack: 242, defense: 192, agility: 98}
+        level140MythicAverage: {hp: 2053, attack: 276, defense: 227, agility: 125}
+        growthRateMin: 3.691
+        growthRateMax: 4.360
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6553,6 +7764,13 @@ pet:
         baseStr: 28
         baseTough: 17
         baseDex: 13
+      panelReference:
+        level1CommonAverage: {hp: 79, attack: 10, defense: 7, agility: 3}
+        level1MythicAverage: {hp: 87, attack: 11, defense: 8, agility: 4}
+        level140CommonAverage: {hp: 1959, attack: 250, defense: 181, agility: 91}
+        level140MythicAverage: {hp: 2151, attack: 285, defense: 216, agility: 118}
+        growthRateMin: 3.612
+        growthRateMax: 4.288
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6589,6 +7807,13 @@ pet:
         baseStr: 26
         baseTough: 21
         baseDex: 12
+      panelReference:
+        level1CommonAverage: {hp: 74, attack: 9, defense: 8, agility: 3}
+        level1MythicAverage: {hp: 81, attack: 10, defense: 9, agility: 4}
+        level140CommonAverage: {hp: 1876, attack: 236, defense: 205, agility: 85}
+        level140MythicAverage: {hp: 2069, attack: 270, defense: 239, agility: 112}
+        growthRateMin: 3.640
+        growthRateMax: 4.302
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6626,6 +7851,13 @@ pet:
         baseStr: 27
         baseTough: 17
         baseDex: 13
+      panelReference:
+        level1CommonAverage: {hp: 74, attack: 9, defense: 7, agility: 3}
+        level1MythicAverage: {hp: 82, attack: 10, defense: 8, agility: 4}
+        level140CommonAverage: {hp: 1891, attack: 241, defense: 179, agility: 91}
+        level140MythicAverage: {hp: 2083, attack: 276, defense: 213, agility: 118}
+        growthRateMin: 3.540
+        growthRateMax: 4.209
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6667,6 +7899,13 @@ pet:
         baseStr: 31
         baseTough: 23
         baseDex: 25
+      panelReference:
+        level1CommonAverage: {hp: 47, attack: 10, defense: 8, agility: 6}
+        level1MythicAverage: {hp: 54, attack: 11, defense: 9, agility: 7}
+        level140CommonAverage: {hp: 1192, attack: 256, defense: 206, agility: 173}
+        level140MythicAverage: {hp: 1384, attack: 290, defense: 241, agility: 201}
+        growthRateMin: 4.396
+        growthRateMax: 5.072
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6704,6 +7943,13 @@ pet:
         baseStr: 33
         baseTough: 24
         baseDex: 24
+      panelReference:
+        level1CommonAverage: {hp: 44, attack: 10, defense: 8, agility: 6}
+        level1MythicAverage: {hp: 52, attack: 11, defense: 9, agility: 7}
+        level140CommonAverage: {hp: 1176, attack: 268, defense: 214, agility: 167}
+        level140MythicAverage: {hp: 1368, attack: 303, defense: 248, agility: 195}
+        growthRateMin: 4.496
+        growthRateMax: 5.173
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6741,6 +7987,13 @@ pet:
         baseStr: 30
         baseTough: 24
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 43, attack: 8, defense: 7, agility: 6}
+        level1MythicAverage: {hp: 49, attack: 10, defense: 8, agility: 7}
+        level140CommonAverage: {hp: 1223, attack: 249, defense: 213, agility: 180}
+        level140MythicAverage: {hp: 1414, attack: 284, defense: 247, agility: 207}
+        growthRateMin: 4.468
+        growthRateMax: 5.129
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6777,6 +8030,13 @@ pet:
         baseStr: 31
         baseTough: 20
         baseDex: 30
+      panelReference:
+        level1CommonAverage: {hp: 41, attack: 8, defense: 6, agility: 7}
+        level1MythicAverage: {hp: 47, attack: 9, defense: 7, agility: 7}
+        level140CommonAverage: {hp: 1228, attack: 255, defense: 188, agility: 207}
+        level140MythicAverage: {hp: 1419, attack: 289, defense: 222, agility: 234}
+        growthRateMin: 4.525
+        growthRateMax: 5.194
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -6814,6 +8074,13 @@ pet:
         baseStr: 34
         baseTough: 20
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 53, attack: 11, defense: 7, agility: 7}
+        level1MythicAverage: {hp: 61, attack: 12, defense: 9, agility: 8}
+        level140CommonAverage: {hp: 1311, attack: 278, defense: 192, agility: 181}
+        level140MythicAverage: {hp: 1504, attack: 312, defense: 226, agility: 208}
+        growthRateMin: 4.504
+        growthRateMax: 5.158
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6851,6 +8118,13 @@ pet:
         baseStr: 38
         baseTough: 23
         baseDex: 29
+      panelReference:
+        level1CommonAverage: {hp: 60, attack: 13, defense: 9, agility: 8}
+        level1MythicAverage: {hp: 68, attack: 15, defense: 10, agility: 10}
+        level140CommonAverage: {hp: 1383, attack: 309, defense: 216, agility: 202}
+        level140MythicAverage: {hp: 1577, attack: 344, defense: 251, agility: 229}
+        growthRateMin: 5.014
+        growthRateMax: 5.676
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6888,6 +8162,13 @@ pet:
         baseStr: 29
         baseTough: 27
         baseDex: 29
+      panelReference:
+        level1CommonAverage: {hp: 46, attack: 9, defense: 8, agility: 7}
+        level1MythicAverage: {hp: 53, attack: 10, defense: 9, agility: 8}
+        level140CommonAverage: {hp: 1258, attack: 246, defense: 234, agility: 200}
+        level140MythicAverage: {hp: 1450, attack: 280, defense: 268, agility: 227}
+        growthRateMin: 4.719
+        growthRateMax: 5.381
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6925,6 +8206,13 @@ pet:
         baseStr: 30
         baseTough: 23
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 54, attack: 10, defense: 8, agility: 7}
+        level1MythicAverage: {hp: 62, attack: 11, defense: 10, agility: 8}
+        level140CommonAverage: {hp: 1333, attack: 253, defense: 210, agility: 181}
+        level140MythicAverage: {hp: 1525, attack: 287, defense: 244, agility: 208}
+        growthRateMin: 4.453
+        growthRateMax: 5.108
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -6966,6 +8254,13 @@ pet:
         baseStr: 18
         baseTough: 10
         baseDex: 33
+      panelReference:
+        level1CommonAverage: {hp: 23, attack: 3, defense: 2, agility: 5}
+        level1MythicAverage: {hp: 28, attack: 4, defense: 3, agility: 6}
+        level140CommonAverage: {hp: 1103, attack: 181, defense: 125, agility: 262}
+        level140MythicAverage: {hp: 1322, attack: 220, defense: 164, agility: 294}
+        growthRateMin: 4.014
+        growthRateMax: 4.784
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7002,6 +8297,13 @@ pet:
         baseStr: 22
         baseTough: 10
         baseDex: 35
+      panelReference:
+        level1CommonAverage: {hp: 28, attack: 5, defense: 3, agility: 7}
+        level1MythicAverage: {hp: 34, attack: 6, defense: 4, agility: 7}
+        level140CommonAverage: {hp: 1079, attack: 206, defense: 123, agility: 269}
+        level140MythicAverage: {hp: 1297, attack: 244, defense: 162, agility: 301}
+        growthRateMin: 4.194
+        growthRateMax: 4.964
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7039,6 +8341,13 @@ pet:
         baseStr: 20
         baseTough: 14
         baseDex: 40
+      panelReference:
+        level1CommonAverage: {hp: 29, attack: 4, defense: 3, agility: 7}
+        level1MythicAverage: {hp: 34, attack: 5, defense: 4, agility: 8}
+        level140CommonAverage: {hp: 1129, attack: 183, defense: 144, agility: 285}
+        level140MythicAverage: {hp: 1326, attack: 217, defense: 180, agility: 312}
+        growthRateMin: 4.302
+        growthRateMax: 4.978
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7076,6 +8385,13 @@ pet:
         baseStr: 24
         baseTough: 11
         baseDex: 40
+      panelReference:
+        level1CommonAverage: {hp: 30, attack: 5, defense: 3, agility: 8}
+        level1MythicAverage: {hp: 35, attack: 6, defense: 4, agility: 8}
+        level140CommonAverage: {hp: 1096, attack: 215, defense: 129, agility: 297}
+        level140MythicAverage: {hp: 1304, attack: 252, defense: 166, agility: 325}
+        growthRateMin: 4.496
+        growthRateMax: 5.216
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7113,6 +8429,13 @@ pet:
         baseStr: 20
         baseTough: 17
         baseDex: 36
+      panelReference:
+        level1CommonAverage: {hp: 30, attack: 4, defense: 4, agility: 6}
+        level1MythicAverage: {hp: 35, attack: 5, defense: 5, agility: 7}
+        level140CommonAverage: {hp: 1179, attack: 185, defense: 166, agility: 256}
+        level140MythicAverage: {hp: 1376, attack: 219, defense: 200, agility: 285}
+        growthRateMin: 4.266
+        growthRateMax: 4.942
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -7150,6 +8473,13 @@ pet:
         baseStr: 22
         baseTough: 14
         baseDex: 33
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 5, defense: 3, agility: 6}
+        level1MythicAverage: {hp: 36, attack: 5, defense: 4, agility: 6}
+        level140CommonAverage: {hp: 1235, attack: 197, defense: 147, agility: 235}
+        level140MythicAverage: {hp: 1435, attack: 233, defense: 182, agility: 263}
+        growthRateMin: 4.065
+        growthRateMax: 4.770
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -7187,6 +8517,13 @@ pet:
         baseStr: 20
         baseTough: 10
         baseDex: 36
+      panelReference:
+        level1CommonAverage: {hp: 33, attack: 5, defense: 3, agility: 7}
+        level1MythicAverage: {hp: 38, attack: 6, defense: 4, agility: 8}
+        level140CommonAverage: {hp: 1207, attack: 188, defense: 122, agility: 267}
+        level140MythicAverage: {hp: 1416, attack: 224, defense: 159, agility: 297}
+        growthRateMin: 4.043
+        growthRateMax: 4.763
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 5
@@ -7224,6 +8561,13 @@ pet:
         baseStr: 24
         baseTough: 13
         baseDex: 38
+      panelReference:
+        level1CommonAverage: {hp: 31, attack: 5, defense: 3, agility: 7}
+        level1MythicAverage: {hp: 36, attack: 6, defense: 4, agility: 8}
+        level140CommonAverage: {hp: 1165, attack: 210, defense: 140, agility: 271}
+        level140MythicAverage: {hp: 1364, attack: 245, defense: 176, agility: 298}
+        growthRateMin: 4.360
+        growthRateMax: 5.043
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -7265,6 +8609,13 @@ pet:
         baseStr: 22
         baseTough: 25
         baseDex: 29
+      panelReference:
+        level1CommonAverage: {hp: 40, attack: 7, defense: 8, agility: 7}
+        level1MythicAverage: {hp: 47, attack: 8, defense: 9, agility: 8}
+        level140CommonAverage: {hp: 1102, attack: 201, defense: 220, agility: 209}
+        level140MythicAverage: {hp: 1298, attack: 237, defense: 256, agility: 238}
+        growthRateMin: 4.374
+        growthRateMax: 5.079
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7301,6 +8652,13 @@ pet:
         baseStr: 23
         baseTough: 24
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 42, attack: 7, defense: 7, agility: 7}
+        level1MythicAverage: {hp: 49, attack: 8, defense: 8, agility: 8}
+        level140CommonAverage: {hp: 1203, attack: 209, defense: 216, agility: 201}
+        level140MythicAverage: {hp: 1404, attack: 245, defense: 252, agility: 230}
+        growthRateMin: 4.353
+        growthRateMax: 5.058
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7338,6 +8696,13 @@ pet:
         baseStr: 26
         baseTough: 24
         baseDex: 29
+      panelReference:
+        level1CommonAverage: {hp: 43, attack: 9, defense: 8, agility: 8}
+        level1MythicAverage: {hp: 51, attack: 10, defense: 9, agility: 9}
+        level140CommonAverage: {hp: 1098, attack: 229, defense: 216, agility: 209}
+        level140MythicAverage: {hp: 1295, attack: 265, defense: 252, agility: 238}
+        growthRateMin: 4.525
+        growthRateMax: 5.230
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7375,6 +8740,13 @@ pet:
         baseStr: 25
         baseTough: 25
         baseDex: 30
+      panelReference:
+        level1CommonAverage: {hp: 49, attack: 9, defense: 9, agility: 9}
+        level1MythicAverage: {hp: 57, attack: 10, defense: 10, agility: 10}
+        level140CommonAverage: {hp: 1122, attack: 216, defense: 216, agility: 209}
+        level140MythicAverage: {hp: 1315, attack: 250, defense: 250, agility: 236}
+        growthRateMin: 4.417
+        growthRateMax: 5.079
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7412,6 +8784,13 @@ pet:
         baseStr: 28
         baseTough: 20
         baseDex: 32
+      panelReference:
+        level1CommonAverage: {hp: 49, attack: 10, defense: 8, agility: 9}
+        level1MythicAverage: {hp: 57, attack: 11, defense: 9, agility: 10}
+        level140CommonAverage: {hp: 1124, attack: 235, defense: 185, agility: 223}
+        level140MythicAverage: {hp: 1318, attack: 270, defense: 220, agility: 251}
+        growthRateMin: 4.432
+        growthRateMax: 5.115
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7449,6 +8828,13 @@ pet:
         baseStr: 31
         baseTough: 25
         baseDex: 33
+      panelReference:
+        level1CommonAverage: {hp: 61, attack: 11, defense: 9, agility: 10}
+        level1MythicAverage: {hp: 69, attack: 13, defense: 11, agility: 11}
+        level140CommonAverage: {hp: 1405, attack: 265, defense: 227, agility: 229}
+        level140MythicAverage: {hp: 1598, attack: 299, defense: 261, agility: 257}
+        growthRateMin: 4.971
+        growthRateMax: 5.626
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -7486,6 +8872,13 @@ pet:
         baseStr: 29
         baseTough: 26
         baseDex: 34
+      panelReference:
+        level1CommonAverage: {hp: 49, attack: 10, defense: 9, agility: 9}
+        level1MythicAverage: {hp: 57, attack: 11, defense: 10, agility: 10}
+        level140CommonAverage: {hp: 1204, attack: 246, defense: 227, agility: 236}
+        level140MythicAverage: {hp: 1397, attack: 280, defense: 262, agility: 263}
+        growthRateMin: 4.899
+        growthRateMax: 5.568
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -7523,6 +8916,13 @@ pet:
         baseStr: 26
         baseTough: 29
         baseDex: 32
+      panelReference:
+        level1CommonAverage: {hp: 48, attack: 8, defense: 9, agility: 8}
+        level1MythicAverage: {hp: 55, attack: 10, defense: 11, agility: 9}
+        level140CommonAverage: {hp: 1218, attack: 227, defense: 245, agility: 222}
+        level140MythicAverage: {hp: 1410, attack: 261, defense: 280, agility: 250}
+        growthRateMin: 4.813
+        growthRateMax: 5.475
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -7564,6 +8964,13 @@ pet:
         baseStr: 19
         baseTough: 23
         baseDex: 19
+      panelReference:
+        level1CommonAverage: {hp: 42, attack: 5, defense: 6, agility: 4}
+        level1MythicAverage: {hp: 47, attack: 6, defense: 7, agility: 4}
+        level140CommonAverage: {hp: 1414, attack: 185, defense: 209, agility: 137}
+        level140MythicAverage: {hp: 1611, attack: 219, defense: 245, agility: 164}
+        growthRateMin: 3.712
+        growthRateMax: 4.396
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7600,6 +9007,13 @@ pet:
         baseStr: 20
         baseTough: 23
         baseDex: 21
+      panelReference:
+        level1CommonAverage: {hp: 42, attack: 5, defense: 6, agility: 4}
+        level1MythicAverage: {hp: 47, attack: 6, defense: 7, agility: 5}
+        level140CommonAverage: {hp: 1433, attack: 186, defense: 204, agility: 144}
+        level140MythicAverage: {hp: 1624, attack: 220, defense: 238, agility: 171}
+        growthRateMin: 3.734
+        growthRateMax: 4.396
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7637,6 +9051,13 @@ pet:
         baseStr: 19
         baseTough: 25
         baseDex: 18
+      panelReference:
+        level1CommonAverage: {hp: 51, attack: 6, defense: 8, agility: 4}
+        level1MythicAverage: {hp: 58, attack: 8, defense: 9, agility: 5}
+        level140CommonAverage: {hp: 1402, attack: 186, defense: 224, agility: 131}
+        level140MythicAverage: {hp: 1601, attack: 221, defense: 260, agility: 158}
+        growthRateMin: 3.763
+        growthRateMax: 4.439
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7674,6 +9095,13 @@ pet:
         baseStr: 23
         baseTough: 22
         baseDex: 22
+      panelReference:
+        level1CommonAverage: {hp: 48, attack: 7, defense: 7, agility: 5}
+        level1MythicAverage: {hp: 55, attack: 8, defense: 8, agility: 6}
+        level140CommonAverage: {hp: 1376, attack: 205, defense: 199, agility: 152}
+        level140MythicAverage: {hp: 1567, attack: 239, defense: 233, agility: 180}
+        growthRateMin: 3.863
+        growthRateMax: 4.532
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7711,6 +9139,13 @@ pet:
         baseStr: 21
         baseTough: 22
         baseDex: 20
+      panelReference:
+        level1CommonAverage: {hp: 46, attack: 6, defense: 6, agility: 4}
+        level1MythicAverage: {hp: 52, attack: 7, defense: 7, agility: 5}
+        level140CommonAverage: {hp: 1430, attack: 198, defense: 204, agility: 145}
+        level140MythicAverage: {hp: 1630, attack: 234, defense: 240, agility: 172}
+        growthRateMin: 3.820
+        growthRateMax: 4.511
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7748,6 +9183,13 @@ pet:
         baseStr: 22
         baseTough: 28
         baseDex: 23
+      panelReference:
+        level1CommonAverage: {hp: 48, attack: 6, defense: 8, agility: 5}
+        level1MythicAverage: {hp: 55, attack: 8, defense: 9, agility: 6}
+        level140CommonAverage: {hp: 1444, attack: 203, defense: 240, agility: 159}
+        level140MythicAverage: {hp: 1635, attack: 237, defense: 275, agility: 187}
+        growthRateMin: 4.194
+        growthRateMax: 4.863
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -7785,6 +9227,13 @@ pet:
         baseStr: 21
         baseTough: 29
         baseDex: 20
+      panelReference:
+        level1CommonAverage: {hp: 51, attack: 6, defense: 8, agility: 4}
+        level1MythicAverage: {hp: 58, attack: 7, defense: 9, agility: 5}
+        level140CommonAverage: {hp: 1532, attack: 198, defense: 247, agility: 139}
+        level140MythicAverage: {hp: 1723, attack: 232, defense: 281, agility: 166}
+        growthRateMin: 4.072
+        growthRateMax: 4.734
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -7822,6 +9271,13 @@ pet:
         baseStr: 39
         baseTough: 28
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 56, attack: 12, defense: 9, agility: 7}
+        level1MythicAverage: {hp: 64, attack: 13, defense: 10, agility: 8}
+        level140CommonAverage: {hp: 1492, attack: 320, defense: 252, agility: 195}
+        level140MythicAverage: {hp: 1684, attack: 354, defense: 286, agility: 222}
+        growthRateMin: 5.317
+        growthRateMax: 5.978
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 5
@@ -7863,6 +9319,13 @@ pet:
         baseStr: 19
         baseTough: 24
         baseDex: 18
+      panelReference:
+        level1CommonAverage: {hp: 35, attack: 5, defense: 6, agility: 4}
+        level1MythicAverage: {hp: 41, attack: 6, defense: 7, agility: 4}
+        level140CommonAverage: {hp: 1219, attack: 193, defense: 226, agility: 140}
+        level140MythicAverage: {hp: 1438, attack: 231, defense: 265, agility: 171}
+        growthRateMin: 3.914
+        growthRateMax: 4.676
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 20
@@ -7901,6 +9364,13 @@ pet:
         baseStr: 21
         baseTough: 21
         baseDex: 22
+      panelReference:
+        level1CommonAverage: {hp: 35, attack: 5, defense: 5, agility: 4}
+        level1MythicAverage: {hp: 41, attack: 6, defense: 6, agility: 5}
+        level140CommonAverage: {hp: 1257, attack: 200, defense: 200, agility: 164}
+        level140MythicAverage: {hp: 1459, attack: 236, defense: 236, agility: 194}
+        growthRateMin: 3.957
+        growthRateMax: 4.669
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7938,6 +9408,13 @@ pet:
         baseStr: 20
         baseTough: 22
         baseDex: 20
+      panelReference:
+        level1CommonAverage: {hp: 30, attack: 4, defense: 5, agility: 3}
+        level1MythicAverage: {hp: 35, attack: 5, defense: 6, agility: 4}
+        level140CommonAverage: {hp: 1223, attack: 198, defense: 212, agility: 155}
+        level140MythicAverage: {hp: 1438, attack: 236, defense: 250, agility: 185}
+        growthRateMin: 3.978
+        growthRateMax: 4.719
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -7975,6 +9452,13 @@ pet:
         baseStr: 24
         baseTough: 19
         baseDex: 23
+      panelReference:
+        level1CommonAverage: {hp: 36, attack: 7, defense: 6, agility: 5}
+        level1MythicAverage: {hp: 43, attack: 8, defense: 7, agility: 6}
+        level140CommonAverage: {hp: 1169, attack: 226, defense: 193, agility: 179}
+        level140MythicAverage: {hp: 1387, attack: 266, defense: 231, agility: 209}
+        growthRateMin: 4.173
+        growthRateMax: 4.928
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 10
@@ -8012,6 +9496,13 @@ pet:
         baseStr: 22
         baseTough: 27
         baseDex: 26
+      panelReference:
+        level1CommonAverage: {hp: 41, attack: 6, defense: 7, agility: 6}
+        level1MythicAverage: {hp: 48, attack: 7, defense: 8, agility: 7}
+        level140CommonAverage: {hp: 1238, attack: 198, defense: 229, agility: 179}
+        level140MythicAverage: {hp: 1430, attack: 232, defense: 263, agility: 207}
+        growthRateMin: 4.223
+        growthRateMax: 4.892
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -8049,6 +9540,13 @@ pet:
         baseStr: 28
         baseTough: 24
         baseDex: 24
+      panelReference:
+        level1CommonAverage: {hp: 49, attack: 8, defense: 7, agility: 6}
+        level1MythicAverage: {hp: 56, attack: 10, defense: 9, agility: 7}
+        level140CommonAverage: {hp: 1360, attack: 240, defense: 215, agility: 167}
+        level140MythicAverage: {hp: 1552, attack: 274, defense: 250, agility: 194}
+        growthRateMin: 4.324
+        growthRateMax: 4.978
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -8086,6 +9584,13 @@ pet:
         baseStr: 25
         baseTough: 23
         baseDex: 28
+      panelReference:
+        level1CommonAverage: {hp: 43, attack: 7, defense: 7, agility: 6}
+        level1MythicAverage: {hp: 49, attack: 8, defense: 8, agility: 7}
+        level140CommonAverage: {hp: 1219, attack: 215, defense: 204, agility: 194}
+        level140MythicAverage: {hp: 1410, attack: 250, defense: 238, agility: 221}
+        growthRateMin: 4.266
+        growthRateMax: 4.935
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -8123,6 +9628,13 @@ pet:
         baseStr: 22
         baseTough: 27
         baseDex: 23
+      panelReference:
+        level1CommonAverage: {hp: 44, attack: 6, defense: 7, agility: 5}
+        level1MythicAverage: {hp: 51, attack: 7, defense: 8, agility: 6}
+        level140CommonAverage: {hp: 1327, attack: 199, defense: 230, agility: 159}
+        level140MythicAverage: {hp: 1519, attack: 234, defense: 265, agility: 187}
+        growthRateMin: 4.101
+        growthRateMax: 4.784
       skill: [8000001,8000002,0,0,0,0,0]
       battleAI:
         attackWeight: 1
@@ -8135,7 +9647,51 @@ pet:
       description: 未知
 
 
-
+##########测试##########
+    - id: 4100264
+      name: 石龟-测试-防守
+      sprite: 264
+      enemyId: 39
+      rarity: 1
+      bestiary: 7271
+      elemental:
+        earth: 9
+        wind: 1
+      attribute:
+        poisonResist: 0
+        paralysisResist: 0
+        sleepResist: -20
+        stoneResist: 65
+        drunkResist: 0
+        confusionResist: 0
+        critical: 0
+        counter: 0
+        rate: 0
+        get: 7
+      growth:
+        initNum: 20
+        lvupPointSource: 4.50
+        baseVital: 21
+        baseStr: 19
+        baseTough: 41
+        baseDex: 8
+      panelReference:
+        level1CommonAverage: { hp: 31, attack: 5, defense: 9, agility: 1 }
+        level1MythicAverage: { hp: 36, attack: 6, defense: 10, agility: 2 }
+        level140CommonAverage: { hp: 1179, attack: 199, defense: 349, agility: 64 }
+        level140MythicAverage: { hp: 1396, attack: 237, defense: 388, agility: 94 }
+        growthRateMin: 4.295
+        growthRateMax: 5.043
+      skill: [ 8000001,8000002,0,0,0,0,0 ]
+      battleAI:
+        attackWeight: 1
+        defenseWeight: 10000
+        escapeWeight: 1
+        targetScope: allOpponents
+        targetSelection: random
+      habitat: 未知
+      level1Spawn: 未知
+      description: 未知
 
 
 
