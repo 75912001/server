@@ -9,7 +9,7 @@ scenes:
     name: 场景一
     enemyCountMax: 1
     enemyGroups:
-      - id: 5
+      - id: 4100264
         weight: 100
 
   - id: 2000002

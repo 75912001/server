@@ -5,17 +5,38 @@
 ## 配置文件
 
 - `character.yaml`: 角色资源配置.
-- `character.sprite.yaml`: 角色动画帧配置.
+- `character.sprite.yaml`: 角色及角色骑宠动画帧、逐动作 FPS、攻击声音、命中表现和原版 Raw 参考配置.
 - `combat.sprite.yaml`: 战斗表现资源配置.
 - `skill.yaml`: 角色和宠物共用的技能配置.
 - `enemy.group.yaml`: 敌人编组、宠物模板、数量和等级规则.
 - `enemy.exp.yaml`: 敌人等级基础经验配置.
 - `exp.yaml`: 角色和宠物等级经验配置.
+- `information.yaml`: 从 STW1.13 `Mission.txt` 转换的 UTF-8 石器情报树和正文, 由 sa.desktop 只读展示.
 - `item.yaml`: 道具和装备配置.
-- `pet.yaml`: 宠物主体、成长、技能槽和战斗 AI 配置.
+- `pet.yaml`: 宠物主体、成长、图鉴面板参考值、技能槽和战斗 AI 配置.
 - `pet.sprite.yaml`: 宠物动画帧和攻击表现配置.
 - `scene.yaml`: 场景及其可遇敌编组配置.
 - `../docs/offset.yaml`: 帧资源图片偏移配置.
+
+## 石器情报配置
+
+`information.yaml` 保留 STW1.13 `Mission.txt` 的 489 条 `PATH/DATA` 记录. `information.entries[].path` 按原文件的 `->` 分隔结果保存从根节点到当前节点的完整层级, `content` 使用带 `\n` 转义的 YAML 双引号字符串保存右侧正文, 避免正文自身缩进被解释为 YAML 结构. 同级节点允许重名, 原始记录顺序决定客户端树节点顺序.
+
+该配置属于 server 统一维护、sa.desktop 单向同步的客户端只读资料, online 服务不加载也不执行业务校验. 客户端通过 `ConfigInformation` 在 `load()` 阶段校验单表结构, 在 `assemble()` 阶段处理子记录先于父记录出现的原始顺序并组装主题树.
+
+## 角色动画元数据生成
+
+`../tool/character_sprite_metadata.py` 从原版 `spr_115.bin` 和 `spradrn_115.bin` 审计 `character.sprite.yaml` 的104个方向动作, 并生成13动作FPS、当前攻击声音及原版Raw参考数据. 默认只读审计, 明确传入 `--write` 才会并发校验后原子写入:
+
+```bash
+python tool/character_sprite_metadata.py \
+  --spr D:/csa_8.0/data/spr_115.bin \
+  --spr-address D:/csa_8.0/data/spradrn_115.bin \
+  --config config/character.sprite.yaml \
+  --write
+```
+
+4个事件字段以 `Raw` 结尾, 记录原版攻击事件的1-based帧位置和声音ID. 当前方向动作与原版帧序列不同时, 生成器还会在生效动作后写入 `<action>Raw`, 例如 `attackRaw`. 所有Raw字段只供后期对照, 客户端只校验而不创建播放缓存; 修改生效动作前必须同时确认当前图集帧、`.tpsheet`和offset完整, 不能直接用Raw覆盖.
 
 online 启动会加载 `character.yaml`、`skill.yaml`、`enemy.group.yaml`、`enemy.exp.yaml`、`exp.yaml`、`item.yaml`、`pet.yaml` 和 `scene.yaml`. 任一必需文件缺失、字段非法或跨表引用无效时, 服务必须直接启动失败.
 
@@ -65,14 +86,21 @@ skill: [8000001,8000002,0,0,0,0,0]
 
 server 消费的主要字段:
 
-- `id`, `rarity`.
+- `id`, `name`, `rarity`.
 - `elemental`: 地、水、火、风总和必须为 10, 只能是单元素或两个相邻元素.
 - `attribute`: 异常抗性、暴击、反击、捕获和服务端战斗特性.
 - `growth`: 初始和升级成长参数.
+- `panelReference`: 客户端图鉴直接展示的1级和140级普通品阶平均值、神话品阶平均值及总成长上下限, 只保存服务端预计算结果.
 - `skill`: 统一技能槽.
 - `battleAI`: 玩家宠物模板和自动遇敌单位共用的 AI 配置.
 
 自动遇敌单位直接使用敌人组引用宠物的 `battleAI`. `battleAI.skillSlotWeights` 固定对应 7 个技能槽; 非 0 权重不能引用空槽.
+
+### 图鉴面板参考值核验
+
+`panelReference` 的完整计算规则记录在 `pet.yaml` 文件头. 客户端只解析并显示这些预计算结果, 不保存成长基础四维, 也不实现参考值算法.
+
+online 启动加载配置时, server 使用权威宠物生成、升级和面板换算规则重新计算所有宠物的 `panelReference`. 核验会集中收集全部不一致项, 每项日志包含宠物 ID、名称、配置实际值以及可直接复制回 `pet.yaml` 的正确 YAML. 存在任一不一致时配置加载失败, 服务不得启动.
 
 ## 跨表关系
 
