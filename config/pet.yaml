@@ -9650,6 +9650,7 @@ pet:
 ##########测试##########
     - id: 4100264
       name: 石龟-测试-防守
+      isTest: true
       sprite: 264
       enemyId: 39
       rarity: 1

@@ -6,7 +6,7 @@
 
 - `character.yaml`: 角色资源配置.
 - `character.sprite.yaml`: 角色及角色骑宠动画帧、逐动作 FPS、攻击声音、命中表现和原版 Raw 参考配置.
-- `combat.sprite.yaml`: 战斗表现资源配置.
+- `combat.sprite.yaml`: 战斗表现资源配置; `value` 保存客户端逐帧消费的有序帧号, 暴击8723条目合并保存前14帧小星和后13帧大星的60Hz时间线.
 - `skill.yaml`: 角色和宠物共用的技能配置.
 - `enemy.group.yaml`: 敌人编组、宠物模板、数量和等级规则.
 - `enemy.exp.yaml`: 敌人等级基础经验配置.
