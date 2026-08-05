@@ -47,8 +47,14 @@ func (p *Account) PostClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket)
 
 // PostCombatRoomFinishedSync 同步请求 Account actor 清除匹配房间引用并投递最终战报.
 func (p *Account) PostCombatRoomFinishedSync(characterUUID uint64, room *CombatRoom, gateway *Gateway, result *pb.CombatRoundResultNotify) error {
-	_, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineAccountActorCmdRoomFinished, characterUUID, room, gateway, result))
-	return err
+	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineAccountActorCmdRoomFinished, characterUUID, room, gateway, result))
+	if err != nil {
+		return err
+	}
+	if finishErr, ok := resp.(error); ok {
+		return finishErr
+	}
+	return nil
 }
 
 func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
@@ -138,6 +144,112 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 				resp = true
 				continue
 			}
+			participantKey := combatRoomParticipantKey{
+				aid:           p.aid,
+				characterUUID: characterUUID,
+			}
+			battleReward, rewardErr := room.playerCombatBattleReward(
+				participantKey,
+				result.GetSettlement().GetBattleResult(),
+			)
+			if rewardErr != nil {
+				character.combatRoom = nil
+				p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Internal.Code())
+				resp = rewardErr
+				continue
+			}
+			persistenceResult, persistErr := persistCombatParticipantResult(
+				p.accountRecord,
+				character.record,
+				combatParticipantPersistenceInput{
+					characterExperience:     battleReward.characterExperience,
+					settleDuelPoint:         battleReward.duelPointBattle,
+					characterDuelPointDelta: battleReward.characterDuelPointDelta,
+					battlePetUUID:           battleReward.battlePetUUID,
+					battlePetExperience:     battleReward.battlePetExperience,
+					itemAssetIDs:            battleReward.itemAssetIDs,
+				},
+				func() error {
+					return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+				},
+			)
+			if persistErr != nil {
+				character.combatRoom = nil
+				p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Internal.Code())
+				resp = persistErr
+				continue
+			}
+			if persistenceResult.baseChanged {
+				p.sendCharacterBaseChangedNotify(gateway, character.record)
+			}
+			if persistenceResult.changedPet != nil {
+				p.sendCharacterPetChangedNotify(gateway, characterUUID, []*pb.PetRecord{persistenceResult.changedPet})
+			}
+			if len(persistenceResult.receivedItemFinalCountMap) > 0 {
+				// 现有道具变化通知只同步可堆叠普通道具的最终数量. 装备实例
+				// 已经写入权威背包, 但客户端装备增量协议尚未定义; 两类奖励
+				// 均通过下方结构化战斗结算摘要展示.
+				p.sendCharacterItemChangedNotify(
+					gateway,
+					characterUUID,
+					persistenceResult.receivedItemFinalCountMap,
+				)
+			}
+			if result.GetSettlement() != nil {
+				// 每个接收角色使用房间最终结果的独立副本. 结算只追加真正
+				// 写入当前账号档案的经验、DP和道具变化. 经验保持角色在前、
+				// 战宠在后的稳定顺序; 客户端不能提交或覆盖奖励数值.
+				settlementUnitKey := &pb.CombatUnitKey{
+					Aid:           p.aid,
+					CharacterUuid: characterUUID,
+				}
+				if persistenceResult.characterExperience.AppliedExp > 0 {
+					result.Settlement.ExpRewardList = append(
+						result.Settlement.ExpRewardList,
+						&pb.CombatSettlementExpReward{
+							UnitKey:  cloneCombatUnitKey(settlementUnitKey),
+							ExpDelta: persistenceResult.characterExperience.AppliedExp,
+						},
+					)
+				}
+				if persistenceResult.battlePetExperience.AppliedExp > 0 {
+					result.Settlement.ExpRewardList = append(
+						result.Settlement.ExpRewardList,
+						&pb.CombatSettlementExpReward{
+							UnitKey: &pb.CombatUnitKey{
+								Aid:           settlementUnitKey.GetAid(),
+								CharacterUuid: settlementUnitKey.GetCharacterUuid(),
+								PetUuid:       battleReward.battlePetUUID,
+							},
+							ExpDelta: persistenceResult.battlePetExperience.AppliedExp,
+						},
+					)
+				}
+				if persistenceResult.duelPointChanged {
+					result.Settlement.DuelPointChange = &pb.CombatSettlementDuelPointChange{
+						UnitKey: cloneCombatUnitKey(settlementUnitKey),
+						Delta:   persistenceResult.characterDuelPointDelta,
+						After:   persistenceResult.characterDuelPointAfter,
+					}
+				}
+				itemRewardMap := make(map[uint32]*pb.CombatSettlementItemReward)
+				for _, itemAssetID := range persistenceResult.receivedItemAssetIDs {
+					if reward := itemRewardMap[itemAssetID]; reward != nil {
+						reward.Count++
+						continue
+					}
+					reward := &pb.CombatSettlementItemReward{
+						UnitKey: cloneCombatUnitKey(settlementUnitKey),
+						ItemId:  itemAssetID,
+						Count:   1,
+					}
+					itemRewardMap[itemAssetID] = reward
+					result.Settlement.ItemRewardList = append(
+						result.Settlement.ItemRewardList,
+						reward,
+					)
+				}
+			}
 			character.combatRoom = nil
 			p.sendClientRes(gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Success.Code(), result)
 			resp = true
@@ -172,7 +284,7 @@ func (p *Account) updateCharacterLogout() {
 		if character == nil || !character.online || character.record == nil {
 			continue
 		}
-		character.record.LastLogoutTimestampMs = timestampMs
+		character.record.Base.LastLogoutTimestampMs = timestampMs
 	}
 }
 

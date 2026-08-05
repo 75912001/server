@@ -31,7 +31,7 @@ func validateAccountRecord(record *pb.AccountRecord) error {
 		if characterRecord == nil {
 			return fmt.Errorf("character slot %d is nil", slot)
 		}
-		characterUUID := characterRecord.GetUuid()
+		characterUUID := characterRecord.GetBase().GetUuid()
 		if characterUUID == 0 {
 			if proto.Size(characterRecord) != 0 {
 				return fmt.Errorf("empty character slot %d contains data", slot)
@@ -64,25 +64,35 @@ func validateAccountRecord(record *pb.AccountRecord) error {
 }
 
 func validateCharacterRecord(record *pb.CharacterRecord, seenUUID map[uint64]struct{}, usedUUID uint64) error {
-	if strings.TrimSpace(record.GetNick()) == "" {
+	if record.GetBase() == nil {
+		return fmt.Errorf("base is nil")
+	}
+	base := record.GetBase()
+	if strings.TrimSpace(base.GetNick()) == "" {
 		return fmt.Errorf("nick is empty")
 	}
-	if !assetIDInRange(record.GetAssetId(), pb.AssetIDRange_AssetIDRange_Character_Start, pb.AssetIDRange_AssetIDRange_Character_End) {
-		return fmt.Errorf("asset id %d is invalid", record.GetAssetId())
+	if !assetIDInRange(base.GetAssetId(), pb.AssetIDRange_AssetIDRange_Character_Start, pb.AssetIDRange_AssetIDRange_Character_End) {
+		return fmt.Errorf("asset id %d is invalid", base.GetAssetId())
 	}
-	if record.GetCreateTimestampMs() <= 0 {
+	if base.GetCreateTimestampMs() <= 0 {
 		return fmt.Errorf("create timestamp is invalid")
 	}
-	if !assetIDInRange(uint64(record.GetSceneId()), pb.AssetIDRange_AssetIDRange_Scene_Start, pb.AssetIDRange_AssetIDRange_Scene_End) {
-		return fmt.Errorf("scene id %d is invalid", record.GetSceneId())
+	if !assetIDInRange(uint64(base.GetSceneId()), pb.AssetIDRange_AssetIDRange_Scene_Start, pb.AssetIDRange_AssetIDRange_Scene_End) {
+		return fmt.Errorf("scene id %d is invalid", base.GetSceneId())
 	}
-	if record.GetVitality()+record.GetStrength()+record.GetToughness()+record.GetDexterity() == 0 {
+	if base.GetVitality()+base.GetStrength()+base.GetToughness()+base.GetDexterity() == 0 {
 		return fmt.Errorf("attribute is empty")
 	}
-	if err := validateCharacterLuckState(record.GetLuckState()); err != nil {
+	if base.GetDuelPoint() > uint32(pb.CharacterLimit_CharacterLimit_MaxDuelPoint) {
+		return fmt.Errorf("duel point %d exceeds limit", base.GetDuelPoint())
+	}
+	if base.GetCharm() > characterMaxCharm {
+		return fmt.Errorf("charm %d exceeds limit", base.GetCharm())
+	}
+	if err := validateCharacterLuckState(base.GetLuckState()); err != nil {
 		return fmt.Errorf("luck state: %w", err)
 	}
-	if record.GetLuckState().GetBaseLuck() == 0 && (record.GetLastLoginTimestampMs() != 0 || record.GetLastLogoutTimestampMs() != 0) {
+	if base.GetLuckState().GetBaseLuck() == 0 && (base.GetLastLoginTimestampMs() != 0 || base.GetLastLogoutTimestampMs() != 0) {
 		return fmt.Errorf("pending luck state has login history")
 	}
 	if len(record.GetPetRecordList()) > int(pb.PetRecordLimit_PetRecordLimit_MaxCarryCount) {
@@ -122,7 +132,7 @@ func validatePetRecord(record *pb.PetRecord, warehouse bool) error {
 	if record.GetUuid() == 0 {
 		return fmt.Errorf("uuid is empty")
 	}
-	if !assetIDInRange(record.GetAssetId(), pb.AssetIDRange_AssetIDRange_Pet_Start, pb.AssetIDRange_AssetIDRange_Pet_End) {
+	if !assetIDInRange(uint64(record.GetAssetId()), pb.AssetIDRange_AssetIDRange_Pet_Start, pb.AssetIDRange_AssetIDRange_Pet_End) {
 		return fmt.Errorf("asset id %d is invalid", record.GetAssetId())
 	}
 	if record.GetGrade() <= pb.PetGrade_PetGrade_Unknow || record.GetGrade() >= pb.PetGrade_PetGrade_Max {

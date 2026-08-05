@@ -118,26 +118,30 @@ func prepareCharacterOnlineRecord(record *pb.CharacterRecord, nowMs int64, roll 
 	if roll == nil {
 		return characterOnlineRecordBackup{}, fmt.Errorf("luck roll function is nil")
 	}
-	needsRefresh, err := characterLuckNeedsRefresh(nowMs, record.GetLuckState())
+	if record == nil || record.GetBase() == nil {
+		return characterOnlineRecordBackup{}, fmt.Errorf("character base record is nil")
+	}
+	base := record.GetBase()
+	needsRefresh, err := characterLuckNeedsRefresh(nowMs, base.GetLuckState())
 	if err != nil {
 		return characterOnlineRecordBackup{}, err
 	}
 
 	backup := characterOnlineRecordBackup{
-		lastLoginTimestampMs: record.GetLastLoginTimestampMs(),
-		luckState:            record.LuckState,
+		lastLoginTimestampMs: base.GetLastLoginTimestampMs(),
+		luckState:            base.LuckState,
 	}
 	if needsRefresh {
 		baseLuck, err := characterBaseLuckFromRoll(roll())
 		if err != nil {
 			return characterOnlineRecordBackup{}, err
 		}
-		record.LuckState = &pb.CharacterLuckState{
+		base.LuckState = &pb.CharacterLuckState{
 			BaseLuck:               baseLuck,
 			LastRefreshTimestampMs: nowMs,
 		}
 	}
-	record.LastLoginTimestampMs = nowMs
+	base.LastLoginTimestampMs = nowMs
 	return backup, nil
 }
 
@@ -145,8 +149,8 @@ func (backup characterOnlineRecordBackup) restore(record *pb.CharacterRecord) {
 	if record == nil {
 		return
 	}
-	record.LastLoginTimestampMs = backup.lastLoginTimestampMs
-	record.LuckState = backup.luckState
+	record.Base.LastLoginTimestampMs = backup.lastLoginTimestampMs
+	record.Base.LuckState = backup.luckState
 }
 
 // newCombatLuckSnapshot 根据本次从已装备物品配置解析的修正值, 计算基础运气、装备合计和限制在1-5的有效运气.

@@ -33,8 +33,35 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	case pb.MsgID_CharacterOfflineReq_CMD:
 		p.onCharacterOfflineReq(gateway, pkt)
 		return
-	case pb.MsgID_SceneEnterReq_CMD:
-		p.onSceneEnterReq(gateway, pkt)
+	case pb.MsgID_CharacterSceneEnterReq_CMD:
+		p.onCharacterSceneEnterReq(gateway, pkt)
+		return
+	case pb.MsgID_CharacterSettingSetReq_CMD:
+		p.onCharacterSettingSetReq(gateway, pkt)
+		return
+	case pb.MsgID_PetCarryStatusSetReq_CMD:
+		p.onPetCarryStatusSetReq(gateway, pkt)
+		return
+	case pb.MsgID_PetWarehouseDepositReq_CMD:
+		p.onPetWarehouseDepositReq(gateway, pkt)
+		return
+	case pb.MsgID_PetWarehouseWithdrawReq_CMD:
+		p.onPetWarehouseWithdrawReq(gateway, pkt)
+		return
+	case pb.MsgID_PetNickSetReq_CMD:
+		p.onPetNickSetReq(gateway, pkt)
+		return
+	case pb.MsgID_ItemWarehouseDepositReq_CMD:
+		p.onItemWarehouseDepositReq(gateway, pkt)
+		return
+	case pb.MsgID_ItemWarehouseWithdrawReq_CMD:
+		p.onItemWarehouseWithdrawReq(gateway, pkt)
+		return
+	case pb.MsgID_ItemUseReq_CMD:
+		p.onItemUseReq(gateway, pkt)
+		return
+	case pb.MsgID_GMCommandReq_CMD:
+		p.onGMCommandReq(gateway, pkt)
 		return
 	case pb.MsgID_CombatAutoEncounterSetReq_CMD:
 		p.onAutoEncounterSetReq(gateway, pkt)
@@ -45,8 +72,8 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	case pb.MsgID_CombatFlowCompleteReq_CMD:
 		p.onCombatFlowCompleteReq(gateway, pkt)
 		return
-	case pb.MsgID_RobotPingReq_CMD:
-		p.onRobotPingReq(gateway, pkt)
+	case pb.MsgID_AccountRobotPingReq_CMD:
+		p.onAccountRobotPingReq(gateway, pkt)
 		return
 	default:
 		xlog.GLog.Warnf("unknown client packet aid:%d messageID:%d", p.aid, pkt.GetMessageId())
@@ -89,20 +116,92 @@ func (p *Account) sendClientErr(gateway *Gateway, messageID uint32, resultID uin
 	})
 }
 
-func (p *Account) onRobotPingReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
-	var req pb.RobotPingReq
-	if err := proto.Unmarshal(pkt.GetBody(), &req); err != nil {
-		p.sendClientErr(gateway, uint32(pb.MsgID_RobotPingRes_CMD), xerror.InvalidArgument.Code())
+func characterBaseRecord(record *pb.CharacterRecord) *pb.CharacterBaseRecord {
+	if record == nil || record.GetBase() == nil {
+		return nil
+	}
+	return proto.Clone(record.GetBase()).(*pb.CharacterBaseRecord)
+}
+
+func (p *Account) sendCharacterBaseChangedNotify(gateway *Gateway, record *pb.CharacterRecord) {
+	base := characterBaseRecord(record)
+	if base == nil {
 		return
 	}
-	p.sendClientRes(gateway, uint32(pb.MsgID_RobotPingRes_CMD), xerror.Success.Code(),
-		&pb.RobotPingRes{
+	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterBaseChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterBaseChangedNotify{CharacterBaseRecord: base})
+}
+
+func (p *Account) sendCharacterPetChangedNotify(gateway *Gateway, characterUUID uint64, petRecordList []*pb.PetRecord) {
+	if characterUUID == 0 || len(petRecordList) == 0 {
+		return
+	}
+	changedPetRecordList := make([]*pb.PetRecord, 0, len(petRecordList))
+	for _, petRecord := range petRecordList {
+		if petRecord != nil {
+			changedPetRecordList = append(changedPetRecordList, proto.Clone(petRecord).(*pb.PetRecord))
+		}
+	}
+	if len(changedPetRecordList) == 0 {
+		return
+	}
+	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterPetChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterPetChangedNotify{CharacterUuid: characterUUID, PetRecordList: changedPetRecordList})
+}
+
+func (p *Account) sendCharacterItemChangedNotify(gateway *Gateway, characterUUID uint64, itemCountMap map[uint32]uint64) {
+	if characterUUID == 0 || len(itemCountMap) == 0 {
+		return
+	}
+	changedItemCountMap := make(map[uint32]uint64, len(itemCountMap))
+	for itemID, count := range itemCountMap {
+		changedItemCountMap[itemID] = count
+	}
+	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterItemChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterItemChangedNotify{CharacterUuid: characterUUID, ItemCountMap: changedItemCountMap})
+}
+
+func (p *Account) onAccountRobotPingReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
+	var req pb.AccountRobotPingReq
+	if err := proto.Unmarshal(pkt.GetBody(), &req); err != nil {
+		p.sendClientErr(gateway, uint32(pb.MsgID_AccountRobotPingRes_CMD), xerror.InvalidArgument.Code())
+		return
+	}
+	p.sendClientRes(gateway, uint32(pb.MsgID_AccountRobotPingRes_CMD), xerror.Success.Code(),
+		&pb.AccountRobotPingRes{
 			Seq:               req.GetSeq(),
 			ClientTimestampMs: req.GetClientTimestampMs(),
 			ServerTimestampMs: time.Now().UnixMilli(),
 			Payload:           req.GetPayload(),
 		},
 	)
+}
+
+// newCharacterRecord 使用已校验的创建参数构造完整角色档案; 默认宠物和账号 UUID 游标由调用方处理.
+func newCharacterRecord(characterUUID uint64, resolvedCharacterNick string, req *pb.CharacterCreateReq, createTimestampMs int64) *pb.CharacterRecord {
+	return &pb.CharacterRecord{
+		Base: &pb.CharacterBaseRecord{
+			Uuid:              characterUUID,
+			Nick:              resolvedCharacterNick,
+			AssetId:           uint64(req.GetCharacterId()),
+			Earth:             req.GetCharacterElemental().GetEarth(),
+			Water:             req.GetCharacterElemental().GetWater(),
+			Fire:              req.GetCharacterElemental().GetFire(),
+			Wind:              req.GetCharacterElemental().GetWind(),
+			DuelPoint:         characterInitialDuelPoint,
+			Charm:             characterInitialCharm,
+			Vitality:          req.GetCharacterAttribute().GetVitality(),
+			Strength:          req.GetCharacterAttribute().GetStrength(),
+			Toughness:         req.GetCharacterAttribute().GetToughness(),
+			Dexterity:         req.GetCharacterAttribute().GetDexterity(),
+			CreateTimestampMs: createTimestampMs,
+			SceneId:           2000001,
+			LuckState:         &pb.CharacterLuckState{},
+		},
+		ItemBag: &pb.ItemContainerRecord{
+			ItemCountMap:       make(map[uint32]uint64),
+			EquipmentRecordMap: make(map[uint64]*pb.EquipmentRecord),
+		},
+		Equipment:     &pb.CharacterEquipmentRecord{},
+		PetRecordList: make([]*pb.PetRecord, 0, int(pb.PetRecordLimit_PetRecordLimit_MaxCarryCount)),
+	}
 }
 
 func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
@@ -121,7 +220,7 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 	slotIndex := int(characterSlotIndex)
 	if slotIndex < len(p.accountRecord.CharacterRecordList) {
 		character := p.accountRecord.CharacterRecordList[slotIndex]
-		if character != nil && character.GetUuid() != 0 {
+		if character != nil && character.GetBase().GetUuid() != 0 {
 			p.sendClientErr(gateway, uint32(pb.MsgID_CharacterCreateRes_CMD), xerror.AlreadyExists.Code())
 			return
 		}
@@ -148,33 +247,15 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 	}
 
 	// character attribute
-	if req.GetCharacterAttribute().GetVitality()+req.GetCharacterAttribute().GetStrength()+req.GetCharacterAttribute().GetToughness()+req.GetCharacterAttribute().GetDexterity() != uint32(pb.CharacterAttributeLimit_CharacterAttributeLimit_TotalPoint) {
+	if req.GetCharacterAttribute().GetVitality()+req.GetCharacterAttribute().GetStrength()+req.GetCharacterAttribute().GetToughness()+req.GetCharacterAttribute().GetDexterity() != uint32(pb.CharacterLimit_CharacterLimit_CreateAttributeTotalPoint) {
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterCreateRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
 
+	previousUsedUUID := p.accountRecord.GetUsedUuid()
+	previousCharacterRecord := p.accountRecord.CharacterRecordList[slotIndex]
 	characterUUID := nextAccountRecordUUID(p.accountRecord)
-	characterRecord := &pb.CharacterRecord{
-		Uuid:              characterUUID,
-		Nick:              resolvedCharacterNick,
-		AssetId:           uint64(req.GetCharacterId()),
-		Exp:               0,
-		Earth:             req.GetCharacterElemental().GetEarth(),
-		Water:             req.GetCharacterElemental().GetWater(),
-		Fire:              req.GetCharacterElemental().GetFire(),
-		Wind:              req.GetCharacterElemental().GetWind(),
-		AvailablePoint:    0,
-		Vitality:          req.CharacterAttribute.GetVitality(),
-		Strength:          req.CharacterAttribute.GetStrength(),
-		Toughness:         req.CharacterAttribute.GetToughness(),
-		Dexterity:         req.CharacterAttribute.GetDexterity(),
-		CreateTimestampMs: time.Now().UnixMilli(),
-		SceneId:           2000001,
-		LuckState:         &pb.CharacterLuckState{},
-		AssetIdRecordMap:  make(map[uint32]uint64),
-		RecordMap:         make(map[uint64]*pb.RecordPrimary),
-		PetRecordList:     make([]*pb.PetRecord, 0, int(pb.PetRecordLimit_PetRecordLimit_MaxCarryCount)),
-	}
+	characterRecord := newCharacterRecord(characterUUID, resolvedCharacterNick, &req, time.Now().UnixMilli())
 
 	// pet
 	var defaultPetRecords = []struct {
@@ -203,6 +284,8 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 	p.accountRecord.CharacterRecordList[slotIndex] = characterRecord
 
 	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
+		p.accountRecord.UsedUuid = previousUsedUUID
+		p.accountRecord.CharacterRecordList[slotIndex] = previousCharacterRecord
 		xlog.GLog.Errorf("set account record failed aid:%d err:%v", p.aid, err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterCreateRes_CMD), xerror.Internal.Code())
 		return
@@ -212,7 +295,7 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 		record:  characterRecord,
 	}
 	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterCreateRes_CMD), xerror.Success.Code(), &pb.CharacterCreateRes{
-		AccountRecord: p.accountRecord,
+		CharacterRecord: characterRecord,
 	})
 }
 
@@ -250,8 +333,8 @@ func (p *Account) onCharacterOnlineReq(gateway *Gateway, pkt *pb.OnlineClientPac
 	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterOnlineRes_CMD), xerror.Success.Code(), &pb.CharacterOnlineRes{
 		CharacterUuid: characterUUID,
 		LuckState: &pb.CharacterLuckState{
-			BaseLuck:               character.record.GetLuckState().GetBaseLuck(),
-			LastRefreshTimestampMs: character.record.GetLuckState().GetLastRefreshTimestampMs(),
+			BaseLuck:               character.record.GetBase().GetLuckState().GetBaseLuck(),
+			LastRefreshTimestampMs: character.record.GetBase().GetLuckState().GetLastRefreshTimestampMs(),
 		},
 	})
 }
@@ -272,7 +355,7 @@ func (p *Account) onCharacterOfflineReq(gateway *Gateway, pkt *pb.OnlineClientPa
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterOfflineRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
-	character.record.LastLogoutTimestampMs = time.Now().UnixMilli()
+	character.record.Base.LastLogoutTimestampMs = time.Now().UnixMilli()
 	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
 		xlog.GLog.Errorf("set account record after character offline failed aid:%d character:%d err:%v", p.aid, characterUUID, err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterOfflineRes_CMD), xerror.Internal.Code())
@@ -285,46 +368,46 @@ func (p *Account) onCharacterOfflineReq(gateway *Gateway, pkt *pb.OnlineClientPa
 	})
 }
 
-func (p *Account) onSceneEnterReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
-	var req pb.SceneEnterReq
+func (p *Account) onCharacterSceneEnterReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
+	var req pb.CharacterSceneEnterReq
 	if err := proto.Unmarshal(pkt.GetBody(), &req); err != nil {
-		p.sendClientErr(gateway, uint32(pb.MsgID_SceneEnterRes_CMD), xerror.InvalidArgument.Code())
+		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
 	characterUUID := req.GetCharacterUuid()
 	character := p.characterManager.find(characterUUID)
 	if character == nil || character.record == nil { // 角色-不存在
-		p.sendClientErr(gateway, uint32(pb.MsgID_SceneEnterRes_CMD), xerror.NotFound.Code())
+		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.NotFound.Code())
 		return
 	}
 	if !character.online { // 角色-不在线
-		p.sendClientErr(gateway, uint32(pb.MsgID_SceneEnterRes_CMD), xerror.FailedPrecondition.Code())
+		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
 	if character.combatRoom != nil { // 战斗中
-		p.sendClientErr(gateway, uint32(pb.MsgID_SceneEnterRes_CMD), xerror.FailedPrecondition.Code())
+		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
 	sceneEntry := gameconfig.GGameConfig.Scene.Get(req.GetSceneId())
 	if sceneEntry == nil { // 场景-不存在
-		p.sendClientErr(gateway, uint32(pb.MsgID_SceneEnterRes_CMD), xerror.InvalidArgument.Code())
+		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
 
-	character.record.SceneId = character.record.GetSceneId()
+	character.record.Base.SceneId = req.GetSceneId()
 	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
 		xlog.GLog.Errorf("set account record after scene enter failed aid:%d character:%d scene:%d err:%v", p.aid, characterUUID, req.GetSceneId(), err)
-		p.sendClientErr(gateway, uint32(pb.MsgID_SceneEnterRes_CMD), xerror.Internal.Code())
+		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.Internal.Code())
 		return
 	}
 	if character.autoEncounterEnabled {
 		character.autoEncounterEnabled = false
 		character.clearAutoEncounterTimer()
 	}
-	// SceneEnter 成功后始终推送 session_id=0 的最终状态. 即使遇敌原本已关闭,
+	// CharacterSceneEnter 成功后始终推送 session_id=0 的最终状态. 即使遇敌原本已关闭,
 	// 客户端也需要这条权威重置信号同步清除该角色的本地自动战斗开关.
 	character.notifyAutoEncounterState(gateway)
-	p.sendClientRes(gateway, uint32(pb.MsgID_SceneEnterRes_CMD), xerror.Success.Code(), &pb.SceneEnterRes{
+	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.Success.Code(), &pb.CharacterSceneEnterRes{
 		CharacterUuid:     characterUUID,
 		SceneId:           req.GetSceneId(),
 		ServerTimestampMs: time.Now().UnixMilli(),

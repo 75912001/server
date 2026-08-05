@@ -6,6 +6,6 @@ import (
 )
 
 func (p *Account) getCharacterScene(character *pb.CharacterRecord) (sceneEntry *gameconfig.SceneEntry) {
-	sceneEntry = gameconfig.GGameConfig.Scene.Get(character.GetSceneId())
+	sceneEntry = gameconfig.GGameConfig.Scene.Get(character.GetBase().GetSceneId())
 	return sceneEntry
 }

@@ -14,12 +14,14 @@ type characterMgr struct {
 	characters map[uint64]*character
 }
 
-// character 保存单个角色的在线状态, 自动遇敌状态和 CombatRoom 消息入口.
+// character 保存单个角色的在线状态、交互开关、自动遇敌状态和 CombatRoom 消息入口.
 // record 属于 Account.accountRecord, 其余字段只在当前账号会话内有效, 不写入 cache.
 type character struct {
-	account *Account
-	record  *pb.CharacterRecord
-	online  bool
+	account     *Account
+	record      *pb.CharacterRecord
+	online      bool
+	teamEnabled bool
+	duelEnabled bool
 
 	autoEncounterEnabled bool
 	autoEncounterTimer   *xtimer.Second
@@ -36,10 +38,10 @@ func newCharacterMgr(account *Account, record *pb.AccountRecord) *characterMgr {
 		return manager
 	}
 	for _, characterRecord := range record.GetCharacterRecordList() {
-		if characterRecord.GetUuid() == 0 {
+		if characterRecord.GetBase().GetUuid() == 0 {
 			continue
 		}
-		characterUUID := characterRecord.GetUuid()
+		characterUUID := characterRecord.GetBase().GetUuid()
 		manager.characters[characterUUID] = &character{
 			account: account,
 			record:  characterRecord,

@@ -34,6 +34,29 @@ func (p *onlineGRPCServer) OnlineBindAccount(_ context.Context, req *pb.OnlineBi
 	if accountRecord.PetWarehouseRecordMap == nil {
 		accountRecord.PetWarehouseRecordMap = make(map[uint64]*pb.PetRecord)
 	}
+	if accountRecord.ItemWarehouse == nil {
+		accountRecord.ItemWarehouse = &pb.ItemContainerRecord{}
+	}
+	if accountRecord.ItemWarehouse.ItemCountMap == nil {
+		accountRecord.ItemWarehouse.ItemCountMap = make(map[uint32]uint64)
+	}
+	if accountRecord.ItemWarehouse.EquipmentRecordMap == nil {
+		accountRecord.ItemWarehouse.EquipmentRecordMap = make(map[uint64]*pb.EquipmentRecord)
+	}
+	for _, characterRecord := range accountRecord.GetCharacterRecordList() {
+		if characterRecord == nil || characterRecord.GetBase().GetUuid() == 0 {
+			continue
+		}
+		if characterRecord.ItemBag == nil {
+			characterRecord.ItemBag = &pb.ItemContainerRecord{}
+		}
+		if characterRecord.ItemBag.ItemCountMap == nil {
+			characterRecord.ItemBag.ItemCountMap = make(map[uint32]uint64)
+		}
+		if characterRecord.ItemBag.EquipmentRecordMap == nil {
+			characterRecord.ItemBag.EquipmentRecordMap = make(map[uint64]*pb.EquipmentRecord)
+		}
+	}
 	req.Account = account
 	req.GatewayKey = gatewayKey
 	res, err := GAccountMgr.Bind(aid, req, accountRecord)
