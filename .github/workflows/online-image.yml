@@ -47,7 +47,7 @@ jobs:
           chmod +x "$XLIB_DIR/grpc/proto/bin/protoc-gen-go-grpc-x-linux"
 
       - name: Generate proto code
-        run: python gen.py
+        run: python 1.gen.py
 
       - name: Test online packages
         run: go test ./online ./common ./proto/pb

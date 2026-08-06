@@ -24,6 +24,8 @@ grpc: # gRPC 配置
   serviceName: GatewayService # gRPC service 名称
   listenAddr: 0.0.0.0:20101 # gRPC 监听地址
   externalAddr: 192.168.71.123:20101 # gRPC 对外地址，写入 etcd 供其他服务调用
+  maxReceiveMessageBytes: 67108864
+  maxSendMessageBytes: 67108864
 
 net: # 网络配置
   - listenAddr: 0.0.0.0:10101 # TCP 监听地址

@@ -28,6 +28,8 @@ grpc:
   serviceName: OnlineService
   listenAddr: 0.0.0.0:20201
   externalAddr: 192.168.71.123:20201
+  maxReceiveMessageBytes: 67108864
+  maxSendMessageBytes: 67108864
 
 # online 自定义配置
 custom:
