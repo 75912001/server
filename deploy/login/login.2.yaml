@@ -17,5 +17,10 @@ base: # 基础配置
 log: # 日志配置
   level: 7 # 日志级别
 
+# gRPC 客户端配置
+grpc:
+  maxReceiveMessageBytes: 67108864
+  maxSendMessageBytes: 67108864
+
 custom: # login 自定义配置
   httpAddr: 0.0.0.0:30402 # HTTP 监听地址

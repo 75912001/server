@@ -26,6 +26,8 @@ grpc:
   serviceName: CacheService
   listenAddr: 0.0.0.0:20301
   externalAddr: 192.168.71.123:20301
+  maxReceiveMessageBytes: 67108864
+  maxSendMessageBytes: 67108864
 
 # Redis 集群配置
 redis:
