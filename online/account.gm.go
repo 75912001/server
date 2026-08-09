@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 
+	"server/common"
 	"server/common/gameconfig"
 	commonpet "server/common/pet"
 	pb "server/proto/pb"
@@ -209,7 +210,7 @@ func (p *Account) onGMCommandReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	}
 
 	// 当前阶段按需求在所有运行模式开放且不校验权限白名单,
-	// 但命令只能修改当前 Account actor 内已上线角色自己的档案.
+	// 但命令只能修改当前 Account actor 内已上线角色自己的档案或邮箱.
 	switch command := req.GetCommand().(type) {
 	case *pb.GMCommandReq_ItemAdd:
 		plan, err := prepareGMItemAddPlan(character.record, command.ItemAdd)
@@ -260,6 +261,32 @@ func (p *Account) onGMCommandReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 					PetId:    plan.petID,
 					PetGrade: plan.petGrade,
 				},
+			},
+		})
+	case *pb.GMCommandReq_MailAdd:
+		title, content, err := common.NormalizeSystemMailText(command.MailAdd.GetTitle(), command.MailAdd.GetContent())
+		if err != nil {
+			xlog.GLog.Warnf("prepare gm system mail add failed aid:%d character:%d err:%v", p.aid, req.GetCharacterUuid(), err)
+			p.sendClientErr(gateway, uint32(pb.MsgID_GMCommandRes_CMD), xerror.InvalidArgument.Code())
+			return
+		}
+		mailRecord, err := unaryCacheAddSystemMail(p.aid, req.GetCharacterUuid(), title, content)
+		if err != nil {
+			xlog.GLog.Errorf("persist gm system mail add failed aid:%d character:%d err:%v", p.aid, req.GetCharacterUuid(), err)
+			p.sendClientErr(gateway, uint32(pb.MsgID_GMCommandRes_CMD), common.GRPCStatusToResultID(err))
+			return
+		}
+		if mailRecord == nil || mailRecord.GetUuid() == 0 {
+			xlog.GLog.Errorf("persist gm system mail add returned empty record aid:%d character:%d", p.aid, req.GetCharacterUuid())
+			p.sendClientErr(gateway, uint32(pb.MsgID_GMCommandRes_CMD), xerror.Internal.Code())
+			return
+		}
+		xlog.GLog.Infof("gm command success aid:%d account:%s character:%d clientIP:%s command:mail_add mail:%d", p.aid, p.account, req.GetCharacterUuid(), p.clientIP, mailRecord.GetUuid())
+		p.sendCharacterSystemMailNotify(gateway, req.GetCharacterUuid(), mailRecord)
+		p.sendClientRes(gateway, uint32(pb.MsgID_GMCommandRes_CMD), xerror.Success.Code(), &pb.GMCommandRes{
+			CharacterUuid: req.GetCharacterUuid(),
+			Result: &pb.GMCommandRes_MailAdd{
+				MailAdd: &pb.GMSystemMailAddResult{MailUuid: mailRecord.GetUuid()},
 			},
 		})
 	default:

@@ -118,7 +118,8 @@ type combatAction struct {
 	// declaredTargetKey保存行动前状态处理尚未改写的声明目标.
 	declaredTargetCaptured bool
 	declaredTargetKey      *pb.CombatUnitKey
-	// segmentCount由skill.yaml的continuationAttack.segmentCount锁定.
+	// segmentCount保存本次动作的计划段数. 连续攻击来自skill.yaml配置,
+	// 普通空手攻击在自身行动开始时按等级和BaseLuck随机锁定.
 	segmentCount uint32
 	// 连击开始执行后按普通攻击命令参与后续反击资格判断.
 	counterCommandPromotedToAttack bool
@@ -403,6 +404,68 @@ func combatEffectiveLuck(state *combatUnitRuntimeState) int64 {
 		return 5
 	}
 	return luck
+}
+
+func combatBaseLuck(state *combatUnitRuntimeState) int64 {
+	if state == nil || combatKind(state.unit) != combatUnitKindPlayer {
+		return 0
+	}
+	luck := int64(state.unit.GetAttribute().GetLuck().GetBaseLuck())
+	if luck < 1 {
+		return 1
+	}
+	if luck > 5 {
+		return 5
+	}
+	return luck
+}
+
+// combatPlayerUnarmedAttackSegmentCountForRoll复刻8.5无武器玩家的段数阈值.
+// 4不属于任何区间; 最高区间直接使用第二次RAND(5,10)已经锁定的结果.
+func combatPlayerUnarmedAttackSegmentCountForRoll(level uint32, baseLuck int64, roll int64, rareSegmentCount uint32) uint32 {
+	if level < 10 {
+		return 1
+	}
+	if baseLuck < 1 {
+		baseLuck = 1
+	} else if baseLuck > 5 {
+		baseLuck = 5
+	}
+	luckWork := baseLuck * 5
+	switch {
+	case roll <= 10+luckWork:
+		return rareSegmentCount
+	case roll <= 30+luckWork:
+		return 3
+	case roll <= 70+luckWork:
+		return 2
+	default:
+		return 1
+	}
+}
+
+// combatPlayerUnarmedAttackSegmentCount只把明确存在的完整装备快照且武器槽为空
+// 识别为真正空手. nil装备表示快照缺失, 不能擅自当成未装备武器.
+func (r *CombatRoom) combatPlayerUnarmedAttackSegmentCount(action *combatAction) uint32 {
+	if r == nil || r.random == nil || action == nil {
+		return 1
+	}
+	attacker := r.stateByKey(action.unitKey)
+	if attacker == nil || combatKind(attacker.unit) != combatUnitKindPlayer ||
+		attacker.unit.GetEquipment() == nil || attacker.unit.GetEquipment().GetWeapon() != nil {
+		return 1
+	}
+	level := attacker.unit.GetAttribute().GetLevel()
+	if level < 10 {
+		return 1
+	}
+	baseLuck := combatBaseLuck(attacker)
+	roll := r.random.rangeInt(1, 1000)
+	rareSegmentCount := uint32(5)
+	if roll <= 10+baseLuck*5 {
+		rareSegmentCount = uint32(r.random.rangeInt(5, 10))
+	}
+	return combatPlayerUnarmedAttackSegmentCountForRoll(level, baseLuck, roll, rareSegmentCount)
 }
 
 func combatPosition(unit *pb.CombatUnit) *pb.CombatPosition {
@@ -1018,9 +1081,9 @@ func combatCounterBase(attacker *combatUnitRuntimeState, defender *combatUnitRun
 // 返回的inclusive说明最终随机比较是否包含相等边界:
 // 玩家使用RAND < threshold, 玩家宠物和敌人使用RAND <= threshold.
 //
-// 当前生产战斗快照没有武器类型, 所以玩家双方都按8.5“未装备武器”分支映射为
-// ITEM_FIST, CounterTbl的拳对拳系数固定为9. 投掷武器禁止反击和其他武器相性
-// 必须等装备类型进入运行态后开发, 不能根据技能ID或equipment_id猜测武器类型.
+// 当前生产战斗快照能区分武器槽是否为空, 但item配置尚未提供8.5武器类型.
+// 因此反击仍统一按ITEM_FIST处理, CounterTbl的拳对拳系数固定为9. 投掷武器
+// 禁止反击和其他武器相性必须等装备类型进入运行态后开发, 不能根据技能ID或asset_id猜测.
 //
 // _SUIT_ADDENDUM在8.5 version.h中启用, 因此玩家阈值保留counterModifier输入.
 func combatCounterThreshold(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState) (threshold float32, inclusive bool) {
@@ -1376,6 +1439,15 @@ func (r *CombatRoom) executeContinuationAttack(action *combatAction, events *[]*
 	// 普通ATTACK通过BATTLE_CounterCheck. 标记不改变合击分组, 因为分组已在
 	// 整回合实际执行前按原始专用命令完成.
 	action.promoteSpecialAttackCommand()
+	return r.executeAttackSegments(action, events)
+}
+
+// executeAttackSegments重复执行已经锁定段数的主动物理攻击. 普通空手攻击保持
+// action.kind为Attack, 因而不会进入ContinuationAttack的gDamageDiv伤害分摊.
+func (r *CombatRoom) executeAttackSegments(action *combatAction, events *[]*combatStepResult) combatAttackOutcome {
+	if action == nil || action.segmentCount == 0 {
+		return combatAttackOutcome{}
+	}
 	var lastOutcome combatAttackOutcome
 	for segmentIndex := uint32(1); segmentIndex <= action.segmentCount; segmentIndex++ {
 		attacker := r.stateByKey(action.unitKey)
@@ -2335,7 +2407,14 @@ func (r *CombatRoom) executeStandaloneAction(action *combatAction, actionByUnit 
 				return r.escapeSettlement(state.unit.GetCamp())
 			}
 		}
-	case action.isAttack() || action.isGuardBreak():
+	case action.isAttack():
+		action.segmentCount = r.combatPlayerUnarmedAttackSegmentCount(action)
+		firstEventIndex := len(*events)
+		outcome := r.executeAttackSegments(action, events)
+		if outcome.continueCounter && len(*events) > firstEventIndex {
+			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
+		}
+	case action.isGuardBreak():
 		outcome := r.executeSingleAttack(action, false, events)
 		if outcome.continueCounter && len(*events) > 0 {
 			r.executeCounterChain(action, outcome.defender, actionByUnit, events)

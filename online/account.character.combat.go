@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"server/common/gameconfig"
-	commonpet "server/common/pet"
 	pb "server/proto/pb"
 
 	xcontrol "github.com/75912001/xlib/control"
@@ -902,18 +901,23 @@ func (c *character) restartAutoEncounterTimer(gateway *Gateway) {
 				encounterErr = err
 				break
 			}
-			// 当前角色档案尚未接入已装备物品集合, 因此装备修正列表为空.
-			// 后续装备系统接入时, 每次从当前已装备物品配置解析修正值并传入聚合函数, 不持久化装备运气.
+			// 当前装备快照用于战斗中的空手判定和客户端展示. item配置尚未提供装备运气修正,
+			// 因此聚合列表仍为空; 后续接入时应从本次已装备物品解析, 不持久化装备运气.
 			luckSnapshot, err := newCombatLuckSnapshot(character.GetBase().GetLuckState().GetBaseLuck(), nil)
 			if err != nil {
 				encounterErr = fmt.Errorf("character luck invalid character:%d: %w", character.GetBase().GetUuid(), err)
 				break
+			}
+			equipmentSnapshot := &pb.CharacterEquipmentRecord{}
+			if equipment := character.GetEquipment(); equipment != nil {
+				equipmentSnapshot = proto.Clone(equipment).(*pb.CharacterEquipmentRecord)
 			}
 			characterUnit := &pb.CombatUnit{
 				Camp:        pb.CombatCamp_CombatCamp_Initiator,
 				Position:    initiatorCharacterPosition,
 				Key:         &pb.CombatUnitKey{Aid: p.aid, CharacterUuid: character.GetBase().GetUuid()},
 				CharacterId: uint32(character.GetBase().GetAssetId()),
+				Equipment:   equipmentSnapshot,
 				Attribute: &pb.CombatUnitAttribute{
 					Hp:      uint32(vitality*4 + strength + toughness + dexterity),
 					Attack:  uint32(maxUint64(1, strength+toughness/10+vitality/10+dexterity/20)),
@@ -972,10 +976,10 @@ func (c *character) restartAutoEncounterTimer(gateway *Gateway) {
 					CharacterId: uint32(character.GetBase().GetAssetId()),
 					PetId:       petAssetID,
 					Attribute: &pb.CombatUnitAttribute{
-						Hp:        commonpet.CalculateHP(rawVitality, rawStrength, rawToughness, rawDexterity),
-						Attack:    commonpet.CalculateAttack(rawVitality, rawStrength, rawToughness, rawDexterity),
-						Defense:   commonpet.CalculateDefense(rawVitality, rawStrength, rawToughness, rawDexterity),
-						Agility:   commonpet.CalculateAgility(rawDexterity),
+						Hp:        gameconfig.CalculatePetPanelHP(rawVitality, rawStrength, rawToughness, rawDexterity),
+						Attack:    gameconfig.CalculatePetPanelAttack(rawVitality, rawStrength, rawToughness, rawDexterity),
+						Defense:   gameconfig.CalculatePetPanelDefense(rawVitality, rawStrength, rawToughness, rawDexterity),
+						Agility:   gameconfig.CalculatePetPanelAgility(rawDexterity),
 						Loyalty:   battlePet.GetLoyalty(),
 						Elemental: combatPetElementalPoints(petEntry),
 						Level:     petLevel,

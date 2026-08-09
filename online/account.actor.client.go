@@ -39,6 +39,12 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	case pb.MsgID_CharacterSettingSetReq_CMD:
 		p.onCharacterSettingSetReq(gateway, pkt)
 		return
+	case pb.MsgID_CharacterAttributeAddReq_CMD:
+		p.onCharacterAttributeAddReq(gateway, pkt)
+		return
+	case pb.MsgID_CharacterAttributeResetReq_CMD:
+		p.onCharacterAttributeResetReq(gateway, pkt)
+		return
 	case pb.MsgID_PetCarryStatusSetReq_CMD:
 		p.onPetCarryStatusSetReq(gateway, pkt)
 		return
@@ -62,6 +68,15 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		return
 	case pb.MsgID_GMCommandReq_CMD:
 		p.onGMCommandReq(gateway, pkt)
+		return
+	case pb.MsgID_CharacterMailboxGetReq_CMD:
+		p.onCharacterMailboxGetReq(gateway, pkt)
+		return
+	case pb.MsgID_CharacterMailReadReq_CMD:
+		p.onCharacterMailReadReq(gateway, pkt)
+		return
+	case pb.MsgID_CharacterMailDeleteReq_CMD:
+		p.onCharacterMailDeleteReq(gateway, pkt)
 		return
 	case pb.MsgID_CombatAutoEncounterSetReq_CMD:
 		p.onAutoEncounterSetReq(gateway, pkt)
@@ -156,6 +171,16 @@ func (p *Account) sendCharacterItemChangedNotify(gateway *Gateway, characterUUID
 		changedItemCountMap[itemID] = count
 	}
 	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterItemChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterItemChangedNotify{CharacterUuid: characterUUID, ItemCountMap: changedItemCountMap})
+}
+
+func (p *Account) sendCharacterSystemMailNotify(gateway *Gateway, characterUUID uint64, mailRecord *pb.MailRecord) {
+	if characterUUID == 0 || mailRecord == nil {
+		return
+	}
+	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterSystemMailNotify_CMD), xerror.Success.Code(), &pb.CharacterSystemMailNotify{
+		CharacterUuid: characterUUID,
+		MailRecord:    proto.Clone(mailRecord).(*pb.MailRecord),
+	})
 }
 
 func (p *Account) onAccountRobotPingReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
