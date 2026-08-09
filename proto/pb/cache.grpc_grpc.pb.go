@@ -21,6 +21,10 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	CacheService_CacheSetAccountRecord_FullMethodName         = "/cache.CacheService/CacheSetAccountRecord"
 	CacheService_CacheGetAccountRecord_FullMethodName         = "/cache.CacheService/CacheGetAccountRecord"
+	CacheService_CacheGetCharacterMailbox_FullMethodName      = "/cache.CacheService/CacheGetCharacterMailbox"
+	CacheService_CacheAddSystemMail_FullMethodName            = "/cache.CacheService/CacheAddSystemMail"
+	CacheService_CacheMarkCharacterMailRead_FullMethodName    = "/cache.CacheService/CacheMarkCharacterMailRead"
+	CacheService_CacheDeleteCharacterMail_FullMethodName      = "/cache.CacheService/CacheDeleteCharacterMail"
 	CacheService_CacheSetAccountVerifyToken_FullMethodName    = "/cache.CacheService/CacheSetAccountVerifyToken"
 	CacheService_CacheUseAccountVerifyToken_FullMethodName    = "/cache.CacheService/CacheUseAccountVerifyToken"
 	CacheService_CacheGetAccountSession_FullMethodName        = "/cache.CacheService/CacheGetAccountSession"
@@ -39,6 +43,16 @@ type CacheServiceClient interface {
 	// 读取账号档案。
 	// 以 aid 做 RingHash 分片，返回当前 aid 对应的 AccountRecord。
 	CacheGetAccountRecord(ctx context.Context, in *CacheGetAccountRecordReq, opts ...grpc.CallOption) (*CacheGetAccountRecordRes, error)
+	// 读取角色完整邮箱并清理已过期邮件。
+	// 以 aid 做 RingHash 分片, character_uuid 必须属于该账号。
+	CacheGetCharacterMailbox(ctx context.Context, in *CacheGetCharacterMailboxReq, opts ...grpc.CallOption) (*CacheGetCharacterMailboxRes, error)
+	// 给角色增加一封系统邮件。
+	// 以 aid 做 RingHash 分片, 邮件 UUID 和时间由 Cache 生成。
+	CacheAddSystemMail(ctx context.Context, in *CacheAddSystemMailReq, opts ...grpc.CallOption) (*CacheAddSystemMailRes, error)
+	// 标记角色的一封邮件为已读。
+	CacheMarkCharacterMailRead(ctx context.Context, in *CacheMarkCharacterMailReadReq, opts ...grpc.CallOption) (*CacheMarkCharacterMailReadRes, error)
+	// 删除角色的一封邮件。
+	CacheDeleteCharacterMail(ctx context.Context, in *CacheDeleteCharacterMailReq, opts ...grpc.CallOption) (*CacheDeleteCharacterMailRes, error)
 	// 写入 accountVerifyToken。
 	// 以 account 做 RingHash 分片，accountVerifyToken 使用一次性 SETNX 语义，未消费前不覆盖。
 	CacheSetAccountVerifyToken(ctx context.Context, in *CacheSetAccountVerifyTokenReq, opts ...grpc.CallOption) (*CacheSetAccountVerifyTokenRes, error)
@@ -81,6 +95,46 @@ func (c *cacheServiceClient) CacheGetAccountRecord(ctx context.Context, in *Cach
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CacheGetAccountRecordRes)
 	err := c.cc.Invoke(ctx, CacheService_CacheGetAccountRecord_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cacheServiceClient) CacheGetCharacterMailbox(ctx context.Context, in *CacheGetCharacterMailboxReq, opts ...grpc.CallOption) (*CacheGetCharacterMailboxRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CacheGetCharacterMailboxRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheGetCharacterMailbox_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cacheServiceClient) CacheAddSystemMail(ctx context.Context, in *CacheAddSystemMailReq, opts ...grpc.CallOption) (*CacheAddSystemMailRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CacheAddSystemMailRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheAddSystemMail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cacheServiceClient) CacheMarkCharacterMailRead(ctx context.Context, in *CacheMarkCharacterMailReadReq, opts ...grpc.CallOption) (*CacheMarkCharacterMailReadRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CacheMarkCharacterMailReadRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheMarkCharacterMailRead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cacheServiceClient) CacheDeleteCharacterMail(ctx context.Context, in *CacheDeleteCharacterMailReq, opts ...grpc.CallOption) (*CacheDeleteCharacterMailRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CacheDeleteCharacterMailRes)
+	err := c.cc.Invoke(ctx, CacheService_CacheDeleteCharacterMail_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -157,6 +211,16 @@ type CacheServiceServer interface {
 	// 读取账号档案。
 	// 以 aid 做 RingHash 分片，返回当前 aid 对应的 AccountRecord。
 	CacheGetAccountRecord(context.Context, *CacheGetAccountRecordReq) (*CacheGetAccountRecordRes, error)
+	// 读取角色完整邮箱并清理已过期邮件。
+	// 以 aid 做 RingHash 分片, character_uuid 必须属于该账号。
+	CacheGetCharacterMailbox(context.Context, *CacheGetCharacterMailboxReq) (*CacheGetCharacterMailboxRes, error)
+	// 给角色增加一封系统邮件。
+	// 以 aid 做 RingHash 分片, 邮件 UUID 和时间由 Cache 生成。
+	CacheAddSystemMail(context.Context, *CacheAddSystemMailReq) (*CacheAddSystemMailRes, error)
+	// 标记角色的一封邮件为已读。
+	CacheMarkCharacterMailRead(context.Context, *CacheMarkCharacterMailReadReq) (*CacheMarkCharacterMailReadRes, error)
+	// 删除角色的一封邮件。
+	CacheDeleteCharacterMail(context.Context, *CacheDeleteCharacterMailReq) (*CacheDeleteCharacterMailRes, error)
 	// 写入 accountVerifyToken。
 	// 以 account 做 RingHash 分片，accountVerifyToken 使用一次性 SETNX 语义，未消费前不覆盖。
 	CacheSetAccountVerifyToken(context.Context, *CacheSetAccountVerifyTokenReq) (*CacheSetAccountVerifyTokenRes, error)
@@ -190,6 +254,18 @@ func (UnimplementedCacheServiceServer) CacheSetAccountRecord(context.Context, *C
 }
 func (UnimplementedCacheServiceServer) CacheGetAccountRecord(context.Context, *CacheGetAccountRecordReq) (*CacheGetAccountRecordRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method CacheGetAccountRecord not implemented")
+}
+func (UnimplementedCacheServiceServer) CacheGetCharacterMailbox(context.Context, *CacheGetCharacterMailboxReq) (*CacheGetCharacterMailboxRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheGetCharacterMailbox not implemented")
+}
+func (UnimplementedCacheServiceServer) CacheAddSystemMail(context.Context, *CacheAddSystemMailReq) (*CacheAddSystemMailRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheAddSystemMail not implemented")
+}
+func (UnimplementedCacheServiceServer) CacheMarkCharacterMailRead(context.Context, *CacheMarkCharacterMailReadReq) (*CacheMarkCharacterMailReadRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheMarkCharacterMailRead not implemented")
+}
+func (UnimplementedCacheServiceServer) CacheDeleteCharacterMail(context.Context, *CacheDeleteCharacterMailReq) (*CacheDeleteCharacterMailRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CacheDeleteCharacterMail not implemented")
 }
 func (UnimplementedCacheServiceServer) CacheSetAccountVerifyToken(context.Context, *CacheSetAccountVerifyTokenReq) (*CacheSetAccountVerifyTokenRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method CacheSetAccountVerifyToken not implemented")
@@ -262,6 +338,78 @@ func _CacheService_CacheGetAccountRecord_Handler(srv interface{}, ctx context.Co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CacheServiceServer).CacheGetAccountRecord(ctx, req.(*CacheGetAccountRecordReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CacheService_CacheGetCharacterMailbox_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheGetCharacterMailboxReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CacheServiceServer).CacheGetCharacterMailbox(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CacheService_CacheGetCharacterMailbox_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CacheServiceServer).CacheGetCharacterMailbox(ctx, req.(*CacheGetCharacterMailboxReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CacheService_CacheAddSystemMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheAddSystemMailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CacheServiceServer).CacheAddSystemMail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CacheService_CacheAddSystemMail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CacheServiceServer).CacheAddSystemMail(ctx, req.(*CacheAddSystemMailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CacheService_CacheMarkCharacterMailRead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheMarkCharacterMailReadReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CacheServiceServer).CacheMarkCharacterMailRead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CacheService_CacheMarkCharacterMailRead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CacheServiceServer).CacheMarkCharacterMailRead(ctx, req.(*CacheMarkCharacterMailReadReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CacheService_CacheDeleteCharacterMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheDeleteCharacterMailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CacheServiceServer).CacheDeleteCharacterMail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CacheService_CacheDeleteCharacterMail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CacheServiceServer).CacheDeleteCharacterMail(ctx, req.(*CacheDeleteCharacterMailReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -388,6 +536,22 @@ var CacheService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CacheGetAccountRecord",
 			Handler:    _CacheService_CacheGetAccountRecord_Handler,
+		},
+		{
+			MethodName: "CacheGetCharacterMailbox",
+			Handler:    _CacheService_CacheGetCharacterMailbox_Handler,
+		},
+		{
+			MethodName: "CacheAddSystemMail",
+			Handler:    _CacheService_CacheAddSystemMail_Handler,
+		},
+		{
+			MethodName: "CacheMarkCharacterMailRead",
+			Handler:    _CacheService_CacheMarkCharacterMailRead_Handler,
+		},
+		{
+			MethodName: "CacheDeleteCharacterMail",
+			Handler:    _CacheService_CacheDeleteCharacterMail_Handler,
 		},
 		{
 			MethodName: "CacheSetAccountVerifyToken",

@@ -7,6 +7,7 @@ package pb
 
 import (
 	context "context"
+	config "github.com/75912001/xlib/config"
 	control "github.com/75912001/xlib/control"
 	error1 "github.com/75912001/xlib/error"
 	interceptor "github.com/75912001/xlib/grpc/proto/interceptor"
@@ -85,15 +86,19 @@ func (p *XOnlineService) Stop() error {
 }
 
 func (p *XOnlineService) dial(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-	opts = []grpc.DialOption{
+	opts = append([]grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
 		grpc.WithTimeout(util.ConnectTimeoutDurationDefault),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(config.GConfigMgr.Grpc.GetMaxReceiveMessageBytes()),
+			grpc.MaxCallSendMsgSize(config.GConfigMgr.Grpc.GetMaxSendMessageBytes()),
+		),
 		grpc.WithChainUnaryInterceptor(
 			interceptor.TimeOutClientInterceptor(),
 			interceptor.TraceClientInterceptor(),
 		),
-	}
+	}, opts...)
 	conn, err := grpc.Dial(target, opts...)
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())

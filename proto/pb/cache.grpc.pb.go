@@ -208,6 +208,428 @@ func (x *CacheGetAccountRecordRes) GetAccountRecord() *AccountRecord {
 	return nil
 }
 
+type CacheGetCharacterMailboxReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Aid           uint64 `protobuf:"varint,1,opt,name=aid,proto3" json:"aid,omitempty"`                                          // 邮箱所属账号 aid
+	CharacterUuid uint64 `protobuf:"varint,2,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"` // 必须属于 aid 的角色 UUID
+}
+
+func (x *CacheGetCharacterMailboxReq) Reset() {
+	*x = CacheGetCharacterMailboxReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cache_grpc_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CacheGetCharacterMailboxReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CacheGetCharacterMailboxReq) ProtoMessage() {}
+
+func (x *CacheGetCharacterMailboxReq) ProtoReflect() protoreflect.Message {
+	mi := &file_cache_grpc_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CacheGetCharacterMailboxReq.ProtoReflect.Descriptor instead.
+func (*CacheGetCharacterMailboxReq) Descriptor() ([]byte, []int) {
+	return file_cache_grpc_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CacheGetCharacterMailboxReq) GetAid() uint64 {
+	if x != nil {
+		return x.Aid
+	}
+	return 0
+}
+
+func (x *CacheGetCharacterMailboxReq) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
+type CacheGetCharacterMailboxRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	MailboxRecord *MailboxRecord `protobuf:"bytes,1,opt,name=mailbox_record,json=mailboxRecord,proto3" json:"mailbox_record,omitempty"` // 清理过期邮件后的完整邮箱快照
+}
+
+func (x *CacheGetCharacterMailboxRes) Reset() {
+	*x = CacheGetCharacterMailboxRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cache_grpc_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CacheGetCharacterMailboxRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CacheGetCharacterMailboxRes) ProtoMessage() {}
+
+func (x *CacheGetCharacterMailboxRes) ProtoReflect() protoreflect.Message {
+	mi := &file_cache_grpc_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CacheGetCharacterMailboxRes.ProtoReflect.Descriptor instead.
+func (*CacheGetCharacterMailboxRes) Descriptor() ([]byte, []int) {
+	return file_cache_grpc_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *CacheGetCharacterMailboxRes) GetMailboxRecord() *MailboxRecord {
+	if x != nil {
+		return x.MailboxRecord
+	}
+	return nil
+}
+
+type CacheAddSystemMailReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Aid           uint64 `protobuf:"varint,1,opt,name=aid,proto3" json:"aid,omitempty"`                                          // 收件角色所属账号 aid
+	CharacterUuid uint64 `protobuf:"varint,2,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"` // 必须属于 aid 的角色 UUID
+	Title         string `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`                                       // 系统邮件纯文本主题
+	Content       string `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`                                   // 系统邮件纯文本正文
+}
+
+func (x *CacheAddSystemMailReq) Reset() {
+	*x = CacheAddSystemMailReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cache_grpc_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CacheAddSystemMailReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CacheAddSystemMailReq) ProtoMessage() {}
+
+func (x *CacheAddSystemMailReq) ProtoReflect() protoreflect.Message {
+	mi := &file_cache_grpc_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CacheAddSystemMailReq.ProtoReflect.Descriptor instead.
+func (*CacheAddSystemMailReq) Descriptor() ([]byte, []int) {
+	return file_cache_grpc_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *CacheAddSystemMailReq) GetAid() uint64 {
+	if x != nil {
+		return x.Aid
+	}
+	return 0
+}
+
+func (x *CacheAddSystemMailReq) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
+func (x *CacheAddSystemMailReq) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *CacheAddSystemMailReq) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+type CacheAddSystemMailRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	MailRecord *MailRecord `protobuf:"bytes,1,opt,name=mail_record,json=mailRecord,proto3" json:"mail_record,omitempty"` // 已持久化的新系统邮件
+}
+
+func (x *CacheAddSystemMailRes) Reset() {
+	*x = CacheAddSystemMailRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cache_grpc_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CacheAddSystemMailRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CacheAddSystemMailRes) ProtoMessage() {}
+
+func (x *CacheAddSystemMailRes) ProtoReflect() protoreflect.Message {
+	mi := &file_cache_grpc_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CacheAddSystemMailRes.ProtoReflect.Descriptor instead.
+func (*CacheAddSystemMailRes) Descriptor() ([]byte, []int) {
+	return file_cache_grpc_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *CacheAddSystemMailRes) GetMailRecord() *MailRecord {
+	if x != nil {
+		return x.MailRecord
+	}
+	return nil
+}
+
+type CacheMarkCharacterMailReadReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Aid           uint64 `protobuf:"varint,1,opt,name=aid,proto3" json:"aid,omitempty"`                                          // 邮件所属账号 aid
+	CharacterUuid uint64 `protobuf:"varint,2,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"` // 必须属于 aid 的角色 UUID
+	MailUuid      uint64 `protobuf:"varint,3,opt,name=mail_uuid,json=mailUuid,proto3" json:"mail_uuid,omitempty"`                // 要标记为已读的邮件 UUID
+}
+
+func (x *CacheMarkCharacterMailReadReq) Reset() {
+	*x = CacheMarkCharacterMailReadReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cache_grpc_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CacheMarkCharacterMailReadReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CacheMarkCharacterMailReadReq) ProtoMessage() {}
+
+func (x *CacheMarkCharacterMailReadReq) ProtoReflect() protoreflect.Message {
+	mi := &file_cache_grpc_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CacheMarkCharacterMailReadReq.ProtoReflect.Descriptor instead.
+func (*CacheMarkCharacterMailReadReq) Descriptor() ([]byte, []int) {
+	return file_cache_grpc_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *CacheMarkCharacterMailReadReq) GetAid() uint64 {
+	if x != nil {
+		return x.Aid
+	}
+	return 0
+}
+
+func (x *CacheMarkCharacterMailReadReq) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
+func (x *CacheMarkCharacterMailReadReq) GetMailUuid() uint64 {
+	if x != nil {
+		return x.MailUuid
+	}
+	return 0
+}
+
+type CacheMarkCharacterMailReadRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *CacheMarkCharacterMailReadRes) Reset() {
+	*x = CacheMarkCharacterMailReadRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cache_grpc_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CacheMarkCharacterMailReadRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CacheMarkCharacterMailReadRes) ProtoMessage() {}
+
+func (x *CacheMarkCharacterMailReadRes) ProtoReflect() protoreflect.Message {
+	mi := &file_cache_grpc_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CacheMarkCharacterMailReadRes.ProtoReflect.Descriptor instead.
+func (*CacheMarkCharacterMailReadRes) Descriptor() ([]byte, []int) {
+	return file_cache_grpc_proto_rawDescGZIP(), []int{9}
+}
+
+type CacheDeleteCharacterMailReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Aid           uint64 `protobuf:"varint,1,opt,name=aid,proto3" json:"aid,omitempty"`                                          // 邮件所属账号 aid
+	CharacterUuid uint64 `protobuf:"varint,2,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"` // 必须属于 aid 的角色 UUID
+	MailUuid      uint64 `protobuf:"varint,3,opt,name=mail_uuid,json=mailUuid,proto3" json:"mail_uuid,omitempty"`                // 要删除的邮件 UUID
+}
+
+func (x *CacheDeleteCharacterMailReq) Reset() {
+	*x = CacheDeleteCharacterMailReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cache_grpc_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CacheDeleteCharacterMailReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CacheDeleteCharacterMailReq) ProtoMessage() {}
+
+func (x *CacheDeleteCharacterMailReq) ProtoReflect() protoreflect.Message {
+	mi := &file_cache_grpc_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CacheDeleteCharacterMailReq.ProtoReflect.Descriptor instead.
+func (*CacheDeleteCharacterMailReq) Descriptor() ([]byte, []int) {
+	return file_cache_grpc_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CacheDeleteCharacterMailReq) GetAid() uint64 {
+	if x != nil {
+		return x.Aid
+	}
+	return 0
+}
+
+func (x *CacheDeleteCharacterMailReq) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
+func (x *CacheDeleteCharacterMailReq) GetMailUuid() uint64 {
+	if x != nil {
+		return x.MailUuid
+	}
+	return 0
+}
+
+type CacheDeleteCharacterMailRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *CacheDeleteCharacterMailRes) Reset() {
+	*x = CacheDeleteCharacterMailRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cache_grpc_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CacheDeleteCharacterMailRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CacheDeleteCharacterMailRes) ProtoMessage() {}
+
+func (x *CacheDeleteCharacterMailRes) ProtoReflect() protoreflect.Message {
+	mi := &file_cache_grpc_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CacheDeleteCharacterMailRes.ProtoReflect.Descriptor instead.
+func (*CacheDeleteCharacterMailRes) Descriptor() ([]byte, []int) {
+	return file_cache_grpc_proto_rawDescGZIP(), []int{11}
+}
+
 type CacheSetAccountVerifyTokenReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -221,7 +643,7 @@ type CacheSetAccountVerifyTokenReq struct {
 func (x *CacheSetAccountVerifyTokenReq) Reset() {
 	*x = CacheSetAccountVerifyTokenReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[4]
+		mi := &file_cache_grpc_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -234,7 +656,7 @@ func (x *CacheSetAccountVerifyTokenReq) String() string {
 func (*CacheSetAccountVerifyTokenReq) ProtoMessage() {}
 
 func (x *CacheSetAccountVerifyTokenReq) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[4]
+	mi := &file_cache_grpc_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -247,7 +669,7 @@ func (x *CacheSetAccountVerifyTokenReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheSetAccountVerifyTokenReq.ProtoReflect.Descriptor instead.
 func (*CacheSetAccountVerifyTokenReq) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{4}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *CacheSetAccountVerifyTokenReq) GetAccount() string {
@@ -280,7 +702,7 @@ type CacheSetAccountVerifyTokenRes struct {
 func (x *CacheSetAccountVerifyTokenRes) Reset() {
 	*x = CacheSetAccountVerifyTokenRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[5]
+		mi := &file_cache_grpc_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -293,7 +715,7 @@ func (x *CacheSetAccountVerifyTokenRes) String() string {
 func (*CacheSetAccountVerifyTokenRes) ProtoMessage() {}
 
 func (x *CacheSetAccountVerifyTokenRes) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[5]
+	mi := &file_cache_grpc_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -306,7 +728,7 @@ func (x *CacheSetAccountVerifyTokenRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheSetAccountVerifyTokenRes.ProtoReflect.Descriptor instead.
 func (*CacheSetAccountVerifyTokenRes) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{5}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{13}
 }
 
 type CacheUseAccountVerifyTokenReq struct {
@@ -321,7 +743,7 @@ type CacheUseAccountVerifyTokenReq struct {
 func (x *CacheUseAccountVerifyTokenReq) Reset() {
 	*x = CacheUseAccountVerifyTokenReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[6]
+		mi := &file_cache_grpc_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -334,7 +756,7 @@ func (x *CacheUseAccountVerifyTokenReq) String() string {
 func (*CacheUseAccountVerifyTokenReq) ProtoMessage() {}
 
 func (x *CacheUseAccountVerifyTokenReq) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[6]
+	mi := &file_cache_grpc_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -347,7 +769,7 @@ func (x *CacheUseAccountVerifyTokenReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheUseAccountVerifyTokenReq.ProtoReflect.Descriptor instead.
 func (*CacheUseAccountVerifyTokenReq) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{6}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *CacheUseAccountVerifyTokenReq) GetAccount() string {
@@ -375,7 +797,7 @@ type CacheUseAccountVerifyTokenRes struct {
 func (x *CacheUseAccountVerifyTokenRes) Reset() {
 	*x = CacheUseAccountVerifyTokenRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[7]
+		mi := &file_cache_grpc_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -388,7 +810,7 @@ func (x *CacheUseAccountVerifyTokenRes) String() string {
 func (*CacheUseAccountVerifyTokenRes) ProtoMessage() {}
 
 func (x *CacheUseAccountVerifyTokenRes) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[7]
+	mi := &file_cache_grpc_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -401,7 +823,7 @@ func (x *CacheUseAccountVerifyTokenRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheUseAccountVerifyTokenRes.ProtoReflect.Descriptor instead.
 func (*CacheUseAccountVerifyTokenRes) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{7}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *CacheUseAccountVerifyTokenRes) GetAid() uint64 {
@@ -425,7 +847,7 @@ type CacheAccountSession struct {
 func (x *CacheAccountSession) Reset() {
 	*x = CacheAccountSession{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[8]
+		mi := &file_cache_grpc_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -438,7 +860,7 @@ func (x *CacheAccountSession) String() string {
 func (*CacheAccountSession) ProtoMessage() {}
 
 func (x *CacheAccountSession) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[8]
+	mi := &file_cache_grpc_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -451,7 +873,7 @@ func (x *CacheAccountSession) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheAccountSession.ProtoReflect.Descriptor instead.
 func (*CacheAccountSession) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{8}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *CacheAccountSession) GetGatewayKey() string {
@@ -493,7 +915,7 @@ type CacheGetAccountSessionReq struct {
 func (x *CacheGetAccountSessionReq) Reset() {
 	*x = CacheGetAccountSessionReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[9]
+		mi := &file_cache_grpc_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -506,7 +928,7 @@ func (x *CacheGetAccountSessionReq) String() string {
 func (*CacheGetAccountSessionReq) ProtoMessage() {}
 
 func (x *CacheGetAccountSessionReq) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[9]
+	mi := &file_cache_grpc_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -519,7 +941,7 @@ func (x *CacheGetAccountSessionReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheGetAccountSessionReq.ProtoReflect.Descriptor instead.
 func (*CacheGetAccountSessionReq) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{9}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *CacheGetAccountSessionReq) GetAid() uint64 {
@@ -540,7 +962,7 @@ type CacheGetAccountSessionRes struct {
 func (x *CacheGetAccountSessionRes) Reset() {
 	*x = CacheGetAccountSessionRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[10]
+		mi := &file_cache_grpc_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -553,7 +975,7 @@ func (x *CacheGetAccountSessionRes) String() string {
 func (*CacheGetAccountSessionRes) ProtoMessage() {}
 
 func (x *CacheGetAccountSessionRes) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[10]
+	mi := &file_cache_grpc_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -566,7 +988,7 @@ func (x *CacheGetAccountSessionRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheGetAccountSessionRes.ProtoReflect.Descriptor instead.
 func (*CacheGetAccountSessionRes) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{10}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *CacheGetAccountSessionRes) GetSession() *CacheAccountSession {
@@ -602,7 +1024,7 @@ type CacheBeginAccountSessionCASReq struct {
 func (x *CacheBeginAccountSessionCASReq) Reset() {
 	*x = CacheBeginAccountSessionCASReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[11]
+		mi := &file_cache_grpc_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -615,7 +1037,7 @@ func (x *CacheBeginAccountSessionCASReq) String() string {
 func (*CacheBeginAccountSessionCASReq) ProtoMessage() {}
 
 func (x *CacheBeginAccountSessionCASReq) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[11]
+	mi := &file_cache_grpc_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -628,7 +1050,7 @@ func (x *CacheBeginAccountSessionCASReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheBeginAccountSessionCASReq.ProtoReflect.Descriptor instead.
 func (*CacheBeginAccountSessionCASReq) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{11}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *CacheBeginAccountSessionCASReq) GetAid() uint64 {
@@ -689,7 +1111,7 @@ type CacheBeginAccountSessionCASRes struct {
 func (x *CacheBeginAccountSessionCASRes) Reset() {
 	*x = CacheBeginAccountSessionCASRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[12]
+		mi := &file_cache_grpc_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -702,7 +1124,7 @@ func (x *CacheBeginAccountSessionCASRes) String() string {
 func (*CacheBeginAccountSessionCASRes) ProtoMessage() {}
 
 func (x *CacheBeginAccountSessionCASRes) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[12]
+	mi := &file_cache_grpc_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -715,7 +1137,7 @@ func (x *CacheBeginAccountSessionCASRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheBeginAccountSessionCASRes.ProtoReflect.Descriptor instead.
 func (*CacheBeginAccountSessionCASRes) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{12}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{20}
 }
 
 type CacheEndAccountSessionCASReq struct {
@@ -730,7 +1152,7 @@ type CacheEndAccountSessionCASReq struct {
 func (x *CacheEndAccountSessionCASReq) Reset() {
 	*x = CacheEndAccountSessionCASReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[13]
+		mi := &file_cache_grpc_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -743,7 +1165,7 @@ func (x *CacheEndAccountSessionCASReq) String() string {
 func (*CacheEndAccountSessionCASReq) ProtoMessage() {}
 
 func (x *CacheEndAccountSessionCASReq) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[13]
+	mi := &file_cache_grpc_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -756,7 +1178,7 @@ func (x *CacheEndAccountSessionCASReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheEndAccountSessionCASReq.ProtoReflect.Descriptor instead.
 func (*CacheEndAccountSessionCASReq) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{13}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *CacheEndAccountSessionCASReq) GetAid() uint64 {
@@ -782,7 +1204,7 @@ type CacheEndAccountSessionCASRes struct {
 func (x *CacheEndAccountSessionCASRes) Reset() {
 	*x = CacheEndAccountSessionCASRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[14]
+		mi := &file_cache_grpc_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -795,7 +1217,7 @@ func (x *CacheEndAccountSessionCASRes) String() string {
 func (*CacheEndAccountSessionCASRes) ProtoMessage() {}
 
 func (x *CacheEndAccountSessionCASRes) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[14]
+	mi := &file_cache_grpc_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -808,7 +1230,7 @@ func (x *CacheEndAccountSessionCASRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheEndAccountSessionCASRes.ProtoReflect.Descriptor instead.
 func (*CacheEndAccountSessionCASRes) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{14}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{22}
 }
 
 type CacheRefreshAccountSessionCASReq struct {
@@ -824,7 +1246,7 @@ type CacheRefreshAccountSessionCASReq struct {
 func (x *CacheRefreshAccountSessionCASReq) Reset() {
 	*x = CacheRefreshAccountSessionCASReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[15]
+		mi := &file_cache_grpc_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -837,7 +1259,7 @@ func (x *CacheRefreshAccountSessionCASReq) String() string {
 func (*CacheRefreshAccountSessionCASReq) ProtoMessage() {}
 
 func (x *CacheRefreshAccountSessionCASReq) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[15]
+	mi := &file_cache_grpc_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -850,7 +1272,7 @@ func (x *CacheRefreshAccountSessionCASReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheRefreshAccountSessionCASReq.ProtoReflect.Descriptor instead.
 func (*CacheRefreshAccountSessionCASReq) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{15}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *CacheRefreshAccountSessionCASReq) GetAid() uint64 {
@@ -883,7 +1305,7 @@ type CacheRefreshAccountSessionCASRes struct {
 func (x *CacheRefreshAccountSessionCASRes) Reset() {
 	*x = CacheRefreshAccountSessionCASRes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cache_grpc_proto_msgTypes[16]
+		mi := &file_cache_grpc_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -896,7 +1318,7 @@ func (x *CacheRefreshAccountSessionCASRes) String() string {
 func (*CacheRefreshAccountSessionCASRes) ProtoMessage() {}
 
 func (x *CacheRefreshAccountSessionCASRes) ProtoReflect() protoreflect.Message {
-	mi := &file_cache_grpc_proto_msgTypes[16]
+	mi := &file_cache_grpc_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -909,7 +1331,7 @@ func (x *CacheRefreshAccountSessionCASRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheRefreshAccountSessionCASRes.ProtoReflect.Descriptor instead.
 func (*CacheRefreshAccountSessionCASRes) Descriptor() ([]byte, []int) {
-	return file_cache_grpc_proto_rawDescGZIP(), []int{16}
+	return file_cache_grpc_proto_rawDescGZIP(), []int{24}
 }
 
 var File_cache_grpc_proto protoreflect.FileDescriptor
@@ -918,7 +1340,8 @@ var file_cache_grpc_proto_rawDesc = []byte{
 	0x0a, 0x10, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x12, 0x05, 0x63, 0x61, 0x63, 0x68, 0x65, 0x1a, 0x0d, 0x6f, 0x70, 0x74, 0x69, 0x6f,
 	0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x11, 0x6d, 0x73, 0x67, 0x2e, 0x61, 0x63,
-	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x72, 0x0a, 0x18, 0x43,
+	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x0e, 0x6d, 0x73, 0x67,
+	0x2e, 0x6d, 0x61, 0x69, 0x6c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x72, 0x0a, 0x18, 0x43,
 	0x61, 0x63, 0x68, 0x65, 0x53, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65,
 	0x63, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x12, 0x17, 0x0a, 0x03, 0x61, 0x69, 0x64, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x04, 0x42, 0x05, 0xc2, 0x3e, 0x02, 0x50, 0x01, 0x52, 0x03, 0x61, 0x69, 0x64,
@@ -936,7 +1359,52 @@ var file_cache_grpc_proto_rawDesc = []byte{
 	0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x5f, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x2e, 0x41,
 	0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x0d, 0x61, 0x63,
-	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x22, 0x97, 0x01, 0x0a, 0x1d,
+	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x22, 0x5d, 0x0a, 0x1b, 0x43,
+	0x61, 0x63, 0x68, 0x65, 0x47, 0x65, 0x74, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72,
+	0x4d, 0x61, 0x69, 0x6c, 0x62, 0x6f, 0x78, 0x52, 0x65, 0x71, 0x12, 0x17, 0x0a, 0x03, 0x61, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x42, 0x05, 0xc2, 0x3e, 0x02, 0x50, 0x01, 0x52, 0x03,
+	0x61, 0x69, 0x64, 0x12, 0x25, 0x0a, 0x0e, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72,
+	0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0d, 0x63, 0x68, 0x61,
+	0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x55, 0x75, 0x69, 0x64, 0x22, 0x5c, 0x0a, 0x1b, 0x43, 0x61,
+	0x63, 0x68, 0x65, 0x47, 0x65, 0x74, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x4d,
+	0x61, 0x69, 0x6c, 0x62, 0x6f, 0x78, 0x52, 0x65, 0x73, 0x12, 0x3d, 0x0a, 0x0e, 0x6d, 0x61, 0x69,
+	0x6c, 0x62, 0x6f, 0x78, 0x5f, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x16, 0x2e, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x2e, 0x4d, 0x61, 0x69, 0x6c,
+	0x62, 0x6f, 0x78, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x0d, 0x6d, 0x61, 0x69, 0x6c, 0x62,
+	0x6f, 0x78, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x22, 0x87, 0x01, 0x0a, 0x15, 0x43, 0x61, 0x63,
+	0x68, 0x65, 0x41, 0x64, 0x64, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x4d, 0x61, 0x69, 0x6c, 0x52,
+	0x65, 0x71, 0x12, 0x17, 0x0a, 0x03, 0x61, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x42,
+	0x05, 0xc2, 0x3e, 0x02, 0x50, 0x01, 0x52, 0x03, 0x61, 0x69, 0x64, 0x12, 0x25, 0x0a, 0x0e, 0x63,
+	0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x04, 0x52, 0x0d, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x55, 0x75,
+	0x69, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74,
+	0x65, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65,
+	0x6e, 0x74, 0x22, 0x4d, 0x0a, 0x15, 0x43, 0x61, 0x63, 0x68, 0x65, 0x41, 0x64, 0x64, 0x53, 0x79,
+	0x73, 0x74, 0x65, 0x6d, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x73, 0x12, 0x34, 0x0a, 0x0b, 0x6d,
+	0x61, 0x69, 0x6c, 0x5f, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x13, 0x2e, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x2e, 0x4d, 0x61, 0x69, 0x6c, 0x52,
+	0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x0a, 0x6d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x63, 0x6f, 0x72,
+	0x64, 0x22, 0x7c, 0x0a, 0x1d, 0x43, 0x61, 0x63, 0x68, 0x65, 0x4d, 0x61, 0x72, 0x6b, 0x43, 0x68,
+	0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x61, 0x64, 0x52,
+	0x65, 0x71, 0x12, 0x17, 0x0a, 0x03, 0x61, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x42,
+	0x05, 0xc2, 0x3e, 0x02, 0x50, 0x01, 0x52, 0x03, 0x61, 0x69, 0x64, 0x12, 0x25, 0x0a, 0x0e, 0x63,
+	0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x04, 0x52, 0x0d, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x55, 0x75,
+	0x69, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x6d, 0x61, 0x69, 0x6c, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x08, 0x6d, 0x61, 0x69, 0x6c, 0x55, 0x75, 0x69, 0x64, 0x22,
+	0x1f, 0x0a, 0x1d, 0x43, 0x61, 0x63, 0x68, 0x65, 0x4d, 0x61, 0x72, 0x6b, 0x43, 0x68, 0x61, 0x72,
+	0x61, 0x63, 0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x61, 0x64, 0x52, 0x65, 0x73,
+	0x22, 0x7a, 0x0a, 0x1b, 0x43, 0x61, 0x63, 0x68, 0x65, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43,
+	0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x12,
+	0x17, 0x0a, 0x03, 0x61, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x42, 0x05, 0xc2, 0x3e,
+	0x02, 0x50, 0x01, 0x52, 0x03, 0x61, 0x69, 0x64, 0x12, 0x25, 0x0a, 0x0e, 0x63, 0x68, 0x61, 0x72,
+	0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04,
+	0x52, 0x0d, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x55, 0x75, 0x69, 0x64, 0x12,
+	0x1b, 0x0a, 0x09, 0x6d, 0x61, 0x69, 0x6c, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x04, 0x52, 0x08, 0x6d, 0x61, 0x69, 0x6c, 0x55, 0x75, 0x69, 0x64, 0x22, 0x1d, 0x0a, 0x1b,
+	0x43, 0x61, 0x63, 0x68, 0x65, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x68, 0x61, 0x72, 0x61,
+	0x63, 0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x73, 0x22, 0x97, 0x01, 0x0a, 0x1d,
 	0x43, 0x61, 0x63, 0x68, 0x65, 0x53, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x56,
 	0x65, 0x72, 0x69, 0x66, 0x79, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x12, 0x1f, 0x0a,
 	0x07, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x05,
@@ -1020,7 +1488,7 @@ var file_cache_grpc_proto_rawDesc = []byte{
 	0x65, 0x63, 0x6f, 0x6e, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0c, 0x65, 0x78, 0x70,
 	0x69, 0x72, 0x65, 0x53, 0x65, 0x63, 0x6f, 0x6e, 0x64, 0x22, 0x22, 0x0a, 0x20, 0x43, 0x61, 0x63,
 	0x68, 0x65, 0x52, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74,
-	0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x52, 0x65, 0x73, 0x32, 0xab, 0x07,
+	0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x52, 0x65, 0x73, 0x32, 0xe0, 0x0a,
 	0x0a, 0x0c, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x66,
 	0x0a, 0x15, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e,
 	0x74, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x12, 0x1f, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e,
@@ -1034,54 +1502,81 @@ var file_cache_grpc_proto_rawDesc = []byte{
 	0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71,
 	0x1a, 0x1f, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x47, 0x65,
 	0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x65,
-	0x73, 0x22, 0x0b, 0xc2, 0x3e, 0x08, 0x52, 0x03, 0x31, 0x30, 0x73, 0xf0, 0x01, 0x05, 0x12, 0x74,
-	0x0a, 0x1a, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e,
-	0x74, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x24, 0x2e, 0x63,
-	0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53, 0x65, 0x74, 0x41, 0x63, 0x63,
-	0x6f, 0x75, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52,
-	0x65, 0x71, 0x1a, 0x24, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65,
-	0x53, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79,
-	0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33,
-	0x73, 0xf0, 0x01, 0x01, 0x12, 0x74, 0x0a, 0x1a, 0x43, 0x61, 0x63, 0x68, 0x65, 0x55, 0x73, 0x65,
-	0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x54, 0x6f, 0x6b,
-	0x65, 0x6e, 0x12, 0x24, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65,
-	0x55, 0x73, 0x65, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79,
-	0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x1a, 0x24, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65,
-	0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x55, 0x73, 0x65, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74,
-	0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x22, 0x0a,
-	0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0, 0x01, 0x01, 0x12, 0x68, 0x0a, 0x16, 0x43, 0x61,
-	0x63, 0x68, 0x65, 0x47, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73,
-	0x73, 0x69, 0x6f, 0x6e, 0x12, 0x20, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63,
-	0x68, 0x65, 0x47, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73,
-	0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x1a, 0x20, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43,
-	0x61, 0x63, 0x68, 0x65, 0x47, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65,
-	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33,
-	0x73, 0xf0, 0x01, 0x05, 0x12, 0x77, 0x0a, 0x1b, 0x43, 0x61, 0x63, 0x68, 0x65, 0x42, 0x65, 0x67,
-	0x69, 0x6e, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e,
-	0x43, 0x41, 0x53, 0x12, 0x25, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68,
-	0x65, 0x42, 0x65, 0x67, 0x69, 0x6e, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73,
-	0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x52, 0x65, 0x71, 0x1a, 0x25, 0x2e, 0x63, 0x61, 0x63,
-	0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x42, 0x65, 0x67, 0x69, 0x6e, 0x41, 0x63, 0x63,
-	0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x52, 0x65,
-	0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0, 0x01, 0x05, 0x12, 0x71, 0x0a,
-	0x19, 0x43, 0x61, 0x63, 0x68, 0x65, 0x45, 0x6e, 0x64, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74,
-	0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x12, 0x23, 0x2e, 0x63, 0x61, 0x63,
-	0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x45, 0x6e, 0x64, 0x41, 0x63, 0x63, 0x6f, 0x75,
+	0x73, 0x22, 0x0b, 0xc2, 0x3e, 0x08, 0x52, 0x03, 0x31, 0x30, 0x73, 0xf0, 0x01, 0x05, 0x12, 0x6f,
+	0x0a, 0x18, 0x43, 0x61, 0x63, 0x68, 0x65, 0x47, 0x65, 0x74, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63,
+	0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x62, 0x6f, 0x78, 0x12, 0x22, 0x2e, 0x63, 0x61, 0x63,
+	0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x47, 0x65, 0x74, 0x43, 0x68, 0x61, 0x72, 0x61,
+	0x63, 0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x62, 0x6f, 0x78, 0x52, 0x65, 0x71, 0x1a, 0x22,
+	0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x47, 0x65, 0x74, 0x43,
+	0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x62, 0x6f, 0x78, 0x52,
+	0x65, 0x73, 0x22, 0x0b, 0xc2, 0x3e, 0x08, 0x52, 0x03, 0x31, 0x30, 0x73, 0xf0, 0x01, 0x05, 0x12,
+	0x5c, 0x0a, 0x12, 0x43, 0x61, 0x63, 0x68, 0x65, 0x41, 0x64, 0x64, 0x53, 0x79, 0x73, 0x74, 0x65,
+	0x6d, 0x4d, 0x61, 0x69, 0x6c, 0x12, 0x1c, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61,
+	0x63, 0x68, 0x65, 0x41, 0x64, 0x64, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x4d, 0x61, 0x69, 0x6c,
+	0x52, 0x65, 0x71, 0x1a, 0x1c, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68,
+	0x65, 0x41, 0x64, 0x64, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65,
+	0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0, 0x01, 0x05, 0x12, 0x74, 0x0a,
+	0x1a, 0x43, 0x61, 0x63, 0x68, 0x65, 0x4d, 0x61, 0x72, 0x6b, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63,
+	0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x61, 0x64, 0x12, 0x24, 0x2e, 0x63, 0x61,
+	0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x4d, 0x61, 0x72, 0x6b, 0x43, 0x68, 0x61,
+	0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x61, 0x64, 0x52, 0x65,
+	0x71, 0x1a, 0x24, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x4d,
+	0x61, 0x72, 0x6b, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c,
+	0x52, 0x65, 0x61, 0x64, 0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73,
+	0xf0, 0x01, 0x05, 0x12, 0x6e, 0x0a, 0x18, 0x43, 0x61, 0x63, 0x68, 0x65, 0x44, 0x65, 0x6c, 0x65,
+	0x74, 0x65, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x12,
+	0x22, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c,
+	0x52, 0x65, 0x71, 0x1a, 0x22, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68,
+	0x65, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72,
+	0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73,
+	0xf0, 0x01, 0x05, 0x12, 0x74, 0x0a, 0x1a, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53, 0x65, 0x74, 0x41,
+	0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x54, 0x6f, 0x6b, 0x65,
+	0x6e, 0x12, 0x24, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53,
+	0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x54,
+	0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x1a, 0x24, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e,
+	0x43, 0x61, 0x63, 0x68, 0x65, 0x53, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x56,
+	0x65, 0x72, 0x69, 0x66, 0x79, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2,
+	0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0, 0x01, 0x01, 0x12, 0x74, 0x0a, 0x1a, 0x43, 0x61, 0x63,
+	0x68, 0x65, 0x55, 0x73, 0x65, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x69,
+	0x66, 0x79, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x24, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e,
+	0x43, 0x61, 0x63, 0x68, 0x65, 0x55, 0x73, 0x65, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x56,
+	0x65, 0x72, 0x69, 0x66, 0x79, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x1a, 0x24, 0x2e,
+	0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x55, 0x73, 0x65, 0x41, 0x63,
+	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x69, 0x66, 0x79, 0x54, 0x6f, 0x6b, 0x65, 0x6e,
+	0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0, 0x01, 0x01, 0x12,
+	0x68, 0x0a, 0x16, 0x43, 0x61, 0x63, 0x68, 0x65, 0x47, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75,
+	0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x20, 0x2e, 0x63, 0x61, 0x63, 0x68,
+	0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x47, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e,
+	0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x1a, 0x20, 0x2e, 0x63, 0x61,
+	0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x47, 0x65, 0x74, 0x41, 0x63, 0x63, 0x6f,
+	0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2,
+	0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0, 0x01, 0x05, 0x12, 0x77, 0x0a, 0x1b, 0x43, 0x61, 0x63,
+	0x68, 0x65, 0x42, 0x65, 0x67, 0x69, 0x6e, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x12, 0x25, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65,
+	0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x42, 0x65, 0x67, 0x69, 0x6e, 0x41, 0x63, 0x63, 0x6f, 0x75,
 	0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x52, 0x65, 0x71, 0x1a,
+	0x25, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x42, 0x65, 0x67,
+	0x69, 0x6e, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e,
+	0x43, 0x41, 0x53, 0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0,
+	0x01, 0x05, 0x12, 0x71, 0x0a, 0x19, 0x43, 0x61, 0x63, 0x68, 0x65, 0x45, 0x6e, 0x64, 0x41, 0x63,
+	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x12,
 	0x23, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x45, 0x6e, 0x64,
 	0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41,
-	0x53, 0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0, 0x01, 0x05,
-	0x12, 0x7d, 0x0a, 0x1d, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68,
-	0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41,
-	0x53, 0x12, 0x27, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52,
-	0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73,
-	0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x52, 0x65, 0x71, 0x1a, 0x27, 0x2e, 0x63, 0x61, 0x63,
-	0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x41,
-	0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53,
-	0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xf0, 0x01, 0x05, 0x1a,
-	0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xa0, 0x01, 0x05, 0x42, 0x14, 0x5a, 0x12, 0x73,
-	0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70,
-	0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x53, 0x52, 0x65, 0x71, 0x1a, 0x23, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63,
+	0x68, 0x65, 0x45, 0x6e, 0x64, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73,
+	0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02,
+	0x33, 0x73, 0xf0, 0x01, 0x05, 0x12, 0x7d, 0x0a, 0x1d, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x65,
+	0x66, 0x72, 0x65, 0x73, 0x68, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73,
+	0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x12, 0x27, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43,
+	0x61, 0x63, 0x68, 0x65, 0x52, 0x65, 0x66, 0x72, 0x65, 0x73, 0x68, 0x41, 0x63, 0x63, 0x6f, 0x75,
+	0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x41, 0x53, 0x52, 0x65, 0x71, 0x1a,
+	0x27, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x65, 0x66,
+	0x72, 0x65, 0x73, 0x68, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69,
+	0x6f, 0x6e, 0x43, 0x41, 0x53, 0x52, 0x65, 0x73, 0x22, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33,
+	0x73, 0xf0, 0x01, 0x05, 0x1a, 0x0a, 0xc2, 0x3e, 0x07, 0x52, 0x02, 0x33, 0x73, 0xa0, 0x01, 0x05,
+	0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1096,52 +1591,72 @@ func file_cache_grpc_proto_rawDescGZIP() []byte {
 	return file_cache_grpc_proto_rawDescData
 }
 
-var file_cache_grpc_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_cache_grpc_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_cache_grpc_proto_goTypes = []any{
 	(*CacheSetAccountRecordReq)(nil),         // 0: cache.CacheSetAccountRecordReq
 	(*CacheSetAccountRecordRes)(nil),         // 1: cache.CacheSetAccountRecordRes
 	(*CacheGetAccountRecordReq)(nil),         // 2: cache.CacheGetAccountRecordReq
 	(*CacheGetAccountRecordRes)(nil),         // 3: cache.CacheGetAccountRecordRes
-	(*CacheSetAccountVerifyTokenReq)(nil),    // 4: cache.CacheSetAccountVerifyTokenReq
-	(*CacheSetAccountVerifyTokenRes)(nil),    // 5: cache.CacheSetAccountVerifyTokenRes
-	(*CacheUseAccountVerifyTokenReq)(nil),    // 6: cache.CacheUseAccountVerifyTokenReq
-	(*CacheUseAccountVerifyTokenRes)(nil),    // 7: cache.CacheUseAccountVerifyTokenRes
-	(*CacheAccountSession)(nil),              // 8: cache.CacheAccountSession
-	(*CacheGetAccountSessionReq)(nil),        // 9: cache.CacheGetAccountSessionReq
-	(*CacheGetAccountSessionRes)(nil),        // 10: cache.CacheGetAccountSessionRes
-	(*CacheBeginAccountSessionCASReq)(nil),   // 11: cache.CacheBeginAccountSessionCASReq
-	(*CacheBeginAccountSessionCASRes)(nil),   // 12: cache.CacheBeginAccountSessionCASRes
-	(*CacheEndAccountSessionCASReq)(nil),     // 13: cache.CacheEndAccountSessionCASReq
-	(*CacheEndAccountSessionCASRes)(nil),     // 14: cache.CacheEndAccountSessionCASRes
-	(*CacheRefreshAccountSessionCASReq)(nil), // 15: cache.CacheRefreshAccountSessionCASReq
-	(*CacheRefreshAccountSessionCASRes)(nil), // 16: cache.CacheRefreshAccountSessionCASRes
-	(*AccountRecord)(nil),                    // 17: account.AccountRecord
+	(*CacheGetCharacterMailboxReq)(nil),      // 4: cache.CacheGetCharacterMailboxReq
+	(*CacheGetCharacterMailboxRes)(nil),      // 5: cache.CacheGetCharacterMailboxRes
+	(*CacheAddSystemMailReq)(nil),            // 6: cache.CacheAddSystemMailReq
+	(*CacheAddSystemMailRes)(nil),            // 7: cache.CacheAddSystemMailRes
+	(*CacheMarkCharacterMailReadReq)(nil),    // 8: cache.CacheMarkCharacterMailReadReq
+	(*CacheMarkCharacterMailReadRes)(nil),    // 9: cache.CacheMarkCharacterMailReadRes
+	(*CacheDeleteCharacterMailReq)(nil),      // 10: cache.CacheDeleteCharacterMailReq
+	(*CacheDeleteCharacterMailRes)(nil),      // 11: cache.CacheDeleteCharacterMailRes
+	(*CacheSetAccountVerifyTokenReq)(nil),    // 12: cache.CacheSetAccountVerifyTokenReq
+	(*CacheSetAccountVerifyTokenRes)(nil),    // 13: cache.CacheSetAccountVerifyTokenRes
+	(*CacheUseAccountVerifyTokenReq)(nil),    // 14: cache.CacheUseAccountVerifyTokenReq
+	(*CacheUseAccountVerifyTokenRes)(nil),    // 15: cache.CacheUseAccountVerifyTokenRes
+	(*CacheAccountSession)(nil),              // 16: cache.CacheAccountSession
+	(*CacheGetAccountSessionReq)(nil),        // 17: cache.CacheGetAccountSessionReq
+	(*CacheGetAccountSessionRes)(nil),        // 18: cache.CacheGetAccountSessionRes
+	(*CacheBeginAccountSessionCASReq)(nil),   // 19: cache.CacheBeginAccountSessionCASReq
+	(*CacheBeginAccountSessionCASRes)(nil),   // 20: cache.CacheBeginAccountSessionCASRes
+	(*CacheEndAccountSessionCASReq)(nil),     // 21: cache.CacheEndAccountSessionCASReq
+	(*CacheEndAccountSessionCASRes)(nil),     // 22: cache.CacheEndAccountSessionCASRes
+	(*CacheRefreshAccountSessionCASReq)(nil), // 23: cache.CacheRefreshAccountSessionCASReq
+	(*CacheRefreshAccountSessionCASRes)(nil), // 24: cache.CacheRefreshAccountSessionCASRes
+	(*AccountRecord)(nil),                    // 25: account.AccountRecord
+	(*MailboxRecord)(nil),                    // 26: account.MailboxRecord
+	(*MailRecord)(nil),                       // 27: account.MailRecord
 }
 var file_cache_grpc_proto_depIdxs = []int32{
-	17, // 0: cache.CacheSetAccountRecordReq.account_record:type_name -> account.AccountRecord
-	17, // 1: cache.CacheGetAccountRecordRes.account_record:type_name -> account.AccountRecord
-	8,  // 2: cache.CacheGetAccountSessionRes.session:type_name -> cache.CacheAccountSession
-	0,  // 3: cache.CacheService.CacheSetAccountRecord:input_type -> cache.CacheSetAccountRecordReq
-	2,  // 4: cache.CacheService.CacheGetAccountRecord:input_type -> cache.CacheGetAccountRecordReq
-	4,  // 5: cache.CacheService.CacheSetAccountVerifyToken:input_type -> cache.CacheSetAccountVerifyTokenReq
-	6,  // 6: cache.CacheService.CacheUseAccountVerifyToken:input_type -> cache.CacheUseAccountVerifyTokenReq
-	9,  // 7: cache.CacheService.CacheGetAccountSession:input_type -> cache.CacheGetAccountSessionReq
-	11, // 8: cache.CacheService.CacheBeginAccountSessionCAS:input_type -> cache.CacheBeginAccountSessionCASReq
-	13, // 9: cache.CacheService.CacheEndAccountSessionCAS:input_type -> cache.CacheEndAccountSessionCASReq
-	15, // 10: cache.CacheService.CacheRefreshAccountSessionCAS:input_type -> cache.CacheRefreshAccountSessionCASReq
-	1,  // 11: cache.CacheService.CacheSetAccountRecord:output_type -> cache.CacheSetAccountRecordRes
-	3,  // 12: cache.CacheService.CacheGetAccountRecord:output_type -> cache.CacheGetAccountRecordRes
-	5,  // 13: cache.CacheService.CacheSetAccountVerifyToken:output_type -> cache.CacheSetAccountVerifyTokenRes
-	7,  // 14: cache.CacheService.CacheUseAccountVerifyToken:output_type -> cache.CacheUseAccountVerifyTokenRes
-	10, // 15: cache.CacheService.CacheGetAccountSession:output_type -> cache.CacheGetAccountSessionRes
-	12, // 16: cache.CacheService.CacheBeginAccountSessionCAS:output_type -> cache.CacheBeginAccountSessionCASRes
-	14, // 17: cache.CacheService.CacheEndAccountSessionCAS:output_type -> cache.CacheEndAccountSessionCASRes
-	16, // 18: cache.CacheService.CacheRefreshAccountSessionCAS:output_type -> cache.CacheRefreshAccountSessionCASRes
-	11, // [11:19] is the sub-list for method output_type
-	3,  // [3:11] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	25, // 0: cache.CacheSetAccountRecordReq.account_record:type_name -> account.AccountRecord
+	25, // 1: cache.CacheGetAccountRecordRes.account_record:type_name -> account.AccountRecord
+	26, // 2: cache.CacheGetCharacterMailboxRes.mailbox_record:type_name -> account.MailboxRecord
+	27, // 3: cache.CacheAddSystemMailRes.mail_record:type_name -> account.MailRecord
+	16, // 4: cache.CacheGetAccountSessionRes.session:type_name -> cache.CacheAccountSession
+	0,  // 5: cache.CacheService.CacheSetAccountRecord:input_type -> cache.CacheSetAccountRecordReq
+	2,  // 6: cache.CacheService.CacheGetAccountRecord:input_type -> cache.CacheGetAccountRecordReq
+	4,  // 7: cache.CacheService.CacheGetCharacterMailbox:input_type -> cache.CacheGetCharacterMailboxReq
+	6,  // 8: cache.CacheService.CacheAddSystemMail:input_type -> cache.CacheAddSystemMailReq
+	8,  // 9: cache.CacheService.CacheMarkCharacterMailRead:input_type -> cache.CacheMarkCharacterMailReadReq
+	10, // 10: cache.CacheService.CacheDeleteCharacterMail:input_type -> cache.CacheDeleteCharacterMailReq
+	12, // 11: cache.CacheService.CacheSetAccountVerifyToken:input_type -> cache.CacheSetAccountVerifyTokenReq
+	14, // 12: cache.CacheService.CacheUseAccountVerifyToken:input_type -> cache.CacheUseAccountVerifyTokenReq
+	17, // 13: cache.CacheService.CacheGetAccountSession:input_type -> cache.CacheGetAccountSessionReq
+	19, // 14: cache.CacheService.CacheBeginAccountSessionCAS:input_type -> cache.CacheBeginAccountSessionCASReq
+	21, // 15: cache.CacheService.CacheEndAccountSessionCAS:input_type -> cache.CacheEndAccountSessionCASReq
+	23, // 16: cache.CacheService.CacheRefreshAccountSessionCAS:input_type -> cache.CacheRefreshAccountSessionCASReq
+	1,  // 17: cache.CacheService.CacheSetAccountRecord:output_type -> cache.CacheSetAccountRecordRes
+	3,  // 18: cache.CacheService.CacheGetAccountRecord:output_type -> cache.CacheGetAccountRecordRes
+	5,  // 19: cache.CacheService.CacheGetCharacterMailbox:output_type -> cache.CacheGetCharacterMailboxRes
+	7,  // 20: cache.CacheService.CacheAddSystemMail:output_type -> cache.CacheAddSystemMailRes
+	9,  // 21: cache.CacheService.CacheMarkCharacterMailRead:output_type -> cache.CacheMarkCharacterMailReadRes
+	11, // 22: cache.CacheService.CacheDeleteCharacterMail:output_type -> cache.CacheDeleteCharacterMailRes
+	13, // 23: cache.CacheService.CacheSetAccountVerifyToken:output_type -> cache.CacheSetAccountVerifyTokenRes
+	15, // 24: cache.CacheService.CacheUseAccountVerifyToken:output_type -> cache.CacheUseAccountVerifyTokenRes
+	18, // 25: cache.CacheService.CacheGetAccountSession:output_type -> cache.CacheGetAccountSessionRes
+	20, // 26: cache.CacheService.CacheBeginAccountSessionCAS:output_type -> cache.CacheBeginAccountSessionCASRes
+	22, // 27: cache.CacheService.CacheEndAccountSessionCAS:output_type -> cache.CacheEndAccountSessionCASRes
+	24, // 28: cache.CacheService.CacheRefreshAccountSessionCAS:output_type -> cache.CacheRefreshAccountSessionCASRes
+	17, // [17:29] is the sub-list for method output_type
+	5,  // [5:17] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_cache_grpc_proto_init() }
@@ -1150,6 +1665,7 @@ func file_cache_grpc_proto_init() {
 		return
 	}
 	file_msg_account_proto_init()
+	file_msg_mail_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_cache_grpc_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*CacheSetAccountRecordReq); i {
@@ -1200,7 +1716,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[4].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheSetAccountVerifyTokenReq); i {
+			switch v := v.(*CacheGetCharacterMailboxReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1212,7 +1728,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[5].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheSetAccountVerifyTokenRes); i {
+			switch v := v.(*CacheGetCharacterMailboxRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1224,7 +1740,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[6].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheUseAccountVerifyTokenReq); i {
+			switch v := v.(*CacheAddSystemMailReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1236,7 +1752,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[7].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheUseAccountVerifyTokenRes); i {
+			switch v := v.(*CacheAddSystemMailRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1248,7 +1764,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[8].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheAccountSession); i {
+			switch v := v.(*CacheMarkCharacterMailReadReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1260,7 +1776,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[9].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheGetAccountSessionReq); i {
+			switch v := v.(*CacheMarkCharacterMailReadRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1272,7 +1788,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[10].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheGetAccountSessionRes); i {
+			switch v := v.(*CacheDeleteCharacterMailReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1284,7 +1800,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[11].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheBeginAccountSessionCASReq); i {
+			switch v := v.(*CacheDeleteCharacterMailRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1296,7 +1812,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[12].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheBeginAccountSessionCASRes); i {
+			switch v := v.(*CacheSetAccountVerifyTokenReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1308,7 +1824,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[13].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheEndAccountSessionCASReq); i {
+			switch v := v.(*CacheSetAccountVerifyTokenRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1320,7 +1836,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[14].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheEndAccountSessionCASRes); i {
+			switch v := v.(*CacheUseAccountVerifyTokenReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1332,7 +1848,7 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[15].Exporter = func(v any, i int) any {
-			switch v := v.(*CacheRefreshAccountSessionCASReq); i {
+			switch v := v.(*CacheUseAccountVerifyTokenRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1344,6 +1860,102 @@ func file_cache_grpc_proto_init() {
 			}
 		}
 		file_cache_grpc_proto_msgTypes[16].Exporter = func(v any, i int) any {
+			switch v := v.(*CacheAccountSession); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cache_grpc_proto_msgTypes[17].Exporter = func(v any, i int) any {
+			switch v := v.(*CacheGetAccountSessionReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cache_grpc_proto_msgTypes[18].Exporter = func(v any, i int) any {
+			switch v := v.(*CacheGetAccountSessionRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cache_grpc_proto_msgTypes[19].Exporter = func(v any, i int) any {
+			switch v := v.(*CacheBeginAccountSessionCASReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cache_grpc_proto_msgTypes[20].Exporter = func(v any, i int) any {
+			switch v := v.(*CacheBeginAccountSessionCASRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cache_grpc_proto_msgTypes[21].Exporter = func(v any, i int) any {
+			switch v := v.(*CacheEndAccountSessionCASReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cache_grpc_proto_msgTypes[22].Exporter = func(v any, i int) any {
+			switch v := v.(*CacheEndAccountSessionCASRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cache_grpc_proto_msgTypes[23].Exporter = func(v any, i int) any {
+			switch v := v.(*CacheRefreshAccountSessionCASReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cache_grpc_proto_msgTypes[24].Exporter = func(v any, i int) any {
 			switch v := v.(*CacheRefreshAccountSessionCASRes); i {
 			case 0:
 				return &v.state
@@ -1362,7 +1974,7 @@ func file_cache_grpc_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_cache_grpc_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   17,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

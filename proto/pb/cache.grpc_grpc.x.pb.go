@@ -7,6 +7,7 @@ package pb
 
 import (
 	context "context"
+	config "github.com/75912001/xlib/config"
 	control "github.com/75912001/xlib/control"
 	proto "github.com/75912001/xlib/grpc/proto"
 	interceptor "github.com/75912001/xlib/grpc/proto/interceptor"
@@ -67,15 +68,19 @@ func (p *XCacheService) Stop() error {
 }
 
 func (p *XCacheService) dial(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-	opts = []grpc.DialOption{
+	opts = append([]grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
 		grpc.WithTimeout(util.ConnectTimeoutDurationDefault),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(config.GConfigMgr.Grpc.GetMaxReceiveMessageBytes()),
+			grpc.MaxCallSendMsgSize(config.GConfigMgr.Grpc.GetMaxSendMessageBytes()),
+		),
 		grpc.WithChainUnaryInterceptor(
 			interceptor.TimeOutClientInterceptor(),
 			interceptor.TraceClientInterceptor(),
 		),
-	}
+	}, opts...)
 	conn, err := grpc.Dial(target, opts...)
 	if err != nil {
 		return nil, errors.WithMessage(err, runtime.Location())
@@ -141,6 +146,86 @@ func (p *XCacheServiceClient) CacheGetAccountRecord(ctx context.Context, in *Cac
 }
 
 func (x *CacheGetAccountRecordReq) Get_XShardKey() (uint64, error) {
+	return x.GetAid(), nil
+}
+
+func (p *XCacheServiceClient) CacheGetCharacterMailbox(ctx context.Context, in *CacheGetCharacterMailboxReq, opts ...grpc.CallOption) (*CacheGetCharacterMailboxRes, error) {
+	shardKeyValue, err := in.Get_XShardKey()
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	strValue := strconv.FormatUint(shardKeyValue, 10)
+
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheGetCharacterMailbox_FullMethodName, shardKeyValue)
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
+	x := NewCacheServiceClient(grpcConn)
+	return x.CacheGetCharacterMailbox(ctx, in, opts...)
+}
+
+func (x *CacheGetCharacterMailboxReq) Get_XShardKey() (uint64, error) {
+	return x.GetAid(), nil
+}
+
+func (p *XCacheServiceClient) CacheAddSystemMail(ctx context.Context, in *CacheAddSystemMailReq, opts ...grpc.CallOption) (*CacheAddSystemMailRes, error) {
+	shardKeyValue, err := in.Get_XShardKey()
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	strValue := strconv.FormatUint(shardKeyValue, 10)
+
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheAddSystemMail_FullMethodName, shardKeyValue)
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
+	x := NewCacheServiceClient(grpcConn)
+	return x.CacheAddSystemMail(ctx, in, opts...)
+}
+
+func (x *CacheAddSystemMailReq) Get_XShardKey() (uint64, error) {
+	return x.GetAid(), nil
+}
+
+func (p *XCacheServiceClient) CacheMarkCharacterMailRead(ctx context.Context, in *CacheMarkCharacterMailReadReq, opts ...grpc.CallOption) (*CacheMarkCharacterMailReadRes, error) {
+	shardKeyValue, err := in.Get_XShardKey()
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	strValue := strconv.FormatUint(shardKeyValue, 10)
+
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheMarkCharacterMailRead_FullMethodName, shardKeyValue)
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
+	x := NewCacheServiceClient(grpcConn)
+	return x.CacheMarkCharacterMailRead(ctx, in, opts...)
+}
+
+func (x *CacheMarkCharacterMailReadReq) Get_XShardKey() (uint64, error) {
+	return x.GetAid(), nil
+}
+
+func (p *XCacheServiceClient) CacheDeleteCharacterMail(ctx context.Context, in *CacheDeleteCharacterMailReq, opts ...grpc.CallOption) (*CacheDeleteCharacterMailRes, error) {
+	shardKeyValue, err := in.Get_XShardKey()
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	strValue := strconv.FormatUint(shardKeyValue, 10)
+
+	ctx, grpcConn, err := selector.Sel(ctx, CacheService_CacheDeleteCharacterMail_FullMethodName, shardKeyValue)
+	if err != nil {
+		return nil, errors.WithMessage(err, runtime.Location())
+	}
+	ctx = proto.SetFromOutgoingContext(ctx, proto.ShardKeyFieldNameDefault, strValue)
+	x := NewCacheServiceClient(grpcConn)
+	return x.CacheDeleteCharacterMail(ctx, in, opts...)
+}
+
+func (x *CacheDeleteCharacterMailReq) Get_XShardKey() (uint64, error) {
 	return x.GetAid(), nil
 }
 
@@ -307,6 +392,10 @@ func SetIStreamCacheServiceServer(streamServer IStreamCacheServiceServer) {
 type IUnaryCacheServiceServer interface {
 	CacheSetAccountRecord(ctx context.Context, req *CacheSetAccountRecordReq) (*CacheSetAccountRecordRes, error)
 	CacheGetAccountRecord(ctx context.Context, req *CacheGetAccountRecordReq) (*CacheGetAccountRecordRes, error)
+	CacheGetCharacterMailbox(ctx context.Context, req *CacheGetCharacterMailboxReq) (*CacheGetCharacterMailboxRes, error)
+	CacheAddSystemMail(ctx context.Context, req *CacheAddSystemMailReq) (*CacheAddSystemMailRes, error)
+	CacheMarkCharacterMailRead(ctx context.Context, req *CacheMarkCharacterMailReadReq) (*CacheMarkCharacterMailReadRes, error)
+	CacheDeleteCharacterMail(ctx context.Context, req *CacheDeleteCharacterMailReq) (*CacheDeleteCharacterMailRes, error)
 	CacheSetAccountVerifyToken(ctx context.Context, req *CacheSetAccountVerifyTokenReq) (*CacheSetAccountVerifyTokenRes, error)
 	CacheUseAccountVerifyToken(ctx context.Context, req *CacheUseAccountVerifyTokenReq) (*CacheUseAccountVerifyTokenRes, error)
 	CacheGetAccountSession(ctx context.Context, req *CacheGetAccountSessionReq) (*CacheGetAccountSessionRes, error)
@@ -327,6 +416,22 @@ func (p *XCacheServiceServer) CacheSetAccountRecord(ctx context.Context, req *Ca
 
 func (p *XCacheServiceServer) CacheGetAccountRecord(ctx context.Context, req *CacheGetAccountRecordReq) (*CacheGetAccountRecordRes, error) {
 	return iUnaryCacheServiceServer.CacheGetAccountRecord(ctx, req)
+}
+
+func (p *XCacheServiceServer) CacheGetCharacterMailbox(ctx context.Context, req *CacheGetCharacterMailboxReq) (*CacheGetCharacterMailboxRes, error) {
+	return iUnaryCacheServiceServer.CacheGetCharacterMailbox(ctx, req)
+}
+
+func (p *XCacheServiceServer) CacheAddSystemMail(ctx context.Context, req *CacheAddSystemMailReq) (*CacheAddSystemMailRes, error) {
+	return iUnaryCacheServiceServer.CacheAddSystemMail(ctx, req)
+}
+
+func (p *XCacheServiceServer) CacheMarkCharacterMailRead(ctx context.Context, req *CacheMarkCharacterMailReadReq) (*CacheMarkCharacterMailReadRes, error) {
+	return iUnaryCacheServiceServer.CacheMarkCharacterMailRead(ctx, req)
+}
+
+func (p *XCacheServiceServer) CacheDeleteCharacterMail(ctx context.Context, req *CacheDeleteCharacterMailReq) (*CacheDeleteCharacterMailRes, error) {
+	return iUnaryCacheServiceServer.CacheDeleteCharacterMail(ctx, req)
 }
 
 func (p *XCacheServiceServer) CacheSetAccountVerifyToken(ctx context.Context, req *CacheSetAccountVerifyTokenReq) (*CacheSetAccountVerifyTokenRes, error) {

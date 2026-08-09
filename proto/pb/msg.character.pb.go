@@ -105,6 +105,115 @@ func (CharacterAction) EnumDescriptor() ([]byte, []int) {
 	return file_msg_character_proto_rawDescGZIP(), []int{0}
 }
 
+// CharacterAttributeType 标识角色可消耗 available_point 提升的基础属性.
+type CharacterAttributeType int32
+
+const (
+	CharacterAttributeType_CharacterAttributeType_Unspecified CharacterAttributeType = 0 // 未指定属性, proto3 enum 默认值
+	CharacterAttributeType_CharacterAttributeType_Vitality    CharacterAttributeType = 1 // 体力
+	CharacterAttributeType_CharacterAttributeType_Strength    CharacterAttributeType = 2 // 腕力
+	CharacterAttributeType_CharacterAttributeType_Toughness   CharacterAttributeType = 3 // 耐力
+	CharacterAttributeType_CharacterAttributeType_Dexterity   CharacterAttributeType = 4 // 速度
+)
+
+// Enum value maps for CharacterAttributeType.
+var (
+	CharacterAttributeType_name = map[int32]string{
+		0: "CharacterAttributeType_Unspecified",
+		1: "CharacterAttributeType_Vitality",
+		2: "CharacterAttributeType_Strength",
+		3: "CharacterAttributeType_Toughness",
+		4: "CharacterAttributeType_Dexterity",
+	}
+	CharacterAttributeType_value = map[string]int32{
+		"CharacterAttributeType_Unspecified": 0,
+		"CharacterAttributeType_Vitality":    1,
+		"CharacterAttributeType_Strength":    2,
+		"CharacterAttributeType_Toughness":   3,
+		"CharacterAttributeType_Dexterity":   4,
+	}
+)
+
+func (x CharacterAttributeType) Enum() *CharacterAttributeType {
+	p := new(CharacterAttributeType)
+	*p = x
+	return p
+}
+
+func (x CharacterAttributeType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CharacterAttributeType) Descriptor() protoreflect.EnumDescriptor {
+	return file_msg_character_proto_enumTypes[1].Descriptor()
+}
+
+func (CharacterAttributeType) Type() protoreflect.EnumType {
+	return &file_msg_character_proto_enumTypes[1]
+}
+
+func (x CharacterAttributeType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CharacterAttributeType.Descriptor instead.
+func (CharacterAttributeType) EnumDescriptor() ([]byte, []int) {
+	return file_msg_character_proto_rawDescGZIP(), []int{1}
+}
+
+// CharacterProfession 定义角色职业, 数值与原版 PROFESSION_CLASS_TYPE 保持一致.
+type CharacterProfession int32
+
+const (
+	CharacterProfession_CharacterProfession_None    CharacterProfession = 0 // 无职业
+	CharacterProfession_CharacterProfession_Fighter CharacterProfession = 1 // 战士
+	CharacterProfession_CharacterProfession_Wizard  CharacterProfession = 2 // 巫师
+	CharacterProfession_CharacterProfession_Hunter  CharacterProfession = 3 // 猎人
+)
+
+// Enum value maps for CharacterProfession.
+var (
+	CharacterProfession_name = map[int32]string{
+		0: "CharacterProfession_None",
+		1: "CharacterProfession_Fighter",
+		2: "CharacterProfession_Wizard",
+		3: "CharacterProfession_Hunter",
+	}
+	CharacterProfession_value = map[string]int32{
+		"CharacterProfession_None":    0,
+		"CharacterProfession_Fighter": 1,
+		"CharacterProfession_Wizard":  2,
+		"CharacterProfession_Hunter":  3,
+	}
+)
+
+func (x CharacterProfession) Enum() *CharacterProfession {
+	p := new(CharacterProfession)
+	*p = x
+	return p
+}
+
+func (x CharacterProfession) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CharacterProfession) Descriptor() protoreflect.EnumDescriptor {
+	return file_msg_character_proto_enumTypes[2].Descriptor()
+}
+
+func (CharacterProfession) Type() protoreflect.EnumType {
+	return &file_msg_character_proto_enumTypes[2]
+}
+
+func (x CharacterProfession) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CharacterProfession.Descriptor instead.
+func (CharacterProfession) EnumDescriptor() ([]byte, []int) {
+	return file_msg_character_proto_rawDescGZIP(), []int{2}
+}
+
 type CharacterLimit int32
 
 const (
@@ -144,11 +253,11 @@ func (x CharacterLimit) String() string {
 }
 
 func (CharacterLimit) Descriptor() protoreflect.EnumDescriptor {
-	return file_msg_character_proto_enumTypes[1].Descriptor()
+	return file_msg_character_proto_enumTypes[3].Descriptor()
 }
 
 func (CharacterLimit) Type() protoreflect.EnumType {
-	return &file_msg_character_proto_enumTypes[1]
+	return &file_msg_character_proto_enumTypes[3]
 }
 
 func (x CharacterLimit) Number() protoreflect.EnumNumber {
@@ -157,7 +266,7 @@ func (x CharacterLimit) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use CharacterLimit.Descriptor instead.
 func (CharacterLimit) EnumDescriptor() ([]byte, []int) {
-	return file_msg_character_proto_rawDescGZIP(), []int{1}
+	return file_msg_character_proto_rawDescGZIP(), []int{3}
 }
 
 type ElementalPoints struct {
@@ -231,15 +340,17 @@ func (x *ElementalPoints) GetWind() uint32 {
 	return 0
 }
 
+// CharacterAttributePoints 保存角色四项基础属性点.
+// 创建角色时四项总和必须为20; 重置时四项与剩余可加点按重置规则校验, 权威总点数不得超过1000.
 type CharacterAttributePoints struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Vitality  uint32 `protobuf:"varint,1,opt,name=vitality,proto3" json:"vitality,omitempty"`   // 体力点数, 0-20
-	Strength  uint32 `protobuf:"varint,2,opt,name=strength,proto3" json:"strength,omitempty"`   // 腕力点数, 0-20
-	Toughness uint32 `protobuf:"varint,3,opt,name=toughness,proto3" json:"toughness,omitempty"` // 耐力点数, 0-20
-	Dexterity uint32 `protobuf:"varint,4,opt,name=dexterity,proto3" json:"dexterity,omitempty"` // 速度点数, 0-20
+	Vitality  uint32 `protobuf:"varint,1,opt,name=vitality,proto3" json:"vitality,omitempty"`   // 体力点数
+	Strength  uint32 `protobuf:"varint,2,opt,name=strength,proto3" json:"strength,omitempty"`   // 腕力点数
+	Toughness uint32 `protobuf:"varint,3,opt,name=toughness,proto3" json:"toughness,omitempty"` // 耐力点数
+	Dexterity uint32 `protobuf:"varint,4,opt,name=dexterity,proto3" json:"dexterity,omitempty"` // 速度点数
 }
 
 func (x *CharacterAttributePoints) Reset() {
@@ -1288,6 +1399,230 @@ func (x *CharacterSettingSetRes) GetDuelEnabled() bool {
 	return false
 }
 
+// 0x00100B#client->gateway#增加角色基础属性-请求
+type CharacterAttributeAddReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CharacterUuid uint64                 `protobuf:"varint,1,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"`                                     // 角色 UUID, 必须属于当前账号、已上线且不在战斗中
+	AttributeType CharacterAttributeType `protobuf:"varint,2,opt,name=attribute_type,json=attributeType,proto3,enum=account.CharacterAttributeType" json:"attribute_type,omitempty"` // 每次只允许提升一个可分配基础属性
+}
+
+func (x *CharacterAttributeAddReq) Reset() {
+	*x = CharacterAttributeAddReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_msg_character_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CharacterAttributeAddReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CharacterAttributeAddReq) ProtoMessage() {}
+
+func (x *CharacterAttributeAddReq) ProtoReflect() protoreflect.Message {
+	mi := &file_msg_character_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CharacterAttributeAddReq.ProtoReflect.Descriptor instead.
+func (*CharacterAttributeAddReq) Descriptor() ([]byte, []int) {
+	return file_msg_character_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *CharacterAttributeAddReq) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
+func (x *CharacterAttributeAddReq) GetAttributeType() CharacterAttributeType {
+	if x != nil {
+		return x.AttributeType
+	}
+	return CharacterAttributeType_CharacterAttributeType_Unspecified
+}
+
+// 0x00100C#gateway->client#增加角色基础属性-回复
+type CharacterAttributeAddRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CharacterUuid uint64                 `protobuf:"varint,1,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"`                                     // 已增加基础属性的角色 UUID
+	AttributeType CharacterAttributeType `protobuf:"varint,2,opt,name=attribute_type,json=attributeType,proto3,enum=account.CharacterAttributeType" json:"attribute_type,omitempty"` // 本次实际增加的基础属性
+}
+
+func (x *CharacterAttributeAddRes) Reset() {
+	*x = CharacterAttributeAddRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_msg_character_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CharacterAttributeAddRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CharacterAttributeAddRes) ProtoMessage() {}
+
+func (x *CharacterAttributeAddRes) ProtoReflect() protoreflect.Message {
+	mi := &file_msg_character_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CharacterAttributeAddRes.ProtoReflect.Descriptor instead.
+func (*CharacterAttributeAddRes) Descriptor() ([]byte, []int) {
+	return file_msg_character_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *CharacterAttributeAddRes) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
+func (x *CharacterAttributeAddRes) GetAttributeType() CharacterAttributeType {
+	if x != nil {
+		return x.AttributeType
+	}
+	return CharacterAttributeType_CharacterAttributeType_Unspecified
+}
+
+// 0x00100D#client->gateway#重置角色基础属性-请求
+type CharacterAttributeResetReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CharacterUuid      uint64                    `protobuf:"varint,1,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"`               // 角色 UUID, 必须属于当前账号、已上线且不在战斗中
+	CharacterAttribute *CharacterAttributePoints `protobuf:"bytes,2,opt,name=character_attribute,json=characterAttribute,proto3" json:"character_attribute,omitempty"` // 客户端在重置弹窗中确认的四项最终属性
+	AvailablePoint     uint32                    `protobuf:"varint,3,opt,name=available_point,json=availablePoint,proto3" json:"available_point,omitempty"`            // 分配完成后的剩余可加点
+}
+
+func (x *CharacterAttributeResetReq) Reset() {
+	*x = CharacterAttributeResetReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_msg_character_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CharacterAttributeResetReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CharacterAttributeResetReq) ProtoMessage() {}
+
+func (x *CharacterAttributeResetReq) ProtoReflect() protoreflect.Message {
+	mi := &file_msg_character_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CharacterAttributeResetReq.ProtoReflect.Descriptor instead.
+func (*CharacterAttributeResetReq) Descriptor() ([]byte, []int) {
+	return file_msg_character_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *CharacterAttributeResetReq) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
+func (x *CharacterAttributeResetReq) GetCharacterAttribute() *CharacterAttributePoints {
+	if x != nil {
+		return x.CharacterAttribute
+	}
+	return nil
+}
+
+func (x *CharacterAttributeResetReq) GetAvailablePoint() uint32 {
+	if x != nil {
+		return x.AvailablePoint
+	}
+	return 0
+}
+
+// 0x00100E#gateway->client#重置角色基础属性-回复
+type CharacterAttributeResetRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CharacterUuid uint64 `protobuf:"varint,1,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"` // 已重置基础属性的角色 UUID
+}
+
+func (x *CharacterAttributeResetRes) Reset() {
+	*x = CharacterAttributeResetRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_msg_character_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CharacterAttributeResetRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CharacterAttributeResetRes) ProtoMessage() {}
+
+func (x *CharacterAttributeResetRes) ProtoReflect() protoreflect.Message {
+	mi := &file_msg_character_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CharacterAttributeResetRes.ProtoReflect.Descriptor instead.
+func (*CharacterAttributeResetRes) Descriptor() ([]byte, []int) {
+	return file_msg_character_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *CharacterAttributeResetRes) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
 var File_msg_character_proto protoreflect.FileDescriptor
 
 var file_msg_character_proto_rawDesc = []byte{
@@ -1464,7 +1799,41 @@ var file_msg_character_proto_rawDesc = []byte{
 	0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0b, 0x74, 0x65,
 	0x61, 0x6d, 0x45, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x12, 0x21, 0x0a, 0x0c, 0x64, 0x75, 0x65,
 	0x6c, 0x5f, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52,
-	0x0b, 0x64, 0x75, 0x65, 0x6c, 0x45, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x2a, 0x9f, 0x03, 0x0a,
+	0x0b, 0x64, 0x75, 0x65, 0x6c, 0x45, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x22, 0x89, 0x01, 0x0a,
+	0x18, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62,
+	0x75, 0x74, 0x65, 0x41, 0x64, 0x64, 0x52, 0x65, 0x71, 0x12, 0x25, 0x0a, 0x0e, 0x63, 0x68, 0x61,
+	0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x04, 0x52, 0x0d, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x55, 0x75, 0x69, 0x64,
+	0x12, 0x46, 0x0a, 0x0e, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x5f, 0x74, 0x79,
+	0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1f, 0x2e, 0x61, 0x63, 0x63, 0x6f, 0x75,
+	0x6e, 0x74, 0x2e, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72,
+	0x69, 0x62, 0x75, 0x74, 0x65, 0x54, 0x79, 0x70, 0x65, 0x52, 0x0d, 0x61, 0x74, 0x74, 0x72, 0x69,
+	0x62, 0x75, 0x74, 0x65, 0x54, 0x79, 0x70, 0x65, 0x22, 0x89, 0x01, 0x0a, 0x18, 0x43, 0x68, 0x61,
+	0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x41,
+	0x64, 0x64, 0x52, 0x65, 0x73, 0x12, 0x25, 0x0a, 0x0e, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74,
+	0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0d, 0x63,
+	0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x55, 0x75, 0x69, 0x64, 0x12, 0x46, 0x0a, 0x0e,
+	0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x0e, 0x32, 0x1f, 0x2e, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x2e, 0x43,
+	0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74,
+	0x65, 0x54, 0x79, 0x70, 0x65, 0x52, 0x0d, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65,
+	0x54, 0x79, 0x70, 0x65, 0x22, 0xc0, 0x01, 0x0a, 0x1a, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74,
+	0x65, 0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x52, 0x65, 0x73, 0x65, 0x74,
+	0x52, 0x65, 0x71, 0x12, 0x25, 0x0a, 0x0e, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72,
+	0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0d, 0x63, 0x68, 0x61,
+	0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x55, 0x75, 0x69, 0x64, 0x12, 0x52, 0x0a, 0x13, 0x63, 0x68,
+	0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e,
+	0x74, 0x2e, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72, 0x69,
+	0x62, 0x75, 0x74, 0x65, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x73, 0x52, 0x12, 0x63, 0x68, 0x61, 0x72,
+	0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x12, 0x27,
+	0x0a, 0x0f, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x70, 0x6f, 0x69, 0x6e,
+	0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0e, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62,
+	0x6c, 0x65, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x22, 0x43, 0x0a, 0x1a, 0x43, 0x68, 0x61, 0x72, 0x61,
+	0x63, 0x74, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x52, 0x65, 0x73,
+	0x65, 0x74, 0x52, 0x65, 0x73, 0x12, 0x25, 0x0a, 0x0e, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74,
+	0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0d, 0x63,
+	0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x55, 0x75, 0x69, 0x64, 0x2a, 0x9f, 0x03, 0x0a,
 	0x0f, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e,
 	0x12, 0x1a, 0x0a, 0x16, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x63, 0x74,
 	0x69, 0x6f, 0x6e, 0x5f, 0x55, 0x6e, 0x6b, 0x6e, 0x6f, 0x77, 0x10, 0x00, 0x12, 0x1a, 0x0a, 0x16,
@@ -1490,7 +1859,30 @@ var file_msg_character_proto_rawDesc = []byte{
 	0x69, 0x6f, 0x6e, 0x5f, 0x57, 0x61, 0x6c, 0x6b, 0x10, 0x0c, 0x12, 0x19, 0x0a, 0x15, 0x43, 0x68,
 	0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x48, 0x61,
 	0x70, 0x70, 0x79, 0x10, 0x0d, 0x12, 0x17, 0x0a, 0x13, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74,
-	0x65, 0x72, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x4d, 0x61, 0x78, 0x10, 0x0e, 0x2a, 0xc8,
+	0x65, 0x72, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x4d, 0x61, 0x78, 0x10, 0x0e, 0x2a, 0xd6,
+	0x01, 0x0a, 0x16, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72,
+	0x69, 0x62, 0x75, 0x74, 0x65, 0x54, 0x79, 0x70, 0x65, 0x12, 0x26, 0x0a, 0x22, 0x43, 0x68, 0x61,
+	0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x54,
+	0x79, 0x70, 0x65, 0x5f, 0x55, 0x6e, 0x73, 0x70, 0x65, 0x63, 0x69, 0x66, 0x69, 0x65, 0x64, 0x10,
+	0x00, 0x12, 0x23, 0x0a, 0x1f, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x74,
+	0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x54, 0x79, 0x70, 0x65, 0x5f, 0x56, 0x69, 0x74, 0x61,
+	0x6c, 0x69, 0x74, 0x79, 0x10, 0x01, 0x12, 0x23, 0x0a, 0x1f, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63,
+	0x74, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x54, 0x79, 0x70, 0x65,
+	0x5f, 0x53, 0x74, 0x72, 0x65, 0x6e, 0x67, 0x74, 0x68, 0x10, 0x02, 0x12, 0x24, 0x0a, 0x20, 0x43,
+	0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74,
+	0x65, 0x54, 0x79, 0x70, 0x65, 0x5f, 0x54, 0x6f, 0x75, 0x67, 0x68, 0x6e, 0x65, 0x73, 0x73, 0x10,
+	0x03, 0x12, 0x24, 0x0a, 0x20, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x41, 0x74,
+	0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x54, 0x79, 0x70, 0x65, 0x5f, 0x44, 0x65, 0x78, 0x74,
+	0x65, 0x72, 0x69, 0x74, 0x79, 0x10, 0x04, 0x2a, 0x94, 0x01, 0x0a, 0x13, 0x43, 0x68, 0x61, 0x72,
+	0x61, 0x63, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x66, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12,
+	0x1c, 0x0a, 0x18, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x66,
+	0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x4e, 0x6f, 0x6e, 0x65, 0x10, 0x00, 0x12, 0x1f, 0x0a,
+	0x1b, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x66, 0x65, 0x73,
+	0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x46, 0x69, 0x67, 0x68, 0x74, 0x65, 0x72, 0x10, 0x01, 0x12, 0x1e,
+	0x0a, 0x1a, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x66, 0x65,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x57, 0x69, 0x7a, 0x61, 0x72, 0x64, 0x10, 0x02, 0x12, 0x1e,
+	0x0a, 0x1a, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x66, 0x65,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x48, 0x75, 0x6e, 0x74, 0x65, 0x72, 0x10, 0x03, 0x2a, 0xc8,
 	0x01, 0x0a, 0x0e, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x4c, 0x69, 0x6d, 0x69,
 	0x74, 0x12, 0x1e, 0x0a, 0x1a, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x4c, 0x69,
 	0x6d, 0x69, 0x74, 0x5f, 0x55, 0x6e, 0x73, 0x70, 0x65, 0x63, 0x69, 0x66, 0x69, 0x65, 0x64, 0x10,
@@ -1520,47 +1912,56 @@ func file_msg_character_proto_rawDescGZIP() []byte {
 	return file_msg_character_proto_rawDescData
 }
 
-var file_msg_character_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_msg_character_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_msg_character_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_msg_character_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_msg_character_proto_goTypes = []any{
 	(CharacterAction)(0),               // 0: account.CharacterAction
-	(CharacterLimit)(0),                // 1: account.CharacterLimit
-	(*ElementalPoints)(nil),            // 2: account.ElementalPoints
-	(*CharacterAttributePoints)(nil),   // 3: account.CharacterAttributePoints
-	(*CharacterLuckState)(nil),         // 4: account.CharacterLuckState
-	(*CharacterBaseRecord)(nil),        // 5: account.CharacterBaseRecord
-	(*CharacterRecord)(nil),            // 6: account.CharacterRecord
-	(*CharacterCreateReq)(nil),         // 7: account.CharacterCreateReq
-	(*CharacterCreateRes)(nil),         // 8: account.CharacterCreateRes
-	(*CharacterOnlineReq)(nil),         // 9: account.CharacterOnlineReq
-	(*CharacterOnlineRes)(nil),         // 10: account.CharacterOnlineRes
-	(*CharacterOfflineReq)(nil),        // 11: account.CharacterOfflineReq
-	(*CharacterOfflineRes)(nil),        // 12: account.CharacterOfflineRes
-	(*CharacterSceneEnterReq)(nil),     // 13: account.CharacterSceneEnterReq
-	(*CharacterSceneEnterRes)(nil),     // 14: account.CharacterSceneEnterRes
-	(*CharacterBaseChangedNotify)(nil), // 15: account.CharacterBaseChangedNotify
-	(*CharacterSettingSetReq)(nil),     // 16: account.CharacterSettingSetReq
-	(*CharacterSettingSetRes)(nil),     // 17: account.CharacterSettingSetRes
-	(*ItemContainerRecord)(nil),        // 18: account.ItemContainerRecord
-	(*CharacterEquipmentRecord)(nil),   // 19: account.CharacterEquipmentRecord
-	(*PetRecord)(nil),                  // 20: account.PetRecord
+	(CharacterAttributeType)(0),        // 1: account.CharacterAttributeType
+	(CharacterProfession)(0),           // 2: account.CharacterProfession
+	(CharacterLimit)(0),                // 3: account.CharacterLimit
+	(*ElementalPoints)(nil),            // 4: account.ElementalPoints
+	(*CharacterAttributePoints)(nil),   // 5: account.CharacterAttributePoints
+	(*CharacterLuckState)(nil),         // 6: account.CharacterLuckState
+	(*CharacterBaseRecord)(nil),        // 7: account.CharacterBaseRecord
+	(*CharacterRecord)(nil),            // 8: account.CharacterRecord
+	(*CharacterCreateReq)(nil),         // 9: account.CharacterCreateReq
+	(*CharacterCreateRes)(nil),         // 10: account.CharacterCreateRes
+	(*CharacterOnlineReq)(nil),         // 11: account.CharacterOnlineReq
+	(*CharacterOnlineRes)(nil),         // 12: account.CharacterOnlineRes
+	(*CharacterOfflineReq)(nil),        // 13: account.CharacterOfflineReq
+	(*CharacterOfflineRes)(nil),        // 14: account.CharacterOfflineRes
+	(*CharacterSceneEnterReq)(nil),     // 15: account.CharacterSceneEnterReq
+	(*CharacterSceneEnterRes)(nil),     // 16: account.CharacterSceneEnterRes
+	(*CharacterBaseChangedNotify)(nil), // 17: account.CharacterBaseChangedNotify
+	(*CharacterSettingSetReq)(nil),     // 18: account.CharacterSettingSetReq
+	(*CharacterSettingSetRes)(nil),     // 19: account.CharacterSettingSetRes
+	(*CharacterAttributeAddReq)(nil),   // 20: account.CharacterAttributeAddReq
+	(*CharacterAttributeAddRes)(nil),   // 21: account.CharacterAttributeAddRes
+	(*CharacterAttributeResetReq)(nil), // 22: account.CharacterAttributeResetReq
+	(*CharacterAttributeResetRes)(nil), // 23: account.CharacterAttributeResetRes
+	(*ItemContainerRecord)(nil),        // 24: account.ItemContainerRecord
+	(*CharacterEquipmentRecord)(nil),   // 25: account.CharacterEquipmentRecord
+	(*PetRecord)(nil),                  // 26: account.PetRecord
 }
 var file_msg_character_proto_depIdxs = []int32{
-	4,  // 0: account.CharacterBaseRecord.luck_state:type_name -> account.CharacterLuckState
-	5,  // 1: account.CharacterRecord.base:type_name -> account.CharacterBaseRecord
-	18, // 2: account.CharacterRecord.item_bag:type_name -> account.ItemContainerRecord
-	19, // 3: account.CharacterRecord.equipment:type_name -> account.CharacterEquipmentRecord
-	20, // 4: account.CharacterRecord.pet_record_list:type_name -> account.PetRecord
-	2,  // 5: account.CharacterCreateReq.character_elemental:type_name -> account.ElementalPoints
-	3,  // 6: account.CharacterCreateReq.character_attribute:type_name -> account.CharacterAttributePoints
-	6,  // 7: account.CharacterCreateRes.character_record:type_name -> account.CharacterRecord
-	4,  // 8: account.CharacterOnlineRes.luck_state:type_name -> account.CharacterLuckState
-	5,  // 9: account.CharacterBaseChangedNotify.character_base_record:type_name -> account.CharacterBaseRecord
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	6,  // 0: account.CharacterBaseRecord.luck_state:type_name -> account.CharacterLuckState
+	7,  // 1: account.CharacterRecord.base:type_name -> account.CharacterBaseRecord
+	24, // 2: account.CharacterRecord.item_bag:type_name -> account.ItemContainerRecord
+	25, // 3: account.CharacterRecord.equipment:type_name -> account.CharacterEquipmentRecord
+	26, // 4: account.CharacterRecord.pet_record_list:type_name -> account.PetRecord
+	4,  // 5: account.CharacterCreateReq.character_elemental:type_name -> account.ElementalPoints
+	5,  // 6: account.CharacterCreateReq.character_attribute:type_name -> account.CharacterAttributePoints
+	8,  // 7: account.CharacterCreateRes.character_record:type_name -> account.CharacterRecord
+	6,  // 8: account.CharacterOnlineRes.luck_state:type_name -> account.CharacterLuckState
+	7,  // 9: account.CharacterBaseChangedNotify.character_base_record:type_name -> account.CharacterBaseRecord
+	1,  // 10: account.CharacterAttributeAddReq.attribute_type:type_name -> account.CharacterAttributeType
+	1,  // 11: account.CharacterAttributeAddRes.attribute_type:type_name -> account.CharacterAttributeType
+	5,  // 12: account.CharacterAttributeResetReq.character_attribute:type_name -> account.CharacterAttributePoints
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_msg_character_proto_init() }
@@ -1765,14 +2166,62 @@ func file_msg_character_proto_init() {
 				return nil
 			}
 		}
+		file_msg_character_proto_msgTypes[16].Exporter = func(v any, i int) any {
+			switch v := v.(*CharacterAttributeAddReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_msg_character_proto_msgTypes[17].Exporter = func(v any, i int) any {
+			switch v := v.(*CharacterAttributeAddRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_msg_character_proto_msgTypes[18].Exporter = func(v any, i int) any {
+			switch v := v.(*CharacterAttributeResetReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_msg_character_proto_msgTypes[19].Exporter = func(v any, i int) any {
+			switch v := v.(*CharacterAttributeResetRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_msg_character_proto_rawDesc,
-			NumEnums:      2,
-			NumMessages:   16,
+			NumEnums:      4,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
