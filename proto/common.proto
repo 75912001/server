@@ -42,4 +42,8 @@ enum Constants {
   Constants_Elemental_Max_Active_Type_Count = 2; // 最多允许同时分配的元素种类数量
   Constants_Elemental_Total_Point = 10; // 地水火风元素总点数
   Constants_Character_Name_Max_Length = 12; // 角色名称最大长度
+  Constants_Mail_Title_Max_Length = 30; // 系统邮件主题最大 Unicode 字符数
+  Constants_Mail_Expire_Days = 365; // 系统邮件固定有效天数
+  Constants_Mail_Content_Max_Length = 500; // 系统邮件正文最大 Unicode 字符数
+  Constants_Mail_System_Inbox_Max_Count = 1000; // 单角色系统邮箱最多保存的未过期邮件数
 }
