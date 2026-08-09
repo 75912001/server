@@ -187,6 +187,8 @@ accountVerifyToken 在 `CacheUseAccountVerifyToken` 成功后即被消费；如�
 | `custom.cacheRPCTimeout` | `3s` | login 调用 cache RPC 的超时时间 |
 | `custom.maxBodyBytes` | `4096` | HTTP 请求体最大字节数 |
 
+Login 不配置 `grpc.listenAddr`, 因此不启动 gRPC 服务端. 运行配置中的 `grpc.maxReceiveMessageBytes` 和 `grpc.maxSendMessageBytes` 都设为 `67108864`, 仅控制 Login 调用 Cache、Gateway 时生成客户端连接的单条消息收发上限, 即 64MiB.
+
 ## etcd 发现
 
 - add cache：先移除同 key 旧 cache，再创建新连接并注册到 xlib resolver。

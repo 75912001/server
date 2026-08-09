@@ -10,7 +10,7 @@
 - etcd 发现 cache/gateway 的逻辑。
 - gateway 选择规则。
 - `connectTicket` payload、签名、过期时间或共享密钥。
-- login 配置、部署配置或 robot 登录行为。
+- login 配置或部署配置.
 
 ## 快速检查
 
@@ -23,17 +23,17 @@ GOCACHE="$PWD/.gocache" go build -buildvcs=false ./login
 
 ## 依赖检查
 
-修改 accountVerifyToken、email/password、cache RPC、gateway 验票、online 登录链路或 robot 自动登录时，运行：
+修改 accountVerifyToken、email/password、cache RPC、gateway 验票或 online 登录链路时, 运行:
 
 ```bash
-go test ./login ./cache ./gateway ./online ./tool/robot/main ./common ./proto/pb
+go test ./login ./cache ./gateway ./online ./common ./proto/pb
 ```
 
 修改 proto 后先生成代码：
 
 ```bash
-python gen.py
-go test ./login ./cache ./gateway ./online ./tool/robot/main ./common ./proto/pb
+python 1.gen.py
+go test ./login ./cache ./gateway ./online ./common ./proto/pb
 ```
 
 ## 静态检查
