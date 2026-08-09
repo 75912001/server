@@ -36,12 +36,31 @@ message ElementalPoints // todo menglc 优化-移除, 扁平化
   uint32 wind = 4; // 风元素点数, 0-10
 }
 
+// CharacterAttributePoints 保存角色四项基础属性点.
+// 创建角色时四项总和必须为20; 重置时四项与剩余可加点按重置规则校验, 权威总点数不得超过1000.
 message CharacterAttributePoints // todo menglc 优化-移除, 扁平化
 {
-  uint32 vitality = 1; // 体力点数, 0-20
-  uint32 strength = 2; // 腕力点数, 0-20
-  uint32 toughness = 3; // 耐力点数, 0-20
-  uint32 dexterity = 4; // 速度点数, 0-20
+  uint32 vitality = 1; // 体力点数
+  uint32 strength = 2; // 腕力点数
+  uint32 toughness = 3; // 耐力点数
+  uint32 dexterity = 4; // 速度点数
+}
+
+// CharacterAttributeType 标识角色可消耗 available_point 提升的基础属性.
+enum CharacterAttributeType {
+  CharacterAttributeType_Unspecified = 0; // 未指定属性, proto3 enum 默认值
+  CharacterAttributeType_Vitality = 1; // 体力
+  CharacterAttributeType_Strength = 2; // 腕力
+  CharacterAttributeType_Toughness = 3; // 耐力
+  CharacterAttributeType_Dexterity = 4; // 速度
+}
+
+// CharacterProfession 定义角色职业, 数值与原版 PROFESSION_CLASS_TYPE 保持一致.
+enum CharacterProfession {
+  CharacterProfession_None = 0; // 无职业
+  CharacterProfession_Fighter = 1; // 战士
+  CharacterProfession_Wizard = 2; // 巫师
+  CharacterProfession_Hunter = 3; // 猎人
 }
 
 enum CharacterLimit {
@@ -165,4 +184,28 @@ message CharacterSettingSetRes {
   uint64 character_uuid = 1; // 已修改设置的角色 UUID
   bool team_enabled = 2; // 当前登录会话中是否允许组队
   bool duel_enabled = 3; // 当前登录会话中是否允许决斗
+}
+
+//0x00100B#client->gateway#增加角色基础属性-请求
+message CharacterAttributeAddReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号、已上线且不在战斗中
+  CharacterAttributeType attribute_type = 2; // 每次只允许提升一个可分配基础属性
+}
+
+//0x00100C#gateway->client#增加角色基础属性-回复
+message CharacterAttributeAddRes {
+  uint64 character_uuid = 1; // 已增加基础属性的角色 UUID
+  CharacterAttributeType attribute_type = 2; // 本次实际增加的基础属性
+}
+
+//0x00100D#client->gateway#重置角色基础属性-请求
+message CharacterAttributeResetReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号、已上线且不在战斗中
+  CharacterAttributePoints character_attribute = 2; // 客户端在重置弹窗中确认的四项最终属性
+  uint32 available_point = 3; // 分配完成后的剩余可加点
+}
+
+//0x00100E#gateway->client#重置角色基础属性-回复
+message CharacterAttributeResetRes {
+  uint64 character_uuid = 1; // 已重置基础属性的角色 UUID
 }
