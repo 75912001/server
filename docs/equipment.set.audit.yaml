@@ -1,0 +1,266 @@
+# 装备套装原版兼容性审计.
+# 本文件解释原版数据, 原版运行时行为和新样本配置之间的差异, 不参与运行时加载.
+
+summary:
+  configuredSetCount: 55
+  configuredItemCount: 354
+  originalActivationPieces: 3
+  unconfiguredSetIds: []
+  excludedItemCount: 0
+  absentSetIdsWithinRange: [37, 48]
+  sameSetIdNameReuseIsConflict: false
+  conclusion: "同一 setId 的异名装备, 超过 3 件的成员和不同效果载体都不是配置冲突; 全部成员均已配置."
+
+configurationShape:
+  root: "equipmentSets"
+  setFields: ["setId", "name", "bonuses", "items"]
+  itemFields: ["originalId", "id", "name", "category", "setEffects", "equipmentEffects"]
+  setBonuses: "bonuses 保存 2件/3件/...套装公共加成; 当前原版采样没有公共条目, 因此均为空数组."
+  itemSetEffects: "items[].setEffects 保存达到 pieces 后由当前装备携带的效果."
+  itemEquipmentEffects: "items[].equipmentEffects 保存不经过套装门槛的直属装备效果."
+  idMigration:
+    originalId: "永久保存原版道具 ID, 用于审计和映射追溯."
+    id: "只表示当前程序装备 ID; 映射完成前省略, 不临时复用 originalId."
+  omittedField:
+    frameId: "只用于源表和审计定位, 不进入新套装配置结构."
+
+# 各工作表字段布局不同, 不能固定按同一列读取 nsuit. 按表头名定位后,
+# item_reference_8_0.xlsx 与原版 itemset6.txt 第 35 个字段(0-based 34)全部一致.
+sourceFieldAudit:
+  comparisonField: "itemset6.txt[34]"
+  mismatchCount: 0
+  configuredItemCount: 354
+  workbookSheets:
+    - name: "道具总表"
+      nsuitColumn: "AE"
+      configuredItemCount: 274
+    - name: "武器.爪"
+      nsuitColumn: "S"
+      configuredItemCount: 6
+    - name: "武器.斧"
+      nsuitColumn: "AE"
+      configuredItemCount: 10
+    - name: "武器.棍"
+      nsuitColumn: "AE"
+      configuredItemCount: 28
+    - name: "武器.枪"
+      nsuitColumn: "AE"
+      configuredItemCount: 22
+    - name: "武器.弓"
+      nsuitColumn: "AE"
+      configuredItemCount: 12
+    - name: "武器.回旋镖"
+      nsuitColumn: "AE"
+      configuredItemCount: 1
+    - name: "武器.投掷斧"
+      nsuitColumn: "AE"
+      configuredItemCount: 0
+    - name: "武器.投掷石"
+      nsuitColumn: "AE"
+      configuredItemCount: 1
+  examples:
+    - originalId: 1619
+      name: "奇普爪"
+      workbookCell: "武器.爪!S345"
+      workbookSetId: 9
+      itemsetSetId: 9
+      result: "两处一致, 归入奇普套装."
+
+# 原版 ITEM_CheckSuitEquip 的实际行为. 证据位于 8.5 服务端源码
+# gmsv/item/item_event.c, gmsv/item/item.c 和 gmsv/include/char_base.h.
+originalRuntimeSemantics:
+  - rule: "固定 3 件激活"
+    behavior: "按已装备物品统计 ITEM_SUITCODE, 相同编号达到 3 件即达标; 套装总成员数不受限制."
+  - rule: "同一 setId 即同一套装"
+    behavior: "原版不读取装备名称来划分名称族, 名称不同仍按相同 ITEM_SUITCODE 混装计数."
+  - rule: "只激活一个套装编号"
+    behavior: "按装备槽顺序找到第一个达到 3 件的 setId 后停止选择, 其他同时达标的 setId 不激活."
+  - rule: "效果跟随当前装备"
+    behavior: "选中 setId 后重新扫描所有装备槽, 只解析当前实际穿戴且 setId 相同的装备 argument."
+  - rule: "同目标后槽覆盖"
+    behavior: "所有套装工作值先清零, 每个 argument 通过 CHAR_setWorkInt 直接赋值; 同一目标不是相加, 后扫描的装备槽覆盖前槽."
+  - rule: "穿脱处理函数负责重算"
+    behavior: "只有调用 ITEM_suitEquip 或 ITEM_ResuitEquip 的穿脱事件会执行 ITEM_CheckSuitEquip."
+
+# setId=24 的两件铠甲都属于同一个套装, 两条效果都应配置. 它们同属身体槽, 不能同时穿戴;
+# 玩家用其中任意一件再搭配另外 2 件 setId=24 装备时, 当前铠甲携带的效果生效.
+set24Example:
+  setId: 24
+  canonicalName: "巨石套装"
+  items:
+    - originalId: 2326
+      name: "巨石之铠"
+      slot: "body"
+      sourceArgument: "MTGH:10"
+      configuredEffect: "defense flat +10"
+    - originalId: 2350
+      name: "尖牙之铠"
+      slot: "body"
+      sourceArgument: "MTGH:30"
+      configuredEffect: "defense flat +30"
+  result: "两项均配置, 由实际穿戴的身体装备决定当前值."
+
+# canonicalName 只用于显示和管理, 不参与套装身份判断. 旧冲突文件排除的名称族现已全部纳入.
+nameReuseAudit:
+  result: "不是冲突"
+  reason: "成员身份只由 setId 决定; 达到件数后, 当前穿戴成员各自携带的效果参与计算."
+  sets:
+    - setId: 1
+      canonicalName: "提亚套装"
+      additionalGroups:
+        - family: "很傻很天真/鱼鱼专用"
+          itemIds: [29105, 29178, 29181]
+    - setId: 2
+      canonicalName: "金乌力文魁套装"
+      additionalGroups:
+        - family: "很傻很天真/自慰"
+          itemIds: [29106, 29341]
+    - setId: 3
+      canonicalName: "盖洛亚套装"
+      additionalGroups:
+        - family: "很傻很天真/牛鞭壮阳"
+          itemIds: [29107, 29342]
+    - setId: 4
+      canonicalName: "拉伊贝套装"
+      additionalGroups:
+        - family: "自定义成人装备"
+          itemIds: [29011, 29012, 29013, 29014, 29108, 29343]
+    - setId: 5
+      canonicalName: "威姆套装"
+      additionalGroups:
+        - family: "很傻很天真"
+          itemIds: [29109]
+    - setId: 6
+      canonicalName: "洛克亚套装"
+      additionalGroups:
+        - family: "很傻很天真/发光内衣"
+          itemIds: [29110, 29268]
+    - setId: 7
+      canonicalName: "索伊套装"
+      additionalGroups:
+        - family: "自定义武器"
+          itemIds: [29111, 29340]
+    - setId: 18
+      canonicalName: "玄武套装"
+      mixedNames: ["玄武", "唯我独尊", "龙头霸主"]
+    - setId: 20
+      canonicalName: "唯我独尊套装"
+      mixedNames: ["唯我独尊", "龙头霸主", "朱雀"]
+    - setId: 21
+      canonicalName: "青龙套装"
+      mixedNames: ["青龙", "唯我独尊", "龙头霸主"]
+    - setId: 24
+      canonicalName: "巨石套装"
+      additionalGroups:
+        - family: "尖牙"
+          itemIds: [2349, 2350, 2351, 2352, 2353, 2354]
+        - family: "战士"
+          itemIds: [19567, 19569]
+    - setId: 51
+      canonicalName: "绿磊套装"
+      additionalGroups:
+        - family: "褐那LV5"
+          itemIds: [21232, 21237, 21242, 21247]
+        - family: "黑暗"
+          itemIds: [21437, 21439, 21440, 21441]
+        - family: "森林"
+          itemIds: [29129, 29131, 29132, 29133]
+        - family: "加强版L6褐那"
+          itemIds: [29356, 29357, 29358, 29359]
+    - setId: 53
+      canonicalName: "蓝淼套装"
+      additionalGroups:
+        - family: "碧华LV5"
+          itemIds: [21252, 21257, 21262, 21267]
+        - family: "加强版L6碧华"
+          itemIds: [29352, 29353, 29354, 29355]
+    - setId: 55
+      canonicalName: "红炎套装"
+      additionalGroups:
+        - family: "洛炎LV5"
+          itemIds: [21272, 21277, 21282, 21287]
+        - family: "焰火"
+          itemIds: [29116, 29117, 29118, 29119]
+        - family: "特制加强红炎"
+          itemIds: [29282, 29284, 29285, 29286]
+        - family: "加强版L6洛炎"
+          itemIds: [29348, 29349, 29350, 29351]
+    - setId: 57
+      canonicalName: "黄晶套装"
+      additionalGroups:
+        - family: "温特LV5"
+          itemIds: [21292, 21297, 21302, 21307]
+        - family: "玄冰"
+          itemIds: [29091, 29092, 29093, 29094]
+        - family: "猪盾/鱼鱼盾"
+          itemIds: [29182, 29183]
+        - family: "特制加强黄晶"
+          itemIds: [29275, 29277, 29278, 29279]
+        - family: "加强版L6温特"
+          itemIds: [29344, 29345, 29346, 29347]
+
+coverageChecks:
+  - frameId: 6326
+    originalId: 2340
+    name: "龙鳞  甲"
+    setId: 26
+    result: "已配置到龙鳞套装."
+  - frameId: 6333
+    originalId: 20570
+    name: "星光服"
+    setId: 42
+    result: "已配置到星光套装, 并保留 MP:15 套装效果."
+
+# 下列效果都有明确业务含义, 但原版当前路径不能正确实现. 样本已按预期语义配置,
+# 并在对应装备条目前写入 TODO 注释, 供后续运行时实现时处理.
+pendingEffects:
+  - setIds: [16, 17]
+    itemIds: [2034, 2039]
+    arguments: ["EA:40", "WA:40", "FI:40", "WI:40", "QU:40"]
+    configuredAs: "地/水/火/风魔法抗性 +40, 魔法闪避 +40"
+    originalIssue: "这些键由 ITEM_MagicEquitWear 解析, 记录却绑定 ITEM_suitEquip; ITEM_CheckSuitEquip 的键表没有它们."
+  - setIds: [18]
+    itemIds: [2114, 2115, 2116]
+    arguments: ["FTGH:20"]
+    configuredAs: "防御 +20%"
+    originalIssue: "ITEM_CheckSuitEquip 没有 FTGH 键; 按 FSTR/FDEX 命名和道具文本推定语义."
+  - setIds: [20, 21]
+    itemIds: [2129, 2130, 2131]
+    arguments: ["FDEX:20"]
+    configuredAs: "敏捷 +20%"
+    originalIssue: "ITEM_CheckSuitEquip 没有 FDEX 键; 按 FSTR 命名和道具文本推定语义."
+  - setIds: [34]
+    itemIds: [2911, 2931]
+    arguments: ["WATER:30"]
+    configuredAs: "水属性 +30"
+    originalIssue: "ITEM_CheckSuitEquip 把水属性键拼成 WRITER, 因此不识别 WATER."
+  - setIds: [41]
+    itemIds: [19755]
+    arguments: ["SUITTGHP:5"]
+    configuredAs: "防御 +5%"
+    originalIssue: "ITEM_CheckSuitEquip 只识别 SUITTGH_P, 因此不识别 SUITTGHP."
+  - setIds: [1, 2, 3]
+    itemIds: [29105, 29178, 29181, 29106, 29107]
+    arguments: ["祝:10x1(回我方10气1回)", "恩:150x1(回我方150体1回合)", "气(20)"]
+    configuredAs: "legacyArgument 原文占位"
+    originalIssue: "服务端源码没有这些套装键, 目前不能可靠推定统一数值模型."
+  - setIds: [33, 34, 35, 36]
+    itemIds: [2907, 2927, 2912, 2932, 2917, 2937, 2922, 2942]
+    arguments: ["雷抗100", "雷抗10", "冰抗100", "冰抗10", "火抗100", "火抗10", "电抗100", "电抗10"]
+    configuredAs: "直属装备火/雷/冰抗性"
+    originalIssue: "数据采用火抗/雷抗/电抗/冰抗格式, ITEM_MagicResist 却查找抗火/抗雷/抗冰."
+
+originalRuntimeBugs:
+  - affectedSetIds: [33, 34, 35, 36]
+    issue: "本组武器和头盔没有 ITEM_suitEquip/ITEM_ResuitEquip; 铠甲只调用 ITEM_MagicResist. 正常穿脱整套不会主动调用 ITEM_CheckSuitEquip, 只有其他套装物品触发重算时才可能被扫描到."
+    configuredResult: "EARTH/WATER/FIRE/WIND 效果仍配置在对应头盔, 并标注 TODO."
+  - affectedSetIds: [34, 35, 36]
+    issue: "原版水/火/风属性未超过 100 的公式分支都错误读取 CHAR_WORK_EA, 只有超过上限时才使用各自工作值判断并截断为 100."
+    configuredResult: "按 WATER/FIRE/WIND 的目标属性配置 +30, 不复刻错误字段."
+  - affectedSetIds: [33, 34, 35, 36]
+    issue: "ITEM_MagicReResist 对雷, 冰及其他分支都误清 CHAR_WORKEQUITFIRE, 不能正确撤销对应抗性."
+    configuredResult: "直属装备效果保留正确 target, 后续运行时必须按目标字段撤销."
+
+implementationBoundary:
+  runtimeImplemented: false
+  scope: "本轮只生成配置样本和兼容性审计, 未修改服务端套装运行时."
