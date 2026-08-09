@@ -4,6 +4,7 @@ package cache;
 option go_package = "server/proto/pb;pb";
 import "options.proto";
 import "msg.account.proto";
+import "msg.mail.proto";
 
 service CacheService {
   option (proto.serviceOpt) = {
@@ -25,6 +26,40 @@ service CacheService {
   rpc CacheGetAccountRecord(CacheGetAccountRecordReq) returns (CacheGetAccountRecordRes) {
     option (proto.methodOpt) = {
       timeout : "10s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+
+  // 读取角色完整邮箱并清理已过期邮件。
+  // 以 aid 做 RingHash 分片, character_uuid 必须属于该账号。
+  rpc CacheGetCharacterMailbox(CacheGetCharacterMailboxReq) returns (CacheGetCharacterMailboxRes) {
+    option (proto.methodOpt) = {
+      timeout : "10s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+
+  // 给角色增加一封系统邮件。
+  // 以 aid 做 RingHash 分片, 邮件 UUID 和时间由 Cache 生成。
+  rpc CacheAddSystemMail(CacheAddSystemMailReq) returns (CacheAddSystemMailRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+
+  // 标记角色的一封邮件为已读。
+  rpc CacheMarkCharacterMailRead(CacheMarkCharacterMailReadReq) returns (CacheMarkCharacterMailReadRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
+      shardKeyFieldType: ShardKeyFieldType_UINT64
+    };
+  }
+
+  // 删除角色的一封邮件。
+  rpc CacheDeleteCharacterMail(CacheDeleteCharacterMailReq) returns (CacheDeleteCharacterMailRes) {
+    option (proto.methodOpt) = {
+      timeout : "3s"
       shardKeyFieldType: ShardKeyFieldType_UINT64
     };
   }
@@ -98,6 +133,44 @@ message CacheGetAccountRecordReq {
 
 message CacheGetAccountRecordRes {
   account.AccountRecord account_record = 1; // 账号档案, 成功时有效, 表示 aid 对应的 AccountRecord。
+}
+
+message CacheGetCharacterMailboxReq {
+  uint64 aid = 1 [(proto.fieldOpt).shardKey = true]; // 邮箱所属账号 aid
+  uint64 character_uuid = 2; // 必须属于 aid 的角色 UUID
+}
+
+message CacheGetCharacterMailboxRes {
+  account.MailboxRecord mailbox_record = 1; // 清理过期邮件后的完整邮箱快照
+}
+
+message CacheAddSystemMailReq {
+  uint64 aid = 1 [(proto.fieldOpt).shardKey = true]; // 收件角色所属账号 aid
+  uint64 character_uuid = 2; // 必须属于 aid 的角色 UUID
+  string title = 3; // 系统邮件纯文本主题
+  string content = 4; // 系统邮件纯文本正文
+}
+
+message CacheAddSystemMailRes {
+  account.MailRecord mail_record = 1; // 已持久化的新系统邮件
+}
+
+message CacheMarkCharacterMailReadReq {
+  uint64 aid = 1 [(proto.fieldOpt).shardKey = true]; // 邮件所属账号 aid
+  uint64 character_uuid = 2; // 必须属于 aid 的角色 UUID
+  uint64 mail_uuid = 3; // 要标记为已读的邮件 UUID
+}
+
+message CacheMarkCharacterMailReadRes {
+}
+
+message CacheDeleteCharacterMailReq {
+  uint64 aid = 1 [(proto.fieldOpt).shardKey = true]; // 邮件所属账号 aid
+  uint64 character_uuid = 2; // 必须属于 aid 的角色 UUID
+  uint64 mail_uuid = 3; // 要删除的邮件 UUID
+}
+
+message CacheDeleteCharacterMailRes {
 }
 
 message CacheSetAccountVerifyTokenReq {
