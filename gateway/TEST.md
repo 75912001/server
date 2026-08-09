@@ -78,12 +78,7 @@ cd /d/src/github.com/sa.project/server
 docker ps
 ```
 
-确认依赖容器和服务运行后，使用客户端模拟器连接 gateway：
-
-```bash
-cd /d/src/github.com/sa.project/server/tool/robot/bin
-./robot.exe
-```
+确认依赖容器和服务运行后, 使用当前受支持客户端连接 gateway. 已废弃的 robot 不属于联调入口.
 
 重点验证：
 
@@ -102,7 +97,7 @@ cd /d/src/github.com/sa.project/server/tool/robot/bin
 - `shard key not found`：检查对应 unary 调用是否传入 selector 需要的 key，或是否应该指定账号已绑定的 online。
 - `GatewayKickAccountSession` 返回 `InvalidArgument`：检查 `aid` 和 `account_session` 是否为空。
 - `GatewayKickAccountSession` 返回 `Aborted`：表示请求中的 `account_session` 已不是当前连接的 accountSession，通常是重复登录或旧请求晚到。
-- 客户端无响应：检查 gateway 日志、online 日志、client.simulator 的 `bin/log`，确认包头长度、消息 ID、SessionID 和 Key 是否正确。
+- 客户端无响应: 检查 gateway、online 和当前客户端日志, 确认包头长度、消息 ID、SessionID 和 Key 是否正确.
 
 ## 8. 后续待补测试
 

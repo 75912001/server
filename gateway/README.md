@@ -13,6 +13,7 @@ Gateway 服务负责客户端 TCP 接入、首次登录验票、单登录顶号�
 - 维护本地 `heartbeatSession`，处理心跳轮换和 `CacheRefreshAccountSessionCAS`。
 - 在 TCP 断开、主动离线、心跳超时、顶号等场景调用 `OnlineUnbindAccount` 和 `CacheEndAccountSessionCAS`。
 - gateway 到 cache、online 和旧 gateway 的 unary 超时统一由 proto `methodOpt.timeout` 控制；具体数值以 `proto/cache.grpc.proto`、`proto/online.grpc.proto` 和 `proto/gateway.grpc.proto` 为准。
+- Gateway 运行配置将 `grpc.maxReceiveMessageBytes` 和 `grpc.maxSendMessageBytes` 都设为 `67108864`, 即服务端和生成客户端的单条消息收发上限均为 64MiB.
 
 ## TCP 登录验证
 
