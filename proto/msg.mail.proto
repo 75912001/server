@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+
+// 消息范围 [0x005000, 0x005fff]
+
+// MailRecord 表示角色邮箱中的一封系统邮件.
+message MailRecord {
+  uint64 uuid = 1; // 邮箱内单调递增且不复用的邮件 UUID
+  string title = 2; // 去除首尾空白后的纯文本主题
+  string content = 3; // 统一换行为 LF 的纯文本正文
+  int64 create_timestamp_ms = 4; // Cache 写入邮件时生成的 Unix 毫秒时间戳
+  int64 expire_timestamp_ms = 5; // 邮件过期的 Unix 毫秒时间戳, now >= 此值即过期
+  bool is_read = 6; // 是否已经成功标记为已读
+}
+
+// MailboxRecord 表示单个角色完整邮箱快照.
+message MailboxRecord {
+  uint64 used_uuid = 1; // 已分配过的最大邮件 UUID, 只增不减且不复用
+  map<uint64, MailRecord> mail_record_map = 2; // key 必须与 MailRecord.uuid 一致
+}
+
+//0x005000#client->gateway#获取角色邮箱-请求
+message CharacterMailboxGetReq {
+  uint64 character_uuid = 1; // 当前账号内已上线的角色 UUID
+}
+
+//0x005001#gateway->client#获取角色邮箱-回复
+message CharacterMailboxGetRes {
+  uint64 character_uuid = 1; // 已加载邮箱的角色 UUID
+  MailboxRecord mailbox_record = 2; // 清理过期邮件后的完整邮箱快照
+}
+
+//0x005002#client->gateway#标记角色邮件已读-请求
+message CharacterMailReadReq {
+  uint64 character_uuid = 1; // 当前账号内已上线的角色 UUID
+  uint64 mail_uuid = 2; // 要标记为已读的邮件 UUID
+}
+
+//0x005003#gateway->client#标记角色邮件已读-回复
+message CharacterMailReadRes {
+  uint64 character_uuid = 1; // 已操作邮件所属的角色 UUID
+  uint64 mail_uuid = 2; // 已标记为已读的邮件 UUID
+}
+
+//0x005004#client->gateway#删除角色邮件-请求
+message CharacterMailDeleteReq {
+  uint64 character_uuid = 1; // 当前账号内已上线的角色 UUID
+  uint64 mail_uuid = 2; // 要删除的邮件 UUID
+}
+
+//0x005005#gateway->client#删除角色邮件-回复
+message CharacterMailDeleteRes {
+  uint64 character_uuid = 1; // 已操作邮件所属的角色 UUID
+  uint64 mail_uuid = 2; // 已删除的邮件 UUID
+}
+
+//0x005006#gateway->client#新增角色系统邮件-通知
+message CharacterSystemMailNotify {
+  uint64 character_uuid = 1; // 收到新邮件的在线角色 UUID
+  MailRecord mail_record = 2; // Cache 持久化成功的新邮件完整记录
+}
