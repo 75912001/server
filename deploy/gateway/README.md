@@ -4,6 +4,10 @@
 
 镜像内时区为 `Asia/Shanghai`，容器日志时间与宿主机本地时间保持一致。
 
+## gRPC 消息大小
+
+`gateway.1.yaml` 和 `gateway.2.yaml` 将 `grpc.maxReceiveMessageBytes`、`grpc.maxSendMessageBytes` 都设为 `67108864`. Gateway gRPC 服务端和生成客户端的单条消息收发上限均为 64MiB.
+
 ## 准备目录
 
 ```bash

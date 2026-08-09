@@ -6,6 +6,10 @@
 
 online 启动时会先加载共享游戏配置. 镜像构建会把仓库 `config/` 整体复制到 `/app/config`, `deploy/online/*.yaml` 使用 `custom.gameConfigDir: /app/config`. 单角色 PVE 自动遇敌使用 `scene.yaml -> enemy.group.yaml -> pet.yaml` 引用链: 场景选择敌人组, 敌人组直接引用宠物模板, 数量和等级来自敌人组, 属性和AI来自宠物模板. server 只校验服务端消费字段和跨表引用; 角色展示字段, 宠物展示字段, 客户端 PNG, `.tpsheet` 和 frame 资源仍由 sa.desktop 校验.
 
+## gRPC 消息大小
+
+`online.1.yaml` 和 `online.2.yaml` 将 `grpc.maxReceiveMessageBytes`、`grpc.maxSendMessageBytes` 都设为 `67108864`. Online gRPC 服务端和生成客户端的单条消息收发上限均为 64MiB.
+
 ## 准备目录
 
 ```bash

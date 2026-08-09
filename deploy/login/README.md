@@ -3,6 +3,10 @@
 本文件中的命令可在仓库任意子目录执行，第一行会自动进入 Git 仓库根目录。
 镜像内时区为 `Asia/Shanghai`，容器日志时间与宿主机本地时间保持一致。
 
+## gRPC 消息大小
+
+`login.1.yaml` 和 `login.2.yaml` 不配置 `grpc.listenAddr`, 因此 Login 不启动 gRPC 服务端. 两份配置将 `grpc.maxReceiveMessageBytes`、`grpc.maxSendMessageBytes` 都设为 `67108864`, 仅控制 Login 发起的生成客户端连接, 单条消息收发上限均为 64MiB.
+
 ## 准备目录
 
 ```bash
