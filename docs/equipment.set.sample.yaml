@@ -1,0 +1,2662 @@
+# 装备套装配置样本.
+# 数据源: item_reference_8_0.xlsx 的 "道具总表" 和 "武器.*" 工作表.
+# 各工作表字段布局不同: "武器.爪" 的 nsuit 在 S 列, 其余目标表在 AE 列; 采样必须按表头名定位, 不能硬编码统一列.
+# 本文件尚未接入服务端配置加载器, 仅用于确定数据结构和完整保存原版数据.
+#
+# equipmentSets 是唯一根节点. setId 标识套装, name 是显示名称, bonuses 保留给
+# 2件/3件/...套装公共加成, items 保存属于该 setId 的全部装备.
+# items[].originalId 永久保存原版道具 ID. items[].id 保留给当前程序装备 ID,
+# 在完成映射前省略, 不让同一个 id 字段在迁移前后表达两种含义.
+# frameId 仅用于源表审计, 不作为新套装配置字段.
+#
+# items[].setEffects 由当前实际穿戴的装备携带, 只有该套装达到 pieces 后才参与.
+# items[].equipmentEffects 是不经过套装门槛的直属装备效果.
+# 同一 setId 的所有装备均属于同一个套装, 名称不同, 成员超过 3 件都不是冲突.
+# 原版同一效果目标不累加: 先清零, 再按装备槽顺序赋值, 靠后槽位覆盖靠前槽位.
+# 原版同时只选择装备槽中最先找到的一个达标 setId; 兼容性细节见 equipment.set.audit.yaml.
+
+equipmentSets:
+  - setId: 1
+    name: "提亚套装"
+    bonuses: []
+    items:
+      - originalId: 1338
+        name: "提亚棒"
+        category: "武器.棍.2"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "percent"
+            value: 30
+            sourceArgument: "FSTR:30"
+      - originalId: 1339
+        name: "提亚兜"
+        category: "防具.头盔.6"
+      - originalId: 1340
+        name: "提亚铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 50
+            sourceArgument: "HP:50"
+      - originalId: 29105
+        name: "很傻很天真鞋"
+        category: "防具.鞋子.26"
+        # TODO: 原版套装解析器不识别此自定义参数, 先以 legacyArgument 保留原文等待实现.
+        setEffects:
+          - pieces: 3
+            type: "legacyArgument"
+            sourceArgument: "祝:10x1(回我方10气1回)"
+      - originalId: 29178
+        name: "很傻很天真鞋"
+        category: "防具.鞋子.26"
+        # TODO: 原版套装解析器不识别此自定义参数, 先以 legacyArgument 保留原文等待实现.
+        setEffects:
+          - pieces: 3
+            type: "legacyArgument"
+            sourceArgument: "祝:10x1(回我方10气1回)"
+      - originalId: 29181
+        name: "鱼鱼专用鞋"
+        category: "防具.鞋子.26"
+        # TODO: 原版套装解析器不识别此自定义参数, 先以 legacyArgument 保留原文等待实现.
+        setEffects:
+          - pieces: 3
+            type: "legacyArgument"
+            sourceArgument: "祝:10x1(回我方10气1回)"
+
+  - setId: 2
+    name: "金乌力文魁套装"
+    bonuses: []
+    items:
+      - originalId: 1341
+        name: "金乌力文魁头盔"
+        category: "防具.头盔.6"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 100
+            sourceArgument: "HP:100"
+      - originalId: 1342
+        name: "金乌力文魁铠甲"
+        category: "防具.铠甲.7"
+      - originalId: 1343
+        name: "金乌力文魁之光"
+        category: "武器.棍.2"
+      - originalId: 29106
+        name: "很傻很天真手套"
+        category: "防具.手套.27"
+        # TODO: 原版套装解析器不识别此自定义参数, 先以 legacyArgument 保留原文等待实现.
+        setEffects:
+          - pieces: 3
+            type: "legacyArgument"
+            sourceArgument: "恩:150x1(回我方150体1回合)"
+      - originalId: 29341
+        name: "自慰手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+
+  - setId: 3
+    name: "盖洛亚套装"
+    bonuses: []
+    items:
+      - originalId: 1397
+        name: "盖洛亚兜"
+        category: "防具.头盔.6"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "flat"
+            value: 40
+            sourceArgument: "MDEX:40"
+      - originalId: 1398
+        name: "盖洛亚铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 30
+            sourceArgument: "HP:30"
+      - originalId: 1399
+        name: "盖洛亚棍棒"
+        category: "武器.棍.2"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "flat"
+            value: 40
+            sourceArgument: "MSTR:40"
+      - originalId: 29107
+        name: "很傻很天真腰带"
+        category: "防具.扩展腰带.24"
+        # TODO: 原版套装解析器不识别此自定义参数, 先以 legacyArgument 保留原文等待实现.
+        setEffects:
+          - pieces: 3
+            type: "legacyArgument"
+            sourceArgument: "气(20)"
+      - originalId: 29342
+        name: "牛鞭壮阳腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+
+  - setId: 4
+    name: "拉伊贝套装"
+    bonuses: []
+    items:
+      - originalId: 1470
+        name: "拉伊贝兜"
+        category: "防具.头盔.6"
+      - originalId: 1471
+        name: "拉伊贝铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 30
+            sourceArgument: "HP:30"
+      - originalId: 1472
+        name: "拉伊贝弓箭"
+        category: "武器.弓.4"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "flat"
+            value: 30
+            sourceArgument: "MSTR:30"
+      - originalId: 29011
+        name: "通用自慰手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29012
+        name: "牛鞭壮阳腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29013
+        name: "极度肉欢盾牌"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29014
+        name: "红杏出墙之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29108
+        name: "很傻很天真盾牌"
+        category: "防具.扩展盾牌.25"
+      - originalId: 29343
+        name: "极度肉欢盾牌"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+
+  - setId: 5
+    name: "威姆套装"
+    bonuses: []
+    items:
+      - originalId: 1473
+        name: "威姆防具"
+        category: "防具.头盔.6"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "flat"
+            value: 20
+            sourceArgument: "MDEX:20"
+      - originalId: 1474
+        name: "威姆服"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 30
+            sourceArgument: "HP:30"
+      - originalId: 1475
+        name: "威姆棍棒"
+        category: "武器.棍.2"
+      - originalId: 29109
+        name: "很傻很天真帽子"
+        category: "防具.头盔.6"
+
+  - setId: 6
+    name: "洛克亚套装"
+    bonuses: []
+    items:
+      - originalId: 1476
+        name: "洛克亚首饰 A4"
+        category: "首饰.项链.10"
+      - originalId: 1477
+        name: "洛克亚防具"
+        category: "防具.头盔.6"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 30
+            sourceArgument: "HP:30"
+      - originalId: 1478
+        name: "洛克亚服"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 30
+            sourceArgument: "HP:30"
+      - originalId: 1479
+        name: "洛克亚棍棒"
+        category: "武器.棍.2"
+      - originalId: 29110
+        name: "很傻很天真衣服"
+        category: "防具.铠甲.7"
+      - originalId: 29268
+        name: "发光的色情内衣"
+        category: "防具.铠甲.7"
+
+  - setId: 7
+    name: "索伊套装"
+    bonuses: []
+    items:
+      - originalId: 1607
+        name: "索伊枪"
+        category: "武器.枪.3"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "percent"
+            value: 10
+            sourceArgument: "FSTR:10"
+      - originalId: 1608
+        name: "索伊铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "flat"
+            value: 20
+            sourceArgument: "MDEX:20"
+      - originalId: 1609
+        name: "索伊兜"
+        category: "防具.头盔.6"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 40
+            sourceArgument: "HP:40"
+      - originalId: 29111
+        name: "很傻很天真衣服"
+        category: "武器.爪.0"
+      - originalId: 29340
+        name: "防色狼武器"
+        category: "武器.爪.0"
+
+  - setId: 8
+    name: "鲁基套装"
+    bonuses: []
+    items:
+      - originalId: 1610
+        name: "鲁基斧"
+        category: "武器.斧.1"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "flat"
+            value: 30
+            sourceArgument: "MDEX:30"
+      - originalId: 1611
+        name: "鲁基兜"
+        category: "防具.头盔.6"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 40
+            sourceArgument: "HP:40"
+      - originalId: 1618
+        name: "鲁基服"
+        category: "防具.铠甲.7"
+
+  - setId: 9
+    name: "奇普套装"
+    bonuses: []
+    items:
+      - originalId: 1619
+        name: "奇普爪"
+        category: "武器.爪.0"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "flat"
+            value: 20
+            sourceArgument: "MSTR:20"
+      - originalId: 1620
+        name: "奇普防具"
+        category: "防具.头盔.6"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 40
+            sourceArgument: "HP:40"
+      - originalId: 1621
+        name: "奇普铠"
+        category: "防具.铠甲.7"
+
+  - setId: 10
+    name: "伊德套装"
+    bonuses: []
+    items:
+      - originalId: 1632
+        name: "伊德铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 30
+            sourceArgument: "HP:30"
+      - originalId: 1633
+        name: "伊德兜"
+        category: "防具.头盔.6"
+      - originalId: 1634
+        name: "伊德枪"
+        category: "武器.枪.3"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "percent"
+            value: 10
+            sourceArgument: "FSTR:10"
+
+  - setId: 11
+    name: "斯克亚套装"
+    bonuses: []
+    items:
+      - originalId: 1635
+        name: "斯克亚服"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 30
+            sourceArgument: "HP:30"
+      - originalId: 1636
+        name: "斯克亚防具"
+        category: "防具.头盔.6"
+      - originalId: 1637
+        name: "斯克亚棍棒"
+        category: "武器.棍.2"
+
+  - setId: 12
+    name: "海蓝套装"
+    bonuses: []
+    items:
+      - originalId: 1690
+        name: "海蓝之棒"
+        category: "武器.棍.2"
+        setEffects:
+          - pieces: 3
+            type: "underwaterBreathing"
+            sourceArgument: "WAST:-1"
+      - originalId: 1691
+        name: "海蓝之兜"
+        category: "防具.头盔.6"
+      - originalId: 1692
+        name: "海蓝之铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 30
+            sourceArgument: "HP:30"
+
+  - setId: 13
+    name: "莫奇套装"
+    bonuses: []
+    items:
+      - originalId: 1822
+        name: "莫奇爪"
+        category: "武器.爪.0"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "percent"
+            value: 10
+            sourceArgument: "FSTR:10"
+      - originalId: 1823
+        name: "莫奇服"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 10
+            sourceArgument: "MP:10"
+      - originalId: 1824
+        name: "莫奇防具"
+        category: "防具.头盔.6"
+
+  - setId: 14
+    name: "凯亚套装"
+    bonuses: []
+    items:
+      - originalId: 1825
+        name: "凯亚枪"
+        category: "武器.枪.3"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 60
+            sourceArgument: "HP:60"
+      - originalId: 1826
+        name: "凯亚铠"
+        category: "防具.铠甲.7"
+      - originalId: 1827
+        name: "凯亚兜"
+        category: "防具.头盔.6"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "percent"
+            value: 15
+            sourceArgument: "FSTR:15"
+
+  - setId: 15
+    name: "华义套装"
+    bonuses: []
+    items:
+      - originalId: 1976
+        name: "华义之兜"
+        category: "防具.头盔.6"
+      - originalId: 1977
+        name: "华义之铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 40
+            sourceArgument: "HP:40"
+      - originalId: 1978
+        name: "华义之斧"
+        category: "武器.斧.1"
+
+  - setId: 16
+    name: "巨熊套装"
+    bonuses: []
+    items:
+      - originalId: 2038
+        name: "巨熊头盔"
+        category: "防具.头盔.6"
+      - originalId: 2039
+        name: "巨熊之铠"
+        category: "防具.铠甲.7"
+        # TODO: 原版 ITEM_MagicEquitWear 能解析 EA/WA/FI/WI/QU, 但该记录绑定 ITEM_suitEquip; 套装解析器不会处理这些键, 新运行时需按此处语义实现.
+        setEffects:
+          - pieces: 3
+            type: "magicResistance"
+            target: "earth"
+            mode: "flat"
+            value: 40
+            sourceArgument: "EA:40"
+          - pieces: 3
+            type: "magicResistance"
+            target: "water"
+            mode: "flat"
+            value: 40
+            sourceArgument: "WA:40"
+          - pieces: 3
+            type: "magicResistance"
+            target: "fire"
+            mode: "flat"
+            value: 40
+            sourceArgument: "FI:40"
+          - pieces: 3
+            type: "magicResistance"
+            target: "wind"
+            mode: "flat"
+            value: 40
+            sourceArgument: "WI:40"
+          - pieces: 3
+            type: "magicDodgeRate"
+            mode: "flat"
+            value: 40
+            sourceArgument: "QU:40"
+      - originalId: 2040
+        name: "巨熊皮带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2041
+        name: "巨熊之靴"
+        category: "防具.鞋子.26"
+      - originalId: 2042
+        name: "巨熊石剑"
+        category: "武器.枪.3"
+      - originalId: 2043
+        name: "巨熊匕首"
+        category: "武器.棍.2"
+
+  - setId: 17
+    name: "森林套装"
+    bonuses: []
+    items:
+      - originalId: 2033
+        name: "森林头盔"
+        category: "防具.头盔.6"
+      - originalId: 2034
+        name: "森林  甲"
+        category: "防具.铠甲.7"
+        # TODO: 原版 ITEM_MagicEquitWear 能解析 EA/WA/FI/WI/QU, 但该记录绑定 ITEM_suitEquip; 套装解析器不会处理这些键, 新运行时需按此处语义实现.
+        setEffects:
+          - pieces: 3
+            type: "magicResistance"
+            target: "earth"
+            mode: "flat"
+            value: 40
+            sourceArgument: "EA:40"
+          - pieces: 3
+            type: "magicResistance"
+            target: "water"
+            mode: "flat"
+            value: 40
+            sourceArgument: "WA:40"
+          - pieces: 3
+            type: "magicResistance"
+            target: "fire"
+            mode: "flat"
+            value: 40
+            sourceArgument: "FI:40"
+          - pieces: 3
+            type: "magicResistance"
+            target: "wind"
+            mode: "flat"
+            value: 40
+            sourceArgument: "WI:40"
+          - pieces: 3
+            type: "magicDodgeRate"
+            mode: "flat"
+            value: 40
+            sourceArgument: "QU:40"
+      - originalId: 2035
+        name: "森林皮带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2036
+        name: "森林之靴"
+        category: "防具.鞋子.26"
+      - originalId: 2037
+        name: "森林木弓"
+        category: "武器.弓.4"
+
+  - setId: 18
+    name: "玄武套装"
+    bonuses: []
+    items:
+      - originalId: 2114
+        name: "玄武斧"
+        category: "武器.斧.1"
+        # TODO: 原版套装解析器没有 FTGH; 依据道具文本和 FSTR/FDEX 命名规则, 先配置为防御百分比加成.
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "defense"
+            mode: "percent"
+            value: 20
+            sourceArgument: "FTGH:20"
+      - originalId: 2115
+        name: "唯我独尊枪"
+        category: "武器.枪.3"
+        # TODO: 原版套装解析器没有 FTGH; 依据道具文本和 FSTR/FDEX 命名规则, 先配置为防御百分比加成.
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "defense"
+            mode: "percent"
+            value: 20
+            sourceArgument: "FTGH:20"
+      - originalId: 2116
+        name: "龙头霸主棍"
+        category: "武器.棍.2"
+        # TODO: 原版套装解析器没有 FTGH; 依据道具文本和 FSTR/FDEX 命名规则, 先配置为防御百分比加成.
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "defense"
+            mode: "percent"
+            value: 20
+            sourceArgument: "FTGH:20"
+      - originalId: 2117
+        name: "唯我独尊兜"
+        category: "防具.头盔.6"
+      - originalId: 2118
+        name: "龙头霸主铠"
+        category: "防具.铠甲.7"
+
+  - setId: 19
+    name: "白虎套装"
+    bonuses: []
+    items:
+      - originalId: 2119
+        name: "白虎斧"
+        category: "武器.斧.1"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 70
+            sourceArgument: "HP:70"
+      - originalId: 2120
+        name: "白虎枪"
+        category: "武器.枪.3"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 70
+            sourceArgument: "HP:70"
+      - originalId: 2121
+        name: "白虎棍"
+        category: "武器.棍.2"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 70
+            sourceArgument: "HP:70"
+      - originalId: 2122
+        name: "白虎兜"
+        category: "防具.头盔.6"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 15
+            sourceArgument: "MP:15"
+      - originalId: 2123
+        name: "白虎铠"
+        category: "防具.铠甲.7"
+
+  - setId: 20
+    name: "唯我独尊套装"
+    bonuses: []
+    items:
+      - originalId: 2124
+        name: "唯我独尊斧"
+        category: "武器.斧.1"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "percent"
+            value: 20
+            sourceArgument: "FSTR:20"
+      - originalId: 2125
+        name: "龙头霸主枪"
+        category: "武器.枪.3"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "percent"
+            value: 20
+            sourceArgument: "FSTR:20"
+      - originalId: 2126
+        name: "朱雀棍"
+        category: "武器.棍.2"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "percent"
+            value: 20
+            sourceArgument: "FSTR:20"
+      - originalId: 2127
+        name: "朱雀兜"
+        category: "防具.头盔.6"
+      - originalId: 2128
+        name: "唯我独尊铠"
+        category: "防具.铠甲.7"
+      - originalId: 2129
+        name: "龙头霸主斧"
+        category: "武器.斧.1"
+        # TODO: 原版套装解析器没有 FDEX; 依据道具文本和 FSTR 命名规则, 先配置为敏捷百分比加成.
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "percent"
+            value: 20
+            sourceArgument: "FDEX:20"
+
+  - setId: 21
+    name: "青龙套装"
+    bonuses: []
+    items:
+      - originalId: 2130
+        name: "青龙枪"
+        category: "武器.枪.3"
+        # TODO: 原版套装解析器没有 FDEX; 依据道具文本和 FSTR 命名规则, 先配置为敏捷百分比加成.
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "percent"
+            value: 20
+            sourceArgument: "FDEX:20"
+      - originalId: 2131
+        name: "唯我独尊棍"
+        category: "武器.棍.2"
+        # TODO: 原版套装解析器没有 FDEX; 依据道具文本和 FSTR 命名规则, 先配置为敏捷百分比加成.
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "percent"
+            value: 20
+            sourceArgument: "FDEX:20"
+      - originalId: 2132
+        name: "龙头霸主兜"
+        category: "防具.头盔.6"
+      - originalId: 2133
+        name: "青龙铠"
+        category: "防具.铠甲.7"
+
+  - setId: 22
+    name: "碧晶套装"
+    bonuses: []
+    items:
+      - originalId: 2305
+        name: "碧晶之帽"
+        category: "防具.头盔.6"
+      - originalId: 2306
+        name: "碧晶之服"
+        category: "防具.铠甲.7"
+      - originalId: 2307
+        name: "碧晶腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2308
+        name: "碧晶之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "flat"
+            value: 10
+            sourceArgument: "MDEX:10"
+      - originalId: 2309
+        name: "碧晶之杖"
+        category: "武器.棍.2"
+      - originalId: 2310
+        name: "碧晶耳饰"
+        category: "首饰.耳环.13"
+      - originalId: 2311
+        name: "碧晶护身符"
+        category: "首饰.护身符.15"
+
+  - setId: 23
+    name: "硬甲套装"
+    bonuses: []
+    items:
+      - originalId: 2312
+        name: "硬甲头盔"
+        category: "防具.头盔.6"
+      - originalId: 2313
+        name: "硬甲  甲"
+        category: "防具.铠甲.7"
+      - originalId: 2314
+        name: "硬甲腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2315
+        name: "硬甲之靴"
+        category: "防具.鞋子.26"
+      - originalId: 2316
+        name: "硬甲战弓"
+        category: "武器.弓.4"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "flat"
+            value: 10
+            sourceArgument: "MSTR:10"
+      - originalId: 2317
+        name: "硬甲戒指"
+        category: "首饰.戒指.11"
+      - originalId: 2318
+        name: "硬甲首饰"
+        category: "首饰.项链.10"
+
+  - setId: 24
+    name: "巨石套装"
+    bonuses: []
+    items:
+      - originalId: 2319
+        name: "巨石头盔"
+        category: "防具.头盔.6"
+      - originalId: 2326
+        name: "巨石之铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "defense"
+            mode: "flat"
+            value: 10
+            sourceArgument: "MTGH:10"
+      - originalId: 2327
+        name: "巨石腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2328
+        name: "巨石之靴"
+        category: "防具.鞋子.26"
+      - originalId: 2329
+        name: "巨石之斧"
+        category: "武器.斧.1"
+      - originalId: 2330
+        name: "巨石石盾"
+        category: "防具.扩展盾牌.25"
+      - originalId: 2331
+        name: "巨石手环"
+        category: "首饰.手环.8"
+      - originalId: 2332
+        name: "巨石首饰"
+        category: "首饰.项链.10"
+      - originalId: 2349
+        name: "尖牙头盔"
+        category: "防具.头盔.6"
+      - originalId: 2350
+        name: "尖牙之铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "defense"
+            mode: "flat"
+            value: 30
+            sourceArgument: "MTGH:30"
+      - originalId: 2351
+        name: "尖牙腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2352
+        name: "尖牙之靴"
+        category: "防具.鞋子.26"
+      - originalId: 2353
+        name: "尖牙之斧"
+        category: "武器.斧.1"
+      - originalId: 2354
+        name: "尖牙石盾"
+        category: "防具.扩展盾牌.25"
+      - originalId: 19567
+        name: "战士盾"
+        category: "防具.扩展盾牌.25"
+      - originalId: 19569
+        name: "战士靴"
+        category: "防具.鞋子.26"
+
+  - setId: 25
+    name: "枯骨套装"
+    bonuses: []
+    items:
+      - originalId: 2334
+        name: "枯骨之帽"
+        category: "防具.头盔.6"
+      - originalId: 2335
+        name: "枯骨之服"
+        category: "防具.铠甲.7"
+      - originalId: 2336
+        name: "枯骨腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2337
+        name: "枯骨之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "flat"
+            value: 30
+            sourceArgument: "MDEX:30"
+      - originalId: 2338
+        name: "枯骨之杖"
+        category: "武器.棍.2"
+
+  - setId: 26
+    name: "龙鳞套装"
+    bonuses: []
+    items:
+      - originalId: 2339
+        name: "龙鳞头盔"
+        category: "防具.头盔.6"
+      - originalId: 2340
+        name: "龙鳞  甲"
+        category: "防具.铠甲.7"
+      - originalId: 2341
+        name: "龙鳞腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2342
+        name: "龙鳞之靴"
+        category: "防具.鞋子.26"
+      - originalId: 2343
+        name: "龙鳞战弓"
+        category: "武器.弓.4"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "flat"
+            value: 30
+            sourceArgument: "MSTR:30"
+
+  - setId: 27
+    name: "洛德套装"
+    bonuses: []
+    items:
+      - originalId: 2358
+        name: "洛德棍"
+        category: "武器.棍.2"
+      - originalId: 2359
+        name: "洛德铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 8
+            sourceArgument: "MP:8"
+      - originalId: 2360
+        name: "洛德盔"
+        category: "防具.头盔.6"
+      - originalId: 2361
+        name: "洛德腰带"
+        category: "防具.扩展腰带.24"
+
+  - setId: 28
+    name: "魔魂套装"
+    bonuses: []
+    items:
+      - originalId: 2388
+        name: "魔魂枪"
+        category: "武器.枪.3"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 20
+            sourceArgument: "HP:20"
+      - originalId: 2389
+        name: "魔魂铠"
+        category: "防具.铠甲.7"
+      - originalId: 2390
+        name: "魔魂兜"
+        category: "防具.头盔.6"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 5
+            sourceArgument: "MP:5"
+      - originalId: 20615
+        name: "魔魂手环A"
+        category: "首饰.手环.8"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "flat"
+            value: 10
+            sourceArgument: "MSTR:10"
+      - originalId: 20616
+        name: "魔魂戒指A"
+        category: "首饰.戒指.11"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "flat"
+            value: 10
+            sourceArgument: "MDEX:10"
+      - originalId: 20617
+        name: "魔魂鞋A"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "defense"
+            mode: "flat"
+            value: 10
+            sourceArgument: "MTGH:10"
+      - originalId: 20621
+        name: "魔魂手环B"
+        category: "首饰.手环.8"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "flat"
+            value: 10
+            sourceArgument: "MSTR:10"
+      - originalId: 20622
+        name: "魔魂戒指B"
+        category: "首饰.戒指.11"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "flat"
+            value: 10
+            sourceArgument: "MDEX:10"
+      - originalId: 20623
+        name: "魔魂鞋B"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "defense"
+            mode: "flat"
+            value: 10
+            sourceArgument: "MTGH:10"
+
+  - setId: 29
+    name: "雷甲套装"
+    bonuses: []
+    items:
+      - originalId: 2859
+        name: "雷甲头盔"
+        category: "防具.头盔.6"
+      - originalId: 2860
+        name: "雷甲之铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "counterRate"
+            mode: "flat"
+            value: 20
+            sourceArgument: "COUNTER:20"
+      - originalId: 2861
+        name: "雷甲腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2862
+        name: "雷甲之靴"
+        category: "防具.鞋子.26"
+      - originalId: 2863
+        name: "雷甲之斧"
+        category: "武器.斧.1"
+      - originalId: 2864
+        name: "雷甲匕首"
+        category: "武器.枪.3"
+
+  - setId: 30
+    name: "飞翔套装"
+    bonuses: []
+    items:
+      - originalId: 2865
+        name: "飞翔之帽"
+        category: "防具.头盔.6"
+      - originalId: 2866
+        name: "飞翔之服"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "magicPower"
+            mode: "percent"
+            value: 5
+            sourceArgument: "M_POW:5"
+      - originalId: 2867
+        name: "飞翔腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2868
+        name: "飞翔之靴"
+        category: "防具.鞋子.26"
+      - originalId: 2869
+        name: "飞翔之杖"
+        category: "武器.棍.2"
+
+  - setId: 31
+    name: "苍贝套装"
+    bonuses: []
+    items:
+      - originalId: 2870
+        name: "苍贝头盔"
+        category: "防具.头盔.6"
+      - originalId: 2871
+        name: "苍贝之甲"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "statusResistance"
+            target: "all"
+            mode: "flat"
+            value: 8
+            sourceArgument: "RESIST:8"
+      - originalId: 2872
+        name: "苍贝腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2873
+        name: "苍贝之靴"
+        category: "防具.鞋子.26"
+      - originalId: 2874
+        name: "苍贝回旋标"
+        category: "武器.回旋镖.17"
+
+  - setId: 32
+    name: "玛拉套装"
+    bonuses: []
+    items:
+      - originalId: 2875
+        name: "玛拉兜"
+        category: "防具.头盔.6"
+      - originalId: 2876
+        name: "玛拉服"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 20
+            sourceArgument: "HP:20"
+      - originalId: 2877
+        name: "玛拉腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 2878
+        name: "玛拉靴"
+        category: "防具.鞋子.26"
+      - originalId: 2879
+        name: "玛拉枪"
+        category: "武器.枪.3"
+
+  - setId: 33
+    name: "柳牙套装"
+    bonuses: []
+    items:
+      - originalId: 2903
+        name: "强化的柳牙弓箭"
+        category: "武器.弓.4"
+      - originalId: 2904
+        name: "强化的柳牙棍棒"
+        category: "武器.棍.2"
+      - originalId: 2905
+        name: "强化的柳牙之枪"
+        category: "武器.枪.3"
+      - originalId: 2906
+        name: "强化的柳牙之兜"
+        category: "防具.头盔.6"
+        # TODO: 原版该物品未绑定 ITEM_suitEquip/ITEM_ResuitEquip, 正常穿脱不会主动重算套装; 这里仍保留其预期套装效果.
+        setEffects:
+          - pieces: 3
+            type: "element"
+            target: "earth"
+            mode: "flat"
+            value: 30
+            sourceArgument: "EARTH:30"
+      - originalId: 2907
+        name: "强化的柳牙之服"
+        category: "防具.铠甲.7"
+        # TODO: 原数据采用火抗/雷抗/电抗/冰抗格式, 原版 ITEM_MagicResist 却查找抗火/抗雷/抗冰; 卸装函数还会误清火抗字段. 这里按道具文本保留直属装备效果.
+        equipmentEffects:
+          - type: "magicResistance"
+            target: "thunder"
+            mode: "flat"
+            value: 100
+            sourceArgument: "雷抗100"
+      - originalId: 2923
+        name: "柳牙弓箭"
+        category: "武器.弓.4"
+      - originalId: 2924
+        name: "柳牙棍棒"
+        category: "武器.棍.2"
+      - originalId: 2925
+        name: "柳牙之枪"
+        category: "武器.枪.3"
+      - originalId: 2926
+        name: "柳牙之兜"
+        category: "防具.头盔.6"
+        # TODO: 原版该物品未绑定 ITEM_suitEquip/ITEM_ResuitEquip, 正常穿脱不会主动重算套装; 这里仍保留其预期套装效果.
+        setEffects:
+          - pieces: 3
+            type: "element"
+            target: "earth"
+            mode: "flat"
+            value: 30
+            sourceArgument: "EARTH:30"
+      - originalId: 2927
+        name: "柳牙之服"
+        category: "防具.铠甲.7"
+        # TODO: 原数据采用火抗/雷抗/电抗/冰抗格式, 原版 ITEM_MagicResist 却查找抗火/抗雷/抗冰; 卸装函数还会误清火抗字段. 这里按道具文本保留直属装备效果.
+        equipmentEffects:
+          - type: "magicResistance"
+            target: "thunder"
+            mode: "flat"
+            value: 10
+            sourceArgument: "雷抗10"
+
+  - setId: 34
+    name: "雪泪套装"
+    bonuses: []
+    items:
+      - originalId: 2908
+        name: "强化的雪泪弓箭"
+        category: "武器.弓.4"
+      - originalId: 2909
+        name: "强化的雪泪棍棒"
+        category: "武器.棍.2"
+      - originalId: 2910
+        name: "强化的雪泪之枪"
+        category: "武器.枪.3"
+      - originalId: 2911
+        name: "强化的雪泪之兜"
+        category: "防具.头盔.6"
+        # TODO: 原版套装解析器把水属性键写成 WRITER, 不识别 WATER; 这里按预期水属性加成配置.
+        # TODO: 原版该物品未绑定 ITEM_suitEquip/ITEM_ResuitEquip, 正常穿脱不会主动重算套装; 这里仍保留其预期套装效果.
+        # TODO: 原版水/火/风属性未达到上限的公式分支错误读取地属性套装值; 新运行时应按此处 target 实现.
+        setEffects:
+          - pieces: 3
+            type: "element"
+            target: "water"
+            mode: "flat"
+            value: 30
+            sourceArgument: "WATER:30"
+      - originalId: 2912
+        name: "强化的雪泪之服"
+        category: "防具.铠甲.7"
+        # TODO: 原数据采用火抗/雷抗/电抗/冰抗格式, 原版 ITEM_MagicResist 却查找抗火/抗雷/抗冰; 卸装函数还会误清火抗字段. 这里按道具文本保留直属装备效果.
+        equipmentEffects:
+          - type: "magicResistance"
+            target: "ice"
+            mode: "flat"
+            value: 100
+            sourceArgument: "冰抗100"
+      - originalId: 2928
+        name: "雪泪弓箭"
+        category: "武器.弓.4"
+      - originalId: 2929
+        name: "雪泪棍棒"
+        category: "武器.棍.2"
+      - originalId: 2930
+        name: "雪泪之枪"
+        category: "武器.枪.3"
+      - originalId: 2931
+        name: "雪泪之兜"
+        category: "防具.头盔.6"
+        # TODO: 原版套装解析器把水属性键写成 WRITER, 不识别 WATER; 这里按预期水属性加成配置.
+        # TODO: 原版该物品未绑定 ITEM_suitEquip/ITEM_ResuitEquip, 正常穿脱不会主动重算套装; 这里仍保留其预期套装效果.
+        # TODO: 原版水/火/风属性未达到上限的公式分支错误读取地属性套装值; 新运行时应按此处 target 实现.
+        setEffects:
+          - pieces: 3
+            type: "element"
+            target: "water"
+            mode: "flat"
+            value: 30
+            sourceArgument: "WATER:30"
+      - originalId: 2932
+        name: "雪泪之服"
+        category: "防具.铠甲.7"
+        # TODO: 原数据采用火抗/雷抗/电抗/冰抗格式, 原版 ITEM_MagicResist 却查找抗火/抗雷/抗冰; 卸装函数还会误清火抗字段. 这里按道具文本保留直属装备效果.
+        equipmentEffects:
+          - type: "magicResistance"
+            target: "ice"
+            mode: "flat"
+            value: 10
+            sourceArgument: "冰抗10"
+
+  - setId: 35
+    name: "阳炽套装"
+    bonuses: []
+    items:
+      - originalId: 2913
+        name: "强化的阳炽弓箭"
+        category: "武器.弓.4"
+      - originalId: 2914
+        name: "强化的阳炽棍棒"
+        category: "武器.棍.2"
+      - originalId: 2915
+        name: "强化的阳炽之枪"
+        category: "武器.枪.3"
+      - originalId: 2916
+        name: "强化的阳炽之兜"
+        category: "防具.头盔.6"
+        # TODO: 原版该物品未绑定 ITEM_suitEquip/ITEM_ResuitEquip, 正常穿脱不会主动重算套装; 这里仍保留其预期套装效果.
+        # TODO: 原版水/火/风属性未达到上限的公式分支错误读取地属性套装值; 新运行时应按此处 target 实现.
+        setEffects:
+          - pieces: 3
+            type: "element"
+            target: "fire"
+            mode: "flat"
+            value: 30
+            sourceArgument: "FIRE:30"
+      - originalId: 2917
+        name: "强化的阳炽之服"
+        category: "防具.铠甲.7"
+        # TODO: 原数据采用火抗/雷抗/电抗/冰抗格式, 原版 ITEM_MagicResist 却查找抗火/抗雷/抗冰; 卸装函数还会误清火抗字段. 这里按道具文本保留直属装备效果.
+        equipmentEffects:
+          - type: "magicResistance"
+            target: "fire"
+            mode: "flat"
+            value: 100
+            sourceArgument: "火抗100"
+      - originalId: 2933
+        name: "阳炽弓箭"
+        category: "武器.弓.4"
+      - originalId: 2934
+        name: "阳炽棍棒"
+        category: "武器.棍.2"
+      - originalId: 2935
+        name: "阳炽之枪"
+        category: "武器.枪.3"
+      - originalId: 2936
+        name: "阳炽之兜"
+        category: "防具.头盔.6"
+        # TODO: 原版该物品未绑定 ITEM_suitEquip/ITEM_ResuitEquip, 正常穿脱不会主动重算套装; 这里仍保留其预期套装效果.
+        # TODO: 原版水/火/风属性未达到上限的公式分支错误读取地属性套装值; 新运行时应按此处 target 实现.
+        setEffects:
+          - pieces: 3
+            type: "element"
+            target: "fire"
+            mode: "flat"
+            value: 30
+            sourceArgument: "FIRE:30"
+      - originalId: 2937
+        name: "阳炽之服"
+        category: "防具.铠甲.7"
+        # TODO: 原数据采用火抗/雷抗/电抗/冰抗格式, 原版 ITEM_MagicResist 却查找抗火/抗雷/抗冰; 卸装函数还会误清火抗字段. 这里按道具文本保留直属装备效果.
+        equipmentEffects:
+          - type: "magicResistance"
+            target: "fire"
+            mode: "flat"
+            value: 10
+            sourceArgument: "火抗10"
+
+  - setId: 36
+    name: "疾翎套装"
+    bonuses: []
+    items:
+      - originalId: 2918
+        name: "强化的疾翎弓箭"
+        category: "武器.弓.4"
+      - originalId: 2919
+        name: "强化的疾翎棍棒"
+        category: "武器.棍.2"
+      - originalId: 2920
+        name: "强化的疾翎之枪"
+        category: "武器.枪.3"
+      - originalId: 2921
+        name: "强化的疾翎之兜"
+        category: "防具.头盔.6"
+        # TODO: 原版该物品未绑定 ITEM_suitEquip/ITEM_ResuitEquip, 正常穿脱不会主动重算套装; 这里仍保留其预期套装效果.
+        # TODO: 原版水/火/风属性未达到上限的公式分支错误读取地属性套装值; 新运行时应按此处 target 实现.
+        setEffects:
+          - pieces: 3
+            type: "element"
+            target: "wind"
+            mode: "flat"
+            value: 30
+            sourceArgument: "WIND:30"
+      - originalId: 2922
+        name: "强化的疾翎之服"
+        category: "防具.铠甲.7"
+        # TODO: 原数据采用火抗/雷抗/电抗/冰抗格式, 原版 ITEM_MagicResist 却查找抗火/抗雷/抗冰; 卸装函数还会误清火抗字段. 这里按道具文本保留直属装备效果.
+        equipmentEffects:
+          - type: "magicResistance"
+            target: "thunder"
+            mode: "flat"
+            value: 100
+            sourceArgument: "电抗100"
+      - originalId: 2938
+        name: "疾翎弓箭"
+        category: "武器.弓.4"
+      - originalId: 2939
+        name: "疾翎棍棒"
+        category: "武器.棍.2"
+      - originalId: 2940
+        name: "疾翎之枪"
+        category: "武器.枪.3"
+      - originalId: 2941
+        name: "疾翎之兜"
+        category: "防具.头盔.6"
+        # TODO: 原版该物品未绑定 ITEM_suitEquip/ITEM_ResuitEquip, 正常穿脱不会主动重算套装; 这里仍保留其预期套装效果.
+        # TODO: 原版水/火/风属性未达到上限的公式分支错误读取地属性套装值; 新运行时应按此处 target 实现.
+        setEffects:
+          - pieces: 3
+            type: "element"
+            target: "wind"
+            mode: "flat"
+            value: 30
+            sourceArgument: "WIND:30"
+      - originalId: 2942
+        name: "疾翎之服"
+        category: "防具.铠甲.7"
+        # TODO: 原数据采用火抗/雷抗/电抗/冰抗格式, 原版 ITEM_MagicResist 却查找抗火/抗雷/抗冰; 卸装函数还会误清火抗字段. 这里按道具文本保留直属装备效果.
+        equipmentEffects:
+          - type: "magicResistance"
+            target: "thunder"
+            mode: "flat"
+            value: 10
+            sourceArgument: "电抗10"
+
+  - setId: 38
+    name: "龙骨套装"
+    bonuses: []
+    items:
+      - originalId: 19739
+        name: "龙骨头盔"
+        category: "防具.头盔.6"
+      - originalId: 19740
+        name: "龙骨铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "percent"
+            value: 20
+            sourceArgument: "SUITDEXP:20"
+      - originalId: 19741
+        name: "龙骨腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 19742
+        name: "龙骨棍"
+        category: "武器.棍.2"
+      - originalId: 19743
+        name: "龙骨靴"
+        category: "防具.鞋子.26"
+
+  - setId: 39
+    name: "夜魂套装"
+    bonuses: []
+    items:
+      - originalId: 19744
+        name: "夜魂帽"
+        category: "防具.头盔.6"
+      - originalId: 19745
+        name: "夜魂服"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "silenceResistance"
+            mode: "flat"
+            value: 30
+            sourceArgument: "RENOCASE:30"
+      - originalId: 19746
+        name: "夜魂皮带"
+        category: "防具.扩展腰带.24"
+      - originalId: 19747
+        name: "夜魂杖"
+        category: "武器.棍.2"
+      - originalId: 19748
+        name: "夜魂鞋"
+        category: "防具.鞋子.26"
+
+  - setId: 40
+    name: "冰炼套装"
+    bonuses: []
+    items:
+      - originalId: 19749
+        name: "冰炼头盔"
+        category: "防具.头盔.6"
+      - originalId: 19750
+        name: "冰炼甲"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "dodgeRate"
+            mode: "flat"
+            value: 20
+            sourceArgument: "WDUCKPOWER:20"
+      - originalId: 19751
+        name: "冰炼腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 19752
+        name: "冰炼枪"
+        category: "武器.枪.3"
+      - originalId: 19753
+        name: "冰炼靴"
+        category: "防具.鞋子.26"
+
+  - setId: 41
+    name: "萨美套装"
+    bonuses: []
+    items:
+      - originalId: 19754
+        name: "萨美头盔"
+        category: "防具.头盔.6"
+      - originalId: 19755
+        name: "萨美硬皮甲"
+        category: "防具.铠甲.7"
+        # TODO: 原版套装解析器只识别 SUITTGH_P; 这里按同义拼写配置为防御百分比加成.
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "defense"
+            mode: "percent"
+            value: 5
+            sourceArgument: "SUITTGHP:5"
+      - originalId: 19756
+        name: "萨美皮带"
+        category: "防具.扩展腰带.24"
+      - originalId: 19757
+        name: "萨美枪"
+        category: "武器.枪.3"
+      - originalId: 19758
+        name: "萨美靴"
+        category: "防具.鞋子.26"
+
+  - setId: 42
+    name: "星光套装"
+    bonuses: []
+    items:
+      - originalId: 20570
+        name: "星光服"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 15
+            sourceArgument: "MP:15"
+      - originalId: 20571
+        name: "星光帽"
+        category: "防具.头盔.6"
+      - originalId: 20572
+        name: "星光爪"
+        category: "武器.爪.0"
+
+  - setId: 43
+    name: "月光套装"
+    bonuses: []
+    items:
+      - originalId: 20595
+        name: "月光帽"
+        category: "防具.头盔.6"
+      - originalId: 20596
+        name: "月光服"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 20597
+        name: "月光枪"
+        category: "武器.枪.3"
+
+  - setId: 44
+    name: "萨贝多套装"
+    bonuses: []
+    items:
+      - originalId: 20720
+        name: "萨贝多头盔"
+        category: "防具.头盔.6"
+      - originalId: 20721
+        name: "萨贝多之铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "poisonOnHit"
+            mode: "chancePercent"
+            value: 50
+            sourceArgument: "SUITPOISON:50"
+      - originalId: 20722
+        name: "萨贝多腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 20723
+        name: "萨贝多之靴"
+        category: "防具.鞋子.26"
+      - originalId: 20724
+        name: "萨贝多右手爪"
+        category: "武器.爪.0"
+      - originalId: 20725
+        name: "萨贝多左手爪"
+        category: "防具.扩展盾牌.25"
+
+  - setId: 45
+    name: "宝斯套装"
+    bonuses: []
+    items:
+      - originalId: 20726
+        name: "宝斯之帽"
+        category: "防具.头盔.6"
+      - originalId: 20727
+        name: "宝斯之服"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "magicPower"
+            mode: "percent"
+            triggerChance: 30
+            value: 30
+            sourceArgument: "M2_POW:30"
+      - originalId: 20728
+        name: "宝斯腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 20729
+        name: "宝斯之靴"
+        category: "防具.鞋子.26"
+      - originalId: 20730
+        name: "宝斯之杖"
+        category: "武器.棍.2"
+      - originalId: 20731
+        name: "宝斯之盾"
+        category: "防具.扩展盾牌.25"
+
+  - setId: 46
+    name: "伊斯卡套装"
+    bonuses: []
+    items:
+      - originalId: 20732
+        name: "伊斯卡轻兜"
+        category: "防具.头盔.6"
+      - originalId: 20733
+        name: "伊斯卡服"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "dodgeRate"
+            mode: "flat"
+            value: 30
+            sourceArgument: "WDUCKPOWER:30"
+      - originalId: 20734
+        name: "伊斯卡轻斧-右"
+        category: "武器.斧.1"
+      - originalId: 20735
+        name: "伊斯卡轻斧-左"
+        category: "防具.扩展盾牌.25"
+      - originalId: 20736
+        name: "伊斯卡腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 20737
+        name: "伊斯卡之靴"
+        category: "防具.鞋子.26"
+
+  - setId: 47
+    name: "拉佛套装"
+    bonuses: []
+    items:
+      - originalId: 20738
+        name: "拉佛之兜"
+        category: "防具.头盔.6"
+      - originalId: 20739
+        name: "拉佛之铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "magicDamageReduction"
+            mode: "percent"
+            value: 20
+            sourceArgument: "UN_POW_M:20"
+      - originalId: 20740
+        name: "拉佛腰带"
+        category: "防具.扩展腰带.24"
+      - originalId: 20741
+        name: "拉佛之石"
+        category: "武器.投掷石.19"
+      - originalId: 20742
+        name: "拉佛之靴"
+        category: "防具.鞋子.26"
+
+  - setId: 49
+    name: "新手套装"
+    bonuses: []
+    items:
+      - originalId: 2993
+        name: "新手手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "defense"
+            mode: "flat"
+            value: 60
+            sourceArgument: "MTGH:60"
+      - originalId: 2994
+        name: "新手铠"
+        category: "防具.铠甲.7"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 160
+            sourceArgument: "HP:160"
+      - originalId: 2995
+        name: "新手腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "flat"
+            value: 60
+            sourceArgument: "MDEX:60"
+      - originalId: 2996
+        name: "新手鞋"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "flat"
+            value: 60
+            sourceArgument: "MSTR:60"
+      - originalId: 2997
+        name: "新手兜"
+        category: "防具.头盔.6"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 10
+            sourceArgument: "MP:10"
+      - originalId: 2998
+        name: "新手棍棒"
+        category: "武器.棍.2"
+        setEffects:
+          - pieces: 3
+            type: "underwaterBreathing"
+            sourceArgument: "WAST:-1"
+
+  - setId: 50
+    name: "褐那LV4套装"
+    bonuses: []
+    items:
+      - originalId: 21231
+        name: "褐那腰带LV4"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21236
+        name: "褐那之靴LV4"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21241
+        name: "褐那手套LV4"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21246
+        name: "褐那之盾LV4"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+
+  - setId: 51
+    name: "绿磊套装"
+    bonuses: []
+    items:
+      - originalId: 19103
+        name: "绿磊腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19105
+        name: "绿磊之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19106
+        name: "绿磊之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19107
+        name: "绿磊手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21232
+        name: "褐那腰带LV5"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21237
+        name: "褐那之靴LV5"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21242
+        name: "褐那手套LV5"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21247
+        name: "褐那之盾LV5"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21437
+        name: "黑暗腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21439
+        name: "黑暗之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21440
+        name: "黑暗之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21441
+        name: "黑暗手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29129
+        name: "森林腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29131
+        name: "森林之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29132
+        name: "森林之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29133
+        name: "森林手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29356
+        name: "加强版L6褐那之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29357
+        name: "加强版L6褐那手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29358
+        name: "加强版L6褐那之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29359
+        name: "加强版L6褐那腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+
+  - setId: 52
+    name: "碧华LV4套装"
+    bonuses: []
+    items:
+      - originalId: 21251
+        name: "碧华腰带LV4"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21256
+        name: "碧华之靴LV4"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21261
+        name: "碧华手套LV4"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21266
+        name: "碧华之盾LV4"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+
+  - setId: 53
+    name: "蓝淼套装"
+    bonuses: []
+    items:
+      - originalId: 19089
+        name: "蓝淼腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19091
+        name: "蓝淼之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19092
+        name: "蓝淼之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19093
+        name: "蓝淼手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21252
+        name: "碧华腰带LV5"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21257
+        name: "碧华之靴LV5"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21262
+        name: "碧华手套LV5"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21267
+        name: "碧华之盾LV5"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 29352
+        name: "加强版L6碧华之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29353
+        name: "加强版L6碧华手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29354
+        name: "加强版L6碧华之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29355
+        name: "加强版L6碧华腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+
+  - setId: 54
+    name: "洛炎LV4套装"
+    bonuses: []
+    items:
+      - originalId: 21271
+        name: "洛炎腰带LV4"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21276
+        name: "洛炎之靴LV4"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21281
+        name: "洛炎手套LV4"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21286
+        name: "洛炎之盾LV4"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+
+  - setId: 55
+    name: "红炎套装"
+    bonuses: []
+    items:
+      - originalId: 19082
+        name: "红炎腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19084
+        name: "红炎之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19085
+        name: "红炎之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19086
+        name: "红炎手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21272
+        name: "洛炎腰带LV5"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21277
+        name: "洛炎之靴LV5"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21282
+        name: "洛炎手套LV5"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21287
+        name: "洛炎之盾LV5"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 29116
+        name: "焰火腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "defense"
+            mode: "flat"
+            value: 100
+            sourceArgument: "MTGH:100"
+      - originalId: 29117
+        name: "焰火之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "flat"
+            value: 100
+            sourceArgument: "MDEX:100"
+      - originalId: 29118
+        name: "焰火手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "flat"
+            value: 100
+            sourceArgument: "MSTR:100"
+      - originalId: 29119
+        name: "焰火之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 160
+            sourceArgument: "HP:160"
+      - originalId: 29282
+        name: "特制加强-红炎腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29284
+        name: "特制加强-红炎之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29285
+        name: "特制加强-红炎之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29286
+        name: "特制加强-红炎手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29348
+        name: "加强版L6洛炎之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29349
+        name: "加强版L6洛炎手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29350
+        name: "加强版L6洛炎之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29351
+        name: "加强版L6洛炎腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+
+  - setId: 56
+    name: "温特LV4套装"
+    bonuses: []
+    items:
+      - originalId: 21291
+        name: "温特腰带LV4"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21296
+        name: "温特之靴LV4"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21301
+        name: "温特手套LV4"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21306
+        name: "温特之盾LV4"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+
+  - setId: 57
+    name: "黄晶套装"
+    bonuses: []
+    items:
+      - originalId: 19096
+        name: "黄晶腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19098
+        name: "黄晶之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19099
+        name: "黄晶之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 19100
+        name: "黄晶手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 21292
+        name: "温特腰带LV5"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21297
+        name: "温特之靴LV5"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21302
+        name: "温特手套LV5"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 21307
+        name: "温特之盾LV5"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 25
+            sourceArgument: "MP:25"
+      - originalId: 29091
+        name: "玄冰盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 16000
+            sourceArgument: "HP:16000"
+      - originalId: 29092
+        name: "玄冰护手"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "attack"
+            mode: "flat"
+            value: 100
+            sourceArgument: "MSTR:100"
+      - originalId: 29093
+        name: "玄冰之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "agility"
+            mode: "flat"
+            value: 100
+            sourceArgument: "MDEX:100"
+      - originalId: 29094
+        name: "玄冰腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "attribute"
+            target: "defense"
+            mode: "flat"
+            value: 100
+            sourceArgument: "MTGH:100"
+      - originalId: 29182
+        name: "猪盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 16000
+            sourceArgument: "HP:16000"
+      - originalId: 29183
+        name: "鱼鱼盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "hp"
+            value: 50000
+            sourceArgument: "HP:50000"
+      - originalId: 29275
+        name: "特制加强-特制加强-黄晶腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29277
+        name: "特制加强-特制加强-黄晶之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29278
+        name: "特制加强-特制加强-黄晶之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29279
+        name: "特制加强-特制加强-黄晶手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29344
+        name: "加强版L6温特之盾"
+        category: "防具.扩展盾牌.25"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29345
+        name: "加强版L6温特手套"
+        category: "防具.手套.27"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29346
+        name: "加强版L6温特之靴"
+        category: "防具.鞋子.26"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
+      - originalId: 29347
+        name: "加强版L6温特腰带"
+        category: "防具.扩展腰带.24"
+        setEffects:
+          - pieces: 3
+            type: "roundRecovery"
+            target: "mp"
+            value: 20
+            sourceArgument: "MP:20"
