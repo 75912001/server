@@ -29,6 +29,37 @@ enum AssetIDRange {
   AssetIDRange_Item_Item_Start = 3000000;
   AssetIDRange_Item_Item_End = 3499999;
   AssetIDRange_Item_Equipment_Start = 3500000;
+
+  AssetIDRange_Item_Equipment_Weapon_Start = 3900000;
+
+  // 爪
+  AssetIDRange_Item_Equipment_Weapon_Claw_Start = 3900000;
+  AssetIDRange_Item_Equipment_Weapon_Claw_End = 3909999;
+  // 斧
+  AssetIDRange_Item_Equipment_Weapon_Axe_Start = 3910000;
+  AssetIDRange_Item_Equipment_Weapon_Axe_End = 3919999;
+  // 棍
+  AssetIDRange_Item_Equipment_Weapon_Staff_Start = 3920000;
+  AssetIDRange_Item_Equipment_Weapon_Staff_End = 3929999;
+  // 枪
+  AssetIDRange_Item_Equipment_Weapon_Spear_Start = 3930000;
+  AssetIDRange_Item_Equipment_Weapon_Spear_End = 3939999;
+  // 弓
+  AssetIDRange_Item_Equipment_Weapon_Bow_Start = 3940000;
+  AssetIDRange_Item_Equipment_Weapon_Bow_End = 3949999;
+  // 回旋镖
+  AssetIDRange_Item_Equipment_Weapon_Boomerang_Start = 3950000;
+  AssetIDRange_Item_Equipment_Weapon_Boomerang_End = 3959999;
+  // 投掷斧
+  AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_Start = 3960000;
+  AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_End = 3969999;
+  // 投掷石
+  AssetIDRange_Item_Equipment_Weapon_ThrowingStone_Start = 3970000;
+  AssetIDRange_Item_Equipment_Weapon_ThrowingStone_End = 3979999;
+
+  AssetIDRange_Item_Equipment_Weapon_End = 3999999;
+
+
   AssetIDRange_Item_Equipment_End = 3999999;
   AssetIDRange_Item_End = 3999999;
   AssetIDRange_Pet_Start = 4000000;
