@@ -2,7 +2,7 @@
 
 ## 适用范围
 
-修改 Account actor、共享配置加载、角色、宠物或邮箱业务、`CombatRoom`、回合动作、gateway stream 路由或 online gRPC handler 时使用本文档.
+修改 Account actor、共享配置加载、角色、宠物、商店或邮箱业务、`CombatRoom`、回合动作、gateway stream 路由或 online gRPC handler 时使用本文档.
 
 ## 快速检查
 
@@ -43,6 +43,20 @@ scene.yaml
 - `enemy.group.yaml enemies[].id` 引用不存在的宠物模板时加载失败.
 - 当前所有宠物技能槽都是 `[8000001,8000002,0,0,0,0,0]`.
 - 配置加载失败后不注册 etcd, 不启动 gRPC 业务入口.
+
+## 全局武器商店购买
+
+- `ShopPurchaseReq` 和 `ShopPurchaseRes` 的消息 ID 分别保持为 `0x003007` 和 `0x003008`.
+- 仅允许购买武器 ID 且 `item.yaml cost > 0` 的条目; `cost = 0`、非武器 ID、预期单价不一致和数量为0必须拒绝.
+- 角色必须属于当前账号、已经在线且不在战斗中. 石币不足、背包满、数量超过剩余格数或 UUID 游标耗尽时不得修改账号档案.
+- 成功购买多件武器时, 新装备 UUID 必须从旧 `used_uuid + 1` 连续递增, 装备记录当前只保存 `uuid` 和 `asset_id`, 并一次性扣除总价.
+- cache 持久化失败必须保留原石币、背包和 UUID 游标; 成功响应必须返回剩余石币、最新游标和完整的本次新增装备列表.
+
+聚焦测试命令:
+
+```bash
+GOCACHE="$PWD/.gocache" go test ./online -run ShopPurchase
+```
 
 ## 统一技能测试
 
