@@ -106,11 +106,10 @@ message CharacterBaseRecord {
 message CharacterRecord {
   CharacterBaseRecord base = 1; // 角色基础权威数据; 完整角色 key 为 AccountRecord.aid + base.uuid
 
-  uint32 stone = 10; // 石币
-  uint32 shell = 11; // 贝壳
-  uint32 diamond = 12; // 钻石
+  reserved 10, 11, 12;
+  reserved "stone", "shell", "diamond";
 
-  //map<uint32, uint64> asset_map = 20; // 资产表, key 为 asset_id, value 为数值
+  map<uint32, uint64> asset_count_map = 20; // 角色独立资产持有数量, key 仅允许 [3490000,3499999], value 为最终持有数量; 缺失等同于 0, 数量为 0 时不持久化
   ItemContainerRecord item_bag = 30; // 角色随身物品背包, 最多容纳 30 种道具或装备实例
   CharacterEquipmentRecord equipment = 40; // 角色当前穿戴装备; 新角色初始化为空消息, 未穿戴部位保持未设置
   //map<uint64, RecordPrimary> record_map = 1000; // 角色临时扩展记录表

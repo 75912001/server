@@ -95,7 +95,7 @@ message ShopPurchaseRes {
   uint32 quantity = 3; // 实际购买数量
   uint64 unit_cost = 4; // 服务端权威单价
   uint64 total_cost = 5; // 本次购买总价
-  uint32 remaining_stone = 6; // 购买后的角色石币
+  ItemElement affected_item = 6; // 本次支付影响的道具及扣除后的最终持有数量
   uint64 used_uuid = 7; // 购买后账号已分配 UUID 游标
   repeated EquipmentRecord equipment_record_list = 10; // 新增到角色背包的装备实例
 }
