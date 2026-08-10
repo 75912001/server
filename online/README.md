@@ -13,7 +13,7 @@ Online 当前负责:
 - 读取、校验和持久化 `AccountRecord`.
 - 角色创建、上线、下线、场景切换和自动遇敌.
 - 宠物携带状态、仓库存取和昵称.
-- 道具使用、背包和仓库存取.
+- 道具使用、背包和仓库存取, 以及全局武器商店购买.
 - 在线角色邮箱的获取、已读、删除和新增邮件通知.
 - GM 结构化命令, 当前支持增加道具、宠物和系统邮件.
 - 每场独立 `CombatRoom` actor 的 PVE 回合、动作和结算.
@@ -50,6 +50,12 @@ Docker 镜像会把仓库 `config/` 复制到 `/app/config`, `deploy/online/*.ya
 配置加载依次执行单表 `load`、跨表 `check` 和 `assemble`. 文件缺失、字段非法或引用无效时直接启动失败, 不继续注册 etcd 或启动业务服务.
 
 自动遇敌按 `scene.yaml -> enemy.group.yaml -> pet.yaml` 生成单位. 场景按权重选择敌人组, 敌人组的 `enemies[].id` 直接引用宠物模板; 数量和等级来自敌人组, 属性和 AI 来自宠物模板, 经验由 `enemy.exp.yaml` 结合宠物模板计算.
+
+## 全局武器商店
+
+`ShopPurchaseReq` 购买 `item.yaml` 中 `cost > 0` 的武器. 商店没有 NPC、场景、库存或限购条件; 服务端仍会校验角色属于当前账号、已经在线且不在战斗中, 并校验客户端提交的预期单价、数量、石币、背包剩余格数和账号 UUID 游标. `cost = 0`、非武器 ID、价格不一致或数量非法都必须拒绝.
+
+购买时先在账号档案副本中扣除石币, 为每件武器创建只含 `uuid` 和 `asset_id` 的 `EquipmentRecord`, 再调用 cache 持久化完整 `AccountRecord`. cache 成功后才提交 Online 内存档案; 任一校验或持久化失败都不修改石币、背包和 `used_uuid`. `ShopPurchaseRes` 返回成交单价、总价、剩余石币、最新 UUID 游标和本次新增装备列表, 供客户端原子替换权威快照.
 
 ## 宠物创建与品阶
 
