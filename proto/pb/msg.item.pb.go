@@ -731,6 +731,182 @@ func (*ItemWarehouseWithdrawRes_Stack) isItemWarehouseWithdrawRes_Item() {}
 
 func (*ItemWarehouseWithdrawRes_EquipmentUuid) isItemWarehouseWithdrawRes_Item() {}
 
+// 0x003007#client->gateway#购买商店商品-请求
+type ShopPurchaseReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CharacterUuid    uint64 `protobuf:"varint,1,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"`            // 执行购买并接收商品的角色 UUID
+	ItemId           uint32 `protobuf:"varint,2,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`                                 // 商品资源 ID; 当前仅接受武器 ID
+	Quantity         uint32 `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`                                           // 购买数量, 范围为 1-30
+	ExpectedUnitCost uint64 `protobuf:"varint,4,opt,name=expected_unit_cost,json=expectedUnitCost,proto3" json:"expected_unit_cost,omitempty"` // 客户端展示的单价; 必须与服务端当前配置一致
+}
+
+func (x *ShopPurchaseReq) Reset() {
+	*x = ShopPurchaseReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_msg_item_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ShopPurchaseReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ShopPurchaseReq) ProtoMessage() {}
+
+func (x *ShopPurchaseReq) ProtoReflect() protoreflect.Message {
+	mi := &file_msg_item_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ShopPurchaseReq.ProtoReflect.Descriptor instead.
+func (*ShopPurchaseReq) Descriptor() ([]byte, []int) {
+	return file_msg_item_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ShopPurchaseReq) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
+func (x *ShopPurchaseReq) GetItemId() uint32 {
+	if x != nil {
+		return x.ItemId
+	}
+	return 0
+}
+
+func (x *ShopPurchaseReq) GetQuantity() uint32 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
+func (x *ShopPurchaseReq) GetExpectedUnitCost() uint64 {
+	if x != nil {
+		return x.ExpectedUnitCost
+	}
+	return 0
+}
+
+// 0x003008#gateway->client#购买商店商品-回复
+type ShopPurchaseRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CharacterUuid       uint64             `protobuf:"varint,1,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"`                     // 执行购买并接收商品的角色 UUID
+	ItemId              uint32             `protobuf:"varint,2,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`                                          // 已购买的商品资源 ID
+	Quantity            uint32             `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`                                                    // 实际购买数量
+	UnitCost            uint64             `protobuf:"varint,4,opt,name=unit_cost,json=unitCost,proto3" json:"unit_cost,omitempty"`                                    // 服务端权威单价
+	TotalCost           uint64             `protobuf:"varint,5,opt,name=total_cost,json=totalCost,proto3" json:"total_cost,omitempty"`                                 // 本次购买总价
+	RemainingStone      uint32             `protobuf:"varint,6,opt,name=remaining_stone,json=remainingStone,proto3" json:"remaining_stone,omitempty"`                  // 购买后的角色石币
+	UsedUuid            uint64             `protobuf:"varint,7,opt,name=used_uuid,json=usedUuid,proto3" json:"used_uuid,omitempty"`                                    // 购买后账号已分配 UUID 游标
+	EquipmentRecordList []*EquipmentRecord `protobuf:"bytes,10,rep,name=equipment_record_list,json=equipmentRecordList,proto3" json:"equipment_record_list,omitempty"` // 新增到角色背包的装备实例
+}
+
+func (x *ShopPurchaseRes) Reset() {
+	*x = ShopPurchaseRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_msg_item_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ShopPurchaseRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ShopPurchaseRes) ProtoMessage() {}
+
+func (x *ShopPurchaseRes) ProtoReflect() protoreflect.Message {
+	mi := &file_msg_item_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ShopPurchaseRes.ProtoReflect.Descriptor instead.
+func (*ShopPurchaseRes) Descriptor() ([]byte, []int) {
+	return file_msg_item_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ShopPurchaseRes) GetCharacterUuid() uint64 {
+	if x != nil {
+		return x.CharacterUuid
+	}
+	return 0
+}
+
+func (x *ShopPurchaseRes) GetItemId() uint32 {
+	if x != nil {
+		return x.ItemId
+	}
+	return 0
+}
+
+func (x *ShopPurchaseRes) GetQuantity() uint32 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
+func (x *ShopPurchaseRes) GetUnitCost() uint64 {
+	if x != nil {
+		return x.UnitCost
+	}
+	return 0
+}
+
+func (x *ShopPurchaseRes) GetTotalCost() uint64 {
+	if x != nil {
+		return x.TotalCost
+	}
+	return 0
+}
+
+func (x *ShopPurchaseRes) GetRemainingStone() uint32 {
+	if x != nil {
+		return x.RemainingStone
+	}
+	return 0
+}
+
+func (x *ShopPurchaseRes) GetUsedUuid() uint64 {
+	if x != nil {
+		return x.UsedUuid
+	}
+	return 0
+}
+
+func (x *ShopPurchaseRes) GetEquipmentRecordList() []*EquipmentRecord {
+	if x != nil {
+		return x.EquipmentRecordList
+	}
+	return nil
+}
+
 var File_msg_item_proto protoreflect.FileDescriptor
 
 var file_msg_item_proto_rawDesc = []byte{
@@ -839,9 +1015,39 @@ var file_msg_item_proto_rawDesc = []byte{
 	0x48, 0x00, 0x52, 0x05, 0x73, 0x74, 0x61, 0x63, 0x6b, 0x12, 0x27, 0x0a, 0x0e, 0x65, 0x71, 0x75,
 	0x69, 0x70, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x0b, 0x20, 0x01, 0x28,
 	0x04, 0x48, 0x00, 0x52, 0x0d, 0x65, 0x71, 0x75, 0x69, 0x70, 0x6d, 0x65, 0x6e, 0x74, 0x55, 0x75,
-	0x69, 0x64, 0x42, 0x06, 0x0a, 0x04, 0x69, 0x74, 0x65, 0x6d, 0x42, 0x14, 0x5a, 0x12, 0x73, 0x65,
-	0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x69, 0x64, 0x42, 0x06, 0x0a, 0x04, 0x69, 0x74, 0x65, 0x6d, 0x22, 0x9b, 0x01, 0x0a, 0x0f, 0x53,
+	0x68, 0x6f, 0x70, 0x50, 0x75, 0x72, 0x63, 0x68, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x12, 0x25,
+	0x0a, 0x0e, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0d, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65,
+	0x72, 0x55, 0x75, 0x69, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x69, 0x74, 0x65, 0x6d, 0x5f, 0x69, 0x64,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x69, 0x74, 0x65, 0x6d, 0x49, 0x64, 0x12, 0x1a,
+	0x0a, 0x08, 0x71, 0x75, 0x61, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0d,
+	0x52, 0x08, 0x71, 0x75, 0x61, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x12, 0x2c, 0x0a, 0x12, 0x65, 0x78,
+	0x70, 0x65, 0x63, 0x74, 0x65, 0x64, 0x5f, 0x75, 0x6e, 0x69, 0x74, 0x5f, 0x63, 0x6f, 0x73, 0x74,
+	0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x10, 0x65, 0x78, 0x70, 0x65, 0x63, 0x74, 0x65, 0x64,
+	0x55, 0x6e, 0x69, 0x74, 0x43, 0x6f, 0x73, 0x74, 0x22, 0xbd, 0x02, 0x0a, 0x0f, 0x53, 0x68, 0x6f,
+	0x70, 0x50, 0x75, 0x72, 0x63, 0x68, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x12, 0x25, 0x0a, 0x0e,
+	0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x04, 0x52, 0x0d, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x55,
+	0x75, 0x69, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x69, 0x74, 0x65, 0x6d, 0x5f, 0x69, 0x64, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x69, 0x74, 0x65, 0x6d, 0x49, 0x64, 0x12, 0x1a, 0x0a, 0x08,
+	0x71, 0x75, 0x61, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x08,
+	0x71, 0x75, 0x61, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x12, 0x1b, 0x0a, 0x09, 0x75, 0x6e, 0x69, 0x74,
+	0x5f, 0x63, 0x6f, 0x73, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x08, 0x75, 0x6e, 0x69,
+	0x74, 0x43, 0x6f, 0x73, 0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x5f, 0x63,
+	0x6f, 0x73, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x04, 0x52, 0x09, 0x74, 0x6f, 0x74, 0x61, 0x6c,
+	0x43, 0x6f, 0x73, 0x74, 0x12, 0x27, 0x0a, 0x0f, 0x72, 0x65, 0x6d, 0x61, 0x69, 0x6e, 0x69, 0x6e,
+	0x67, 0x5f, 0x73, 0x74, 0x6f, 0x6e, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0e, 0x72,
+	0x65, 0x6d, 0x61, 0x69, 0x6e, 0x69, 0x6e, 0x67, 0x53, 0x74, 0x6f, 0x6e, 0x65, 0x12, 0x1b, 0x0a,
+	0x09, 0x75, 0x73, 0x65, 0x64, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x07, 0x20, 0x01, 0x28, 0x04,
+	0x52, 0x08, 0x75, 0x73, 0x65, 0x64, 0x55, 0x75, 0x69, 0x64, 0x12, 0x4c, 0x0a, 0x15, 0x65, 0x71,
+	0x75, 0x69, 0x70, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x5f, 0x6c,
+	0x69, 0x73, 0x74, 0x18, 0x0a, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x61, 0x63, 0x63, 0x6f,
+	0x75, 0x6e, 0x74, 0x2e, 0x45, 0x71, 0x75, 0x69, 0x70, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x63,
+	0x6f, 0x72, 0x64, 0x52, 0x13, 0x65, 0x71, 0x75, 0x69, 0x70, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65,
+	0x63, 0x6f, 0x72, 0x64, 0x4c, 0x69, 0x73, 0x74, 0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72, 0x76,
+	0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -856,7 +1062,7 @@ func file_msg_item_proto_rawDescGZIP() []byte {
 	return file_msg_item_proto_rawDescData
 }
 
-var file_msg_item_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_msg_item_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_msg_item_proto_goTypes = []any{
 	(*ItemElement)(nil),                // 0: account.ItemElement
 	(*ItemContainerRecord)(nil),        // 1: account.ItemContainerRecord
@@ -868,25 +1074,28 @@ var file_msg_item_proto_goTypes = []any{
 	(*ItemWarehouseDepositRes)(nil),    // 7: account.ItemWarehouseDepositRes
 	(*ItemWarehouseWithdrawReq)(nil),   // 8: account.ItemWarehouseWithdrawReq
 	(*ItemWarehouseWithdrawRes)(nil),   // 9: account.ItemWarehouseWithdrawRes
-	nil,                                // 10: account.ItemContainerRecord.ItemCountMapEntry
-	nil,                                // 11: account.ItemContainerRecord.EquipmentRecordMapEntry
-	nil,                                // 12: account.CharacterItemChangedNotify.ItemCountMapEntry
-	(*EquipmentRecord)(nil),            // 13: account.EquipmentRecord
+	(*ShopPurchaseReq)(nil),            // 10: account.ShopPurchaseReq
+	(*ShopPurchaseRes)(nil),            // 11: account.ShopPurchaseRes
+	nil,                                // 12: account.ItemContainerRecord.ItemCountMapEntry
+	nil,                                // 13: account.ItemContainerRecord.EquipmentRecordMapEntry
+	nil,                                // 14: account.CharacterItemChangedNotify.ItemCountMapEntry
+	(*EquipmentRecord)(nil),            // 15: account.EquipmentRecord
 }
 var file_msg_item_proto_depIdxs = []int32{
-	10, // 0: account.ItemContainerRecord.item_count_map:type_name -> account.ItemContainerRecord.ItemCountMapEntry
-	11, // 1: account.ItemContainerRecord.equipment_record_map:type_name -> account.ItemContainerRecord.EquipmentRecordMapEntry
-	12, // 2: account.CharacterItemChangedNotify.item_count_map:type_name -> account.CharacterItemChangedNotify.ItemCountMapEntry
+	12, // 0: account.ItemContainerRecord.item_count_map:type_name -> account.ItemContainerRecord.ItemCountMapEntry
+	13, // 1: account.ItemContainerRecord.equipment_record_map:type_name -> account.ItemContainerRecord.EquipmentRecordMapEntry
+	14, // 2: account.CharacterItemChangedNotify.item_count_map:type_name -> account.CharacterItemChangedNotify.ItemCountMapEntry
 	2,  // 3: account.ItemWarehouseDepositReq.stack:type_name -> account.ItemStackTransfer
 	2,  // 4: account.ItemWarehouseDepositRes.stack:type_name -> account.ItemStackTransfer
 	2,  // 5: account.ItemWarehouseWithdrawReq.stack:type_name -> account.ItemStackTransfer
 	2,  // 6: account.ItemWarehouseWithdrawRes.stack:type_name -> account.ItemStackTransfer
-	13, // 7: account.ItemContainerRecord.EquipmentRecordMapEntry.value:type_name -> account.EquipmentRecord
-	8,  // [8:8] is the sub-list for method output_type
-	8,  // [8:8] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	15, // 7: account.ShopPurchaseRes.equipment_record_list:type_name -> account.EquipmentRecord
+	15, // 8: account.ItemContainerRecord.EquipmentRecordMapEntry.value:type_name -> account.EquipmentRecord
+	9,  // [9:9] is the sub-list for method output_type
+	9,  // [9:9] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_msg_item_proto_init() }
@@ -1016,6 +1225,30 @@ func file_msg_item_proto_init() {
 				return nil
 			}
 		}
+		file_msg_item_proto_msgTypes[10].Exporter = func(v any, i int) any {
+			switch v := v.(*ShopPurchaseReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_msg_item_proto_msgTypes[11].Exporter = func(v any, i int) any {
+			switch v := v.(*ShopPurchaseRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_msg_item_proto_msgTypes[6].OneofWrappers = []any{
 		(*ItemWarehouseDepositReq_Stack)(nil),
@@ -1039,7 +1272,7 @@ func file_msg_item_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_msg_item_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -47,6 +47,8 @@ enum MsgID {
   ItemWarehouseDepositRes_CMD = 12292; //0x003004#gateway->client#将角色背包物品存入账号仓库-回复
   ItemWarehouseWithdrawReq_CMD = 12293; //0x003005#client->gateway#将账号仓库物品取入角色背包-请求
   ItemWarehouseWithdrawRes_CMD = 12294; //0x003006#gateway->client#将账号仓库物品取入角色背包-回复
+  ShopPurchaseReq_CMD = 12295; //0x003007#client->gateway#购买商店商品-请求
+  ShopPurchaseRes_CMD = 12296; //0x003008#gateway->client#购买商店商品-回复
   CharacterMailboxGetReq_CMD = 20480; //0x005000#client->gateway#获取角色邮箱-请求
   CharacterMailboxGetRes_CMD = 20481; //0x005001#gateway->client#获取角色邮箱-回复
   CharacterMailReadReq_CMD = 20482; //0x005002#client->gateway#标记角色邮件已读-请求

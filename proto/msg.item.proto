@@ -79,3 +79,23 @@ message ItemWarehouseWithdrawRes {
     uint64 equipment_uuid = 11; // 实际取出的装备 UUID
   }
 }
+
+//0x003007#client->gateway#购买商店商品-请求
+message ShopPurchaseReq {
+  uint64 character_uuid = 1; // 执行购买并接收商品的角色 UUID
+  uint32 item_id = 2; // 商品资源 ID; 当前仅接受武器 ID
+  uint32 quantity = 3; // 购买数量, 范围为 1-30
+  uint64 expected_unit_cost = 4; // 客户端展示的单价; 必须与服务端当前配置一致
+}
+
+//0x003008#gateway->client#购买商店商品-回复
+message ShopPurchaseRes {
+  uint64 character_uuid = 1; // 执行购买并接收商品的角色 UUID
+  uint32 item_id = 2; // 已购买的商品资源 ID
+  uint32 quantity = 3; // 实际购买数量
+  uint64 unit_cost = 4; // 服务端权威单价
+  uint64 total_cost = 5; // 本次购买总价
+  uint32 remaining_stone = 6; // 购买后的角色石币
+  uint64 used_uuid = 7; // 购买后账号已分配 UUID 游标
+  repeated EquipmentRecord equipment_record_list = 10; // 新增到角色背包的装备实例
+}
