@@ -11,6 +11,7 @@ cache 测试重点不是单纯追求覆盖率，而是稳定覆盖服务契约�
 - accountVerifyToken 设置、消费和删除。
 - aid 按 `base.groupID` 分段生成。
 - `AccountRecord` protobuf 读写, 包括角色随身携带宠物和账号宠物仓库字段透传。
+- 角色邮箱文本规范化、hash 字段解码、过期清理和损坏数据拒绝。
 - cache accountSession 的批量读写、CAS 替换、续期、删除和迟到请求保护。
 
 ## 快速单元测试
@@ -25,7 +26,9 @@ GOCACHE="$PWD/../.gocache" go test ../common . ../proto/pb
 覆盖内容：
 
 - `common.GroupAIDStart` 公式。
+- 系统邮件主题和正文长度、控制字符、换行规范化。
 - cache Redis key 生成。
+- 角色邮箱 `usedUUID/mail:{uuid}` 字段生成、protobuf 解码、过期过滤和损坏数据拒绝。
 - cache accountSession enum 到 Redis hash field 的映射。
 - cache accountSession identity/record 转换。
 - cache accountSession response 组装。
@@ -37,7 +40,7 @@ GOCACHE="$PWD/../.gocache" go test ../common . ../proto/pb
 
 ```bash
 cd ../cache 2>/dev/null || cd cache
-GOCACHE="$PWD/../.gocache" go test ../common . ../online ../gateway ../login ../tool/robot/main ../proto/pb
+GOCACHE="$PWD/../.gocache" go test ../common . ../online ../gateway ../login ../proto/pb
 ```
 
 ```bash
@@ -128,7 +131,7 @@ GOCACHE="$PWD/../.gocache" go test -tags=integration -bench=. -benchmem .
 ```bash
 cd ../cache 2>/dev/null || cd cache
 GOCACHE="$PWD/../.gocache" go test ../common . ../proto/pb
-GOCACHE="$PWD/../.gocache" go test ../common . ../online ../gateway ../login ../tool/robot/main ../proto/pb
+GOCACHE="$PWD/../.gocache" go test ../common . ../online ../gateway ../login ../proto/pb
 GOCACHE="$PWD/../.gocache" go build -buildvcs=false .
 GOCACHE="$PWD/../.gocache" go test -bench=. -benchmem .
 mkdir -p ../.coverage
@@ -151,6 +154,7 @@ rmdir ../.coverage 2>/dev/null || true
 
 - accountVerifyToken 设置和消费流程。
 - account record 读写; cache 不校验宠物仓库和角色随身携带宠物之间的业务不变量。
+- 角色邮箱 get/add/read/delete; 验证角色归属、365 天过期、1000 封有效邮件上限和只清理过期邮件。
 - cache accountSession set/get/replace/delete/expire。
 - 参数错误返回 `InvalidArgument`。
 - 记录不存在返回 `NotFound`。

@@ -8,6 +8,7 @@ import (
 )
 
 var GCfgCustomRedisKeyFormatAccountRecord string
+var GCfgCustomRedisKeyFormatCharacterMailbox string
 var GCfgCustomRedisKeyFormatAccountSession string
 var GCfgCustomRedisKeyFormatAccountVerifyToken string
 var GCfgCustomRedisKeyFormatAccountAID string
@@ -18,6 +19,7 @@ var GCfgBaseGroupID uint32
 func initCustomConfig() {
 	GCfgBaseGroupID = *xconfig.GConfigMgr.Base.GroupID
 	GCfgCustomRedisKeyFormatAccountRecord = xconfig.GConfigMgr.GetCustomString("redisKeyFormatAccountRecord", "account:{%v}:record")
+	GCfgCustomRedisKeyFormatCharacterMailbox = xconfig.GConfigMgr.GetCustomString("redisKeyFormatCharacterMailbox", "account:{%v}:character:%v:mailbox")
 	GCfgCustomRedisKeyFormatAccountSession = xconfig.GConfigMgr.GetCustomString("redisKeyFormatAccountSession", "account:{%v}:session")
 	GCfgCustomRedisKeyFormatAccountVerifyToken = xconfig.GConfigMgr.GetCustomString("redisKeyFormatAccountVerifyToken", "account:{%v}:accountVerifyToken")
 	GCfgCustomRedisKeyFormatAccountAID = xconfig.GConfigMgr.GetCustomString("redisKeyFormatAccountAID", "account:{%v}:aid")
@@ -27,6 +29,10 @@ func initCustomConfig() {
 
 func RedisKeyAccountRecord(aid uint64) string {
 	return fmt.Sprintf(GCfgCustomRedisKeyFormatAccountRecord, aid)
+}
+
+func RedisKeyCharacterMailbox(aid uint64, characterUUID uint64) string {
+	return fmt.Sprintf(GCfgCustomRedisKeyFormatCharacterMailbox, aid, characterUUID)
 }
 
 func RedisKeyAccountSession(aid uint64) string {

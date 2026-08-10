@@ -7,6 +7,7 @@ Cache 服务负责统一访问 Redis Cluster, 提供 accountVerifyToken、账号
 - 存储和消费 accountVerifyToken。
 - 确保账号存在，并为新账号分配 aid。
 - 存储 `AccountRecord`，Redis 中以 protobuf 二进制保存。
+- 以独立 Redis hash 存储角色邮箱, 支持完整读取、增加系统邮件、标记已读和单封删除。
 - 维护 `account:{aid}:session` 对应 cache accountSession 的读取、开始、结束和 TTL 刷新 CAS。
 - 通过 Redis Lua 脚本实现 accountVerifyToken 消费和 cache accountSession CAS 操作。
 - cache 只保存和校验数据，不决定账号应该归属哪个 gateway 或 online。
@@ -20,6 +21,7 @@ account:{account}:lock        account 首次创建锁
 account:aid:sequence:{groupID}   当前 group 的 aid 自增序列
 account:{aid}:record          AccountRecord protobuf 二进制
 account:{aid}:session            cache accountSession hash
+account:{aid}:character:{characterUUID}:mailbox  角色邮箱 hash
 ```
 
 `{...}` 是 Redis Cluster hash tag。`account:{aid}:record` 和 `account:{aid}:session` 会按同一个 aid 分到同一 slot; `account:{account}:accountVerifyToken`、`aid`、`lock` 会按同一个 account 分到同一 slot。
@@ -54,9 +56,28 @@ accountSession
 
 当前不保存 `state` 或 `binding` 字段。gateway 抢占 cache accountSession 后才会调用 online 绑定 actor; 如果绑定失败, gateway 负责删除 cache accountSession。若 gateway 在抢占成功后、绑定完成前崩溃, cache 不主动判定半成品状态, 该 cache accountSession 依赖 TTL 过期释放。
 
+## 角色邮箱
+
+角色邮箱不进入 `AccountRecord`, 每个角色使用独立的 `account:{aid}:character:{characterUUID}:mailbox` hash. hash 只包含以下字段:
+
+```text
+usedUUID       已分配过的最大邮件 UUID, 只增不减且不复用
+mail:{uuid}    MailRecord protobuf 二进制
+```
+
+- Cache 在每次新增邮件时生成 UUID、创建时间和过期时间. 邮件固定保存 365 天, `now >= expire_timestamp_ms` 时视为过期。
+- 单角色最多保存 1000 封未过期系统邮件. 达到容量时先清理过期邮件; 清理后仍满则返回 `ResourceExhausted`, 不删除有效邮件。
+- 完整读取会清理并排除过期邮件. 已读和删除遇到不存在或已过期邮件时返回 `NotFound`; 已读重复调用直接成功。
+- 主题去除首尾空白后保存, 最多 30 个 Unicode 字符, 不允许控制字符. 正文最多 500 个 Unicode 字符, CRLF/CR 统一为 LF, 允许 LF 和 tab, 但去除首尾空白后不得为空。
+- Cache 在处理每个邮箱 RPC 前读取 `AccountRecord`, 确认 `character_uuid` 属于请求中的 aid. 邮箱 hash 不重复保存 aid 或 character UUID。
+- 当前邮箱操作直接使用 `HGETALL/HGET/HSET/HDEL/HINCRBY`, 不增加 CAS、幂等键或 revision. 幂等和重复发送由系统邮件发送方负责。
+- `custom.redisKeyFormatCharacterMailbox` 未配置时使用上述默认 key. 现有 bin 和 deploy yaml 与其他 Redis key format 一样省略该可选覆盖项。
+
 ## gRPC 接口
 
 `CacheService` 使用 RingHash 负载策略，gateway 调用这些 RPC 的默认超时时间为 3 秒。
+
+Cache 运行配置将 `grpc.maxReceiveMessageBytes` 和 `grpc.maxSendMessageBytes` 都设为 `67108864`, 即单条消息收发上限均为 64MiB. 该配置同时作用于 Cache gRPC 服务端和 Cache 发起的生成客户端连接.
 
 | RPC | shard key | 作用 |
 | --- | --- | --- |
@@ -64,6 +85,10 @@ accountSession
 | `CacheUseAccountVerifyToken` | `account` | 验证并消费 accountVerifyToken, 成功后确保账号存在并返回 aid。 |
 | `CacheSetAccountRecord` | `aid` | 写入 `AccountRecord`，要求请求 `aid` 与 `AccountRecord.aid` 一致。 |
 | `CacheGetAccountRecord` | `aid` | 读取 `AccountRecord`。 |
+| `CacheGetCharacterMailbox` | `aid` | 校验角色归属, 清理过期邮件并返回完整 `MailboxRecord`。 |
+| `CacheAddSystemMail` | `aid` | 校验和规范化纯文本, 持久化一封系统邮件并返回完整 `MailRecord`。 |
+| `CacheMarkCharacterMailRead` | `aid` | 将一封有效邮件标记为已读。 |
+| `CacheDeleteCharacterMail` | `aid` | 删除一封有效邮件。 |
 | `CacheGetAccountSession` | `aid` | 读取当前 `gatewayKey/accountSession/loginTimestampMs/onlineKey`；`login_timestamp_ms` 对外表示登录时间毫秒值，读取不到完整 cache accountSession 时返回 `NotFound`。 |
 | `CacheBeginAccountSessionCAS` | `aid` | `expected_account_session` 为空时要求当前 cache accountSession 不存在; 非空时要求当前 `accountSession` 匹配后替换为新 cache accountSession。 |
 | `CacheEndAccountSessionCAS` | `aid` | `expected_account_session` 匹配时删除 cache accountSession。 |
@@ -82,10 +107,12 @@ cache accountSession CAS 请求字段:
 
 | 场景 | code |
 | --- | --- |
-| 参数为空、aid 为 0、写入 cache accountSession 字段缺失、expire_second 为 0 | `InvalidArgument` |
-| Redis 执行错误、序列化失败、账号数据异常 | `Internal` |
+| 参数为空、aid/character UUID/mail UUID 为 0、邮件文本非法、写入 cache accountSession 字段缺失、expire_second 为 0 | `InvalidArgument` |
+| Redis 执行错误、序列化失败、账号或邮箱数据异常 | `Internal` |
 | accountVerifyToken 已存在 | `AlreadyExists` |
-| accountVerifyToken 不存在、已使用或读取数据不存在 | `NotFound` |
+| accountVerifyToken 不存在、已使用、角色不存在、邮件不存在或邮件已过期 | `NotFound` |
+| 单角色已有 1000 封未过期系统邮件 | `ResourceExhausted` |
+| 邮件 UUID 已达到 Redis `HINCRBY` 可用上限 | `FailedPrecondition` |
 | accountSession expected 不匹配 | `Aborted` |
 
 ## accountVerifyToken
@@ -133,6 +160,7 @@ GroupAIDStart(groupID) = uint64(groupID) * 1,000,000,000,000 + 1
 
 - `account:{aid}:record` 使用 protobuf marshal 后的二进制保存。
 - `AccountRecord` 是账号级档案聚合根, `aid/account` 下管理多个角色; `character_record_list` 的数组下标是角色槽位, 空槽使用 `uuid == 0` 的 `CharacterRecord` 占位, 每个账号最多可用角色槽位数量由 proto 常量 `AccountRecordLimit_MaxCharacterSlotCount` 定义, 完整角色业务 key 是 `aid + uuid`。
+- `MailboxRecord` 不属于 `AccountRecord` 或 `CharacterRecord` 字段, 避免单封邮件状态变化重写整个账号档案; 角色层级由独立 Redis key 表达。
 - `CharacterRecord.asset_id` 是角色资源 ID/角色 ID 的权威字段; `CharacterRecord.exp/earth/water/fire/wind/available_point/vitality/strength/toughness/dexterity/scene_id/create_timestamp_ms/rebirth_count/last_login_timestamp_ms/last_logout_timestamp_ms` 直接保存角色经验、元素点数、可用点、基础状态、当前场景、创建时间、转生次数和上下线时间; `asset_id_record_map` 当前不承载角色资源 ID、经验、元素、属性、场景、创建时间、转生次数、上下线时间戳、方向和动作。
 - 组队和决斗开关只属于 online 当前登录会话, 不计入 `CharacterRecord`; cache 不保存该状态, 重新登录后统一恢复为关闭.
 - `CharacterRecord.pet_record_list` 只保存角色当前随身携带宠物, 按携带顺序排列, 单角色最多携带 `PetRecordLimit_MaxCarryCount` 只; `AccountRecord.pet_warehouse_record_map` 是账号宠物仓库, 同账号下所有角色共享, 最多存放 `AccountRecordLimit_MaxPetWarehouseCount` 只.
@@ -185,6 +213,10 @@ gateway
 
 online
   -> CacheSetAccountRecord
+  -> CacheGetCharacterMailbox
+  -> CacheAddSystemMail
+  -> CacheMarkCharacterMailRead
+  -> CacheDeleteCharacterMail
 ```
 
 ## 排障
@@ -193,6 +225,9 @@ online
 - `accountVerifyToken not found or used`: accountVerifyToken 不存在、过期、已消费或值不匹配。
 - `account session changed`：CAS expected 不匹配，说明 cache accountSession 已被其他登录、离线或 TTL 变化接管。
 - `account session not found`：当前 aid 没有 cache accountSession。
+- `character mailbox is full`: 该角色清理过期邮件后仍有 1000 封有效系统邮件, 本次新增失败。
+- `character mail not found`: 邮件不存在或已经过期并被清理, 客户端应移除对应本地记录。
+- `character mailbox data is invalid`: 邮箱 hash 字段、UUID、protobuf、文本或时间戳不符合存储契约, 需要修复源数据, 不应静默忽略。
 - `redis: nil` 读取 `AccountRecord`：账号档案缺失；如果账号映射已存在，`EnsureAccount` 会按账号数据不一致返回错误。
 - `redis addrs is empty`：`redis` 配置存在空地址列表。
 - `redis config not found`：未配置 `redis` 项。
