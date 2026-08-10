@@ -1,6 +1,8 @@
 package gameconfig
 
 import (
+	"math"
+
 	xmap "github.com/75912001/xlib/map"
 	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
@@ -16,6 +18,8 @@ type EnemyGroupConfig struct {
 type EnemyGroupEntry struct {
 	// ID 来自 enemyGroups[].id, 必须为正数, 并且在 enemy.group.yaml 内唯一.
 	ID *uint32 `yaml:"id"`
+	// Name 来自 enemyGroups[].name, 用于配置审计和错误定位.
+	Name *string `yaml:"name"`
 	// IsBoss 来自 enemyGroups[].isBoss, 缺省为 false; Boss 组按固定 enemies 顺序出怪, 不使用普通组随机规则.
 	IsBoss *bool `yaml:"isBoss"`
 	// CountRange 来自 enemyGroups[].countRange, 表示普通敌人组出怪数量范围; Boss 组不允许配置.
@@ -84,6 +88,9 @@ func (p *EnemyGroupConfig) load(dir string) error {
 
 func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 	for i, group := range entries {
+		if group == nil {
+			return errors.Errorf("敌人组不能为空: index:%d %v", i, xruntime.Location())
+		}
 		if group.ID == nil {
 			return errors.Errorf("敌人组缺少 id: index:%d %v", i, xruntime.Location())
 		}
@@ -117,11 +124,8 @@ func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 			babyRate := uint32(0)
 			group.BabyRate = &babyRate
 		} else {
-			if group.CountRange == nil {
-				return errors.Errorf("普通敌人组缺少 countRange: group:%d %v", *group.ID, xruntime.Location())
-			}
-			if group.CountRange.Min == nil || group.CountRange.Max == nil {
-				return errors.Errorf("普通敌人组 countRange 无效: group:%d %v", *group.ID, xruntime.Location())
+			if group.CountRange == nil || group.CountRange.Min == nil || group.CountRange.Max == nil {
+				return errors.Errorf("普通敌人组缺少有效 countRange: group:%d %v", *group.ID, xruntime.Location())
 			}
 			if *group.CountRange.Min < int(pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Min) ||
 				*group.CountRange.Max > int(pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Max) {
@@ -130,25 +134,20 @@ func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 					pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Min,
 					pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Max, xruntime.Location())
 			}
-			if group.LevelRange == nil && group.RoleLevelOffset == nil {
-				return errors.Errorf("普通敌人组缺少 levelRange 或 roleLevelOffset: group:%d %v", *group.ID, xruntime.Location())
-			}
-			if group.LevelRange != nil && group.RoleLevelOffset != nil {
-				return errors.Errorf("普通敌人组不能同时配置 levelRange 和 roleLevelOffset: group:%d %v", *group.ID, xruntime.Location())
+			if (group.LevelRange == nil) == (group.RoleLevelOffset == nil) {
+				return errors.Errorf("普通敌人组 levelRange 和 roleLevelOffset 必须且只能配置一个: group:%d %v",
+					*group.ID, xruntime.Location())
 			}
 			if group.LevelRange != nil {
-				if group.LevelRange.Min == nil || group.LevelRange.Max == nil {
-					return errors.Errorf("普通敌人组 levelRange 无效: group:%d %v", *group.ID, xruntime.Location())
-				}
-				if *group.LevelRange.Min < int(pb.LevelRange_LevelRange_Min) || *group.LevelRange.Max > int(pb.LevelRange_LevelRange_Max) {
-					return errors.Errorf("普通敌人组 levelRange 超出范围: group:%d range:[%d,%d] expected:[%d,%d] %v",
-						*group.ID, *group.LevelRange.Min, *group.LevelRange.Max, pb.LevelRange_LevelRange_Min, pb.LevelRange_LevelRange_Max, xruntime.Location())
+				if group.LevelRange.Min == nil || group.LevelRange.Max == nil ||
+					*group.LevelRange.Min < int(pb.LevelRange_LevelRange_Min) ||
+					*group.LevelRange.Max > int(pb.LevelRange_LevelRange_Max) {
+					return errors.Errorf("普通敌人组 levelRange 超出范围: group:%d %v", *group.ID, xruntime.Location())
 				}
 			}
-			if group.RoleLevelOffset != nil {
-				if group.RoleLevelOffset.Min == nil || group.RoleLevelOffset.Max == nil {
-					return errors.Errorf("普通敌人组 roleLevelOffset 无效: group:%d %v", *group.ID, xruntime.Location())
-				}
+			if group.RoleLevelOffset != nil &&
+				(group.RoleLevelOffset.Min == nil || group.RoleLevelOffset.Max == nil) {
+				return errors.Errorf("普通敌人组 roleLevelOffset 无效: group:%d %v", *group.ID, xruntime.Location())
 			}
 			if group.Captured == nil {
 				defaultValue := true
@@ -175,29 +174,57 @@ func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 				return errors.Errorf("敌人组 enemy 缺少 id: group:%d index:%d %v", *group.ID, enemyIndex, xruntime.Location())
 			}
 			enemyID := *enemy.ID
-			if *group.IsBoss { // 是 boss
+			if *group.IsBoss {
 				if enemy.Weight != nil {
 					return errors.Errorf("Boss 敌人组不允许配置 weight: group:%d enemy:%d %v", *group.ID, enemyID, xruntime.Location())
 				}
 				if enemy.Level == nil {
 					return errors.Errorf("Boss 敌人组必须配置 level: group:%d enemy:%d %v", *group.ID, enemyID, xruntime.Location())
 				}
-				if *enemy.Level < uint32(pb.LevelRange_LevelRange_Min) || uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level {
+				if *enemy.Level < uint32(pb.LevelRange_LevelRange_Min) ||
+					uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level {
 					return errors.Errorf("Boss 敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v", *group.ID, enemyID, *enemy.Level, xruntime.Location())
 				}
 				continue
 			}
 
-			// 是 非 boss
 			if enemy.Weight == nil {
 				weight := uint32(0)
 				enemy.Weight = &weight
 			}
-			if enemy.Level == nil {
-				continue
+			if *enemy.Weight > uint32(math.MaxInt32) {
+				return errors.Errorf("普通敌人组条目weight超出C int范围: group:%d enemy:%d weight:%d %v",
+					*group.ID, enemyID, *enemy.Weight, xruntime.Location())
 			}
-			if *enemy.Level < uint32(pb.LevelRange_LevelRange_Min) || uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level {
-				return errors.Errorf("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v", *group.ID, enemyID, *enemy.Level, xruntime.Location())
+			if enemy.Level != nil &&
+				(*enemy.Level < uint32(pb.LevelRange_LevelRange_Min) ||
+					uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level) {
+				return errors.Errorf("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v",
+					*group.ID, enemyID, *enemy.Level, xruntime.Location())
+			}
+		}
+		if !*group.IsBoss {
+			requiredCount := 0
+			totalWeight := uint64(0)
+			for enemyIndex := range group.Enemies {
+				weight := *group.Enemies[enemyIndex].Weight
+				if weight == 0 {
+					requiredCount++
+					continue
+				}
+				totalWeight += uint64(weight)
+			}
+			if requiredCount > *group.CountRange.Min {
+				return errors.Errorf("普通敌人组必出敌人数超过countRange下限: group:%d required:%d min:%d %v",
+					*group.ID, requiredCount, *group.CountRange.Min, xruntime.Location())
+			}
+			if requiredCount < *group.CountRange.Max && totalWeight == 0 {
+				return errors.Errorf("普通敌人组缺少可填充countRange的正权重敌人: group:%d %v",
+					*group.ID, xruntime.Location())
+			}
+			if totalWeight > uint64(math.MaxInt32) {
+				return errors.Errorf("普通敌人组总权重超出C int范围: group:%d total:%d %v",
+					*group.ID, totalWeight, xruntime.Location())
 			}
 		}
 
@@ -209,20 +236,18 @@ func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 }
 
 func (p *EnemyGroupConfig) check() error {
-	var err error
+	var checkErr error
 	p.Foreach(func(_ uint32, group *EnemyGroupEntry) bool {
 		for _, enemy := range group.Enemies {
 			if !GGameConfig.Pet.IsExist(*enemy.ID) {
-				err = errors.Errorf("敌人组引用了未定义宠物: group:%d pet:%d %v", *group.ID, *enemy.ID, xruntime.Location())
+				checkErr = errors.Errorf("敌人组引用了未定义宠物: group:%d pet:%d %v",
+					*group.ID, *enemy.ID, xruntime.Location())
 				return false
 			}
 		}
 		return true
 	})
-	if err != nil {
-		return err
-	}
-	return nil
+	return checkErr
 }
 
 func (p *EnemyGroupConfig) assemble() error {

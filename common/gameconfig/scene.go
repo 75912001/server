@@ -1,11 +1,14 @@
 package gameconfig
 
 import (
+	"math"
 	"strings"
 
 	xmap "github.com/75912001/xlib/map"
 	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
+
+	pb "server/proto/pb"
 )
 
 type SceneConfig struct {
@@ -17,6 +20,9 @@ type SceneEntry struct {
 	ID *uint32 `yaml:"id"`
 	// Name 来自 scenes[].name, 表示场景名称, 主要用于配置识别, 日志和排障.
 	Name *string `yaml:"name"`
+	// EnemyCountMax 来自 scenes[].enemyCountMax, 保留场景遇敌区域元数据, 范围为1至10.
+	// 当前普通敌组实际出怪数量由enemy.group.yaml的countRange决定.
+	EnemyCountMax *uint32 `yaml:"enemyCountMax"`
 	// EnemyGroups 来自 scenes[].enemyGroups, 保存当前场景可遇敌敌人组和权重.
 	EnemyGroups []SceneEnemyGroupEntry `yaml:"enemyGroups"`
 }
@@ -24,7 +30,7 @@ type SceneEntry struct {
 type SceneEnemyGroupEntry struct {
 	// ID 来自 enemyGroups[].id, 必须引用 enemy.group.yaml 中存在的敌人组ID.
 	ID *uint32 `yaml:"id"`
-	// Weight 来自 enemyGroups[].weight, 表示当前场景选择该敌人组的权重, 必须大于0.
+	// Weight 来自 enemyGroups[].weight, 映射8.5遇敌区域的敌组权重. 0不占随机区间且不会被抽中, 场景总权重必须大于0.
 	Weight *uint32 `yaml:"weight"`
 }
 
@@ -58,6 +64,16 @@ func (p *SceneConfig) configure(entries []*SceneEntry) error {
 		if strings.TrimSpace(*scene.Name) == "" {
 			return errors.Errorf("场景 name 不能为空: scene:%d %v", *scene.ID, xruntime.Location())
 		}
+		if scene.EnemyCountMax == nil {
+			return errors.Errorf("场景缺少 enemyCountMax: scene:%d %v", *scene.ID, xruntime.Location())
+		}
+		if *scene.EnemyCountMax < uint32(pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Min) ||
+			*scene.EnemyCountMax > uint32(pb.CombatCampPosition_CombatCampPosition_Count) {
+			return errors.Errorf("场景 enemyCountMax 超出范围: scene:%d value:%d expected:[%d,%d] %v",
+				*scene.ID, *scene.EnemyCountMax,
+				pb.CombatEnemyGroupEnemyCountRange_CombatEnemyGroupEnemyCountRange_Min,
+				pb.CombatCampPosition_CombatCampPosition_Count, xruntime.Location())
+		}
 		if scene.EnemyGroups == nil {
 			return errors.Errorf("场景缺少 enemyGroups: scene:%d %v", *scene.ID, xruntime.Location())
 		}
@@ -73,9 +89,21 @@ func (p *SceneConfig) configure(entries []*SceneEntry) error {
 				return errors.Errorf("场景 enemyGroups 缺少 weight: scene:%d group:%d %v", *scene.ID, groupID, xruntime.Location())
 			}
 			weight := *scene.EnemyGroups[i].Weight
-			if weight == 0 {
-				return errors.Errorf("场景 enemyGroups[].weight 必须大于0: scene:%d group:%d weight:%d %v", *scene.ID, groupID, weight, xruntime.Location())
+			if weight > uint32(math.MaxInt32) {
+				return errors.Errorf("场景 enemyGroups[].weight 超出C int范围: scene:%d group:%d weight:%d %v",
+					*scene.ID, groupID, weight, xruntime.Location())
 			}
+		}
+		totalWeight := uint64(0)
+		for i := range scene.EnemyGroups {
+			totalWeight += uint64(*scene.EnemyGroups[i].Weight)
+		}
+		if totalWeight == 0 {
+			return errors.Errorf("场景 enemyGroups 总权重必须大于0: scene:%d %v", *scene.ID, xruntime.Location())
+		}
+		if totalWeight > uint64(math.MaxInt32) {
+			return errors.Errorf("场景 enemyGroups 总权重超出C int范围: scene:%d total:%d %v",
+				*scene.ID, totalWeight, xruntime.Location())
 		}
 		if !p.AddIfNotExist(*scene.ID, scene) {
 			return errors.Errorf("场景ID重复: scene:%d %v", *scene.ID, xruntime.Location())

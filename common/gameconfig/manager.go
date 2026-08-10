@@ -2,20 +2,16 @@ package gameconfig
 
 func Load(dir string) (err error) {
 	GGameConfig = &Manager{
-		CharacterSkill: newCharacterSkillConfig(),
-		PetSkill:       newPetSkillConfig(),
-		Pet:            newPetConfig(),
-		Character:      newCharacterConfig(),
-		Enemy:          newEnemyGroupConfig(),
-		EnemyExp:       newEnemyExpConfig(),
-		Scene:          newSceneConfig(),
-		Exp:            newExpConfig(),
-		Item:           newItemConfig(),
+		Skill:     newSkillConfig(),
+		Pet:       newPetConfig(),
+		Character: newCharacterConfig(),
+		Enemy:     newEnemyGroupConfig(),
+		EnemyExp:  newEnemyExpConfig(),
+		Scene:     newSceneConfig(),
+		Exp:       newExpConfig(),
+		Item:      newItemConfig(),
 	}
-	if err := GGameConfig.CharacterSkill.load(dir); err != nil {
-		return err
-	}
-	if err := GGameConfig.PetSkill.load(dir); err != nil {
+	if err := GGameConfig.Skill.load(dir); err != nil {
 		return err
 	}
 	if err := GGameConfig.Pet.load(dir); err != nil {
@@ -40,10 +36,7 @@ func Load(dir string) (err error) {
 		return err
 	}
 
-	if err := GGameConfig.CharacterSkill.check(); err != nil {
-		return err
-	}
-	if err := GGameConfig.PetSkill.check(); err != nil {
+	if err := GGameConfig.Skill.check(); err != nil {
 		return err
 	}
 	if err := GGameConfig.Pet.check(); err != nil {
@@ -68,10 +61,7 @@ func Load(dir string) (err error) {
 		return err
 	}
 
-	if err := GGameConfig.CharacterSkill.assemble(); err != nil {
-		return err
-	}
-	if err := GGameConfig.PetSkill.assemble(); err != nil {
+	if err := GGameConfig.Skill.assemble(); err != nil {
 		return err
 	}
 	if err := GGameConfig.Pet.assemble(); err != nil {
