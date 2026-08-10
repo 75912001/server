@@ -31,20 +31,37 @@ func newCharacterItemManager(record *pb.CharacterRecord) *characterItemManager {
 }
 
 func (p *characterItemManager) Count(itemID uint32) uint64 {
-	if p == nil || p.record == nil || p.record.GetItemBag() == nil {
+	if p == nil || p.record == nil {
+		return 0
+	}
+	if isCharacterAssetItemID(itemID) {
+		return p.record.GetAssetCountMap()[itemID]
+	}
+	if p.record.GetItemBag() == nil {
 		return 0
 	}
 	return p.record.GetItemBag().GetItemCountMap()[itemID]
 }
 
 func (p *characterItemManager) Add(itemID uint32, count uint64) error {
-	if _, err := configuredItem(itemID); err != nil {
-		return err
-	}
 	if p == nil || p.record == nil || count == 0 {
 		return fmt.Errorf("%w: item manager or count is invalid", errItemUseInvalidArgument)
 	}
+	if _, err := configuredItem(itemID); err != nil {
+		return err
+	}
 	current := p.Count(itemID)
+	if isCharacterAssetItemID(itemID) {
+		const maximumCharacterAssetCount = uint64(math.MaxInt64)
+		if current > maximumCharacterAssetCount || count > maximumCharacterAssetCount-current {
+			return fmt.Errorf("%w: character asset %d count exceeds max int64", errItemUseFailedPrecondition, itemID)
+		}
+		if p.record.AssetCountMap == nil {
+			p.record.AssetCountMap = make(map[uint32]uint64)
+		}
+		p.record.AssetCountMap[itemID] = current + count
+		return nil
+	}
 	if count > math.MaxUint64-current {
 		return fmt.Errorf("%w: item %d count overflows uint64", errItemUseFailedPrecondition, itemID)
 	}
@@ -63,15 +80,23 @@ func (p *characterItemManager) Add(itemID uint32, count uint64) error {
 }
 
 func (p *characterItemManager) Consume(itemID uint32, count uint64) error {
-	if _, err := configuredItem(itemID); err != nil {
-		return err
-	}
 	if p == nil || p.record == nil || count == 0 {
 		return fmt.Errorf("%w: item manager or count is invalid", errItemUseInvalidArgument)
+	}
+	if _, err := configuredItem(itemID); err != nil {
+		return err
 	}
 	current := p.Count(itemID)
 	if current < count {
 		return fmt.Errorf("%w: item %d count %d is less than %d", errItemUseFailedPrecondition, itemID, current, count)
+	}
+	if isCharacterAssetItemID(itemID) {
+		if current == count {
+			delete(p.record.AssetCountMap, itemID)
+			return nil
+		}
+		p.record.AssetCountMap[itemID] = current - count
+		return nil
 	}
 	if current == count {
 		delete(p.record.GetItemBag().ItemCountMap, itemID)
@@ -79,6 +104,11 @@ func (p *characterItemManager) Consume(itemID uint32, count uint64) error {
 	}
 	p.record.GetItemBag().ItemCountMap[itemID] = current - count
 	return nil
+}
+
+func isCharacterAssetItemID(itemID uint32) bool {
+	return itemID >= uint32(pb.AssetIDRange_AssetIDRange_CharacterAsset_Start) &&
+		itemID <= uint32(pb.AssetIDRange_AssetIDRange_CharacterAsset_End)
 }
 
 func configuredItem(itemID uint32) (*gameconfig.ItemEntry, error) {

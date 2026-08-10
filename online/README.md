@@ -51,11 +51,17 @@ Docker 镜像会把仓库 `config/` 复制到 `/app/config`, `deploy/online/*.ya
 
 自动遇敌按 `scene.yaml -> enemy.group.yaml -> pet.yaml` 生成单位. 场景按权重选择敌人组, 敌人组的 `enemies[].id` 直接引用宠物模板; 数量和等级来自敌人组, 属性和 AI 来自宠物模板, 经验由 `enemy.exp.yaml` 结合宠物模板计算.
 
+## 角色道具与独立资产
+
+角色道具统一通过 `characterItemManager.Count/Add/Consume` 访问. `[3000000,3489999]` 的普通可堆叠道具存入 `item_bag.item_count_map` 并占用背包种类容量; `[3490000,3499999]` 的角色独立资产存入 `CharacterRecord.asset_count_map`, 不占背包容量且禁止存入账号共享仓库. 两类数据都必须存在于 `item.yaml`, 数量为 0 时删除映射键, 查询缺失键返回 0. 角色独立资产的合法数量上限为 `math.MaxInt64`, 避免超出 Godot 有符号 64 位整数范围.
+
+协议 `AssetID` 枚举当前定义 `AssetID_Stone`、`AssetID_Shell` 和 `AssetID_Diamond`. `CharacterItemChangedNotify` 对两类道具都携带最终数量, 调用方按 ID 范围选择目标容器. cache 档案中的角色资产若范围非法、数量超限、缺少配置或误存入角色背包/账号仓库, 账号绑定直接失败; 项目不迁移旧 `stone/shell/diamond` 字段.
+
 ## 全局武器商店
 
-`ShopPurchaseReq` 购买 `item.yaml` 中 `cost > 0` 的武器. 商店没有 NPC、场景、库存或限购条件; 服务端仍会校验角色属于当前账号、已经在线且不在战斗中, 并校验客户端提交的预期单价、数量、石币、背包剩余格数和账号 UUID 游标. `cost = 0`、非武器 ID、价格不一致或数量非法都必须拒绝.
+`ShopPurchaseReq` 购买 `item.yaml` 中 `cost > 0` 的武器, `cost` 当前固定使用 `AssetID_Stone` 计价. 商店没有 NPC、场景、库存或限购条件; 服务端仍会校验角色属于当前账号、已经在线且不在战斗中, 并校验客户端提交的预期单价、数量、石币资产、背包剩余格数和账号 UUID 游标. `cost = 0`、非武器 ID、价格不一致或数量非法都必须拒绝.
 
-购买时先在账号档案副本中扣除石币, 为每件武器创建只含 `uuid` 和 `asset_id` 的 `EquipmentRecord`, 再调用 cache 持久化完整 `AccountRecord`. cache 成功后才提交 Online 内存档案; 任一校验或持久化失败都不修改石币、背包和 `used_uuid`. `ShopPurchaseRes` 返回成交单价、总价、剩余石币、最新 UUID 游标和本次新增装备列表, 供客户端原子替换权威快照.
+购买时先在账号档案副本中通过统一道具接口扣除石币资产, 为每件武器创建只含 `uuid` 和 `asset_id` 的 `EquipmentRecord`, 再调用 cache 持久化完整 `AccountRecord`. cache 成功后才提交 Online 内存档案; 任一校验或持久化失败都不修改资产、背包和 `used_uuid`. `ShopPurchaseRes.affected_item` 返回 `AssetID_Stone` 及扣除后的最终持有数量, 同时返回成交单价、总价、最新 UUID 游标和本次新增装备列表, 供客户端原子替换权威快照.
 
 ## 宠物创建与品阶
 

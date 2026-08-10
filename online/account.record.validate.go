@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"strings"
 
+	"server/common/gameconfig"
 	pb "server/proto/pb"
 
 	"google.golang.org/protobuf/proto"
@@ -23,6 +25,11 @@ func validateAccountRecord(record *pb.AccountRecord) error {
 	}
 	if len(record.GetPetWarehouseRecordMap()) > int(pb.AccountRecordLimit_AccountRecordLimit_MaxPetWarehouseCount) {
 		return fmt.Errorf("pet warehouse count exceeds limit")
+	}
+	for itemID := range record.GetItemWarehouse().GetItemCountMap() {
+		if isCharacterAssetItemID(itemID) {
+			return fmt.Errorf("item warehouse contains character asset %d", itemID)
+		}
 	}
 
 	usedUUID := record.GetUsedUuid()
@@ -97,6 +104,22 @@ func validateCharacterRecord(record *pb.CharacterRecord, seenUUID map[uint64]str
 	}
 	if len(record.GetPetRecordList()) > int(pb.PetRecordLimit_PetRecordLimit_MaxCarryCount) {
 		return fmt.Errorf("carried pet count exceeds limit")
+	}
+	for assetID, count := range record.GetAssetCountMap() {
+		if !isCharacterAssetItemID(assetID) {
+			return fmt.Errorf("character asset id %d is outside [%d,%d]", assetID, pb.AssetIDRange_AssetIDRange_CharacterAsset_Start, pb.AssetIDRange_AssetIDRange_CharacterAsset_End)
+		}
+		if count > uint64(math.MaxInt64) {
+			return fmt.Errorf("character asset %d count %d exceeds max int64", assetID, count)
+		}
+		if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Item == nil || gameconfig.GGameConfig.Item.Get(assetID) == nil {
+			return fmt.Errorf("character asset config %d is missing", assetID)
+		}
+	}
+	for itemID := range record.GetItemBag().GetItemCountMap() {
+		if isCharacterAssetItemID(itemID) {
+			return fmt.Errorf("item bag contains character asset %d", itemID)
+		}
 	}
 
 	battleCount := 0

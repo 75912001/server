@@ -56,6 +56,15 @@ func (p *onlineGRPCServer) OnlineBindAccount(_ context.Context, req *pb.OnlineBi
 		if characterRecord.ItemBag.EquipmentRecordMap == nil {
 			characterRecord.ItemBag.EquipmentRecordMap = make(map[uint64]*pb.EquipmentRecord)
 		}
+		if characterRecord.AssetCountMap == nil {
+			characterRecord.AssetCountMap = make(map[uint32]uint64)
+		} else {
+			for assetID, count := range characterRecord.AssetCountMap {
+				if count == 0 {
+					delete(characterRecord.AssetCountMap, assetID)
+				}
+			}
+		}
 	}
 	req.Account = account
 	req.GatewayKey = gatewayKey

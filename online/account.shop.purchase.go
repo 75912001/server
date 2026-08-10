@@ -30,7 +30,7 @@ type shopPurchasePlan struct {
 	quantity            uint32
 	unitCost            uint64
 	totalCost           uint64
-	remainingStone      uint32
+	affectedItem        *pb.ItemElement
 	previousUsedUUID    uint64
 	nextUsedUUID        uint64
 	equipmentRecordList []*pb.EquipmentRecord
@@ -94,14 +94,15 @@ func (p *Account) onShopPurchaseReq(gateway *Gateway, pkt *pb.OnlineClientPacket
 	equipmentUUIDStart := plan.equipmentRecordList[0].GetUuid()
 	equipmentUUIDEnd := plan.equipmentRecordList[len(plan.equipmentRecordList)-1].GetUuid()
 	xlog.GLog.Infof(
-		"shop purchase success aid:%d character:%d item:%d quantity:%d unitCost:%d totalCost:%d remainingStone:%d equipmentUUIDStart:%d equipmentUUIDEnd:%d",
+		"shop purchase success aid:%d character:%d item:%d quantity:%d unitCost:%d totalCost:%d affectedItem:%d affectedCount:%d equipmentUUIDStart:%d equipmentUUIDEnd:%d",
 		p.aid,
 		plan.characterUUID,
 		plan.itemID,
 		plan.quantity,
 		plan.unitCost,
 		plan.totalCost,
-		plan.remainingStone,
+		plan.affectedItem.GetAssetId(),
+		plan.affectedItem.GetCount(),
 		equipmentUUIDStart,
 		equipmentUUIDEnd,
 	)
@@ -116,7 +117,7 @@ func (p *Account) onShopPurchaseReq(gateway *Gateway, pkt *pb.OnlineClientPacket
 		Quantity:            plan.quantity,
 		UnitCost:            plan.unitCost,
 		TotalCost:           plan.totalCost,
-		RemainingStone:      plan.remainingStone,
+		AffectedItem:        proto.Clone(plan.affectedItem).(*pb.ItemElement),
 		UsedUuid:            plan.nextUsedUUID,
 		EquipmentRecordList: responseEquipmentRecordList,
 	})
@@ -167,8 +168,10 @@ func prepareShopPurchasePlan(
 		return nil, fmt.Errorf("%w: item %d total cost overflows uint64", errShopPurchaseRecordInvalid, itemID)
 	}
 	totalCost := itemEntry.Cost * uint64(quantity)
-	if totalCost > uint64(characterRecord.GetStone()) {
-		return nil, fmt.Errorf("%w: stone %d is less than total cost %d", errShopPurchaseFailedPrecondition, characterRecord.GetStone(), totalCost)
+	stoneID := uint32(pb.AssetID_AssetID_Stone)
+	stoneCount := newCharacterItemManager(characterRecord).Count(stoneID)
+	if totalCost > stoneCount {
+		return nil, fmt.Errorf("%w: stone %d is less than total cost %d", errShopPurchaseFailedPrecondition, stoneCount, totalCost)
 	}
 	if itemContainerCount(characterRecord.GetItemBag())+int(quantity) > int(pb.CharacterLimit_CharacterLimit_MaxItemBagCount) {
 		return nil, fmt.Errorf("%w: item bag has %d records and needs %d slots", errShopPurchaseResourceExhausted, itemContainerCount(characterRecord.GetItemBag()), quantity)
@@ -212,8 +215,11 @@ func prepareShopPurchasePlan(
 		nextCharacter.ItemBag.EquipmentRecordMap[equipmentUUID] = equipmentRecord
 		equipmentRecordList = append(equipmentRecordList, equipmentRecord)
 	}
-	nextCharacter.Stone = uint32(uint64(characterRecord.GetStone()) - totalCost)
+	if err := newCharacterItemManager(nextCharacter).Consume(stoneID, totalCost); err != nil {
+		return nil, fmt.Errorf("%w: consume stone: %v", errShopPurchaseRecordInvalid, err)
+	}
 	nextAccountRecord.UsedUuid = nextUsedUUID
+	affectedItem := &pb.ItemElement{AssetId: stoneID, Count: newCharacterItemManager(nextCharacter).Count(stoneID)}
 
 	return &shopPurchasePlan{
 		characterUUID:       characterRecord.GetBase().GetUuid(),
@@ -221,7 +227,7 @@ func prepareShopPurchasePlan(
 		quantity:            quantity,
 		unitCost:            itemEntry.Cost,
 		totalCost:           totalCost,
-		remainingStone:      nextCharacter.GetStone(),
+		affectedItem:        affectedItem,
 		previousUsedUUID:    previousUsedUUID,
 		nextUsedUUID:        nextUsedUUID,
 		equipmentRecordList: equipmentRecordList,

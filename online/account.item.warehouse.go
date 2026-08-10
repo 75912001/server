@@ -153,6 +153,9 @@ func prepareItemWarehouseTransfer(
 		if itemID == 0 || count == 0 {
 			return nil, errItemWarehouseInvalidArgument
 		}
+		if isCharacterAssetItemID(itemID) {
+			return nil, fmt.Errorf("%w: character asset %d cannot be transferred", errItemWarehouseInvalidArgument, itemID)
+		}
 		if _, err := configuredItem(itemID); err != nil {
 			return nil, err
 		}

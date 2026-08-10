@@ -66,6 +66,9 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	case pb.MsgID_ItemUseReq_CMD:
 		p.onItemUseReq(gateway, pkt)
 		return
+	case pb.MsgID_ShopPurchaseReq_CMD:
+		p.onShopPurchaseReq(gateway, pkt)
+		return
 	case pb.MsgID_GMCommandReq_CMD:
 		p.onGMCommandReq(gateway, pkt)
 		return
