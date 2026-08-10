@@ -105,6 +105,15 @@ items:
       use:
         target: pet
         loyalty: 40
+    3490000:
+      name: 石币
+      sprite: 0
+    3490001:
+      name: 贝壳
+      sprite: 0
+    3490002:
+      name: 钻石
+      sprite: 0
   # 武器.爪
   weaponClaw:
     3900000:
