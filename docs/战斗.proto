@@ -941,7 +941,7 @@ enum LegacyBattleRule {
   LegacyBattleRule_CounterReactionStopsChain = 55; // 反击双方存在光镜守时本次反击可结算, 但返回值会终止继续扩展反击链
   LegacyBattleRule_WeaponAttackCountRandom = 56; // 武器可按 ITEM_ATTACKNUM_MIN/MAX 随机攻击次数, 每回合最终段数必须下发
   LegacyBattleRule_UnarmedLuckyMultiHit = 57; // 10级以上玩家空手普通攻击按基础运气CHAR_LUCK随机得到2、3或5-10段, 装备运气不参与
-  LegacyBattleRule_FistMultiHitDamageDivision = 58; // 空手多段把 gDamageDiv 设为段数; 部分武器多段和疯狂暴走不一定分摊
+  LegacyBattleRule_FistMultiHitDamageDivision = 58; // 装备 ITEM_FIST 爪且由武器 attacknum 产生的多段把 gDamageDiv 设为计划段数; 真正空手幸运多段保持 1
   LegacyBattleRule_MountCombinedCombatAttribute = 59; // 骑乘时攻击、防御、敏捷可由人物和骑宠经 BATTLE_adjustRidePet3A 合成
   LegacyBattleRule_MountDamageSplit = 60; // 受击时人物和骑宠按双方防御力比例分摊伤害并分别更新 HP/死亡
   LegacyBattleRule_MountFallAndTransform = 61; // 落马、狐狸化、乌力化会解除骑乘并改变形象/动作限制
