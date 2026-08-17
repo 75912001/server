@@ -6,7 +6,7 @@
 
 - `character.yaml`: 角色资源配置.
 - `character.sprite.yaml`: 角色及角色骑宠动画帧、逐动作 FPS、攻击声音、命中表现和原版 Raw 参考配置.
-- `common.sprite.yaml`: 通用精灵资源配置; `atlas` 使用相对 `assets` 的无扩展名路径并且必须以 `common/` 开头, `value` 保存客户端逐帧消费的有序帧号, 8702-8713是地水火风的大中小属性图标, 暴击8723条目合并保存前14帧小星和后13帧大星的60Hz时间线; 9195和9196分别是设置窗口角色属性加点按钮的未按下和按下状态.
+- `common.sprite.yaml`: 通用精灵资源配置; `atlas` 使用相对 `assets` 的无扩展名路径并且必须以 `common/` 开头, `value` 保存客户端逐帧消费的有序帧号, 8702-8710和347511-347513是地水火风的大中小属性图标, 242302是设置窗口角色随身物品位置的原版背景板, 暴击8723条目合并保存前14帧小星和后13帧大星的60Hz时间线; 9195和9196分别是设置窗口角色属性加点按钮的未按下和按下状态.
 - `skill.yaml`: 角色和宠物共用的技能配置.
 - `enemy.group.yaml`: 敌人编组、宠物模板、数量和等级规则.
 - `enemy.exp.yaml`: 敌人等级基础经验配置.
@@ -26,7 +26,7 @@
 
 ## 角色动画元数据生成
 
-`../tool/character_sprite_metadata.py` 从原版 `spr_115.bin` 和 `spradrn_115.bin` 审计 `character.sprite.yaml` 的104个方向动作, 并生成13动作FPS、当前攻击声音及原版Raw参考数据. 默认只读审计, 明确传入 `--write` 才会并发校验后原子写入:
+`../tool/character_sprite_metadata.py` 从原版 `spr_115.bin` 和 `spradrn_115.bin` 审计 `character.sprite.yaml` 的104个方向动作, 并生成13动作FPS、当前攻击声音、Throw投射物释放帧、Throw动作声音及原版Raw参考数据. 默认只读审计, 明确传入 `--write` 才会并发校验后原子写入:
 
 ```bash
 python tool/character_sprite_metadata.py \
@@ -35,6 +35,8 @@ python tool/character_sprite_metadata.py \
   --config config/character.sprite.yaml \
   --write
 ```
+
+`throwReleaseFrameNumber`记录原版Throw动作中10000-10099投射物事件映射后的1-based帧位置, 没有该事件时为0; `throwActionSoundFrameNumberList`和`throwActionSoundIdList`记录生效Throw动作的逐帧声音事件. 默认值来自原版事件, 新版另对吉米四种颜色实战复用的unarmed sprite 0/5/10/15在原版第5项释放前的第4项补充声音ID 4. 生成器要求同一sprite八方向映射完全一致, 不允许客户端用固定帧或“倒数第几帧”猜测释放时点.
 
 4个事件字段以 `Raw` 结尾, 记录原版攻击事件的1-based帧位置和声音ID. 当前方向动作与原版帧序列不同时, 生成器还会在生效动作后写入 `<action>Raw`, 例如 `attackRaw`. 所有Raw字段只供后期对照, 客户端只校验而不创建播放缓存; 修改生效动作前必须同时确认当前图集帧、`.tpsheet`和offset完整, 不能直接用Raw覆盖.
 

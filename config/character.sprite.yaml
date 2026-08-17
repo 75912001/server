@@ -60,6 +60,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [250]
@@ -197,6 +200,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -334,6 +340,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -471,6 +480,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -608,6 +620,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [255]
@@ -746,6 +761,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [250]
@@ -883,6 +901,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -1020,6 +1041,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -1157,6 +1181,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -1294,6 +1321,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [255]
@@ -1432,6 +1462,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [250]
@@ -1569,6 +1602,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -1706,6 +1742,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -1843,6 +1882,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -1980,6 +2022,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [255]
@@ -2118,6 +2163,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [250]
@@ -2255,6 +2303,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -2392,6 +2443,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -2529,6 +2583,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -2666,6 +2723,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [255]
@@ -2804,6 +2864,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250,250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6,8]
     attackImpactSoundIdListRaw: [250,250]
@@ -2941,6 +3004,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -3078,6 +3144,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -3215,6 +3284,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254,254,254,254,254,254,254,254,254,254,254,254]
     attackActionSoundFrameNumberList: [3,7,11,22]
     attackActionSoundIdList: [9,9,9,9]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [23]
@@ -3353,6 +3425,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [15]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [16]
     attackImpactSoundIdListRaw: [255]
@@ -3491,6 +3566,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250,250,250,250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8,10,12,14]
     attackImpactSoundIdListRaw: [250,250,250,250]
@@ -3628,6 +3706,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -3765,6 +3846,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -3902,6 +3986,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254,254,254,254,254,254,254,254,254,254,254,254]
     attackActionSoundFrameNumberList: [3,7,11,22]
     attackActionSoundIdList: [9,9,9,9]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [23]
@@ -4040,6 +4127,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [15]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [16]
     attackImpactSoundIdListRaw: [255]
@@ -4178,6 +4268,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [29]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [30]
     attackImpactSoundIdListRaw: [250]
@@ -4315,6 +4408,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -4452,6 +4548,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -4589,6 +4688,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254,254,254,254,254,254,254,254,254,254,254,254]
     attackActionSoundFrameNumberList: [3,7,11,22]
     attackActionSoundIdList: [9,9,9,9]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [23]
@@ -4727,6 +4829,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [15]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [16]
     attackImpactSoundIdListRaw: [255]
@@ -4865,6 +4970,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [44]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [45]
     attackImpactSoundIdListRaw: [250]
@@ -5002,6 +5110,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -5139,6 +5250,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -5276,6 +5390,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254,254,254,254,254]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [28,36,38,40,42]
@@ -5422,6 +5539,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [15]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 13
+    throwActionSoundFrameNumberList: [12]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [16]
     attackImpactSoundIdListRaw: [255]
@@ -5560,6 +5680,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -5697,6 +5820,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -5834,6 +5960,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -5971,6 +6100,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [254]
@@ -6108,6 +6240,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [13]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [14]
     attackImpactSoundIdListRaw: [255]
@@ -6246,6 +6381,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -6383,6 +6521,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -6520,6 +6661,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -6657,6 +6801,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [254]
@@ -6794,6 +6941,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [13]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [14]
     attackImpactSoundIdListRaw: [255]
@@ -6932,6 +7082,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -7069,6 +7222,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -7206,6 +7362,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -7343,6 +7502,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [254]
@@ -7480,6 +7642,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [13]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [14]
     attackImpactSoundIdListRaw: [255]
@@ -7618,6 +7783,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -7755,6 +7923,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -7892,6 +8063,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -8029,6 +8203,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [254]
@@ -8166,6 +8343,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [13]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: [8]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [14]
     attackImpactSoundIdListRaw: [255]
@@ -8304,6 +8484,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -8441,6 +8624,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -8578,6 +8764,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -8715,6 +8904,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [10]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [11]
@@ -8867,6 +9059,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [10]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [11]
     attackImpactSoundIdListRaw: [255]
@@ -9005,6 +9200,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -9142,6 +9340,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -9279,6 +9480,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -9416,6 +9620,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [10]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [11]
@@ -9568,6 +9775,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [10]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [11]
     attackImpactSoundIdListRaw: [255]
@@ -9706,6 +9916,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -9843,6 +10056,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -9980,6 +10196,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -10117,6 +10336,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [10]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [11]
@@ -10269,6 +10491,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [10]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [11]
     attackImpactSoundIdListRaw: [255]
@@ -10407,6 +10632,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -10544,6 +10772,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -10681,6 +10912,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -10818,6 +11052,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [10]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [11]
@@ -10970,6 +11207,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [10]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [11]
     attackImpactSoundIdListRaw: [255]
@@ -11108,6 +11348,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [250]
@@ -11245,6 +11488,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [252]
@@ -11382,6 +11628,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [253]
@@ -11519,6 +11768,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [254]
@@ -11656,6 +11908,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [255]
@@ -11794,6 +12049,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [250]
@@ -11931,6 +12189,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [252]
@@ -12068,6 +12329,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [253]
@@ -12205,6 +12469,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [254]
@@ -12342,6 +12609,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [255]
@@ -12480,6 +12750,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [250]
@@ -12617,6 +12890,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [252]
@@ -12754,6 +13030,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [253]
@@ -12891,6 +13170,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [254]
@@ -13028,6 +13310,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [255]
@@ -13166,6 +13451,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: [4]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [250]
@@ -13303,6 +13591,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [252]
@@ -13440,6 +13731,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [253]
@@ -13577,6 +13871,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [254]
@@ -13714,6 +14011,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 4
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [255]
@@ -13852,6 +14152,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [2,17]
     attackActionSoundIdList: [114,3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [18]
     attackImpactSoundIdListRaw: [250]
@@ -13989,6 +14292,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [252]
@@ -14126,6 +14432,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [5]
@@ -14267,6 +14576,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -14404,6 +14716,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [255]
@@ -14542,6 +14857,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [2,17]
     attackActionSoundIdList: [114,3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [18]
     attackImpactSoundIdListRaw: [250]
@@ -14679,6 +14997,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [252]
@@ -14816,6 +15137,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [253]
@@ -14953,6 +15277,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -15090,6 +15417,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [255]
@@ -15228,6 +15558,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [2,17]
     attackActionSoundIdList: [114,3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [18]
     attackImpactSoundIdListRaw: [250]
@@ -15365,6 +15698,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [252]
@@ -15502,6 +15838,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [253]
@@ -15639,6 +15978,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -15776,6 +16118,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [255]
@@ -15914,6 +16259,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [2,17]
     attackActionSoundIdList: [114,3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
@@ -16061,6 +16409,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [252]
@@ -16198,6 +16549,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [5]
     attackImpactSoundIdListRaw: [253]
@@ -16335,6 +16689,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -16472,6 +16829,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [255]
@@ -16610,6 +16970,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -16747,6 +17110,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -16884,6 +17250,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -17021,6 +17390,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -17158,6 +17530,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [255]
@@ -17296,6 +17671,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -17433,6 +17811,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -17570,6 +17951,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -17707,6 +18091,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -17844,6 +18231,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [255]
@@ -17982,6 +18372,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -18119,6 +18512,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -18256,6 +18652,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -18393,6 +18792,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -18530,6 +18932,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [255]
@@ -18668,6 +19073,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -18805,6 +19213,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [252]
@@ -18942,6 +19353,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [253]
@@ -19079,6 +19493,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [254]
@@ -19216,6 +19633,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [255]
@@ -19354,6 +19774,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [1,5,9,13,17]
     attackActionSoundIdList: [1,1,1,1,1]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [22]
     attackImpactSoundIdListRaw: [250]
@@ -19491,6 +19914,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [252]
@@ -19628,6 +20054,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [253]
@@ -19765,6 +20194,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [254]
@@ -19902,6 +20334,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [255]
@@ -20040,6 +20475,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [1,5,9,13,17]
     attackActionSoundIdList: [1,1,1,1,1]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [22]
     attackImpactSoundIdListRaw: [250]
@@ -20177,6 +20615,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [252]
@@ -20314,6 +20755,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [253]
@@ -20451,6 +20895,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [254]
@@ -20588,6 +21035,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [255]
@@ -20726,6 +21176,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [1,5,9,13,17]
     attackActionSoundIdList: [1,1,1,1,1]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [22]
     attackImpactSoundIdListRaw: [250]
@@ -20863,6 +21316,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [252]
@@ -21000,6 +21456,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [253]
@@ -21137,6 +21596,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [254]
@@ -21274,6 +21736,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [255]
@@ -21412,6 +21877,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [1,5,9,13,17]
     attackActionSoundIdList: [1,1,1,1,1]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [22]
     attackImpactSoundIdListRaw: [250]
@@ -21549,6 +22017,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [252]
@@ -21686,6 +22157,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [253]
@@ -21823,6 +22297,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [254]
@@ -21960,6 +22437,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [5]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 7
+    throwActionSoundFrameNumberList: [6]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [6]
     attackImpactSoundIdListRaw: [255]
@@ -22098,6 +22578,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -22235,6 +22718,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -22372,6 +22858,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -22509,6 +22998,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [254]
@@ -22646,6 +23138,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [255]
@@ -22784,6 +23279,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -22921,6 +23419,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -23058,6 +23559,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -23195,6 +23699,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [254]
@@ -23332,6 +23839,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [255]
@@ -23470,6 +23980,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -23607,6 +24120,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -23744,6 +24260,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -23881,6 +24400,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [254]
@@ -24018,6 +24540,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [255]
@@ -24156,6 +24681,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [7]
     attackImpactSoundIdListRaw: [250]
@@ -24293,6 +24821,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -24430,6 +24961,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -24567,6 +25101,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [254]
@@ -24704,6 +25241,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [11]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 9
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [12]
     attackImpactSoundIdListRaw: [255]
@@ -24842,6 +25382,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [250]
@@ -24979,6 +25522,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -25116,6 +25662,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -25253,6 +25802,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [254]
@@ -25390,6 +25942,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [12]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [13]
     attackImpactSoundIdListRaw: [255]
@@ -25528,6 +26083,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [250]
@@ -25665,6 +26223,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -25802,6 +26363,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -25939,6 +26503,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [254]
@@ -26076,6 +26643,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [12]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [13]
     attackImpactSoundIdListRaw: [255]
@@ -26214,6 +26784,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [250]
@@ -26351,6 +26924,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -26488,6 +27064,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -26625,6 +27204,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [254]
@@ -26762,6 +27344,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [12]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [13]
     attackImpactSoundIdListRaw: [255]
@@ -26900,6 +27485,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [250]
@@ -27037,6 +27625,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [252]
@@ -27174,6 +27765,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [253]
@@ -27311,6 +27905,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [254]
@@ -27448,6 +28045,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [12]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [13]
     attackImpactSoundIdListRaw: [255]
@@ -27586,6 +28186,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [250]
@@ -27723,6 +28326,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [8]
@@ -27869,6 +28475,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [5]
@@ -28015,6 +28624,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [14]
@@ -28161,6 +28773,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [14]
@@ -28308,6 +28923,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [250]
@@ -28445,6 +29063,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [8]
@@ -28591,6 +29212,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [5]
@@ -28737,6 +29361,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [14]
@@ -28883,6 +29510,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [14]
@@ -29030,6 +29660,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [250]
@@ -29167,6 +29800,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [8]
@@ -29313,6 +29949,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [5]
@@ -29459,6 +30098,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [14]
@@ -29605,6 +30247,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [14]
@@ -29752,6 +30397,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7]
     attackActionSoundIdList: [1]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [8]
     attackImpactSoundIdListRaw: [250]
@@ -29889,6 +30537,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [8]
@@ -30035,6 +30686,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [4]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [5]
@@ -30181,6 +30835,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [14]
@@ -30327,6 +30984,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # ActionRaw差异: 对应方向动作的 *Raw 字段保留原版帧序列, 仅供查阅, 覆盖当前动作前须确认图集帧和偏移完整.
     attackImpactFrameNumberListRaw: [14]
@@ -30474,6 +31134,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250,250,250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [8,9,10,11,12]
@@ -30612,6 +31275,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [252]
@@ -30749,6 +31415,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [253]
@@ -30886,6 +31555,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [254]
@@ -31023,6 +31695,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [255]
@@ -31161,6 +31836,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250,250,250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [8,9,10,11,12]
@@ -31299,6 +31977,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [252]
@@ -31436,6 +32117,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [253]
@@ -31573,6 +32257,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [254]
@@ -31710,6 +32397,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [255]
@@ -31848,6 +32538,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250,250,250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [8,9,10,11,12]
@@ -31986,6 +32679,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [252]
@@ -32123,6 +32819,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [253]
@@ -32260,6 +32959,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [254]
@@ -32397,6 +33099,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [255]
@@ -32535,6 +33240,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250,250,250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [8,9,10,11,12]
@@ -32673,6 +33381,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [3]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [252]
@@ -32810,6 +33521,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [253]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [2]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [253]
@@ -32947,6 +33661,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [8]
     attackActionSoundIdList: [9]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [9]
     attackImpactSoundIdListRaw: [254]
@@ -33084,6 +33801,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: []
     attackActionSoundFrameNumberList: [9]
     attackActionSoundIdList: [10]
+    throwReleaseFrameNumber: 8
+    throwActionSoundFrameNumberList: [7]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [10]
     attackImpactSoundIdListRaw: [255]
@@ -33222,6 +33942,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -33360,6 +34083,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -33497,6 +34223,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -33634,6 +34363,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -33771,6 +34503,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -33909,6 +34644,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -34048,6 +34786,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -34186,6 +34927,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -34324,6 +35068,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -34462,6 +35209,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -34600,6 +35350,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -34738,6 +35491,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -34875,6 +35631,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -35012,6 +35771,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -35149,6 +35911,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -35287,6 +36052,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -35426,6 +36194,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -35564,6 +36335,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -35702,6 +36476,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -35840,6 +36617,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -35978,6 +36758,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -36116,6 +36899,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -36253,6 +37039,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -36390,6 +37179,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -36527,6 +37319,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -36665,6 +37460,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -36804,6 +37602,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -36942,6 +37743,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -37080,6 +37884,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -37218,6 +38025,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -37356,6 +38166,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -37494,6 +38307,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -37631,6 +38447,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -37768,6 +38587,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -37905,6 +38727,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -38043,6 +38868,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -38182,6 +39010,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -38320,6 +39151,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -38458,6 +39292,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -38596,6 +39433,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -38734,6 +39574,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -38872,6 +39715,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -39009,6 +39855,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -39146,6 +39995,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -39283,6 +40135,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -39421,6 +40276,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -39560,6 +40418,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -39698,6 +40559,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -39836,6 +40700,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -39974,6 +40841,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -40112,6 +40982,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -40250,6 +41123,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -40387,6 +41263,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -40524,6 +41403,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -40661,6 +41543,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -40799,6 +41684,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -40938,6 +41826,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -41076,6 +41967,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -41214,6 +42108,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -41352,6 +42249,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -41490,6 +42390,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -41628,6 +42531,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -41765,6 +42671,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -41902,6 +42811,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -42039,6 +42951,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -42177,6 +43092,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -42316,6 +43234,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -42454,6 +43375,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -42592,6 +43516,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -42730,6 +43657,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -42868,6 +43798,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -43006,6 +43939,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -43143,6 +44079,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -43280,6 +44219,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -43417,6 +44359,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -43555,6 +44500,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -43694,6 +44642,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -43832,6 +44783,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -43970,6 +44924,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -44108,6 +45065,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -44246,6 +45206,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -44384,6 +45347,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -44521,6 +45487,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -44658,6 +45627,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -44795,6 +45767,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -44933,6 +45908,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -45072,6 +46050,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -45210,6 +46191,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -45348,6 +46332,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -45486,6 +46473,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -45624,6 +46614,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -45761,6 +46754,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -45898,6 +46894,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -46035,6 +47034,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -46173,6 +47175,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -46312,6 +47317,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -46450,6 +47458,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -46588,6 +47599,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -46726,6 +47740,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -46864,6 +47881,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -47002,6 +48022,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -47139,6 +48162,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -47276,6 +48302,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -47413,6 +48442,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -47551,6 +48583,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -47690,6 +48725,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -47828,6 +48866,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -47966,6 +49007,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -48104,6 +49148,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -48242,6 +49289,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -48380,6 +49430,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -48517,6 +49570,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -48654,6 +49710,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
     attackActionSoundIdList: [63]
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [21]
     attackImpactSoundIdListRaw: [250]
@@ -48791,6 +49850,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -48929,6 +49991,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -49068,6 +50133,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -49206,6 +50274,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
@@ -49344,6 +50415,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -49482,6 +50556,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 5
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [3,7]
@@ -49621,6 +50698,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -49759,6 +50839,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -49897,6 +50980,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -50035,6 +51121,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -50173,6 +51262,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -50312,6 +51404,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -50449,6 +51544,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -50587,6 +51685,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -50725,6 +51826,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -50863,6 +51967,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -51002,6 +52109,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -51140,6 +52250,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -51278,6 +52391,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -51416,6 +52532,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -51553,6 +52672,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -51692,6 +52814,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -51830,6 +52955,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -51968,6 +53096,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -52106,6 +53237,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -52244,6 +53378,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -52383,6 +53520,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -52521,6 +53661,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -52658,6 +53801,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -52796,6 +53942,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -52934,6 +54083,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -53073,6 +54225,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -53211,6 +54366,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -53349,6 +54507,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -53487,6 +54648,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -53625,6 +54789,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -53763,6 +54930,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -53901,6 +55071,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -54039,6 +55212,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -54177,6 +55353,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -54315,6 +55494,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -54454,6 +55636,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -54592,6 +55777,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -54730,6 +55918,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -54867,6 +56058,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -55005,6 +56199,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -55144,6 +56341,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -55282,6 +56482,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -55420,6 +56623,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -55558,6 +56764,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -55696,6 +56905,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -55835,6 +57047,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -55972,6 +57187,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -56110,6 +57328,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -56248,6 +57469,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -56386,6 +57610,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -56525,6 +57752,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -56663,6 +57893,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -56801,6 +58034,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -56939,6 +58175,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -57076,6 +58315,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -57215,6 +58457,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -57353,6 +58598,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -57491,6 +58739,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -57629,6 +58880,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -57767,6 +59021,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -57906,6 +59163,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -58044,6 +59304,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -58181,6 +59444,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -58319,6 +59585,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -58457,6 +59726,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -58596,6 +59868,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -58734,6 +60009,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -58872,6 +60150,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -59010,6 +60291,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -59148,6 +60432,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -59286,6 +60573,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -59424,6 +60714,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -59562,6 +60855,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -59700,6 +60996,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -59838,6 +61137,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -59977,6 +61279,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -60115,6 +61420,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -60253,6 +61561,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -60390,6 +61701,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -60528,6 +61842,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -60667,6 +61984,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -60805,6 +62125,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -60943,6 +62266,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -61081,6 +62407,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -61219,6 +62548,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -61358,6 +62690,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -61495,6 +62830,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -61633,6 +62971,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -61771,6 +63112,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [9,15]
     attackActionSoundIdList: [250,251]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [2,4,6,8,10,16]
@@ -61909,6 +63253,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [60,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -62048,6 +63395,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [8,14]
     attackActionSoundIdList: [64,64]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [10,16]
@@ -62186,6 +63536,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [5,9]
     attackActionSoundIdList: [250,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,10]
@@ -62324,6 +63677,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [3,7]
     attackActionSoundIdList: [9,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,8]
@@ -62462,6 +63818,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [7,9,11,14]
     attackActionSoundIdList: [71,71,71,250]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     attackImpactFrameNumberListRaw: [15]
     attackImpactSoundIdListRaw: [250]
@@ -62599,6 +63958,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [3]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [5,8,11,14,17]
@@ -62738,6 +64100,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
     attackActionSoundIdList: []
+    throwReleaseFrameNumber: 0
+    throwActionSoundFrameNumberList: []
+    throwActionSoundIdList: []
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [6,9]
@@ -62876,6 +64241,9 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
     attackImpactSoundIdList: [251]
     attackActionSoundFrameNumberList: [1]
     attackActionSoundIdList: [62]
+    throwReleaseFrameNumber: 10
+    throwActionSoundFrameNumberList: [9]
+    throwActionSoundIdList: [4]
     # Raw参考数据直接记录原版攻击事件, 仅供对照, 不参与运行时播放.
     # Raw差异: 原版命中事件数与当前 attackImpactFrameNumberList 不同, 后期修改须先对照当前八方向 attack 帧序列.
     attackImpactFrameNumberListRaw: [4,7]
