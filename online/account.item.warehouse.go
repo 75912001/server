@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 
-	"server/common/gameconfig"
 	pb "server/proto/pb"
 
 	xerror "github.com/75912001/xlib/error"
@@ -186,8 +185,8 @@ func prepareItemWarehouseTransfer(
 	if _, exists := target.GetEquipmentRecordMap()[equipmentUUID]; exists {
 		return nil, fmt.Errorf("%w: equipment %d already exists in target", errItemWarehouseRecordInvalid, equipmentUUID)
 	}
-	if err := configuredEquipment(equipment.GetAssetId()); err != nil {
-		return nil, err
+	if err := validateEquipmentRecord(equipment, equipmentUUID); err != nil {
+		return nil, fmt.Errorf("%w: %v", errItemWarehouseRecordInvalid, err)
 	}
 	if itemContainerCount(target) >= targetCapacity {
 		return nil, fmt.Errorf("%w: target count %d", errItemWarehouseResourceExhausted, itemContainerCount(target))
@@ -195,17 +194,6 @@ func prepareItemWarehouseTransfer(
 	plan.equipment = equipment
 	plan.equipmentUUID = equipmentUUID
 	return plan, nil
-}
-
-func configuredEquipment(equipmentID uint32) error {
-	if equipmentID < uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Start) ||
-		equipmentID > uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_End) {
-		return fmt.Errorf("%w: equipment id %d is invalid", errItemWarehouseRecordInvalid, equipmentID)
-	}
-	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Item == nil || gameconfig.GGameConfig.Item.Get(equipmentID) == nil {
-		return fmt.Errorf("%w: equipment config %d not found", errItemWarehouseTargetNotFound, equipmentID)
-	}
-	return nil
 }
 
 // persistItemWarehouseTransfer 只在计划完成全部本地校验后修改两个容器, cache 失败时恢复原值.

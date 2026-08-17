@@ -18,7 +18,6 @@ const (
 	combatRandomIncrement                 = uint64(1442695040888963407)
 	combatRandomUint32Denominator         = 1 << 32
 	combatMaximumCounter                  = 5
-	combatPlayerCounterFists              = 9
 	combatEnemyAISkillSlotCount           = 7
 	combatCounterDivisor          float32 = 0.08
 )
@@ -119,8 +118,10 @@ type combatAction struct {
 	declaredTargetCaptured bool
 	declaredTargetKey      *pb.CombatUnitKey
 	// segmentCount保存本次动作的计划段数. 连续攻击来自skill.yaml配置,
-	// 普通空手攻击在自身行动开始时按等级和BaseLuck随机锁定.
+	// 普通武器攻击按attacknum范围锁定, 空手攻击按等级和BaseLuck锁定.
 	segmentCount uint32
+	// weaponDamageDivision只对原版ITEM_FIST爪武器的普通多段攻击生效.
+	weaponDamageDivision bool
 	// 连击开始执行后按普通攻击命令参与后续反击资格判断.
 	counterCommandPromotedToAttack bool
 }
@@ -178,7 +179,7 @@ func (a *combatAction) isGuardBreak() bool {
 }
 
 func (a *combatAction) usesMultiSegmentDamageDivision() bool {
-	return a != nil && a.isContinuationAttack()
+	return a != nil && (a.isContinuationAttack() || a.weaponDamageDivision)
 }
 
 func (a *combatAction) canCounter() bool {
@@ -468,6 +469,63 @@ func (r *CombatRoom) combatPlayerUnarmedAttackSegmentCount(action *combatAction)
 	return combatPlayerUnarmedAttackSegmentCountForRoll(level, baseLuck, roll, rareSegmentCount)
 }
 
+// combatPlayerAttackSegmentCount在普通攻击动作开始时锁定一次段数. 有武器时每个动作
+// 只执行一次attacknum闭区间随机; 没有武器时继续使用既有空手连击规则.
+func (r *CombatRoom) combatPlayerAttackSegmentCount(action *combatAction) uint32 {
+	segmentCount, weaponDamageDivision := r.combatPlayerAttackSegmentPlan(action)
+	if action != nil {
+		action.weaponDamageDivision = weaponDamageDivision
+	}
+	return segmentCount
+}
+
+func (r *CombatRoom) combatPlayerAttackSegmentPlan(action *combatAction) (uint32, bool) {
+	if r == nil || r.random == nil || action == nil {
+		return 1, false
+	}
+	attacker := r.stateByKey(action.unitKey)
+	if attacker == nil || combatKind(attacker.unit) != combatUnitKindPlayer || attacker.unit.GetEquipment() == nil {
+		return 1, false
+	}
+	if attacker.unit.GetEquipment().GetWeapon() == nil {
+		return r.combatPlayerUnarmedAttackSegmentCount(action), false
+	}
+	minimum := attacker.weaponAttackNumberMin
+	maximum := attacker.weaponAttackNumberMax
+	if minimum > maximum {
+		return 1, false
+	}
+	segmentCount := r.random.rangeInt(int64(minimum), int64(maximum))
+	if segmentCount <= 0 {
+		segmentCount = 1
+	}
+	if segmentCount > math.MaxUint32 {
+		segmentCount = math.MaxUint32
+	}
+	return uint32(segmentCount), attacker.weaponType == pb.CharacterWeaponType_CharacterWeaponType_Claw
+}
+
+func (r *CombatRoom) combatConsumeEquippedWeaponAttackSegmentPlan(action *combatAction) {
+	if r == nil || action == nil {
+		return
+	}
+	attacker := r.stateByKey(action.unitKey)
+	if attacker == nil || combatKind(attacker.unit) != combatUnitKindPlayer ||
+		attacker.unit.GetEquipment() == nil || attacker.unit.GetEquipment().GetWeapon() == nil {
+		return
+	}
+	_, _ = r.combatPlayerAttackSegmentPlan(action)
+}
+
+// combatConsumeUnusedPlayerAttackSegmentPlan保留8.5在命令分派前锁定武器攻击次数的
+// 随机顺序. 非普通攻击只消耗这次抽取, 不得用它覆盖技能段数或开启爪分摊.
+func (r *CombatRoom) combatConsumeUnusedPlayerAttackSegmentPlan(action *combatAction) {
+	if action == nil || action.isAttack() {
+		return
+	}
+	r.combatConsumeEquippedWeaponAttackSegmentPlan(action)
+}
+
 func combatPosition(unit *pb.CombatUnit) *pb.CombatPosition {
 	if unit == nil {
 		return nil
@@ -589,11 +647,10 @@ func (r *CombatRoom) combatDodge(attacker *combatUnitRuntimeState, defender *com
 //   - 非玩家单位攻击玩家: 不开平方, 除数改为10;
 //   - 玩家攻击非玩家单位: 敌方敏捷先乘0.6并按C int复合赋值向零截断.
 //
-// attacker.criticalModifier对应8.5的装备暴击输入At_Soubi, 当前生产快照尚未接入装备来源,
-// 因而实际值仍为0. 字段和0.5加成顺序保留在公式中, 等D017接入真实装备数据后无需改变
-// 随机判定链. defender.ultimateKnockbackImmune同时映射源码在公式末尾对真实基础形象
+// attacker.criticalModifier对应8.5的装备暴击输入At_Soubi, 玩家建房时从武器实例固化值冻结.
+// 字段和0.5加成顺序属于原版随机判定链. defender.ultimateKnockbackImmune同时映射源码在公式末尾对真实基础形象
 // 101813/101814执行的`per=0`; 守护已经在调用本函数前把计算目标切换到实际守护宠物.
-// 弓暴击例外和其他特殊宠物技能加成仍等待对应运行态接入.
+// 弓与其他武器共用本阈值和随机判定, 只在后续暴击伤害阶段跳过近战追加伤害.
 func combatCriticalThreshold(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState) int64 {
 	attackerDex := combatEffectiveAgilityPower(attacker)
 	defenderDex := combatEffectiveAgilityPower(defender)
@@ -869,18 +926,25 @@ func (r *CombatRoom) combatBaseDamageWithDefenseMode(attacker *combatUnitRuntime
 }
 
 func (s *combatUnitRuntimeState) otherDamageModifier() int64 {
-	return 0
+	if s == nil {
+		return 0
+	}
+	return s.otherDamagePower
 }
 
 func (s *combatUnitRuntimeState) otherDefenseModifier() int64 {
-	return 0
+	if s == nil {
+		return 0
+	}
+	return s.otherDefensePower
 }
 
 type combatAttackRoll struct {
-	dodged        bool
-	critical      bool
-	guardBypassed bool
-	damage        uint64
+	dodged                  bool
+	critical                bool
+	guardBypassed           bool
+	normalHitWithZeroDamage bool
+	damage                  uint64
 }
 
 // combatGuardReductionActive判断目标本次受击是否执行防御减伤.
@@ -980,6 +1044,30 @@ func combatContinuationAttackAdjustedDamage(damage uint64, divisor uint32) uint6
 	return uint64(adjusted)
 }
 
+// combatBoomerangAdjustedDamage复刻BATTLE_COM_BOOMERANG在一次完整BATTLE_AttackSeq
+// 之后应用的gBattleDamageModyfy=0.3. 8.5中的倍率变量是C float, 所以必须先把
+// 整数伤害转换为float32再相乘, 最后向零截断; 大于2^24时不能改用float64代替.
+// 原版不会在这一步补正最低伤害, 因而缩放前1至3点的正伤害会变成0.
+func combatBoomerangAdjustedDamage(damage uint64) uint64 {
+	return uint64(int64(float32(damage) * float32(0.3)))
+}
+
+// combatBoomerangAdjustedRoll在命中类型已经由BATTLE_AttackSeq确定后应用0.3倍率.
+// 缩放前的正伤害即使缩放后为0仍保持NORMAL或CRITICAL; 缩放前已经为0则对应
+// MISS/ALLGUARD, 不能因为此前暴击判定成功而继续携带CRITICAL表现.
+func combatBoomerangAdjustedRoll(roll combatAttackRoll) combatAttackRoll {
+	if roll.dodged {
+		return roll
+	}
+	unscaledDamage := roll.damage
+	if unscaledDamage == 0 {
+		roll.critical = false
+	}
+	roll.damage = combatBoomerangAdjustedDamage(unscaledDamage)
+	roll.normalHitWithZeroDamage = unscaledDamage > 0 && !roll.critical && roll.damage == 0
+	return roll
+}
+
 // combatAttackRoll执行一次基础物理随机和伤害计算.
 func (r *CombatRoom) combatAttackRoll(
 	attacker *combatUnitRuntimeState,
@@ -993,7 +1081,9 @@ func (r *CombatRoom) combatAttackRoll(
 	}
 	critical := r.combatCritical(attacker, defender)
 	damage := r.combatBaseDamageWithDefenseMode(attacker, defender, false)
-	if critical {
+	// 8.5的弓暴击仍返回BATTLE_RET_CRITICAL, 但伤害继续使用BATTLE_DamageCalc;
+	// 只有非弓才调用BATTLE_CriDamageCalc追加目标防御与双方等级计算出的伤害.
+	if critical && attacker.weaponType != pb.CharacterWeaponType_CharacterWeaponType_Bow {
 		attackerLevel := maxUint64(1, uint64(attacker.unit.GetAttribute().GetLevel()))
 		defenderLevel := maxUint64(1, uint64(defender.unit.GetAttribute().GetLevel()))
 		criticalAddition := int64(float32(combatEffectiveDefensePower(defender)) * float32(attackerLevel) / float32(defenderLevel) * 0.5)
@@ -1077,19 +1167,141 @@ func combatCounterBase(attacker *combatUnitRuntimeState, defender *combatUnitRun
 	return int64(percentage)
 }
 
+const (
+	combatCounterWeaponNone = iota
+	combatCounterWeaponClaw
+	combatCounterWeaponAxe
+	combatCounterWeaponClub
+	combatCounterWeaponSpear
+	combatCounterWeaponBow
+	combatCounterWeaponThrow
+	combatCounterWeaponOther
+	combatCounterWeaponCount
+)
+
+var combatPlayerCounterWeaponTable = [combatCounterWeaponCount][combatCounterWeaponCount]int64{
+	{10, 9, 8, 8, 5, 0, 0, 0},
+	{10, 9, 7, 7, 6, 0, 0, 0},
+	{9, 8, 10, 10, 7, 0, 0, 0},
+	{8, 8, 10, 10, 7, 0, 0, 0},
+	{6, 6, 8, 8, 9, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0},
+}
+
+func combatPlayerUsesThrowingWeapon(state *combatUnitRuntimeState) bool {
+	if state == nil || combatKind(state.unit) != combatUnitKindPlayer {
+		return false
+	}
+	switch state.weaponType {
+	case pb.CharacterWeaponType_CharacterWeaponType_Bow,
+		pb.CharacterWeaponType_CharacterWeaponType_Boomerang,
+		pb.CharacterWeaponType_CharacterWeaponType_ThrowingAxe,
+		pb.CharacterWeaponType_CharacterWeaponType_ThrowingStone:
+		return true
+	default:
+		return false
+	}
+}
+
+var combatBowWithinRowTargetOrder = [5][2][5]uint32{
+	{{0, 2, 1, 4, 3}, {0, 1, 2, 3, 4}},
+	{{1, 0, 3, 2, 4}, {1, 3, 0, 2, 4}},
+	{{2, 4, 0, 1, 3}, {2, 0, 4, 1, 3}},
+	{{3, 1, 0, 2, 4}, {3, 1, 0, 2, 4}},
+	{{4, 2, 0, 1, 3}, {4, 2, 0, 1, 3}},
+}
+
+var combatBoomerangWithinRowTargetOrder = [2][5]uint32{
+	{4, 2, 0, 1, 3},
+	{3, 1, 0, 2, 4},
+}
+
+// combatBoomerangTargetPositions把8.5 BoomerangVsTbl的全局20站位映射到现代
+// 单阵营0..9站位. Initiator对应原版side 0并正向遍历表; Defender对应side 1
+// 并反向遍历. 声明目标只决定0..4或5..9这一排, 每排的五个位置各尝试一次.
+func combatBoomerangTargetPositions(attackerCamp pb.CombatCamp, targetPosition uint32) ([5]uint32, bool) {
+	positions := [5]uint32{}
+	if targetPosition >= 10 {
+		return positions, false
+	}
+	orderIndex := 0
+	switch attackerCamp {
+	case pb.CombatCamp_CombatCamp_Initiator:
+	case pb.CombatCamp_CombatCamp_Defender:
+		orderIndex = 1
+	default:
+		return positions, false
+	}
+	rowBase := targetPosition - targetPosition%5
+	for index, position := range combatBoomerangWithinRowTargetOrder[orderIndex] {
+		positions[index] = rowBase + position
+	}
+	return positions, true
+}
+
+// combatBowTargetPositions把8.5 aBowW的全局20站位顺序映射到现代协议的
+// 单阵营0..9站位. 每个同行位置后立刻插入另一排的对应位置, 因而十个位置
+// 各出现一次; variant只对应原版BATTLE_TargetListSet的一次RAND(0,1).
+func combatBowTargetPositions(targetPosition uint32, variant int64) ([10]uint32, bool) {
+	positions := [10]uint32{}
+	if targetPosition >= 10 || variant < 0 || variant > 1 {
+		return positions, false
+	}
+	withinRow := targetPosition % 5
+	rowBase := targetPosition - withinRow
+	pairedRowBase := uint32(0)
+	if rowBase == 0 {
+		pairedRowBase = 5
+	}
+	for index, position := range combatBowWithinRowTargetOrder[withinRow][variant] {
+		positions[index*2] = rowBase + position
+		positions[index*2+1] = pairedRowBase + position
+	}
+	return positions, true
+}
+
+func combatPlayerCounterWeaponIndex(state *combatUnitRuntimeState) int {
+	if state == nil || combatKind(state.unit) != combatUnitKindPlayer {
+		return combatCounterWeaponClaw
+	}
+	switch state.weaponType {
+	case pb.CharacterWeaponType_CharacterWeaponType_Unarmed, pb.CharacterWeaponType_CharacterWeaponType_Claw:
+		return combatCounterWeaponClaw
+	case pb.CharacterWeaponType_CharacterWeaponType_Axe:
+		return combatCounterWeaponAxe
+	case pb.CharacterWeaponType_CharacterWeaponType_Stick:
+		return combatCounterWeaponClub
+	case pb.CharacterWeaponType_CharacterWeaponType_Spear:
+		// 8.5 BATTLE_ItemType2ItemMap定义了SPEAR类别却没有映射ITEM_SPEAR, 实际落到NONE行.
+		return combatCounterWeaponNone
+	case pb.CharacterWeaponType_CharacterWeaponType_Bow:
+		return combatCounterWeaponBow
+	case pb.CharacterWeaponType_CharacterWeaponType_Boomerang,
+		pb.CharacterWeaponType_CharacterWeaponType_ThrowingAxe,
+		pb.CharacterWeaponType_CharacterWeaponType_ThrowingStone:
+		return combatCounterWeaponThrow
+	default:
+		return combatCounterWeaponNone
+	}
+}
+
+func combatPlayerCounterWeaponCoefficient(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState) int64 {
+	attackerIndex := combatPlayerCounterWeaponIndex(attacker)
+	defenderIndex := combatPlayerCounterWeaponIndex(defender)
+	return combatPlayerCounterWeaponTable[attackerIndex][defenderIndex]
+}
+
 // combatCounterThreshold对应BATTLE_CounterCheckPlayer和BATTLE_CounterCheckPet.
-// 返回的inclusive说明最终随机比较是否包含相等边界:
-// 玩家使用RAND < threshold, 玩家宠物和敌人使用RAND <= threshold.
-//
-// 当前生产战斗快照能区分武器槽是否为空, 但item配置尚未提供8.5武器类型.
-// 因此反击仍统一按ITEM_FIST处理, CounterTbl的拳对拳系数固定为9. 投掷武器
-// 禁止反击和其他武器相性必须等装备类型进入运行态后开发, 不能根据技能ID或asset_id猜测.
-//
+// 返回的inclusive说明最终随机比较是否包含相等边界: 玩家使用RAND < threshold,
+// 玩家宠物和敌人使用RAND <= threshold. 玩家系数来自原版CounterTbl的精确武器类别.
 // _SUIT_ADDENDUM在8.5 version.h中启用, 因此玩家阈值保留counterModifier输入.
 func combatCounterThreshold(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState) (threshold float32, inclusive bool) {
 	base := combatCounterBase(attacker, defender)
 	if combatKind(attacker.unit) == combatUnitKindPlayer {
-		percentage := float32(float64(base*combatPlayerCounterFists)*0.1 + float64(combatEffectiveLuck(attacker)) + float64(attacker.counterModifier))
+		weaponCoefficient := combatPlayerCounterWeaponCoefficient(attacker, defender)
+		percentage := float32(float64(base*weaponCoefficient)*0.1 + float64(combatEffectiveLuck(attacker)) + float64(attacker.counterModifier))
 		threshold = percentage * float32(100)
 		if threshold <= 0 {
 			threshold = 1
@@ -1112,6 +1324,11 @@ func combatCounterThreshold(attacker *combatUnitRuntimeState, defender *combatUn
 // 非玩家包含相等意味着随机值1可以成功. 这里把随机结果转为float32, 对应C中
 // RAND返回int后与float per比较时的类型提升; 1至10000均可由float32精确表示.
 func (r *CombatRoom) combatCounterCheck(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState) bool {
+	// 8.5的玩家与宠物/敌人反击入口都会先检查攻守双方装备. 任一玩家持远程
+	// 投掷武器时直接失败且不消费反击随机数, 与本次候选反击者的单位类型无关.
+	if combatPlayerUsesThrowingWeapon(attacker) || combatPlayerUsesThrowingWeapon(defender) {
+		return false
+	}
 	threshold, inclusive := combatCounterThreshold(attacker, defender)
 	randomValue := float32(r.random.rangeInt(1, 10000))
 	if inclusive {
@@ -1262,7 +1479,7 @@ func combatHitResults(roll combatAttackRoll, defender *combatUnitRuntimeState) [
 	}
 	if roll.critical {
 		results = append(results, combatHitResultCritical)
-	} else if roll.damage > 0 {
+	} else if roll.damage > 0 || roll.normalHitWithZeroDamage {
 		results = append(results, combatHitResultNormal)
 	} else {
 		results = append(results, combatHitResultMiss)
@@ -1355,6 +1572,12 @@ type combatAttackOutcome struct {
 
 // executeSingleAttack结算一个普通物理、破除防御或连续攻击段.
 func (r *CombatRoom) executeSingleAttack(action *combatAction, counter bool, events *[]*combatStepResult) combatAttackOutcome {
+	return r.executeSingleAttackWithBoomerangModifier(action, counter, events, false)
+}
+
+// executeSingleAttackWithBoomerangModifier复用一次完整普通物理结算, 只允许
+// 回旋镖在Guard和最低伤害随机之后、实际扣血之前应用原版0.3倍率.
+func (r *CombatRoom) executeSingleAttackWithBoomerangModifier(action *combatAction, counter bool, events *[]*combatStepResult, boomerang bool) combatAttackOutcome {
 	if r == nil || action == nil {
 		return combatAttackOutcome{}
 	}
@@ -1400,6 +1623,9 @@ func (r *CombatRoom) executeSingleAttack(action *combatAction, counter bool, eve
 	}
 	if action.usesMultiSegmentDamageDivision() {
 		roll.damage = combatContinuationAttackAdjustedDamage(roll.damage, action.segmentCount)
+	}
+	if boomerang {
+		roll = combatBoomerangAdjustedRoll(roll)
 	}
 
 	application := r.applyCombatDamage(attacker, defender, roll.damage, roll.critical)
@@ -1448,6 +1674,15 @@ func (r *CombatRoom) executeAttackSegments(action *combatAction, events *[]*comb
 	if action == nil || action.segmentCount == 0 {
 		return combatAttackOutcome{}
 	}
+	attacker := r.stateByKey(action.unitKey)
+	if attacker != nil && combatKind(attacker.unit) == combatUnitKindPlayer &&
+		attacker.weaponType == pb.CharacterWeaponType_CharacterWeaponType_Boomerang {
+		return r.executeBoomerangAttack(action, events)
+	}
+	if attacker != nil && combatKind(attacker.unit) == combatUnitKindPlayer &&
+		attacker.weaponType == pb.CharacterWeaponType_CharacterWeaponType_Bow {
+		return r.executeBowAttackSegments(action, events)
+	}
 	var lastOutcome combatAttackOutcome
 	for segmentIndex := uint32(1); segmentIndex <= action.segmentCount; segmentIndex++ {
 		attacker := r.stateByKey(action.unitKey)
@@ -1463,6 +1698,123 @@ func (r *CombatRoom) executeAttackSegments(action *combatAction, events *[]*comb
 		}
 		lastOutcome = outcome
 		if r.battleSettlementIfFinished() != nil {
+			break
+		}
+	}
+	return lastOutcome
+}
+
+// executeBoomerangAttack按8.5 BATTLE_COM_BOOMERANG扫过声明目标所在的一排.
+// 声明目标死亡时仍保留原排; 只有整排已无有效目标时才随机选择一个存活敌人一次,
+// 并改扫该敌人的排. 空位、死亡和离场单位被跳过, attacknum不限制实际目标数.
+func (r *CombatRoom) executeBoomerangAttack(action *combatAction, events *[]*combatStepResult) combatAttackOutcome {
+	if r == nil || r.random == nil || action == nil {
+		return combatAttackOutcome{}
+	}
+	attacker := r.stateByKey(action.unitKey)
+	if attacker == nil || attacker.unit == nil || !attacker.alive || attacker.escaped {
+		return combatAttackOutcome{}
+	}
+
+	captureCombatActionDeclaredTarget(action)
+	declaredTarget := r.stateByKey(action.declaredTargetKey)
+	targetCamp := pb.CombatCamp_CombatCamp_Defender
+	if attacker.unit.GetCamp() == pb.CombatCamp_CombatCamp_Defender {
+		targetCamp = pb.CombatCamp_CombatCamp_Initiator
+	}
+	targetPosition := uint32(10)
+	if declaredTarget != nil && declaredTarget.unit != nil &&
+		declaredTarget.unit.GetCamp() != attacker.unit.GetCamp() {
+		targetPosition = declaredTarget.unit.GetPosition()
+	}
+	positions, positionsOK := combatBoomerangTargetPositions(attacker.unit.GetCamp(), targetPosition)
+	rowHasTarget := false
+	if positionsOK {
+		for _, position := range positions {
+			defender := r.combatStateAtPosition(targetCamp, position)
+			if defender != nil && defender.alive && !defender.escaped {
+				rowHasTarget = true
+				break
+			}
+		}
+	}
+	if !rowHasTarget {
+		candidates := r.aliveOpponentKeys(action.unitKey)
+		if len(candidates) == 0 {
+			return combatAttackOutcome{}
+		}
+		fallback := r.stateByKey(candidates[r.random.rangeInt(0, int64(len(candidates)-1))])
+		if fallback == nil || fallback.unit == nil {
+			return combatAttackOutcome{}
+		}
+		targetCamp = fallback.unit.GetCamp()
+		var ok bool
+		positions, ok = combatBoomerangTargetPositions(attacker.unit.GetCamp(), fallback.unit.GetPosition())
+		if !ok {
+			return combatAttackOutcome{}
+		}
+	}
+
+	var lastOutcome combatAttackOutcome
+	for _, position := range positions {
+		attacker = r.stateByKey(action.unitKey)
+		if attacker == nil || !attacker.alive || attacker.escaped || r.battleSettlementIfFinished() != nil {
+			break
+		}
+		defender := r.combatStateAtPosition(targetCamp, position)
+		if defender == nil || !defender.alive || defender.escaped {
+			continue
+		}
+		segmentAction := *action
+		segmentAction.targetKey = cloneCombatUnitKey(defender.unit.GetKey())
+		outcome := r.executeSingleAttackWithBoomerangModifier(&segmentAction, false, events, true)
+		if outcome.defender == nil {
+			continue
+		}
+		lastOutcome = outcome
+	}
+	lastOutcome.continueCounter = false
+	return lastOutcome
+}
+
+// executeBowAttackSegments按8.5弓的aDefList执行普通攻击. 声明目标只用于决定
+// 十站位序列, 此后依次尝试每个位置一次; 空位、死亡和离场单位会被跳过且不消耗
+// attacknum. BATTLE_Attack实际执行一次才计为一段, 达到计划段数或序列结束即停止.
+func (r *CombatRoom) executeBowAttackSegments(action *combatAction, events *[]*combatStepResult) combatAttackOutcome {
+	if r == nil || r.random == nil || action == nil || action.segmentCount == 0 {
+		return combatAttackOutcome{}
+	}
+	attacker := r.stateByKey(action.unitKey)
+	target := r.stateByKey(action.targetKey)
+	if attacker == nil || attacker.unit == nil || target == nil || target.unit == nil ||
+		attacker.unit.GetCamp() == target.unit.GetCamp() {
+		return combatAttackOutcome{}
+	}
+	positions, ok := combatBowTargetPositions(target.unit.GetPosition(), r.random.rangeInt(0, 1))
+	if !ok {
+		return combatAttackOutcome{}
+	}
+
+	var lastOutcome combatAttackOutcome
+	executedCount := uint32(0)
+	for _, position := range positions {
+		attacker = r.stateByKey(action.unitKey)
+		if attacker == nil || !attacker.alive || attacker.escaped || r.battleSettlementIfFinished() != nil {
+			break
+		}
+		defender := r.combatStateAtPosition(target.unit.GetCamp(), position)
+		if defender == nil || !defender.alive || defender.escaped || combatUnitKeyEqual(defender.unit.GetKey(), action.unitKey) {
+			continue
+		}
+		segmentAction := *action
+		segmentAction.targetKey = cloneCombatUnitKey(defender.unit.GetKey())
+		outcome := r.executeSingleAttack(&segmentAction, false, events)
+		if outcome.defender == nil {
+			continue
+		}
+		lastOutcome = outcome
+		executedCount++
+		if executedCount >= action.segmentCount || r.battleSettlementIfFinished() != nil {
 			break
 		}
 	}
@@ -2210,9 +2562,9 @@ func (r *CombatRoom) buildCombatActionGroups(actions []*combatAction) []combatAc
 			state = r.stateByKey(action.unitKey)
 		}
 		// 8.5 ComboCheck只有“普通ATTACK、非投掷武器、HP为正且CanMove”
-		// 的候选起点才执行RAND(1,100). 当前尚无武器运行态, 因而投掷武器
-		// 条件继续留在待开发项; 已接入的不可行动状态必须在抽数之前排除.
-		if action == nil || !action.isAttack() || !combatCanMoveForComboCheck(state) {
+		// 的候选起点才执行RAND(1,100). 武器运行态已接入, 弓及其他投掷武器
+		// 必须和不可行动状态一样在抽数之前排除.
+		if action == nil || !action.isAttack() || !combatCanMoveForComboCheck(state) || combatPlayerUsesThrowingWeapon(state) {
 			groups = append(groups, combatActionGroup{actions: []*combatAction{action}})
 			index++
 			continue
@@ -2243,8 +2595,11 @@ func (r *CombatRoom) buildCombatActionGroups(actions []*combatAction) []combatAc
 }
 
 func combatComboActionMatches(room *CombatRoom, first *combatAction, next *combatAction) bool {
-	if first == nil || next == nil || !next.isAttack() ||
-		!combatCanMoveForComboCheck(room.stateByKey(next.unitKey)) ||
+	if first == nil || next == nil || !next.isAttack() {
+		return false
+	}
+	nextState := room.stateByKey(next.unitKey)
+	if !combatCanMoveForComboCheck(nextState) || combatPlayerUsesThrowingWeapon(nextState) ||
 		!combatUnitKeyEqual(first.targetKey, next.targetKey) {
 		return false
 	}
@@ -2280,6 +2635,10 @@ func (r *CombatRoom) executeCombo(group combatActionGroup, actionByUnit map[stri
 		return
 	}
 
+	// 8.5只在合击组第一名实际执行者进入主循环时锁定一次武器attacknum.
+	// 随后成员由BATTLE_COM_COMBO分支直接结算并跳过各自的主循环, 所以不额外抽取.
+	// 合击始终是成员单段累计伤害, 这次预抽只保留随机顺序, 不开启爪多段或分摊.
+	r.combatConsumeEquippedWeaponAttackSegmentPlan(activeActions[0])
 	defender := r.resolveCombatTarget(activeActions[0])
 	if defender == nil {
 		return
@@ -2387,6 +2746,7 @@ func (r *CombatRoom) executeStandaloneAction(action *combatAction, actionByUnit 
 		return nil
 	}
 	captureCombatActionDeclaredTarget(action)
+	r.combatConsumeUnusedPlayerAttackSegmentPlan(action)
 	defer r.addPVEEnemyDefeatProfit([]*pb.CombatUnitKey{action.unitKey})
 
 	switch {
@@ -2408,7 +2768,7 @@ func (r *CombatRoom) executeStandaloneAction(action *combatAction, actionByUnit 
 			}
 		}
 	case action.isAttack():
-		action.segmentCount = r.combatPlayerUnarmedAttackSegmentCount(action)
+		action.segmentCount = r.combatPlayerAttackSegmentCount(action)
 		firstEventIndex := len(*events)
 		outcome := r.executeAttackSegments(action, events)
 		if outcome.continueCounter && len(*events) > firstEventIndex {

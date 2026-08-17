@@ -18,9 +18,16 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	msgID := pb.MsgID(pkt.GetMessageId())
 	switch msgID {
 	case pb.MsgID_AccountRecordReq_CMD:
+		effectiveAttributeList, err := characterEffectiveAttributeList(p.accountRecord)
+		if err != nil {
+			xlog.GLog.Errorf("calculate account effective attributes failed aid:%d err:%v", p.aid, err)
+			p.sendClientErr(gateway, uint32(pb.MsgID_AccountRecordRes_CMD), xerror.Internal.Code())
+			return
+		}
 		p.sendClientRes(gateway, uint32(pb.MsgID_AccountRecordRes_CMD), xerror.Success.Code(),
 			&pb.AccountRecordRes{
-				AccountRecord: p.accountRecord,
+				AccountRecord:                   p.accountRecord,
+				CharacterEffectiveAttributeList: effectiveAttributeList,
 			},
 		)
 		return
@@ -44,6 +51,9 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		return
 	case pb.MsgID_CharacterAttributeResetReq_CMD:
 		p.onCharacterAttributeResetReq(gateway, pkt)
+		return
+	case pb.MsgID_CharacterEquipmentReplaceReq_CMD:
+		p.onCharacterEquipmentReplaceReq(gateway, pkt)
 		return
 	case pb.MsgID_PetCarryStatusSetReq_CMD:
 		p.onPetCarryStatusSetReq(gateway, pkt)
@@ -146,7 +156,15 @@ func (p *Account) sendCharacterBaseChangedNotify(gateway *Gateway, record *pb.Ch
 	if base == nil {
 		return
 	}
-	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterBaseChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterBaseChangedNotify{CharacterBaseRecord: base})
+	effective, err := characterEffectiveAttribute(record)
+	if err != nil {
+		xlog.GLog.Errorf("calculate changed character effective attribute failed aid:%d character:%d err:%v", p.aid, base.GetUuid(), err)
+		return
+	}
+	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterBaseChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterBaseChangedNotify{
+		CharacterBaseRecord: base,
+		EffectiveAttribute:  effective,
+	})
 }
 
 func (p *Account) sendCharacterPetChangedNotify(gateway *Gateway, characterUUID uint64, petRecordList []*pb.PetRecord) {
@@ -350,6 +368,13 @@ func (p *Account) onCharacterOnlineReq(gateway *Gateway, pkt *pb.OnlineClientPac
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterOnlineRes_CMD), xerror.Internal.Code())
 		return
 	}
+	effective, err := characterEffectiveAttribute(character.record)
+	if err != nil {
+		backup.restore(character.record)
+		xlog.GLog.Errorf("calculate character online effective attribute failed aid:%d character:%d err:%v", p.aid, characterUUID, err)
+		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterOnlineRes_CMD), xerror.Internal.Code())
+		return
+	}
 	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
 		backup.restore(character.record)
 		xlog.GLog.Errorf("set account record after character online failed aid:%d character:%d err:%v", p.aid, characterUUID, err)
@@ -364,6 +389,7 @@ func (p *Account) onCharacterOnlineReq(gateway *Gateway, pkt *pb.OnlineClientPac
 			BaseLuck:               character.record.GetBase().GetLuckState().GetBaseLuck(),
 			LastRefreshTimestampMs: character.record.GetBase().GetLuckState().GetLastRefreshTimestampMs(),
 		},
+		EffectiveAttribute: effective,
 	})
 }
 

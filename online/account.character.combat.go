@@ -94,6 +94,11 @@ type combatUnitRuntimeState struct {
 	dodgeModifier           int64
 	criticalModifier        int64
 	counterModifier         int64
+	otherDamagePower        int64
+	otherDefensePower       int64
+	weaponType              pb.CharacterWeaponType
+	weaponAttackNumberMin   uint32
+	weaponAttackNumberMax   uint32
 }
 
 // applyPetBattleTraits把宠物模板中不进入协议的8.5固有战斗特性冻结到单位运行态.
@@ -901,9 +906,26 @@ func (c *character) restartAutoEncounterTimer(gateway *Gateway) {
 				encounterErr = err
 				break
 			}
-			// 当前装备快照用于战斗中的空手判定和客户端展示. item配置尚未提供装备运气修正,
-			// 因此聚合列表仍为空; 后续接入时应从本次已装备物品解析, 不持久化装备运气.
-			luckSnapshot, err := newCombatLuckSnapshot(character.GetBase().GetLuckState().GetBaseLuck(), nil)
+			effectiveAttribute, err := characterEffectiveAttribute(character)
+			if err != nil {
+				encounterErr = fmt.Errorf("character effective attribute invalid character:%d: %w", character.GetBase().GetUuid(), err)
+				break
+			}
+			// 装备运气使用实例创建时固化的数值, 只写入本场有效快照, 不回写基础运气.
+			var equipmentLuckModifierList []int32
+			characterWeaponAttackNumberMin := uint32(0)
+			characterWeaponAttackNumberMax := uint32(0)
+			if weapon := character.GetEquipment().GetWeapon(); weapon != nil {
+				equipmentLuckModifierList = append(equipmentLuckModifierList, equipmentFixedModifierValueInt32(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_LuckModifier))
+				weaponEntry, err := configuredWeaponEntry(weapon.GetAssetId())
+				if err != nil {
+					encounterErr = fmt.Errorf("character weapon config invalid character:%d: %w", character.GetBase().GetUuid(), err)
+					break
+				}
+				characterWeaponAttackNumberMin = weaponEntry.AttackNumberMin
+				characterWeaponAttackNumberMax = weaponEntry.AttackNumberMax
+			}
+			luckSnapshot, err := newCombatLuckSnapshot(character.GetBase().GetLuckState().GetBaseLuck(), equipmentLuckModifierList)
 			if err != nil {
 				encounterErr = fmt.Errorf("character luck invalid character:%d: %w", character.GetBase().GetUuid(), err)
 				break
@@ -919,19 +941,14 @@ func (c *character) restartAutoEncounterTimer(gateway *Gateway) {
 				CharacterId: uint32(character.GetBase().GetAssetId()),
 				Equipment:   equipmentSnapshot,
 				Attribute: &pb.CombatUnitAttribute{
-					Hp:      uint32(vitality*4 + strength + toughness + dexterity),
-					Attack:  uint32(maxUint64(1, strength+toughness/10+vitality/10+dexterity/20)),
-					Defense: uint32(maxUint64(1, toughness+strength/10+vitality/10+dexterity/20)),
-					Agility: uint32(maxUint64(1, dexterity)),
-					MaxMp:   uint32(pb.CharacterLimit_CharacterLimit_MagicPointMax),
-					Elemental: &pb.ElementalPoints{
-						Earth: character.GetBase().GetEarth(),
-						Water: character.GetBase().GetWater(),
-						Fire:  character.GetBase().GetFire(),
-						Wind:  character.GetBase().GetWind(),
-					},
-					Level: characterLevel,
-					Luck:  luckSnapshot,
+					Hp:        effectiveAttribute.GetMaxHp(),
+					Attack:    effectiveAttribute.GetAttack(),
+					Defense:   effectiveAttribute.GetDefense(),
+					Agility:   effectiveAttribute.GetAgility(),
+					MaxMp:     effectiveAttribute.GetMaxMp(),
+					Elemental: proto.Clone(effectiveAttribute.GetElemental()).(*pb.ElementalPoints),
+					Level:     characterLevel,
+					Luck:      luckSnapshot,
 				},
 			}
 			targetAttributes[combatUnitKeyMapKey(characterUnit.GetKey())] = combatTargetAttributeSnapshot{
@@ -969,6 +986,12 @@ func (c *character) restartAutoEncounterTimer(gateway *Gateway) {
 					encounterErr = fmt.Errorf("pet runtime attribute missing pet:%d", battlePet.GetUuid())
 					break
 				}
+				petDefense := gameconfig.CalculatePetPanelDefense(rawVitality, rawStrength, rawToughness, rawDexterity)
+				petAgility := gameconfig.CalculatePetPanelAgility(rawDexterity)
+				if petDefense > math.MaxInt32 || petAgility > math.MaxInt32 {
+					encounterErr = fmt.Errorf("pet signed combat attribute overflows pet:%d defense:%d agility:%d", battlePet.GetUuid(), petDefense, petAgility)
+					break
+				}
 				petUnit = &pb.CombatUnit{
 					Camp:        pb.CombatCamp_CombatCamp_Initiator,
 					Position:    initiatorPetPosition,
@@ -978,8 +1001,8 @@ func (c *character) restartAutoEncounterTimer(gateway *Gateway) {
 					Attribute: &pb.CombatUnitAttribute{
 						Hp:        gameconfig.CalculatePetPanelHP(rawVitality, rawStrength, rawToughness, rawDexterity),
 						Attack:    gameconfig.CalculatePetPanelAttack(rawVitality, rawStrength, rawToughness, rawDexterity),
-						Defense:   gameconfig.CalculatePetPanelDefense(rawVitality, rawStrength, rawToughness, rawDexterity),
-						Agility:   gameconfig.CalculatePetPanelAgility(rawDexterity),
+						Defense:   int32(petDefense),
+						Agility:   int32(petAgility),
 						Loyalty:   battlePet.GetLoyalty(),
 						Elemental: combatPetElementalPoints(petEntry),
 						Level:     petLevel,
@@ -1039,8 +1062,8 @@ func (c *character) restartAutoEncounterTimer(gateway *Gateway) {
 					Attribute: &pb.CombatUnitAttribute{
 						Hp:        enemyAttributes.hp,
 						Attack:    enemyAttributes.attack,
-						Defense:   enemyAttributes.defense,
-						Agility:   enemyAttributes.agility,
+						Defense:   int32(enemyAttributes.defense),
+						Agility:   int32(enemyAttributes.agility),
 						Elemental: combatPetElementalPoints(enemyPet),
 						Level:     level,
 					},
@@ -1088,6 +1111,12 @@ func (c *character) restartAutoEncounterTimer(gateway *Gateway) {
 				state.enemyExperience = enemyExperiences[unitKey]
 				if combatUnitKeyEqual(unit.GetKey(), characterUnit.GetKey()) {
 					state.characterDuelPoint = character.GetBase().GetDuelPoint()
+					state.criticalModifier = int64(effectiveAttribute.GetCriticalModifier())
+					state.otherDamagePower = int64(effectiveAttribute.GetOtherDamageModifier())
+					state.otherDefensePower = int64(effectiveAttribute.GetOtherDefenseModifier())
+					state.weaponType = effectiveAttribute.GetWeaponType()
+					state.weaponAttackNumberMin = characterWeaponAttackNumberMin
+					state.weaponAttackNumberMax = characterWeaponAttackNumberMax
 				}
 				if unit.GetPetId() != 0 {
 					applyPetBattleTraits(state, gameconfig.GGameConfig.Pet.Get(unit.GetPetId()))
@@ -1639,9 +1668,10 @@ func persistCombatParticipantResult(
 					characterRecord.ItemBag.ItemCountMap[entry.assetID]
 				continue
 			}
-			equipment := &pb.EquipmentRecord{
-				Uuid:    entry.equipmentUUID,
-				AssetId: entry.assetID,
+			equipment, err := newEquipmentRecord(entry.equipmentUUID, entry.assetID)
+			if err != nil {
+				rollback()
+				return combatParticipantPersistenceResult{}, fmt.Errorf("create combat drop equipment %d: %w", entry.equipmentUUID, err)
 			}
 			characterRecord.ItemBag.EquipmentRecordMap[entry.equipmentUUID] = equipment
 			result.receivedEquipmentRecords = append(result.receivedEquipmentRecords, equipment)

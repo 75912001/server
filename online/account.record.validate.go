@@ -26,14 +26,17 @@ func validateAccountRecord(record *pb.AccountRecord) error {
 	if len(record.GetPetWarehouseRecordMap()) > int(pb.AccountRecordLimit_AccountRecordLimit_MaxPetWarehouseCount) {
 		return fmt.Errorf("pet warehouse count exceeds limit")
 	}
+	usedUUID := record.GetUsedUuid()
+	seenUUID := make(map[uint64]struct{})
 	for itemID := range record.GetItemWarehouse().GetItemCountMap() {
 		if isCharacterAssetItemID(itemID) {
 			return fmt.Errorf("item warehouse contains character asset %d", itemID)
 		}
 	}
+	if err := validateEquipmentContainer(record.GetItemWarehouse(), int(pb.AccountRecordLimit_AccountRecordLimit_MaxItemWarehouseCount), seenUUID, usedUUID); err != nil {
+		return fmt.Errorf("item warehouse: %w", err)
+	}
 
-	usedUUID := record.GetUsedUuid()
-	seenUUID := make(map[uint64]struct{})
 	for slot, characterRecord := range record.GetCharacterRecordList() {
 		if characterRecord == nil {
 			return fmt.Errorf("character slot %d is nil", slot)
@@ -120,6 +123,12 @@ func validateCharacterRecord(record *pb.CharacterRecord, seenUUID map[uint64]str
 		if isCharacterAssetItemID(itemID) {
 			return fmt.Errorf("item bag contains character asset %d", itemID)
 		}
+	}
+	if err := validateEquipmentContainer(record.GetItemBag(), int(pb.CharacterLimit_CharacterLimit_MaxItemBagCount), seenUUID, usedUUID); err != nil {
+		return fmt.Errorf("item bag: %w", err)
+	}
+	if err := validateCharacterEquipment(record, seenUUID, usedUUID); err != nil {
+		return fmt.Errorf("equipped item: %w", err)
 	}
 
 	battleCount := 0

@@ -211,7 +211,10 @@ func prepareShopPurchasePlan(
 		if _, exists := nextCharacter.ItemBag.EquipmentRecordMap[equipmentUUID]; exists {
 			return nil, fmt.Errorf("%w: equipment uuid %d already exists in item bag", errShopPurchaseRecordInvalid, equipmentUUID)
 		}
-		equipmentRecord := &pb.EquipmentRecord{Uuid: equipmentUUID, AssetId: itemID}
+		equipmentRecord, err := newEquipmentRecord(equipmentUUID, itemID)
+		if err != nil {
+			return nil, fmt.Errorf("%w: create equipment %d: %v", errShopPurchaseRecordInvalid, equipmentUUID, err)
+		}
 		nextCharacter.ItemBag.EquipmentRecordMap[equipmentUUID] = equipmentRecord
 		equipmentRecordList = append(equipmentRecordList, equipmentRecord)
 	}
