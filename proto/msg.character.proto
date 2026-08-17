@@ -5,6 +5,7 @@ option go_package = "server/proto/pb;pb";
 
 import "record.proto";
 import "equipment.proto";
+import "weapon.proto";
 import "msg.item.proto";
 import "msg.pet.proto";
 
@@ -78,6 +79,30 @@ message CharacterLuckState {
   int64 last_refresh_timestamp_ms = 2; // 最近一次自动LS日刷新时间, 单位毫秒
 }
 
+// CharacterEffectiveAttribute 是角色基础属性叠加当前装备后的运行期派生快照, 不写入账号档案.
+message CharacterEffectiveAttribute {
+  uint64 character_uuid = 1; // 角色 UUID
+  uint32 max_hp = 2; // 装备修正后的最大生命值
+  uint32 attack = 3; // 装备修正后的攻击力
+  int32 defense = 4; // 装备修正后的防御力, 原版最低为-100
+  int32 agility = 5; // 装备修正后的敏捷, 原版最低为-100
+  uint32 max_mp = 6; // 装备修正后的最大魔法值, 范围0-1000
+  uint32 effective_luck = 10; // 装备修正后的有效运气, 范围1-5
+  uint32 effective_charm = 11; // 装备修正后的有效魅力, 范围0-100
+  int32 effective_avoid = 12; // 装备修正后的有效闪避
+  int32 critical_modifier = 13; // 装备固化暴击修正合计, 保留原版配置值和量纲
+  int32 poison_resistance_modifier = 20; // 毒抗性修正合计, 保留原版配置值和量纲
+  int32 paralysis_resistance_modifier = 21; // 麻痹抗性修正合计, 保留原版配置值和量纲
+  int32 sleep_resistance_modifier = 22; // 睡眠抗性修正合计, 保留原版配置值和量纲
+  int32 stone_resistance_modifier = 23; // 石化抗性修正合计, 保留原版配置值和量纲
+  int32 drunk_resistance_modifier = 24; // 酒醉抗性修正合计, 保留原版配置值和量纲
+  int32 confusion_resistance_modifier = 25; // 混乱抗性修正合计, 保留原版配置值和量纲
+  ElementalPoints elemental = 30; // 装备元素修正后的地水火风点数, 各项限制在0-10
+  int32 other_damage_modifier = 31; // 原版额外伤害修正合计
+  int32 other_defense_modifier = 32; // 原版额外防御修正合计
+  CharacterWeaponType weapon_type = 40; // 当前实际武器类型, 未装备时为空手
+}
+
 // CharacterBaseRecord 表示不包含道具、扩展记录和宠物集合的角色基础权威快照.
 message CharacterBaseRecord {
   uint64 uuid = 1; // 角色 UUID, 在所属 AccountRecord.aid 作用域内唯一
@@ -141,6 +166,7 @@ message CharacterOnlineReq {
 message CharacterOnlineRes {
   uint64 character_uuid = 1; // 已上线的角色 UUID
   CharacterLuckState luck_state = 2; // 本次登录完成LS日刷新后的权威基础运气状态
+  CharacterEffectiveAttribute effective_attribute = 3; // 角色上线后的完整有效属性快照
 }
 
 //0x001004#client->gateway#角色下线-请求
@@ -169,6 +195,7 @@ message CharacterSceneEnterRes {
 //0x001008#gateway->client#角色基础数据变化-通知
 message CharacterBaseChangedNotify {
   CharacterBaseRecord character_base_record = 1; // cache持久化成功后的角色基础权威快照
+  CharacterEffectiveAttribute effective_attribute = 2; // 基础数据变化后的完整有效属性快照
 }
 
 //0x001009#client->gateway#修改角色设置-请求
@@ -207,4 +234,20 @@ message CharacterAttributeResetReq {
 //0x00100E#gateway->client#重置角色基础属性-回复
 message CharacterAttributeResetRes {
   uint64 character_uuid = 1; // 已重置基础属性的角色 UUID
+}
+
+//0x00100F#client->gateway#替换角色装备-请求
+message CharacterEquipmentReplaceReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号、已上线且不在战斗中
+  EquipmentType equipment_type = 2; // 目标装备部位; 当前仅支持武器
+  uint64 equipment_uuid = 3; // 背包装备 UUID; 0 表示卸下目标部位装备
+}
+
+//0x001010#gateway->client#替换角色装备-回复
+message CharacterEquipmentReplaceRes {
+  uint64 character_uuid = 1; // 已完成换装的角色 UUID
+  EquipmentType equipment_type = 2; // 本次实际替换的装备部位
+  ItemContainerRecord item_bag = 10; // 换装成功后的完整随身背包
+  CharacterEquipmentRecord equipment = 11; // 换装成功后的完整穿戴装备
+  CharacterEffectiveAttribute effective_attribute = 12; // 换装成功后的完整有效属性快照
 }

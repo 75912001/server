@@ -64,16 +64,16 @@ message CombatLuckSnapshot {
   sint32 effective_luck = 3; // clamp(base_luck+equipment_modifier,1,5)
 }
 
-// CombatUnitAttribute 保存单位进入战斗时的基础属性快照, 后续运行期变化不回写此消息.
+// CombatUnitAttribute 保存单位进入战斗时的有效属性快照, 后续运行期变化不回写此消息.
 message CombatUnitAttribute {
   uint32 hp = 2; // 开战生命值
   uint32 attack = 3; // 攻击力
-  uint32 defense = 4; // 防御力
-  uint32 agility = 5; // 敏捷
+  int32 defense = 4; // 防御力, 玩家装备修正后最低可为-100
+  int32 agility = 5; // 敏捷, 玩家装备修正后最低可为-100
   uint32 loyalty = 6; // 忠诚度, 非宠物单位为 0
   ElementalPoints elemental = 7; // 地水火风元素点数, 当前共享配置总和为 10
   uint32 level = 8; // 服务端根据经验或敌人配置得到的实际等级
-  uint32 max_mp = 10; // 战斗魔法值上限; 玩家角色固定为CharacterLimit_MagicPointMax
+  uint32 max_mp = 10; // 战斗魔法值上限; 玩家角色包含装备修正
   CombatLuckSnapshot luck = 15; // 玩家角色开战运气快照; 宠物和敌方单位为空
 }
 

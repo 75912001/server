@@ -68,6 +68,7 @@ message AccountRecordReq {
 //0x000014#gateway->client#请求账号档案-回复
 message AccountRecordRes {
   AccountRecord account_record = 1; // 账号档案
+  repeated CharacterEffectiveAttribute character_effective_attribute_list = 2; // 全部有效角色按角色槽位顺序返回的运行期有效属性快照
 }
 
 //0x000017#client->gateway#机器人压测-请求

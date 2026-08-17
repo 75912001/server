@@ -18,8 +18,8 @@ enum AssetType {
 enum AssetID {
   AssetID_Unspecified = 0;
   AssetID_Stone = 3490000;
-  AssetID_Shell = 3490001;
-  AssetID_Diamond = 3490002;
+  AssetID_Silver = 3490001;
+  AssetID_Gold = 3490002;
 }
 
 enum AssetIDRange {

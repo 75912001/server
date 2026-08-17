@@ -25,13 +25,28 @@ enum EquipmentType {
 message EquipmentRecord {
   uint64 uuid = 1; // 装备 UUID, 在所属 AccountRecord.aid 作用域内唯一
   uint32 asset_id = 2; // 装备资产 ID, 对应装备配置 ID
-  map<int32, uint64> record_base_map = 10; // 装备基础数值表, key 使用 EquipmentRecordBase
+  map<int32, int64> record_base_map = 10; // 装备基础数值表, key 使用 EquipmentRecordBase; 15项随机属性即使固化为0也必须完整保存
   map<int32, RecordPrimary> record_map = 1000; // 装备扩展记录表, key 使用 EquipmentRecordPrimary
 }
 
 // EquipmentRecordBase 定义 record_base_map 的基础数值类型.
 enum EquipmentRecordBase {
   EquipmentRecordBase_Unknow = 0; // 未知基础数值类型, proto3 默认值
+  EquipmentRecordBase_AttackModifier = 1; // 攻击力修正
+  EquipmentRecordBase_DefenceModifier = 2; // 防御力修正
+  EquipmentRecordBase_QuickModifier = 3; // 敏捷修正
+  EquipmentRecordBase_MaxHPModifier = 4; // 最大生命值修正
+  EquipmentRecordBase_MaxMPModifier = 5; // 最大魔法值修正
+  EquipmentRecordBase_LuckModifier = 6; // 运气修正
+  EquipmentRecordBase_CharmModifier = 7; // 魅力修正
+  EquipmentRecordBase_AvoidModifier = 8; // 闪避修正
+  EquipmentRecordBase_PoisonResistanceModifier = 9; // 毒抗性修正
+  EquipmentRecordBase_ParalysisResistanceModifier = 10; // 麻痹抗性修正
+  EquipmentRecordBase_SleepResistanceModifier = 11; // 睡眠抗性修正
+  EquipmentRecordBase_StoneResistanceModifier = 12; // 石化抗性修正
+  EquipmentRecordBase_DrunkResistanceModifier = 13; // 酒醉抗性修正
+  EquipmentRecordBase_ConfusionResistanceModifier = 14; // 混乱抗性修正
+  EquipmentRecordBase_CriticalModifier = 15; // 暴击修正
   EquipmentRecordBase_DamagePercent = 10000; // 伤害百分比
   EquipmentRecordBase_CritRate = 10001; // 暴击率
   EquipmentRecordBase_CritDamageBonusRate = 10002; // 暴击伤害加成率
