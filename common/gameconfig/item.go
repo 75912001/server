@@ -32,7 +32,9 @@ type ItemEntry struct {
 	Level        uint32                 `yaml:"level"`
 	Profession   pb.CharacterProfession `yaml:"neprof"`
 	OtherDamage  int32                  `yaml:"otdmags"`
+	OtherDefence int32                  `yaml:"otdefcs"`
 	SuitCode     uint32                 `yaml:"nsuit"`
+	WeaponType   pb.CharacterWeaponType `yaml:"-"`
 
 	AttackNumberMin uint32 `yaml:"attacknum_min"`
 	AttackNumberMax uint32 `yaml:"attacknum_max"`
@@ -67,6 +69,10 @@ type ItemEntry struct {
 	DrunkMax       int32  `yaml:"drunk_max"`
 	ConfusionMin   int32  `yaml:"confusion_min"`
 	ConfusionMax   int32  `yaml:"confusion_max"`
+	CriticalMin    int32  `yaml:"critical_min"`
+	CriticalMax    int32  `yaml:"critical_max"`
+	MagicID        uint32 `yaml:"magicid"`
+	MagicUseMP     uint32 `yaml:"magicusemp"`
 
 	Use *ItemUseEntry `yaml:"use"`
 }
@@ -78,22 +84,23 @@ type ItemUseEntry struct {
 }
 
 type itemGroupDefinition struct {
-	name   string
-	start  uint32
-	end    uint32
-	weapon bool
+	name       string
+	start      uint32
+	end        uint32
+	weapon     bool
+	weaponType pb.CharacterWeaponType
 }
 
 var itemGroupDefinitions = []itemGroupDefinition{
 	{name: "item", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Item_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Item_End)},
-	{name: "weaponClaw", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Claw_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Claw_End), weapon: true},
-	{name: "weaponAxe", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Axe_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Axe_End), weapon: true},
-	{name: "weaponStaff", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Staff_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Staff_End), weapon: true},
-	{name: "weaponSpear", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Spear_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Spear_End), weapon: true},
-	{name: "weaponBow", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Bow_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Bow_End), weapon: true},
-	{name: "weaponBoomerang", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Boomerang_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Boomerang_End), weapon: true},
-	{name: "weaponThrowingAxe", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_End), weapon: true},
-	{name: "weaponThrowingStone", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingStone_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingStone_End), weapon: true},
+	{name: "weaponClaw", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Claw_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Claw_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Claw},
+	{name: "weaponAxe", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Axe_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Axe_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Axe},
+	{name: "weaponStaff", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Staff_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Staff_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Stick},
+	{name: "weaponSpear", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Spear_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Spear_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Spear},
+	{name: "weaponBow", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Bow_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Bow_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Bow},
+	{name: "weaponBoomerang", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Boomerang_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Boomerang_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Boomerang},
+	{name: "weaponThrowingAxe", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_ThrowingAxe},
+	{name: "weaponThrowingStone", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingStone_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingStone_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_ThrowingStone},
 }
 
 func newItemConfig() *ItemConfig {
@@ -139,6 +146,7 @@ func (p *ItemConfig) load(dir string) error {
 			}
 			itemIDValue := itemID
 			entry.ID = &itemIDValue
+			entry.WeaponType = group.weaponType
 			if entry.Name == nil || strings.TrimSpace(*entry.Name) == "" {
 				return errors.Errorf("道具名称不能为空: id:%d %v", itemID, xruntime.Location())
 			}
@@ -205,6 +213,7 @@ func validateItemAttributes(itemID uint32, entry *ItemEntry) error {
 		{name: "stone", min: entry.StoneMin, max: entry.StoneMax},
 		{name: "drunk", min: entry.DrunkMin, max: entry.DrunkMax},
 		{name: "confusion", min: entry.ConfusionMin, max: entry.ConfusionMax},
+		{name: "critical", min: entry.CriticalMin, max: entry.CriticalMax},
 	}
 	for _, itemRange := range ranges {
 		if itemRange.min > itemRange.max {
