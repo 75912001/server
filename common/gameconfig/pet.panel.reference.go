@@ -3,11 +3,7 @@ package gameconfig
 import (
 	"fmt"
 	"math"
-)
-
-const (
-	petPanelReferenceLevelMax  = uint32(140)
-	petSavedBaseGradeOffsetMax = int32(2)
+	"server/proto/pb"
 )
 
 const (
@@ -80,8 +76,8 @@ func calculatePetPanelReference(pet *PetEntry) PetPanelReferenceEntry {
 	reference := PetPanelReferenceEntry{
 		Level1CommonAverage:   calculatePetPanelAverage(pet.Growth, 1, petSavedBaseGradeOffsetMin, rankAverage),
 		Level1MythicAverage:   calculatePetPanelAverage(pet.Growth, 1, petSavedBaseGradeOffsetMax, rankAverage),
-		Level140CommonAverage: calculatePetPanelAverage(pet.Growth, petPanelReferenceLevelMax, petSavedBaseGradeOffsetMin, rankAverage),
-		Level140MythicAverage: calculatePetPanelAverage(pet.Growth, petPanelReferenceLevelMax, petSavedBaseGradeOffsetMax, rankAverage),
+		Level140CommonAverage: calculatePetPanelAverage(pet.Growth, uint32(pb.LevelRange_LevelRange_Max), petSavedBaseGradeOffsetMin, rankAverage),
+		Level140MythicAverage: calculatePetPanelAverage(pet.Growth, uint32(pb.LevelRange_LevelRange_Max), petSavedBaseGradeOffsetMax, rankAverage),
 	}
 	reference.GrowthRateMin = valuePtr(calculatePetPanelGrowthRate(reference.Level1CommonAverage, reference.Level140CommonAverage))
 	reference.GrowthRateMax = valuePtr(calculatePetPanelGrowthRate(reference.Level1MythicAverage, reference.Level140MythicAverage))
@@ -93,7 +89,7 @@ func calculatePetPanelGrowthRate(level1 *PetPanelAttributeEntry, level140 *PetPa
 	growthTotal := (*level140.Attack - *level1.Attack) +
 		(*level140.Defense - *level1.Defense) +
 		(*level140.Agility - *level1.Agility)
-	rate := float64(growthTotal) / float64(petPanelReferenceLevelMax-1)
+	rate := float64(growthTotal) / float64(pb.LevelRange_LevelRange_Max-1)
 	return math.Round(rate*1000.0) / 1000.0
 }
 
