@@ -24,7 +24,7 @@ type Manager struct {
 	Enemy *EnemyGroupConfig
 	// EnemyExp 是 enemy.exp.yaml 的敌人基础经验配置, 用于按敌人模板和等级生成初始 CHAR_EXP.
 	EnemyExp *EnemyExpConfig
-	// Scene 是 scene.yaml 的场景配置, 用于校验角色所在场景并按场景权重选择敌人组.
+	// Scene 是 scene.yaml 的场景配置, 用于校验地图坐标、阻挡和传送, 并按当前坐标选择默认或区域遇敌规则.
 	Scene *SceneConfig
 	// Exp 是 exp.yaml 的等级经验配置, 用于按累计经验推导等级和下一等级门槛.
 	Exp *ExpConfig
