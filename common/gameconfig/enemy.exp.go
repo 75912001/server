@@ -124,6 +124,15 @@ func (p *EnemyExpConfig) GenerateEnemyExp(petID uint32, lv uint32) (uint32, erro
 	return uint32(expFloat), nil
 }
 
+// GenerateEnemyDefeatExperience一次完成“生成怪物经验+按等级差衰减”. // todo menglc [优化] 直接使用该函数, GenerateEnemyExp / CalculateEnemyDefeatExperience 可以改成内部的函数, 或者直接原地展开, 移除那两个函数.
+func (p *EnemyExpConfig) GenerateEnemyDefeatExperience(petID uint32, enemyLevel uint32, attackerLevel uint32) (uint64, error) {
+	enemyExp, err := p.GenerateEnemyExp(petID, enemyLevel)
+	if err != nil {
+		return 0, err
+	}
+	return CalculateEnemyDefeatExperience(enemyExp, attackerLevel, enemyLevel), nil
+}
+
 // CalculateEnemyDefeatExperience复刻BATTLE_AddExpItem对一只刚死亡敌人的等级差经验衰减.
 //
 // 规则按每只敌人、每名实际攻击参与者独立执行:
