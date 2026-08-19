@@ -27,3 +27,7 @@ func isItemID(id uint32) bool {
 func isEquipmentID(id uint32) bool {
 	return id >= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Start) && id <= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_End)
 }
+
+func isEquipmentWeaponID(id uint32) bool {
+	return id >= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Start) && id <= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_End)
+}
