@@ -7,29 +7,9 @@ import (
 	pb "server/proto/pb"
 
 	"github.com/pkg/errors"
-	"github.com/redis/go-redis/v9"
 	grpccodes "google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 )
-
-func validateCharacterMailboxOwner(ctx context.Context, aid uint64, characterUUID uint64) error {
-	accountRecord, err := GRedis.GetAccountRecord(ctx, aid)
-	if errors.Is(err, redis.Nil) {
-		return grpcstatus.Error(grpccodes.NotFound, "account record not found")
-	}
-	if err != nil {
-		return grpcstatus.Error(grpccodes.Internal, err.Error())
-	}
-	if accountRecord.GetAid() != aid {
-		return grpcstatus.Error(grpccodes.Internal, "account record aid mismatch")
-	}
-	for _, characterRecord := range accountRecord.GetCharacterRecordList() {
-		if characterRecord.GetBase().GetUuid() == characterUUID {
-			return nil
-		}
-	}
-	return grpcstatus.Error(grpccodes.NotFound, "character not found")
-}
 
 func characterMailboxGRPCError(err error) error {
 	switch {
@@ -50,9 +30,9 @@ func (s *cacheGRPCServer) CacheGetCharacterMailbox(ctx context.Context, req *pb.
 	if aid == 0 || characterUUID == 0 {
 		return &pb.CacheGetCharacterMailboxRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	if err := validateCharacterMailboxOwner(ctx, aid, characterUUID); err != nil {
-		return &pb.CacheGetCharacterMailboxRes{}, err
-	}
+	// if err := validateCharacterMailboxOwner(ctx, aid, characterUUID); err != nil {
+	// 	return &pb.CacheGetCharacterMailboxRes{}, err
+	// }
 	mailboxRecord, err := GRedis.GetCharacterMailbox(ctx, aid, characterUUID)
 	if err != nil {
 		return &pb.CacheGetCharacterMailboxRes{}, characterMailboxGRPCError(err)
@@ -70,9 +50,9 @@ func (s *cacheGRPCServer) CacheAddSystemMail(ctx context.Context, req *pb.CacheA
 	if err != nil {
 		return &pb.CacheAddSystemMailRes{}, grpcstatus.Error(grpccodes.InvalidArgument, err.Error())
 	}
-	if err := validateCharacterMailboxOwner(ctx, aid, characterUUID); err != nil {
-		return &pb.CacheAddSystemMailRes{}, err
-	}
+	// if err := validateCharacterMailboxOwner(ctx, aid, characterUUID); err != nil {
+	// 	return &pb.CacheAddSystemMailRes{}, err
+	// }
 	mailRecord, err := GRedis.AddSystemMail(ctx, aid, characterUUID, title, content)
 	if err != nil {
 		return &pb.CacheAddSystemMailRes{}, characterMailboxGRPCError(err)
@@ -87,9 +67,9 @@ func (s *cacheGRPCServer) CacheMarkCharacterMailRead(ctx context.Context, req *p
 	if aid == 0 || characterUUID == 0 || mailUUID == 0 {
 		return &pb.CacheMarkCharacterMailReadRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	if err := validateCharacterMailboxOwner(ctx, aid, characterUUID); err != nil {
-		return &pb.CacheMarkCharacterMailReadRes{}, err
-	}
+	// if err := validateCharacterMailboxOwner(ctx, aid, characterUUID); err != nil {
+	// 	return &pb.CacheMarkCharacterMailReadRes{}, err
+	// }
 	if err := GRedis.MarkCharacterMailRead(ctx, aid, characterUUID, mailUUID); err != nil {
 		return &pb.CacheMarkCharacterMailReadRes{}, characterMailboxGRPCError(err)
 	}
@@ -103,9 +83,9 @@ func (s *cacheGRPCServer) CacheDeleteCharacterMail(ctx context.Context, req *pb.
 	if aid == 0 || characterUUID == 0 || mailUUID == 0 {
 		return &pb.CacheDeleteCharacterMailRes{}, grpcstatus.Error(grpccodes.InvalidArgument, "invalid argument")
 	}
-	if err := validateCharacterMailboxOwner(ctx, aid, characterUUID); err != nil {
-		return &pb.CacheDeleteCharacterMailRes{}, err
-	}
+	// if err := validateCharacterMailboxOwner(ctx, aid, characterUUID); err != nil {
+	// 	return &pb.CacheDeleteCharacterMailRes{}, err
+	// }
 	if err := GRedis.DeleteCharacterMail(ctx, aid, characterUUID, mailUUID); err != nil {
 		return &pb.CacheDeleteCharacterMailRes{}, characterMailboxGRPCError(err)
 	}
