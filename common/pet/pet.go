@@ -68,20 +68,8 @@ func EnsureGrowthBaseline(record *pb.PetRecord, currentLevel uint32) error {
 		}
 		return nil
 	}
-	if hasGrowthBaselineAttributes(record) {
-		// 兼容字段改名前已经写入的真实 1 级快照; 字段编号未变化, 只需补齐来源等级.
-		record.GrowthBaselineLevel = uint32(pb.LevelRange_LevelRange_Min)
-		return nil
-	}
 	recordGrowthBaseline(record, currentLevel)
 	return nil
-}
-
-func hasGrowthBaselineAttributes(record *pb.PetRecord) bool {
-	return record.GetGrowthBaselineHp() != 0 ||
-		record.GetGrowthBaselineAttack() != 0 ||
-		record.GetGrowthBaselineDefense() != 0 ||
-		record.GetGrowthBaselineAgility() != 0
 }
 
 func recordGrowthBaseline(record *pb.PetRecord, level uint32) {
