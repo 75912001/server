@@ -6,16 +6,17 @@
 
 - `character.yaml`: 角色资源配置.
 - `character.sprite.yaml`: 角色及角色骑宠动画帧、逐动作 FPS、攻击声音、命中表现和原版 Raw 参考配置.
-- `common.sprite.yaml`: 通用精灵资源配置; `atlas` 使用相对 `assets` 的无扩展名路径并且必须以 `common/` 开头, `value` 保存客户端逐帧消费的有序帧号, 8702-8710和347511-347513是地水火风的大中小属性图标, 242302是设置窗口角色随身物品位置的原版背景板, 暴击8723条目合并保存前14帧小星和后13帧大星的60Hz时间线; 9195和9196分别是设置窗口角色属性加点按钮的未按下和按下状态.
+- `common.sprite.yaml`: 通用精灵资源配置; `atlas` 使用相对 `assets` 的无扩展名路径并且必须以 `common/` 开头, `value` 保存客户端逐帧消费的有序帧号, 8702-8710和347511-347513是地水火风的大中小属性图标, 242302是设置窗口角色随身物品位置的原版背景板, 暴击8723条目合并保存前14帧小星和后13帧大星的60Hz时间线; 9195和9196分别是设置窗口角色属性加点按钮的未按下和按下状态. 900000100/900000110/900000120/900000130分别是普通伤害、暴击伤害、HP恢复和MP恢复的数字精灵组, 每组`value`按0-9顺序保存十帧.
 - `skill.yaml`: 角色和宠物共用的技能配置.
 - `enemy.group.yaml`: 敌人编组、宠物模板、数量和等级规则.
 - `enemy.exp.yaml`: 敌人等级基础经验配置.
 - `exp.yaml`: 角色和宠物等级经验配置.
 - `information.yaml`: 从 STW1.13 `Mission.txt` 转换的 UTF-8 石器情报树和正文, 由 sa.desktop 只读展示.
-- `item.yaml`: 道具和装备配置, 使用 `items.<group>.<id>` 分组; 非零 `sprite` 必须同时配置以 `item/` 开头的无扩展名 `atlas` 路径, 武器ID必须位于对应协议分组区间. 武器条目可保存原版名称、说明、价格、装备等级、职业限制、套装编号、攻击次数、能力随机范围、元素和异常抗性; `cost > 0` 表示可在全局商店购买, `cost = 0` 表示不可购买; 未配置的数值字段默认为0, 非法范围会导致启动失败.
+- `item.yaml`: 普通道具和角色资产配置, 使用 `items.item.<id>` 分组; 非零 `sprite` 必须同时配置以 `item/` 开头的无扩展名 `atlas` 路径.
+- `item.weapon.yaml`: 八类武器配置, 使用 `items.<weaponGroup>.<id>` 分组; 武器ID必须位于对应协议分组区间. 武器条目可保存原版名称、说明、价格、装备等级、职业限制、套装编号、攻击次数、能力随机范围、元素和异常抗性; `cost > 0` 表示可在全局商店购买, `cost = 0` 表示不可购买; 未配置的数值字段默认为0, 非法范围会导致启动失败.
 - `pet.yaml`: 宠物主体、成长、图鉴面板参考值、技能槽和战斗 AI 配置.
 - `pet.sprite.yaml`: 宠物动画帧和攻击表现配置.
-- `scene.yaml`: 场景及其可遇敌编组配置.
+- `scene.yaml`: 与客户端 `map_id` 一致的地图尺寸、阻挡、默认/区域遇敌规则和传送配置.
 - `../docs/offset.yaml`: 帧资源图片偏移配置.
 
 ## 石器情报配置
@@ -40,7 +41,7 @@ python tool/character_sprite_metadata.py \
 
 4个事件字段以 `Raw` 结尾, 记录原版攻击事件的1-based帧位置和声音ID. 当前方向动作与原版帧序列不同时, 生成器还会在生效动作后写入 `<action>Raw`, 例如 `attackRaw`. 所有Raw字段只供后期对照, 客户端只校验而不创建播放缓存; 修改生效动作前必须同时确认当前图集帧、`.tpsheet`和offset完整, 不能直接用Raw覆盖.
 
-online 启动会加载 `character.yaml`、`skill.yaml`、`enemy.group.yaml`、`enemy.exp.yaml`、`exp.yaml`、`item.yaml`、`pet.yaml` 和 `scene.yaml`. 任一必需文件缺失、字段非法或跨表引用无效时, 服务必须直接启动失败.
+online 启动会加载 `character.yaml`、`skill.yaml`、`enemy.group.yaml`、`enemy.exp.yaml`、`exp.yaml`、`item.yaml`、`item.weapon.yaml`、`pet.yaml` 和 `scene.yaml`. 任一必需文件缺失、字段非法或跨表引用无效时, 服务必须直接启动失败.
 
 ## 统一技能配置
 
@@ -115,7 +116,8 @@ scene.yaml
   -> skill.yaml
 ```
 
-- `scene.yaml` 引用敌人组.
+- `scene.yaml` 使用 `sa-scene-v1`, 地图 ID 与客户端 `map_id` 一致; `collision.blockedRows` 保存服务端阻挡, `encounter.default` 和 `encounter.regions` 引用敌人组, `warps` 保存传送起点与目标.
+- 遇敌区域按逐行 `[y,startX,endX]` 闭区间保存, 不得重叠或覆盖阻挡格; 未命中区域时使用全图默认规则.
 - `enemy.group.yaml` 的 `enemies[].id` 直接引用宠物模板.
 - `pet.yaml` 的非 0 技能槽引用 `skill.yaml`.
 
