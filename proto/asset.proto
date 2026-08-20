@@ -30,8 +30,8 @@ enum AssetIDRange {
   AssetIDRange_Record_End = 999999;
   AssetIDRange_Character_Start = 1000000;
   AssetIDRange_Character_End = 1999999;
-  AssetIDRange_Scene_Start = 2000000;
-  AssetIDRange_Scene_End = 2999999;
+  AssetIDRange_Scene_Start = 1;
+  AssetIDRange_Scene_End = 999999;
   AssetIDRange_Item_Start = 3000000;
   AssetIDRange_Item_Item_Start = 3000000;
   AssetIDRange_CharacterAsset_Start = 3490000;

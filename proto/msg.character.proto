@@ -3,6 +3,7 @@ syntax = "proto3";
 package account;
 option go_package = "server/proto/pb;pb";
 
+import "asset.proto";
 import "record.proto";
 import "equipment.proto";
 import "weapon.proto";
@@ -126,6 +127,8 @@ message CharacterBaseRecord {
   CharacterLuckState luck_state = 19; // 角色基础运气和 LS 日自动刷新状态
   uint32 duel_point = 21; // 角色决斗点(DP)
   uint32 charm = 22; // 角色魅力
+  uint32 scene_x = 23; // 角色在当前场景中的格坐标x
+  uint32 scene_y = 24; // 角色在当前场景中的格坐标y
 }
 
 message CharacterRecord {
@@ -183,6 +186,8 @@ message CharacterOfflineRes {
 message CharacterSceneEnterReq {
   uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号且当前已上线
   uint32 scene_id = 2; // 目标场景 ID, 必须存在于 scene.yaml
+  uint32 scene_x = 3; // 目标场景落点格坐标x
+  uint32 scene_y = 4; // 目标场景落点格坐标y
 }
 
 //0x001007#gateway->client#进入场景-回复
@@ -190,6 +195,8 @@ message CharacterSceneEnterRes {
   uint64 character_uuid = 1; // 已进入场景的角色 UUID
   uint32 scene_id = 2; // 已进入的场景 ID
   int64 server_timestamp_ms = 3; // 服务端回复时间戳, 单位毫秒
+  uint32 scene_x = 4; // 服务端接受的场景格坐标x
+  uint32 scene_y = 5; // 服务端接受的场景格坐标y
 }
 
 //0x001008#gateway->client#角色基础数据变化-通知
@@ -250,4 +257,77 @@ message CharacterEquipmentReplaceRes {
   ItemContainerRecord item_bag = 10; // 换装成功后的完整随身背包
   CharacterEquipmentRecord equipment = 11; // 换装成功后的完整穿戴装备
   CharacterEffectiveAttribute effective_attribute = 12; // 换装成功后的完整有效属性快照
+}
+
+// CharacterSceneCoordinate 是移动请求中的一个完整地图格坐标.
+message CharacterSceneCoordinate {
+  uint32 x = 1; // 地图格坐标x
+  uint32 y = 2; // 地图格坐标y
+}
+
+// SceneCharacterInfo 是进入视野时下发的一名角色完整地图表现快照.
+message SceneCharacterInfo {
+  uint64 aid = 1; // 角色所属账号 ID
+  uint64 character_uuid = 2; // 角色 UUID, 在所属账号内唯一
+  uint64 asset_id = 3; // 角色视觉资源 ID
+  string nick = 4; // 角色昵称
+  CharacterWeaponType weapon_type = 5; // 当前武器类型
+  uint32 scene_x = 6; // 当前权威地图格坐标x
+  uint32 scene_y = 7; // 当前权威地图格坐标y
+  AssetDirection direction = 8; // 当前8方向
+  uint32 move_end_x = 9; // 当前移动序列的权威终点x, 静止时等于scene_x
+  uint32 move_end_y = 10; // 当前移动序列的权威终点y, 静止时等于scene_y
+}
+
+//0x001011#client->gateway#提交角色场景移动序列-请求
+message CharacterSceneMoveReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号且已上线
+  uint32 start_x = 2; // 客户端计算路径时的完整格起点x
+  uint32 start_y = 3; // 客户端计算路径时的完整格起点y
+  repeated CharacterSceneCoordinate step_list = 4; // 从起点开始的相邻格序列, 最多32格; 空数组表示停止
+}
+
+//0x001012#gateway->client#角色场景移动-通知
+message CharacterSceneMoveNotify {
+  uint64 target_character_uuid = 1; // 本通知对应的接收角色 UUID
+  uint64 aid = 2; // 移动角色所属账号 ID
+  uint64 character_uuid = 3; // 移动角色 UUID
+  uint32 current_x = 4; // 服务端当前权威格坐标x
+  uint32 current_y = 5; // 服务端当前权威格坐标y
+  uint32 move_end_x = 6; // 服务端校验和阻挡截断后的终点x
+  uint32 move_end_y = 7; // 服务端校验和阻挡截断后的终点y
+  AssetDirection direction = 8; // 当前移动方向或阻挡后保留的朝向
+}
+
+//0x001013#client->gateway#角色原地转向-请求
+message CharacterSceneTurnReq {
+  uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号且已上线
+  AssetDirection direction = 2; // 转向后的8方向
+}
+
+//0x001014#gateway->client#附近角色原地转向-通知
+message CharacterSceneTurnNotify {
+  uint64 target_character_uuid = 1; // 本通知对应的接收角色 UUID
+  uint64 aid = 2; // 转向角色所属账号 ID
+  uint64 character_uuid = 3; // 转向角色 UUID
+  AssetDirection direction = 4; // 转向后的8方向
+}
+
+//0x001015#gateway->client#当前视野角色快照-通知
+message CharacterSceneSnapshotNotify {
+  uint64 target_character_uuid = 1; // 本通知对应的接收角色 UUID
+  repeated SceneCharacterInfo character_list = 2; // 当前23x23视野内的其他角色
+}
+
+//0x001016#gateway->client#角色进入当前视野-通知
+message CharacterSceneVisibleEnterNotify {
+  uint64 target_character_uuid = 1; // 本通知对应的接收角色 UUID
+  SceneCharacterInfo character = 2; // 新进入视野角色的完整地图表现快照
+}
+
+//0x001017#gateway->client#角色离开当前视野-通知
+message CharacterSceneVisibleLeaveNotify {
+  uint64 target_character_uuid = 1; // 本通知对应的接收角色 UUID
+  uint64 aid = 2; // 离开视野角色所属账号 ID
+  uint64 character_uuid = 3; // 离开视野角色 UUID
 }

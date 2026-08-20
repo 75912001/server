@@ -32,6 +32,13 @@ enum MsgID {
   CharacterAttributeResetRes_CMD = 4110; //0x00100E#gateway->client#重置角色基础属性-回复
   CharacterEquipmentReplaceReq_CMD = 4111; //0x00100F#client->gateway#替换角色装备-请求
   CharacterEquipmentReplaceRes_CMD = 4112; //0x001010#gateway->client#替换角色装备-回复
+  CharacterSceneMoveReq_CMD = 4113; //0x001011#client->gateway#提交角色场景移动序列-请求
+  CharacterSceneMoveNotify_CMD = 4114; //0x001012#gateway->client#角色场景移动-通知
+  CharacterSceneTurnReq_CMD = 4115; //0x001013#client->gateway#角色原地转向-请求
+  CharacterSceneTurnNotify_CMD = 4116; //0x001014#gateway->client#附近角色原地转向-通知
+  CharacterSceneSnapshotNotify_CMD = 4117; //0x001015#gateway->client#当前视野角色快照-通知
+  CharacterSceneVisibleEnterNotify_CMD = 4118; //0x001016#gateway->client#角色进入当前视野-通知
+  CharacterSceneVisibleLeaveNotify_CMD = 4119; //0x001017#gateway->client#角色离开当前视野-通知
   CombatAutoEncounterSetReq_CMD = 1048577; //0x100001#client->gateway#设置自动遇敌-请求
   CombatAutoEncounterSetRes_CMD = 1048578; //0x100002#gateway->client#设置自动遇敌-回复
   CombatBattleStartNotify_CMD = 1048580; //0x100004#gateway->client#战斗开始-通知

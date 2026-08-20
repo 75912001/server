@@ -191,6 +191,8 @@ message CombatKnockbackDetail {
 message CombatAutoEncounterSetReq {
   bool enabled = 1; // 是否开启自动遇敌
   uint64 character_uuid = 2; // 目标角色 UUID, 必须属于当前账号且处于在线状态
+  uint32 scene_x = 3; // 开启时角色所在场景格坐标x
+  uint32 scene_y = 4; // 开启时角色所在场景格坐标y
 }
 
 // CombatAutoEncounterSetRes 返回服务端最终接受的角色自动遇敌状态, 也用于服务端主动重置状态.
@@ -199,6 +201,8 @@ message CombatAutoEncounterSetRes {
   bool enabled = 1; // 服务端确认后的自动遇敌状态
   int64 server_timestamp_ms = 2; // 服务端回复时间戳, 单位毫秒
   uint64 character_uuid = 3; // 已更新自动遇敌状态的角色 UUID
+  uint32 scene_x = 4; // 服务端接受的场景格坐标x
+  uint32 scene_y = 5; // 服务端接受的场景格坐标y
 }
 
 // CombatBattleStartNotify 通知战斗参与者创建战斗场景.

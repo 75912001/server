@@ -48,6 +48,11 @@ enum PetRecordLimit {
   PetRecordLimit_MaxCarryCount = 5; // 单个角色最多可随身携带宠物数量
 }
 
+enum PetSkillLimit {
+  PetSkillLimit_Unspecified = 0; // 未指定宠物技能限制, proto3 enum 默认值
+  PetSkillLimit_MaxSlotCount = 7; // 宠物固定技能槽数量, 与8.5技能槽和战斗AI权重一一对应
+}
+
 enum PetCarryStatus {
   PetCarryStatus_Unknow = 0; // 未指定携带状态, 旧档案或非法默认值
   PetCarryStatus_Rest = 1; // 休息, 不可参与战斗; 仓库内宠物固定为该状态; 客户端状态色: 白色 #FFFFFF
