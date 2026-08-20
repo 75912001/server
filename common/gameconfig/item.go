@@ -107,28 +107,50 @@ func newItemConfig() *ItemConfig {
 	return &ItemConfig{MapMgr: xmap.NewMapMgr[uint32, *ItemEntry]()}
 }
 
-func (p *ItemConfig) load(dir string) error {
+func loadItemGroups(dir string, fileName string, weapon bool) (map[string]map[uint32]*ItemEntry, error) {
 	var root struct {
 		Items map[string]map[uint32]*ItemEntry `yaml:"items"`
 	}
-	if err := loadYAMLFile(dir, FileItem, &root); err != nil {
-		return err
+	if err := loadYAMLFile(dir, fileName, &root); err != nil {
+		return nil, err
 	}
 	if len(root.Items) == 0 {
-		return errors.Errorf("道具配置不能为空: %s %v", FileItem, xruntime.Location())
+		return nil, errors.Errorf("道具配置不能为空: %s %v", fileName, xruntime.Location())
 	}
 	for groupName, entries := range root.Items {
-		if _, ok := findItemGroupDefinition(groupName); !ok {
-			return errors.Errorf("道具分组无效: group:%s %v", groupName, xruntime.Location())
+		group, ok := findItemGroupDefinition(groupName)
+		if !ok {
+			return nil, errors.Errorf("道具分组无效: file:%s group:%s %v", fileName, groupName, xruntime.Location())
+		}
+		if group.weapon != weapon {
+			return nil, errors.Errorf("道具分组所属文件错误: file:%s group:%s %v", fileName, groupName, xruntime.Location())
 		}
 		if len(entries) == 0 {
-			return errors.Errorf("道具分组不能为空: group:%s %v", groupName, xruntime.Location())
+			return nil, errors.Errorf("道具分组不能为空: file:%s group:%s %v", fileName, groupName, xruntime.Location())
 		}
+	}
+	return root.Items, nil
+}
+
+func (p *ItemConfig) load(dir string) error {
+	itemGroups, err := loadItemGroups(dir, FileItem, false)
+	if err != nil {
+		return err
+	}
+	weaponGroups, err := loadItemGroups(dir, FileItemWeapon, true)
+	if err != nil {
+		return err
+	}
+	for groupName, entries := range weaponGroups {
+		if _, exists := itemGroups[groupName]; exists {
+			return errors.Errorf("道具分组跨文件重复: group:%s %v", groupName, xruntime.Location())
+		}
+		itemGroups[groupName] = entries
 	}
 
 	seenItemIDs := make(map[uint32]string)
 	for _, group := range itemGroupDefinitions {
-		entries, ok := root.Items[group.name]
+		entries, ok := itemGroups[group.name]
 		if !ok {
 			continue
 		}
@@ -185,7 +207,7 @@ func (p *ItemConfig) load(dir string) error {
 		}
 	}
 	if len(seenItemIDs) == 0 {
-		return errors.Errorf("道具配置没有可用条目: %s %v", FileItem, xruntime.Location())
+		return errors.Errorf("道具配置没有可用条目: %s,%s %v", FileItem, FileItemWeapon, xruntime.Location())
 	}
 	return nil
 }
