@@ -259,6 +259,52 @@ func (PetRecordLimit) EnumDescriptor() ([]byte, []int) {
 	return file_msg_pet_proto_rawDescGZIP(), []int{3}
 }
 
+type PetSkillLimit int32
+
+const (
+	PetSkillLimit_PetSkillLimit_Unspecified  PetSkillLimit = 0 // 未指定宠物技能限制, proto3 enum 默认值
+	PetSkillLimit_PetSkillLimit_MaxSlotCount PetSkillLimit = 7 // 宠物固定技能槽数量, 与8.5技能槽和战斗AI权重一一对应
+)
+
+// Enum value maps for PetSkillLimit.
+var (
+	PetSkillLimit_name = map[int32]string{
+		0: "PetSkillLimit_Unspecified",
+		7: "PetSkillLimit_MaxSlotCount",
+	}
+	PetSkillLimit_value = map[string]int32{
+		"PetSkillLimit_Unspecified":  0,
+		"PetSkillLimit_MaxSlotCount": 7,
+	}
+)
+
+func (x PetSkillLimit) Enum() *PetSkillLimit {
+	p := new(PetSkillLimit)
+	*p = x
+	return p
+}
+
+func (x PetSkillLimit) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PetSkillLimit) Descriptor() protoreflect.EnumDescriptor {
+	return file_msg_pet_proto_enumTypes[4].Descriptor()
+}
+
+func (PetSkillLimit) Type() protoreflect.EnumType {
+	return &file_msg_pet_proto_enumTypes[4]
+}
+
+func (x PetSkillLimit) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PetSkillLimit.Descriptor instead.
+func (PetSkillLimit) EnumDescriptor() ([]byte, []int) {
+	return file_msg_pet_proto_rawDescGZIP(), []int{4}
+}
+
 type PetCarryStatus int32
 
 const (
@@ -301,11 +347,11 @@ func (x PetCarryStatus) String() string {
 }
 
 func (PetCarryStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_msg_pet_proto_enumTypes[4].Descriptor()
+	return file_msg_pet_proto_enumTypes[5].Descriptor()
 }
 
 func (PetCarryStatus) Type() protoreflect.EnumType {
-	return &file_msg_pet_proto_enumTypes[4]
+	return &file_msg_pet_proto_enumTypes[5]
 }
 
 func (x PetCarryStatus) Number() protoreflect.EnumNumber {
@@ -314,7 +360,7 @@ func (x PetCarryStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use PetCarryStatus.Descriptor instead.
 func (PetCarryStatus) EnumDescriptor() ([]byte, []int) {
-	return file_msg_pet_proto_rawDescGZIP(), []int{4}
+	return file_msg_pet_proto_rawDescGZIP(), []int{5}
 }
 
 type PetRecord struct {
@@ -1275,7 +1321,12 @@ var file_msg_pet_proto_rawDesc = []byte{
 	0x69, 0x74, 0x5f, 0x55, 0x6e, 0x73, 0x70, 0x65, 0x63, 0x69, 0x66, 0x69, 0x65, 0x64, 0x10, 0x00,
 	0x12, 0x20, 0x0a, 0x1c, 0x50, 0x65, 0x74, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x4c, 0x69, 0x6d,
 	0x69, 0x74, 0x5f, 0x4d, 0x61, 0x78, 0x43, 0x61, 0x72, 0x72, 0x79, 0x43, 0x6f, 0x75, 0x6e, 0x74,
-	0x10, 0x05, 0x2a, 0xaa, 0x01, 0x0a, 0x0e, 0x50, 0x65, 0x74, 0x43, 0x61, 0x72, 0x72, 0x79, 0x53,
+	0x10, 0x05, 0x2a, 0x4e, 0x0a, 0x0d, 0x50, 0x65, 0x74, 0x53, 0x6b, 0x69, 0x6c, 0x6c, 0x4c, 0x69,
+	0x6d, 0x69, 0x74, 0x12, 0x1d, 0x0a, 0x19, 0x50, 0x65, 0x74, 0x53, 0x6b, 0x69, 0x6c, 0x6c, 0x4c,
+	0x69, 0x6d, 0x69, 0x74, 0x5f, 0x55, 0x6e, 0x73, 0x70, 0x65, 0x63, 0x69, 0x66, 0x69, 0x65, 0x64,
+	0x10, 0x00, 0x12, 0x1e, 0x0a, 0x1a, 0x50, 0x65, 0x74, 0x53, 0x6b, 0x69, 0x6c, 0x6c, 0x4c, 0x69,
+	0x6d, 0x69, 0x74, 0x5f, 0x4d, 0x61, 0x78, 0x53, 0x6c, 0x6f, 0x74, 0x43, 0x6f, 0x75, 0x6e, 0x74,
+	0x10, 0x07, 0x2a, 0xaa, 0x01, 0x0a, 0x0e, 0x50, 0x65, 0x74, 0x43, 0x61, 0x72, 0x72, 0x79, 0x53,
 	0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x19, 0x0a, 0x15, 0x50, 0x65, 0x74, 0x43, 0x61, 0x72, 0x72,
 	0x79, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x5f, 0x55, 0x6e, 0x6b, 0x6e, 0x6f, 0x77, 0x10, 0x00,
 	0x12, 0x17, 0x0a, 0x13, 0x50, 0x65, 0x74, 0x43, 0x61, 0x72, 0x72, 0x79, 0x53, 0x74, 0x61, 0x74,
@@ -1302,33 +1353,34 @@ func file_msg_pet_proto_rawDescGZIP() []byte {
 	return file_msg_pet_proto_rawDescData
 }
 
-var file_msg_pet_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
+var file_msg_pet_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
 var file_msg_pet_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_msg_pet_proto_goTypes = []any{
 	(PetAction)(0),                    // 0: account.PetAction
 	(PetRarity)(0),                    // 1: account.PetRarity
 	(PetGrade)(0),                     // 2: account.PetGrade
 	(PetRecordLimit)(0),               // 3: account.PetRecordLimit
-	(PetCarryStatus)(0),               // 4: account.PetCarryStatus
-	(*PetRecord)(nil),                 // 5: account.PetRecord
-	(*PetCarryStatusChange)(nil),      // 6: account.PetCarryStatusChange
-	(*PetCarryStatusSetReq)(nil),      // 7: account.PetCarryStatusSetReq
-	(*PetCarryStatusSetRes)(nil),      // 8: account.PetCarryStatusSetRes
-	(*CharacterPetChangedNotify)(nil), // 9: account.CharacterPetChangedNotify
-	(*PetWarehouseDepositReq)(nil),    // 10: account.PetWarehouseDepositReq
-	(*PetWarehouseDepositRes)(nil),    // 11: account.PetWarehouseDepositRes
-	(*PetWarehouseWithdrawReq)(nil),   // 12: account.PetWarehouseWithdrawReq
-	(*PetWarehouseWithdrawRes)(nil),   // 13: account.PetWarehouseWithdrawRes
-	(*PetNickSetReq)(nil),             // 14: account.PetNickSetReq
-	(*PetNickSetRes)(nil),             // 15: account.PetNickSetRes
+	(PetSkillLimit)(0),                // 4: account.PetSkillLimit
+	(PetCarryStatus)(0),               // 5: account.PetCarryStatus
+	(*PetRecord)(nil),                 // 6: account.PetRecord
+	(*PetCarryStatusChange)(nil),      // 7: account.PetCarryStatusChange
+	(*PetCarryStatusSetReq)(nil),      // 8: account.PetCarryStatusSetReq
+	(*PetCarryStatusSetRes)(nil),      // 9: account.PetCarryStatusSetRes
+	(*CharacterPetChangedNotify)(nil), // 10: account.CharacterPetChangedNotify
+	(*PetWarehouseDepositReq)(nil),    // 11: account.PetWarehouseDepositReq
+	(*PetWarehouseDepositRes)(nil),    // 12: account.PetWarehouseDepositRes
+	(*PetWarehouseWithdrawReq)(nil),   // 13: account.PetWarehouseWithdrawReq
+	(*PetWarehouseWithdrawRes)(nil),   // 14: account.PetWarehouseWithdrawRes
+	(*PetNickSetReq)(nil),             // 15: account.PetNickSetReq
+	(*PetNickSetRes)(nil),             // 16: account.PetNickSetRes
 }
 var file_msg_pet_proto_depIdxs = []int32{
-	4, // 0: account.PetRecord.carry_status:type_name -> account.PetCarryStatus
+	5, // 0: account.PetRecord.carry_status:type_name -> account.PetCarryStatus
 	2, // 1: account.PetRecord.grade:type_name -> account.PetGrade
-	4, // 2: account.PetCarryStatusChange.carry_status:type_name -> account.PetCarryStatus
-	6, // 3: account.PetCarryStatusSetReq.change:type_name -> account.PetCarryStatusChange
-	6, // 4: account.PetCarryStatusSetRes.change_list:type_name -> account.PetCarryStatusChange
-	5, // 5: account.CharacterPetChangedNotify.pet_record_list:type_name -> account.PetRecord
+	5, // 2: account.PetCarryStatusChange.carry_status:type_name -> account.PetCarryStatus
+	7, // 3: account.PetCarryStatusSetReq.change:type_name -> account.PetCarryStatusChange
+	7, // 4: account.PetCarryStatusSetRes.change_list:type_name -> account.PetCarryStatusChange
+	6, // 5: account.CharacterPetChangedNotify.pet_record_list:type_name -> account.PetRecord
 	6, // [6:6] is the sub-list for method output_type
 	6, // [6:6] is the sub-list for method input_type
 	6, // [6:6] is the sub-list for extension type_name
@@ -1481,7 +1533,7 @@ func file_msg_pet_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_msg_pet_proto_rawDesc,
-			NumEnums:      5,
+			NumEnums:      6,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
