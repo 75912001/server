@@ -37,8 +37,6 @@ type PetEntry struct {
 	BattleAI *PetBattleAIEntry `yaml:"battleAI"`
 }
 
-const petBattleAISkillSlotCount = 7
-
 type PetBattleAITargetScope string
 
 const (
@@ -191,7 +189,20 @@ func (p *PetConfig) load(dir string) error {
 			return err
 		}
 	}
-	return validatePetPanelReferences(root.Pet)
+	panelReferenceErrors := make([]string, 0)
+	for _, pets := range root.Pet {
+		for _, pet := range pets {
+			expected := calculatePetPanelReference(pet)
+			if !petPanelReferenceEqual(pet.PanelReference, &expected) {
+				panelReferenceErrors = append(panelReferenceErrors, formatPetPanelReferenceError(pet, &expected))
+			}
+		}
+	}
+	if len(panelReferenceErrors) > 0 {
+		return errors.Errorf("宠物 panelReference 核验失败: count:%d\n%s %v",
+			len(panelReferenceErrors), strings.Join(panelReferenceErrors, "\n"), xruntime.Location())
+	}
+	return nil
 }
 
 func (p *PetConfig) configure(entries []*PetEntry) error {
@@ -329,8 +340,9 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 		if pet.SkillSlots == nil {
 			return errors.Errorf("宠物缺少 skill: pet:%d %v", *pet.ID, xruntime.Location())
 		}
-		if len(pet.SkillSlots) == 0 {
-			return errors.Errorf("宠物 skill 须大于 0 个槽位: ID:%d %v", *pet.ID, xruntime.Location())
+		if len(pet.SkillSlots) != int(pb.PetSkillLimit_PetSkillLimit_MaxSlotCount) {
+			return errors.Errorf("宠物 skill 必须完整配置%d个槽位: ID:%d count:%d %v",
+				pb.PetSkillLimit_PetSkillLimit_MaxSlotCount, *pet.ID, len(pet.SkillSlots), xruntime.Location())
 		}
 		hasSkill := false
 		for index, skillID := range pet.SkillSlots {
@@ -353,23 +365,6 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 		if !p.AddIfNotExist(*pet.ID, pet) {
 			return errors.Errorf("宠物ID重复: %d %v", *pet.ID, xruntime.Location())
 		}
-	}
-	return nil
-}
-
-func validatePetPanelReferences(petsByFamily map[string][]*PetEntry) error {
-	panelReferenceErrors := make([]string, 0)
-	for _, pets := range petsByFamily {
-		for _, pet := range pets {
-			expected := calculatePetPanelReference(pet)
-			if !petPanelReferenceEqual(pet.PanelReference, &expected) {
-				panelReferenceErrors = append(panelReferenceErrors, formatPetPanelReferenceError(pet, &expected))
-			}
-		}
-	}
-	if len(panelReferenceErrors) > 0 {
-		return errors.Errorf("宠物 panelReference 核验失败: count:%d\n%s %v",
-			len(panelReferenceErrors), strings.Join(panelReferenceErrors, "\n"), xruntime.Location())
 	}
 	return nil
 }
@@ -398,9 +393,9 @@ func (p *PetBattleAIEntry) check(petID uint32, skillSlots []uint32) error {
 			petID, *p.AttackWeight, *p.DefenseWeight, *p.EscapeWeight, xruntime.Location())
 	}
 	if p.SkillSlotWeights != nil {
-		if len(p.SkillSlotWeights) != petBattleAISkillSlotCount {
-			return errors.Errorf("宠物 battleAI.skillSlotWeights 必须完整配置7个槽位: pet:%d count:%d %v",
-				petID, len(p.SkillSlotWeights), xruntime.Location())
+		if len(p.SkillSlotWeights) != int(pb.PetSkillLimit_PetSkillLimit_MaxSlotCount) {
+			return errors.Errorf("宠物 battleAI.skillSlotWeights 必须完整配置%d个槽位: pet:%d count:%d %v",
+				pb.PetSkillLimit_PetSkillLimit_MaxSlotCount, petID, len(p.SkillSlotWeights), xruntime.Location())
 		}
 		for slotIndex, weight := range p.SkillSlotWeights {
 			if weight > math.MaxInt32 {
@@ -418,11 +413,20 @@ func (p *PetBattleAIEntry) check(petID uint32, skillSlots []uint32) error {
 		return errors.Errorf("宠物 battleAI 动作权重总和超出[0,2147483647]: pet:%d total:%d %v",
 			petID, weightSum, xruntime.Location())
 	}
-	if p.TargetScope == nil || !validPetBattleAITargetScope(*p.TargetScope) {
+	if p.TargetScope == nil || (*p.TargetScope != PetBattleAITargetScopeAllOpponents &&
+		*p.TargetScope != PetBattleAITargetScopePlayerCharacters &&
+		*p.TargetScope != PetBattleAITargetScopePlayerPets &&
+		*p.TargetScope != PetBattleAITargetScopePartyLeader) {
 		return errors.Errorf("宠物 battleAI.targetScope 非法: pet:%d value:%v %v",
 			petID, p.TargetScope, xruntime.Location())
 	}
-	if p.TargetSelection == nil || !validPetBattleAITargetSelection(*p.TargetSelection) {
+	if p.TargetSelection == nil || (*p.TargetSelection != PetBattleAITargetSelectionRandom &&
+		*p.TargetSelection != PetBattleAITargetSelectionHighestHP &&
+		*p.TargetSelection != PetBattleAITargetSelectionLowestHP &&
+		*p.TargetSelection != PetBattleAITargetSelectionHighestAttack &&
+		*p.TargetSelection != PetBattleAITargetSelectionHighestAgility &&
+		*p.TargetSelection != PetBattleAITargetSelectionLowestAgility &&
+		*p.TargetSelection != PetBattleAITargetSelectionElementalSubdue) {
 		return errors.Errorf("宠物 battleAI.targetSelection 非法: pet:%d value:%v %v",
 			petID, p.TargetSelection, xruntime.Location())
 	}
@@ -442,33 +446,6 @@ func (p *PetBattleAIEntry) check(petID uint32, skillSlots []uint32) error {
 			petID, *p.TargetRandomRollMax, xruntime.Location())
 	}
 	return nil
-}
-
-func validPetBattleAITargetScope(scope PetBattleAITargetScope) bool {
-	switch scope {
-	case PetBattleAITargetScopeAllOpponents,
-		PetBattleAITargetScopePlayerCharacters,
-		PetBattleAITargetScopePlayerPets,
-		PetBattleAITargetScopePartyLeader:
-		return true
-	default:
-		return false
-	}
-}
-
-func validPetBattleAITargetSelection(selection PetBattleAITargetSelection) bool {
-	switch selection {
-	case PetBattleAITargetSelectionRandom,
-		PetBattleAITargetSelectionHighestHP,
-		PetBattleAITargetSelectionLowestHP,
-		PetBattleAITargetSelectionHighestAttack,
-		PetBattleAITargetSelectionHighestAgility,
-		PetBattleAITargetSelectionLowestAgility,
-		PetBattleAITargetSelectionElementalSubdue:
-		return true
-	default:
-		return false
-	}
 }
 
 // petRankFromBaseSum 根据宠物配置表的固定基础四维总和生成成长档位.
