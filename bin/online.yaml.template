@@ -31,6 +31,11 @@ grpc:
   maxReceiveMessageBytes: 67108864
   maxSendMessageBytes: 67108864
 
+# 毫秒定时器用于账号移动队列, 20ms扫描并使用最近到期小顶堆.
+timer:
+  scanMillisecondDuration: 20ms # 移动任务扫描颗粒度
+  millisecondType: 1 # 1表示小顶堆, 优先弹出最近到期任务
+
 # online 自定义配置
 custom:
   gameConfigDir: ../config # 共享游戏配置目录, 本地 bin 启动时相对 bin/online.yaml 解析到项目根目录 config
