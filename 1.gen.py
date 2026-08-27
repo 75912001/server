@@ -5,6 +5,14 @@ import subprocess
 import sys
 
 XLIB_MODULE = "github.com/75912001/xlib"
+# 已下线的场景通知编号和枚举名称永久保留, 防止新协议误用旧客户端曾经识别的命令.
+RESERVED_CMD_VALUES = {0x001015, 0x001016, 0x001017}
+RESERVED_CMD_NAMES = {
+    "CharacterSceneSnapshotNotify_CMD",
+    "CharacterSceneVisibleEnterNotify_CMD",
+    "CharacterSceneVisibleLeaveNotify_CMD",
+}
+
 COLOR_GREEN = "\033[32m"
 COLOR_RED = "\033[31m"
 COLOR_RESET = "\033[0m"
@@ -197,6 +205,13 @@ def gen_cmd_proto(proto_dir):
         if decimal_val == 0:
             print_error(f"Error: CMD value 0 is reserved: {source_name}:{msg_name}")
             sys.exit(1)
+        enum_name = f"{msg_name}_CMD"
+        if decimal_val in RESERVED_CMD_VALUES or enum_name in RESERVED_CMD_NAMES:
+            print_error(
+                f"Error: reserved CMD cannot be reused: "
+                f"{source_name}:{msg_name} value={hex_val}"
+            )
+            sys.exit(1)
         if decimal_val in seen_values:
             print_error(
                 f"Error: duplicated CMD value {hex_val}: "
@@ -220,6 +235,12 @@ def gen_cmd_proto(proto_dir):
         f.write(f'option go_package = "{go_package}";\n')
         f.write("\nenum MsgID {\n")
         f.write("  MsgIDUnknown_CMD = 0; // proto3 首值必须为 0\n")
+        f.write("  reserved 4117 to 4119; // 旧版场景快照、进入和离开通知编号, 禁止复用\n")
+        f.write(
+            '  reserved "CharacterSceneSnapshotNotify_CMD", '
+            '"CharacterSceneVisibleEnterNotify_CMD", '
+            '"CharacterSceneVisibleLeaveNotify_CMD";\n'
+        )
         for hex_val, direction, desc, msg_name, _ in all_entries:
             comment = f"//{hex_val}#{direction}#{desc}"
             f.write(f"  {msg_name}_CMD = {int(hex_val, 16)}; {comment}\n")
