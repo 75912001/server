@@ -3,28 +3,12 @@ syntax = "proto3";
 package account;
 option go_package = "server/proto/pb;pb";
 
-import "asset.proto";
+import "common.proto";
 
 // 消息范围 [0x001019, 0x00101B]
 
-message CharacterTeamTarget {
-  uint64 aid = 1; // 目标角色所属账号 ID
-  uint64 character_uuid = 2; // 目标角色 UUID, 与 aid 共同构成唯一标识
-}
-
-message CharacterTeamMember {
-  uint64 aid = 1; // 成员所属账号 ID
-  uint64 character_uuid = 2; // 成员角色 UUID
-  string nick = 3; // 成员当前昵称
-  bool leader = 4; // 是否为队长; 权威列表同时保证队长位于第一项
-}
-
-message CharacterTeamSnapshot {
-  repeated CharacterTeamMember member_list = 1; // 当前完整成员列表, 未组队时为空, 最多5人
-}
-
 message CharacterTeamJoinReq {
-  CharacterTeamTarget target = 1; // 目标队长, 必须提供完整 aid + character_uuid
+  CharacterKey target = 1; // 目标队长, 必须提供完整角色身份
 }
 
 message CharacterTeamJoinRes {}
@@ -38,7 +22,7 @@ message CharacterTeamDisbandReq {}
 message CharacterTeamDisbandRes {}
 
 message CharacterTeamKickReq {
-  CharacterTeamTarget target = 1; // 被踢成员, 必须提供完整 aid + character_uuid
+  CharacterKey target = 1; // 被踢成员, 必须提供完整角色身份
 }
 
 message CharacterTeamKickRes {}
@@ -70,8 +54,4 @@ message CharacterTeamOperationRes {
 //0x00101B#gateway->client#角色队伍变化-通知
 message CharacterTeamChangedNotify {
   uint64 target_character_uuid = 1; // 本通知对应的本地角色 UUID
-  CharacterTeamSnapshot snapshot = 2; // 变化后的完整权威快照; 空列表表示当前无队伍
-  uint32 current_x = 3; // 本地角色应用本次队伍变化后的权威地图格坐标x
-  uint32 current_y = 4; // 本地角色应用本次队伍变化后的权威地图格坐标y
-  AssetDirection direction = 5; // 本地角色应用本次队伍变化后的权威方向
 }
