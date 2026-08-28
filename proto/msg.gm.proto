@@ -16,7 +16,6 @@ message GMItemAddCommand {
 message GMItemAddResult {
   uint32 item_id = 1; // 已增加的道具资源 ID
   uint64 added_count = 2; // 本次实际增加数量
-  reserved 3;
 }
 
 // GMPetAddCommand 表示给发起命令的角色自身增加一只 1 级随身宠物.
