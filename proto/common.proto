@@ -19,6 +19,12 @@ message Point {
   int32 y = 2;
 }
 
+// Character Key 唯一标识角色
+message CharacterKey {
+  uint64 aid = 1; // 账号 ID; 玩家单位为 AccountRecord.aid
+  uint64 character_uuid = 2; // 角色 UUID; 玩家单位为所属角色 UUID
+}
+
 enum LevelRange {
   LevelRange_Unknow = 0;
   LevelRange_Min = 1;
