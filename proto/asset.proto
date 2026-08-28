@@ -30,16 +30,20 @@ enum AssetIDRange {
   AssetIDRange_Record_End = 999999;
   AssetIDRange_Character_Start = 1000000;
   AssetIDRange_Character_End = 1999999;
-  AssetIDRange_Scene_Start = 1;
-  AssetIDRange_Scene_End = 999999;
-  AssetIDRange_Item_Start = 3000000;
+
+  AssetIDRange_Map_Start = 1; // 地图
+    AssetIDRange_Map_Training_Start = 90000;
+    AssetIDRange_Map_Training_End = 99999;
+  AssetIDRange_Map_End = 999999;
+
+  AssetIDRange_Item_Start = 3000000; // 道具
   AssetIDRange_Item_Item_Start = 3000000;
   AssetIDRange_CharacterAsset_Start = 3490000;
   AssetIDRange_CharacterAsset_End = 3499999;
   AssetIDRange_Item_Item_End = 3499999;
   AssetIDRange_Item_Equipment_Start = 3500000;
 
-    AssetIDRange_Item_Equipment_Weapon_Start = 3900000;
+    AssetIDRange_Item_Equipment_Weapon_Start = 3900000; // 武器
       // 爪
       AssetIDRange_Item_Equipment_Weapon_Claw_Start = 3900000;
       AssetIDRange_Item_Equipment_Weapon_Claw_End = 3909999;
