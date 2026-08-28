@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+
+import "asset.proto";
+import "common.proto";
+import "weapon.proto";
+
+// MapCharacterInfo 是练级地图角色列表使用的完整显示快照.
+message MapCharacterInfo {
+  CharacterKey character = 1; // 角色唯一标识
+  uint64 character_id = 2; // 角色视觉资源 ID
+  string nick = 3; // 角色昵称
+  uint64 rebirth_count = 4; // 角色转生次数
+  uint64 exp = 5; // 角色当前原始经验值, 客户端据此计算等级
+  uint64 mount_pet_id = 6; // 当前骑宠资源 ID; 没有骑宠时为 0
+  bool team_enabled = 7; // 当前登录会话中是否允许组队
+}
+
+// CharacterMapGroup 是练级地图第一层展示节点.
+// 单人节点只有一项; 队伍节点第一项固定为队长, 后续项保持服务端队伍顺序.
+message CharacterMapGroup {
+  repeated MapCharacterInfo character_list = 1;
+}
+
+//0x00101C#client->gateway#进入地图-请求
+message CharacterMapEnterReq {
+  uint64 character_uuid = 1; // 发起进入操作的当前账号角色 UUID
+  uint32 map_id = 2; // 当前版本允许进入的练级地图 ID
+}
+
+//0x00101D#gateway->client#进入地图-回复
+message CharacterMapEnterRes {
+  uint64 character_uuid = 1; // 本次进入地图的接收角色 UUID
+  uint32 map_id = 2; // 服务端确认的目标地图 ID
+  repeated CharacterMapGroup group_list = 3; // 目标地图全部其他分组, 不包含接收角色所在队伍
+}
+
+//0x00101E#gateway->client#地图角色事件-通知
+message CharacterMapEventNotify {
+  uint64 target_character_uuid = 1; // 本通知对应的接收角色 UUID
+
+  oneof event {
+    CharacterMapGroup map_join = 10; // 新加入地图的单人或完整队伍分组
+    CharacterKey map_leave = 11; // 离开地图的第一层角色身份; 队长表示整队离开
+    CharacterKey team_leave = 12; // 离开队伍并继续留在当前地图的成员身份
+    CharacterKey team_disband = 13; // 解散队伍的队长身份
+    MapCharacterInfo character_update = 14; // 已有角色最新的完整显示快照
+  }
+}
+
