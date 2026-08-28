@@ -82,9 +82,6 @@ message ItemWarehouseWithdrawRes {
 
 //0x003007#client->gateway#购买商店商品-请求
 message ShopPurchaseReq {
-  reserved 4;
-  reserved "expected_unit_cost";
-
   uint64 character_uuid = 1; // 执行购买并接收商品的角色 UUID
   uint32 item_id = 2; // 商品资源 ID; 当前仅接受武器 ID
   uint32 quantity = 3; // 购买数量, 范围为 1-30
@@ -92,9 +89,6 @@ message ShopPurchaseReq {
 
 //0x003008#gateway->client#购买商店商品-回复
 message ShopPurchaseRes {
-  reserved 4;
-  reserved "unit_cost";
-
   uint64 character_uuid = 1; // 执行购买并接收商品的角色 UUID
   uint32 item_id = 2; // 已购买的商品资源 ID
   uint32 quantity = 3; // 实际购买数量
