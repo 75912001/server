@@ -87,9 +87,6 @@ func validateCharacterRecord(record *pb.CharacterRecord, seenUUID map[uint64]str
 	if base.GetCreateTimestampMs() <= 0 {
 		return fmt.Errorf("create timestamp is invalid")
 	}
-	if !assetIDInRange(uint64(base.GetSceneId()), pb.AssetIDRange_AssetIDRange_Scene_Start, pb.AssetIDRange_AssetIDRange_Scene_End) {
-		return fmt.Errorf("scene id %d is invalid", base.GetSceneId())
-	}
 	if base.GetVitality()+base.GetStrength()+base.GetToughness()+base.GetDexterity() == 0 {
 		return fmt.Errorf("attribute is empty")
 	}
@@ -98,6 +95,9 @@ func validateCharacterRecord(record *pb.CharacterRecord, seenUUID map[uint64]str
 	}
 	if base.GetCharm() > characterMaxCharm {
 		return fmt.Errorf("charm %d exceeds limit", base.GetCharm())
+	}
+	if base.GetReputation() > characterMaxReputation {
+		return fmt.Errorf("reputation %d exceeds limit", base.GetReputation())
 	}
 	if err := validateCharacterLuckState(base.GetLuckState()); err != nil {
 		return fmt.Errorf("luck state: %w", err)
@@ -130,6 +130,9 @@ func validateCharacterRecord(record *pb.CharacterRecord, seenUUID map[uint64]str
 	if err := validateCharacterEquipment(record, seenUUID, usedUUID); err != nil {
 		return fmt.Errorf("equipped item: %w", err)
 	}
+	if err := validateCharacterTaskRecords(record); err != nil {
+		return fmt.Errorf("task record: %w", err)
+	}
 
 	battleCount := 0
 	mountCount := 0
@@ -160,6 +163,71 @@ func validateCharacterRecord(record *pb.CharacterRecord, seenUUID map[uint64]str
 	return nil
 }
 
+func validateCharacterTaskRecords(record *pb.CharacterRecord) error {
+	if record == nil {
+		return fmt.Errorf("record is nil")
+	}
+	if len(record.GetTaskRecordMap()) == 0 {
+		return nil
+	}
+	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Task == nil {
+		return fmt.Errorf("task config is not loaded")
+	}
+	for taskID, taskRecord := range record.GetTaskRecordMap() {
+		task := gameconfig.GGameConfig.Task.Get(taskID)
+		if task == nil {
+			return fmt.Errorf("task config %d is missing", taskID)
+		}
+		if taskRecord == nil || taskRecord.GetAcceptedAtMs() <= 0 {
+			return fmt.Errorf("task %d accepted timestamp is invalid", taskID)
+		}
+		if len(taskRecord.GetStepRecordList()) != len(task.Steps) {
+			return fmt.Errorf("task %d step count %d does not match config %d", taskID, len(taskRecord.GetStepRecordList()), len(task.Steps))
+		}
+		previousCompletedAtMs := taskRecord.GetAcceptedAtMs()
+		incompleteFound := false
+		for index, stepRecord := range taskRecord.GetStepRecordList() {
+			stepID := uint32(index + 1)
+			step := task.Steps[index]
+			if step == nil || step.ID == nil || *step.ID != stepID || stepRecord == nil || stepRecord.GetStepId() != stepID {
+				return fmt.Errorf("task %d step %d does not match config", taskID, stepID)
+			}
+			startedAtMs := stepRecord.GetStartedAtMs()
+			completedAtMs := stepRecord.GetCompletedAtMs()
+			rewardClaimedAtMs := stepRecord.GetRewardClaimedAtMs()
+			if incompleteFound && (startedAtMs != 0 || completedAtMs != 0 || rewardClaimedAtMs != 0) {
+				return fmt.Errorf("task %d step %d changed before previous step completed", taskID, stepID)
+			}
+			if startedAtMs != 0 && startedAtMs < previousCompletedAtMs {
+				return fmt.Errorf("task %d step %d started before previous state", taskID, stepID)
+			}
+			if completedAtMs != 0 && (startedAtMs == 0 || completedAtMs < startedAtMs) {
+				return fmt.Errorf("task %d step %d completion timestamp is invalid", taskID, stepID)
+			}
+			if rewardClaimedAtMs != 0 && (completedAtMs == 0 || rewardClaimedAtMs < completedAtMs) {
+				return fmt.Errorf("task %d step %d reward timestamp is invalid", taskID, stepID)
+			}
+			if step.RewardID == nil {
+				return fmt.Errorf("task %d step %d reward config is missing", taskID, stepID)
+			}
+			if *step.RewardID == 0 {
+				if completedAtMs == 0 && rewardClaimedAtMs != 0 {
+					return fmt.Errorf("task %d step %d no-reward state is invalid", taskID, stepID)
+				}
+				if completedAtMs != 0 && rewardClaimedAtMs != completedAtMs {
+					return fmt.Errorf("task %d step %d no-reward claim timestamp must equal completion timestamp", taskID, stepID)
+				}
+			}
+			if completedAtMs == 0 {
+				incompleteFound = true
+				continue
+			}
+			previousCompletedAtMs = completedAtMs
+		}
+	}
+	return nil
+}
+
 func validatePetRecord(record *pb.PetRecord, warehouse bool) error {
 	if record.GetUuid() == 0 {
 		return fmt.Errorf("uuid is empty")
@@ -179,11 +247,37 @@ func validatePetRecord(record *pb.PetRecord, warehouse bool) error {
 	if record.GetCreateTimestampMs() <= 0 {
 		return fmt.Errorf("create timestamp is invalid")
 	}
-	if record.GetSavedBaseVitality() == 0 || record.GetSavedBaseStrength() == 0 || record.GetSavedBaseToughness() == 0 || record.GetSavedBaseDexterity() == 0 {
-		return fmt.Errorf("saved base attribute is incomplete")
+	if len(record.GetSkillIdList()) != int(pb.PetSkillLimit_PetSkillLimit_MaxSlotCount) {
+		return fmt.Errorf("skill slot count %d is invalid", len(record.GetSkillIdList()))
 	}
-	if record.GetRawVitality() == 0 || record.GetRawStrength() == 0 || record.GetRawToughness() == 0 || record.GetRawDexterity() == 0 {
-		return fmt.Errorf("raw attribute is incomplete")
+	for slotIndex, skillID := range record.GetSkillIdList() {
+		if skillID == 0 {
+			continue
+		}
+		if !assetIDInRange(uint64(skillID), pb.AssetIDRange_AssetIDRange_Skill_Start, pb.AssetIDRange_AssetIDRange_Skill_End) {
+			return fmt.Errorf("skill slot %d id %d is invalid", slotIndex, skillID)
+		}
+		if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Skill == nil || gameconfig.GGameConfig.Skill.Get(skillID) == nil {
+			return fmt.Errorf("skill slot %d config %d is missing", slotIndex, skillID)
+		}
+	}
+	panelHP := gameconfig.CalculatePetPanelHP(
+		record.GetRawVitality(),
+		record.GetRawStrength(),
+		record.GetRawToughness(),
+		record.GetRawDexterity(),
+	)
+	if panelHP <= 0 {
+		return fmt.Errorf("pet panel HP %d is invalid", panelHP)
+	}
+	panelAttack := gameconfig.CalculatePetPanelAttack(
+		record.GetRawVitality(),
+		record.GetRawStrength(),
+		record.GetRawToughness(),
+		record.GetRawDexterity(),
+	)
+	if panelAttack <= 0 {
+		return fmt.Errorf("pet panel attack %d is invalid", panelAttack)
 	}
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"time"
 
 	"server/common"
 	"server/common/gameconfig"
@@ -23,12 +24,13 @@ var (
 )
 
 type gmItemAddPlan struct {
-	characterUUID uint64
-	itemID        uint32
-	addedCount    uint64
-	currentCount  uint64
-	previous      *pb.CharacterRecord
-	next          *pb.CharacterRecord
+	characterUUID        uint64
+	itemID               uint32
+	addedCount           uint64
+	currentCount         uint64
+	previous             *pb.CharacterRecord
+	next                 *pb.CharacterRecord
+	changedTaskRecordMap map[uint32]*pb.CharacterTaskRecord
 }
 
 type gmPetAddPlan struct {
@@ -51,13 +53,18 @@ func prepareGMItemAddPlan(record *pb.CharacterRecord, command *pb.GMItemAddComma
 	if err := newCharacterItemManager(next).Add(command.GetItemId(), command.GetCount()); err != nil {
 		return nil, err
 	}
+	changedTasks, err := newCharacterTaskManager(next).Refresh(time.Now().UnixMilli())
+	if err != nil {
+		return nil, fmt.Errorf("advance task after GM item add: %w", err)
+	}
 	return &gmItemAddPlan{
-		characterUUID: record.GetBase().GetUuid(),
-		itemID:        command.GetItemId(),
-		addedCount:    command.GetCount(),
-		currentCount:  newCharacterItemManager(next).Count(command.GetItemId()),
-		previous:      record,
-		next:          next,
+		characterUUID:        record.GetBase().GetUuid(),
+		itemID:               command.GetItemId(),
+		addedCount:           command.GetCount(),
+		currentCount:         newCharacterItemManager(next).Count(command.GetItemId()),
+		previous:             record,
+		next:                 next,
+		changedTaskRecordMap: changedTasks,
 	}, nil
 }
 
@@ -87,7 +94,10 @@ func prepareGMPetAddPlan(accountRecord *pb.AccountRecord, record *pb.CharacterRe
 
 	next := proto.Clone(record).(*pb.CharacterRecord)
 	petUUID := accountRecord.GetUsedUuid() + 1
-	petRecord := commonpet.NewRecord(petEntry, petUUID, 1, petGrade)
+	petRecord, err := commonpet.NewRecord(petEntry, petUUID, 1, petGrade)
+	if err != nil {
+		return nil, fmt.Errorf("%w: create pet %d: %v", errGMPetAddFailedPrecondition, petID, err)
+	}
 	petRecord.CarryStatus = pb.PetCarryStatus_PetCarryStatus_Wait
 	next.PetRecordList = append(next.PetRecordList, petRecord)
 	return &gmPetAddPlan{
@@ -228,6 +238,7 @@ func (p *Account) onGMCommandReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		}
 		xlog.GLog.Infof("gm command success aid:%d account:%s character:%d clientIP:%s command:item_add item:%d added:%d current:%d", p.aid, p.account, plan.characterUUID, p.clientIP, plan.itemID, plan.addedCount, plan.currentCount)
 		p.sendCharacterItemChangedNotify(gateway, plan.characterUUID, map[uint32]uint64{plan.itemID: plan.currentCount})
+		p.sendCharacterTaskChangedNotify(gateway, plan.characterUUID, plan.changedTaskRecordMap)
 		p.sendClientRes(gateway, uint32(pb.MsgID_GMCommandRes_CMD), xerror.Success.Code(), &pb.GMCommandRes{
 			CharacterUuid: plan.characterUUID,
 			Result: &pb.GMCommandRes_ItemAdd{

@@ -83,12 +83,7 @@ func (p *Account) onPetCarryStatusSetReq(gateway *Gateway, pkt *pb.OnlineClientP
 		p.sendClientErr(gateway, uint32(pb.MsgID_PetCarryStatusSetRes_CMD), xerror.Internal.Code())
 		return
 	}
-	changedPetRecordList := make([]*pb.PetRecord, 0, len(plan.changes))
-	for _, change := range plan.changes {
-		changedPetRecordList = append(changedPetRecordList, change.record)
-	}
-	p.sendCharacterPetChangedNotify(gateway, character.record.GetBase().GetUuid(), changedPetRecordList)
-
+	p.refreshCharacterPresence(character)
 	p.sendClientRes(gateway, uint32(pb.MsgID_PetCarryStatusSetRes_CMD), xerror.Success.Code(), &pb.PetCarryStatusSetRes{
 		CharacterUuid: req.GetCharacterUuid(),
 		ChangeList:    plan.responseChangeList(),

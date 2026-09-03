@@ -17,7 +17,7 @@ type Account struct {
 	accountRecord  *pb.AccountRecord // 账号 记录
 	actor          *xactor.Actor[uint64]
 
-	characterManager *characterMgr // 账号内全部角色的在线, 自动遇敌和 CombatRoom 引用
+	characterManager *characterMgr // 账号内全部角色的在线, 自动遇敌和 CombatRoom actor 指针
 }
 
 func newAccount(aid uint64) *Account {

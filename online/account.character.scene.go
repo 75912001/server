@@ -1,11 +1,8 @@
 package main
 
-import (
-	"server/common/gameconfig"
-	pb "server/proto/pb"
-)
+import "server/common/gameconfig"
 
-func (p *Account) getCharacterScene(character *pb.CharacterRecord) (sceneEntry *gameconfig.SceneEntry) {
-	sceneEntry = gameconfig.GGameConfig.Scene.Get(character.GetBase().GetSceneId())
+func (p *Account) getCharacterScene(character *character) (sceneEntry *gameconfig.SceneEntry) {
+	sceneEntry = gameconfig.GGameConfig.Scene.Get(character.sceneID)
 	return sceneEntry
 }

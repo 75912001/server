@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"time"
 
 	pb "server/proto/pb"
 
@@ -103,9 +104,10 @@ func (p *Account) onItemWarehouseWithdrawReq(gateway *Gateway, pkt *pb.OnlineCli
 		p.sendClientErr(gateway, uint32(pb.MsgID_ItemWarehouseWithdrawRes_CMD), itemWarehouseResultID(err))
 		return
 	}
-	if err := persistItemWarehouseTransfer(plan, func() error {
+	changedTasks, err := persistCharacterTaskWarehouseWithdraw(plan, character.record, time.Now().UnixMilli(), func() error {
 		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
-	}); err != nil {
+	})
+	if err != nil {
 		xlog.GLog.Errorf("persist item warehouse withdraw failed aid:%d character:%d err:%v", p.aid, req.GetCharacterUuid(), err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_ItemWarehouseWithdrawRes_CMD), xerror.Internal.Code())
 		return
@@ -118,6 +120,30 @@ func (p *Account) onItemWarehouseWithdrawReq(gateway *Gateway, pkt *pb.OnlineCli
 		res.Item = &pb.ItemWarehouseWithdrawRes_EquipmentUuid{EquipmentUuid: plan.equipmentUUID}
 	}
 	p.sendClientRes(gateway, uint32(pb.MsgID_ItemWarehouseWithdrawRes_CMD), xerror.Success.Code(), res)
+	p.sendCharacterTaskChangedNotify(gateway, req.GetCharacterUuid(), changedTasks)
+}
+
+// 仓库取出先在内存完成容器移动和任务重算, 再执行同一次Cache写入.
+// 原容器事务回滚道具, 本层同时恢复任务, 不产生额外持久化请求.
+func persistCharacterTaskWarehouseWithdraw(plan *itemWarehouseTransferPlan, record *pb.CharacterRecord, nowMs int64, persist func() error) (map[uint32]*pb.CharacterTaskRecord, error) {
+	if plan == nil || record == nil || plan.target != record.GetItemBag() || nowMs <= 0 || persist == nil {
+		return nil, errItemWarehouseInvalidArgument
+	}
+	previousTasks := cloneCharacterTaskRecordMap(record.GetTaskRecordMap())
+	var changedTasks map[uint32]*pb.CharacterTaskRecord
+	err := persistItemWarehouseTransfer(plan, func() error {
+		var err error
+		changedTasks, err = newCharacterTaskManager(record).Refresh(nowMs)
+		if err != nil {
+			return err
+		}
+		return persist()
+	})
+	if err != nil {
+		record.TaskRecordMap = previousTasks
+		return nil, err
+	}
+	return changedTasks, nil
 }
 
 func (p *Account) itemWarehouseCharacter(characterUUID uint64) *character {
