@@ -1,0 +1,26 @@
+# 本文件由Godot make_map地图编辑器保存当前地图时自动生成.
+# 地图基础数据来源: sa.desktop/map/map.catalog.json和maps/<map_id>.
+# 敌人组引用来源: server/config/enemy.group.yaml.
+# 服务端根据角色当前地图ID选择全地图遇敌配置, 并按坐标判断阻挡和传送.
+# 请勿手工修改, 手工内容可能在下次保存该地图时被覆盖.
+
+
+scenes: # 当前文件唯一的服务端地图.
+  - id: 90110 # 地图唯一ID, 与客户端map_id一致.
+    name: "练级110-120" # 地图显示名称.
+    width: 64 # 地图横向格数.
+    height: 64 # 地图纵向格数.
+
+    collision: # 服务端权威阻挡配置.
+      blockedRows: [] # 阻挡区间列表, 每项格式为[y, 起始x, 结束x].
+
+    encounter: # 服务端遇敌配置.
+      enabled: true # 是否允许遇敌.
+      enemyGroups: # 可选择的敌人组及相对权重.
+        - id: 90110 # 引用enemy.group.yaml中的敌人组ID.
+          weight: 1 # 相对选择权重, 总和不要求等于100.
+
+    npcs: [] # 来源为map.entity.yaml中的NPC及其功能选项.
+
+    warps: [] # 来源为map.entity.yaml中的传送点.
+
