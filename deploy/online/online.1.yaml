@@ -29,5 +29,6 @@ grpc:
   maxReceiveMessageBytes: 67108864
   maxSendMessageBytes: 67108864
 
+
 custom:
   gameConfigDir: /app/config
