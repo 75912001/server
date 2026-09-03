@@ -5,11 +5,11 @@
 #
 # 用法:
 #   在 server 仓库根目录使用 Git Bash 执行:
-#     ./deploy.sh
+#     ./2.deploy.sh
 #
 # 执行流程:
 #   1. 检查 python/docker 和 Docker daemon.
-#   2. 执行 python gen.py 生成 protobuf 代码.
+#   2. 执行 python 1.gen.py 生成 protobuf 代码.
 #   3. 按 cache -> online -> gateway -> login 顺序处理各服务:
 #      清理 deploy/<service>/log, 停止 server.<service>.1,
 #      删除 server.<service>.1, 删除 server.<service>:dev,
@@ -181,7 +181,7 @@ deploy_service() {
 }
 
 main() {
-    # deploy.sh 位于 server 仓库根目录, 直接以脚本位置作为部署根目录, 避免依赖 git safe.directory.
+    # 2.deploy.sh 位于 server 仓库根目录, 直接以脚本位置作为部署根目录, 避免依赖 git safe.directory.
     SERVER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     cd "$SERVER_DIR" || exit 1
 
