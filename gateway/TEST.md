@@ -78,7 +78,7 @@ cd /d/src/github.com/sa.project/server
 docker ps
 ```
 
-确认依赖容器和服务运行后, 使用当前受支持客户端连接 gateway. 已废弃的 robot 不属于联调入口.
+确认依赖容器和服务运行后, 使用当前受支持客户端连接 gateway.
 
 重点验证：
 
