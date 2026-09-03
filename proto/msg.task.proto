@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+
+// 消息范围 [0x007000, 0x007fff]
+
+// CharacterTaskStepRecord 保存单个串行任务步骤的权威状态.
+message CharacterTaskStepRecord {
+  uint32 step_id = 1; // task.yaml中从1连续递增的步骤ID
+  int64 started_at_ms = 2; // 步骤首次满足开始条件的Unix毫秒时间戳; 0表示尚未开始
+  int64 completed_at_ms = 3; // 步骤完成的Unix毫秒时间戳; 0表示尚未完成
+  int64 reward_claimed_at_ms = 4; // 步骤奖励领取时间; 无奖励步骤完成时与completed_at_ms相同
+}
+
+// CharacterTaskRecord 保存一个已接取任务及其全部有序步骤记录.
+message CharacterTaskRecord {
+  int64 accepted_at_ms = 1; // 任务接取的Unix毫秒时间戳
+  repeated CharacterTaskStepRecord step_record_list = 2; // 按task.yaml步骤顺序保存, step_id从1连续递增
+}
+
+//0x007000#client->gateway#接取任务-请求
+message TaskAcceptReq {
+  uint64 character_uuid = 1; // 当前账号内已上线的角色UUID
+  uint32 task_id = 2; // 要接取的运行任务ID
+}
+
+//0x007001#gateway->client#接取任务-回复
+message TaskAcceptRes {
+  uint64 character_uuid = 1; // 已接取任务所属角色UUID
+  uint32 task_id = 2; // 已接取的任务ID
+}
+
+//0x007002#client->gateway#提交任务步骤-请求
+message TaskSubmitReq {
+  uint64 character_uuid = 1; // 当前账号内已上线的角色UUID
+  uint32 task_id = 2; // 要提交的任务ID
+  uint32 step_id = 3; // 要提交的当前步骤ID
+}
+
+//0x007003#gateway->client#提交任务步骤-回复
+message TaskSubmitRes {
+  uint64 character_uuid = 1; // 已提交步骤所属角色UUID
+  uint32 task_id = 2; // 已提交的任务ID
+  uint32 step_id = 3; // 已提交的步骤ID
+}
+
+//0x007004#client->gateway#领取任务步骤奖励-请求
+message TaskStepRewardClaimReq {
+  uint64 character_uuid = 1; // 当前账号内已上线的角色UUID
+  uint32 task_id = 2; // 奖励所属任务ID
+  uint32 step_id = 3; // 要领取奖励的已完成步骤ID
+}
+
+//0x007005#gateway->client#领取任务步骤奖励-回复
+message TaskStepRewardClaimRes {
+  uint64 character_uuid = 1; // 已领取奖励所属角色UUID
+  uint32 task_id = 2; // 已领取奖励所属任务ID
+  uint32 step_id = 3; // 已领取奖励所属步骤ID
+}
+
+//0x007006#gateway->client#角色任务记录变化-通知
+message CharacterTaskChangedNotify {
+  uint64 character_uuid = 1; // 任务变化所属角色UUID
+  map<uint32, CharacterTaskRecord> changed_task_record_map = 2; // 仅包含本次变化的任务记录, 客户端按task_id合并
+}
+
+//0x007007#client->gateway#挑战任务步骤-请求
+message TaskBattleChallengeReq {
+  uint64 character_uuid = 1; // 当前账号内已上线且未在战斗中的角色UUID
+  uint32 task_id = 2; // 已接取任务ID, 服务端从配置读取敌群
+  uint32 step_id = 3; // 已开始且未完成的当前步骤ID
+}
+
+//0x007008#gateway->client#挑战任务步骤-回复
+message TaskBattleChallengeRes {
+  uint64 character_uuid = 1; // 发起挑战的角色UUID
+  uint32 task_id = 2; // 服务端校验通过的任务ID
+  uint32 step_id = 3; // 服务端校验通过的步骤ID
+}

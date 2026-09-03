@@ -3,7 +3,7 @@ syntax = "proto3";
 package account;
 option go_package = "server/proto/pb;pb";
 
-import "record.proto";
+import "msg.item.proto";
 
 // 消息范围 [0x002000, 0x002fff]
 
@@ -71,20 +71,21 @@ message PetRecord {
   int64 create_timestamp_ms = 6; // 宠物创建时间戳, 单位毫秒
   uint32 rebirth_count = 7; // 宠物转生次数
   PetCarryStatus carry_status = 8; // 宠物携带状态; 只有角色随身携带时参与战斗/骑乘语义, 仓库内宠物固定为 Rest
+  repeated uint32 skill_id_list = 9; // 宠物实例的固定7个技能槽; 0表示空槽, 创建时复制pet.yaml模板, 后续学习只修改实例
 
   PetGrade grade = 100; // 宠物品阶, 决定创建时 SavedBase 成长偏移
-  uint32 saved_base_vitality = 101; // 宠物实例基础体力成长值; 创建时由配置 growth.baseVital 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
-  uint32 saved_base_strength = 102; // 宠物实例基础腕力成长值; 创建时由配置 growth.baseStr 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
-  uint32 saved_base_toughness = 103; // 宠物实例基础耐力成长值; 创建时由配置 growth.baseTough 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
-  uint32 saved_base_dexterity = 104; // 宠物实例基础速度成长值; 创建时由配置 growth.baseDex 叠加 PetGrade 品阶偏移生成, 后续升级固定使用
-  uint32 raw_vitality = 105; // 宠物当前原始体力值; 创建和升级时累加生成, 战斗运行期 HP 等派生属性由该值参与换算
-  uint32 raw_strength = 106; // 宠物当前原始腕力值; 创建和升级时累加生成, 战斗运行期攻击等派生属性由该值参与换算
-  uint32 raw_toughness = 107; // 宠物当前原始耐力值; 创建和升级时累加生成, 战斗运行期防御等派生属性由该值参与换算
-  uint32 raw_dexterity = 108; // 宠物当前原始速度值; 创建和升级时累加生成, 战斗运行期敏捷等派生属性由该值参与换算
+  int32 saved_base_vitality = 101; // 宠物实例基础体力成长值; 配置基础值叠加品阶偏移后可为0或负数, 后续升级固定使用
+  int32 saved_base_strength = 102; // 宠物实例基础腕力成长值; 配置基础值叠加品阶偏移后可为0或负数, 后续升级固定使用
+  int32 saved_base_toughness = 103; // 宠物实例基础耐力成长值; 配置基础值叠加品阶偏移后可为0或负数, 后续升级固定使用
+  int32 saved_base_dexterity = 104; // 宠物实例基础速度成长值; 配置基础值叠加品阶偏移后可为0或负数, 后续升级固定使用
+  int32 raw_vitality = 105; // 宠物当前原始体力值; 按原版有符号计算创建和升级, 战斗运行期 HP 等派生属性由该值参与换算
+  int32 raw_strength = 106; // 宠物当前原始腕力值; 按原版有符号计算创建和升级, 战斗运行期攻击等派生属性由该值参与换算
+  int32 raw_toughness = 107; // 宠物当前原始耐力值; 按原版有符号计算创建和升级, 战斗运行期防御等派生属性由该值参与换算
+  int32 raw_dexterity = 108; // 宠物当前原始速度值; 按原版有符号计算创建和升级, 战斗运行期敏捷等派生属性由该值参与换算
   uint32 growth_baseline_hp = 109; // 成长率基准 HP 上限; 无 1 级记录时使用首次获得时的当前值
   uint32 growth_baseline_attack = 110; // 成长率基准攻击力; 无 1 级记录时使用首次获得时的当前值
-  uint32 growth_baseline_defense = 111; // 成长率基准防御力; 无 1 级记录时使用首次获得时的当前值
-  uint32 growth_baseline_agility = 112; // 成长率基准敏捷; 无 1 级记录时使用首次获得时的当前值
+  int32 growth_baseline_defense = 111; // 成长率基准防御力; 原版有符号四维可能生成0或负值
+  int32 growth_baseline_agility = 112; // 成长率基准敏捷; 原版有符号速度可能生成0或负值
   uint32 growth_baseline_level = 113; // 成长率基准对应等级; 1 表示真实 1 级记录, 高等级首次获得时记录当前等级
 }
 
@@ -148,4 +149,22 @@ message PetNickSetRes {
   uint64 character_uuid = 1; // 宠物所属角色 UUID
   uint64 pet_uuid = 2; // 已修改昵称的随身宠物 UUID
   string nick = 3; // 已持久化的最终自定义昵称; 空字符串表示已清除昵称
+}
+
+//0x002009#client->gateway#学习替换或遗忘随身宠物技能-请求
+message PetSkillSetReq {
+  uint64 character_uuid = 1; // 宠物所属角色 UUID, 必须属于当前账号且在线
+  uint64 pet_uuid = 2; // 需要修改技能槽的随身宠物 UUID
+  uint32 slot_index = 3; // 技能槽下标, 合法范围为0-6
+  uint32 skill_id = 4; // 目标技能 ID; 0表示免费遗忘, 非0表示按skill.yaml.cost学习或替换
+}
+
+//0x00200A#gateway->client#学习替换或遗忘随身宠物技能-回复
+message PetSkillSetRes {
+  uint64 character_uuid = 1; // 宠物所属角色 UUID
+  uint64 pet_uuid = 2; // 已修改技能槽的随身宠物 UUID
+  uint32 slot_index = 3; // 已修改的技能槽下标
+  uint32 skill_id = 4; // 已写入的最终技能 ID; 0表示该槽已清空
+  uint64 cost = 5; // 本次实际扣除的石币; 遗忘为0
+  ItemElement affected_item = 6; // 石币的最终权威数量
 }

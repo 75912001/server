@@ -10,6 +10,7 @@ import "weapon.proto";
 import "msg.item.proto";
 import "msg.map.proto";
 import "msg.pet.proto";
+import "msg.task.proto";
 
 // 消息范围 [0x001000, 0x001fff]
 
@@ -124,12 +125,13 @@ message CharacterBaseRecord {
   int64 last_logout_timestamp_ms = 15; // 角色最后登出时间戳, 单位毫秒
   int64 create_timestamp_ms = 16; // 角色创建时间戳, 单位毫秒
   uint64 rebirth_count = 17; // 角色转生次数
-  uint32 scene_id = 18; // 角色当前场景 ID
+  reserved 18;
+  reserved "scene_id";
   CharacterLuckState luck_state = 19; // 角色基础运气和 LS 日自动刷新状态
+  uint32 reputation = 20; // 角色声望内部值, 100 表示显示 1.00, 最大 100000000
   uint32 duel_point = 21; // 角色决斗点(DP)
   uint32 charm = 22; // 角色魅力
-  uint32 scene_x = 23; // 角色在当前场景中的格坐标x
-  uint32 scene_y = 24; // 角色在当前场景中的格坐标y
+  reserved 23, 24;
 }
 
 message CharacterRecord {
@@ -139,6 +141,7 @@ message CharacterRecord {
   CharacterEquipmentRecord equipment = 40; // 角色当前穿戴装备; 新角色初始化为空消息, 未穿戴部位保持未设置
   //map<uint64, RecordPrimary> record_map = 1000; // 角色临时扩展记录表
   repeated PetRecord pet_record_list = 2000; // 角色当前随身携带宠物记录列表, 按携带顺序排列, 数量不超过 PetRecordLimit_MaxCarryCount
+  map<uint32, CharacterTaskRecord> task_record_map = 3000; // 已接取任务的完整记录, key为task.yaml中的任务ID
 }
 
 //0x001000#client->gateway#创建角色-请求

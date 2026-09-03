@@ -87,7 +87,8 @@ message CombatUnit {
   uint32 mount_pet_id = 13; // 骑宠资源 ID; 没有骑宠时为 0
   CombatUnitAttribute attribute = 20; // 开战时可见战斗属性快照
   CharacterEquipmentRecord equipment = 30; // 入场时的完整装备状态; 换装效果执行后由客户端全量覆盖
- }
+  repeated uint32 skill_id_list = 40; // 仅玩家战宠的固定7槽开战快照; 角色和敌人单位为空
+}
 
 // CombatAssetType 标识战斗期间可发生增减的单位运行期数值.
 enum CombatAssetType {
@@ -141,7 +142,7 @@ enum CombatStatusType {
 // CombatDurationUnit 标识状态或场地效果剩余时长的递减单位.
 enum CombatDurationUnit {
   CombatDurationUnit_Unknown = 0; // 未指定时长单位
-  CombatDurationUnit_Action = 1; // 每次相关单位行动后递减
+  CombatDurationUnit_Action = 1; // 按相关单位行动次数结算, 具体递减时点由状态规则决定
   CombatDurationUnit_Round = 2; // 每个战斗回合后递减
   CombatDurationUnit_Hit = 3; // 每次触发或承受命中后递减
   CombatDurationUnit_Permanent = 4; // 本场战斗内永久生效
@@ -191,8 +192,7 @@ message CombatKnockbackDetail {
 message CombatAutoEncounterSetReq {
   bool enabled = 1; // 是否开启自动遇敌
   uint64 character_uuid = 2; // 目标角色 UUID, 必须属于当前账号且处于在线状态
-  uint32 scene_x = 3; // 开启时角色所在场景格坐标x
-  uint32 scene_y = 4; // 开启时角色所在场景格坐标y
+  reserved 3, 4;
 }
 
 // CombatAutoEncounterSetRes 返回服务端最终接受的角色自动遇敌状态, 也用于服务端主动重置状态.
@@ -201,8 +201,7 @@ message CombatAutoEncounterSetRes {
   bool enabled = 1; // 服务端确认后的自动遇敌状态
   int64 server_timestamp_ms = 2; // 服务端回复时间戳, 单位毫秒
   uint64 character_uuid = 3; // 已更新自动遇敌状态的角色 UUID
-  uint32 scene_x = 4; // 服务端接受的场景格坐标x
-  uint32 scene_y = 5; // 服务端接受的场景格坐标y
+  reserved 4, 5;
 }
 
 // CombatBattleStartNotify 通知战斗参与者创建战斗场景.
@@ -274,6 +273,7 @@ enum CombatUnitLeaveReason {
   CombatUnitLeaveReason_Captured = 3; // 被捕获离场
   CombatUnitLeaveReason_Defeated = 4; // 战败离场
   CombatUnitLeaveReason_Intimidated = 5; // 被恐吓技能送回主人身边
+  CombatUnitLeaveReason_Detached = 6; // 角色下线或运行态清理导致的外部脱离战场
 }
 
 // CombatCaptureResult 标识捕获动作的结算结果.
@@ -290,6 +290,7 @@ enum CombatCaptureFailureReason {
   CombatCaptureFailureReason_NotCapturable = 2; // 目标不可捕获
   CombatCaptureFailureReason_Probability = 3; // 捕获概率判定失败
   CombatCaptureFailureReason_Capacity = 4; // 宠物栏容量不足
+  CombatCaptureFailureReason_Persistence = 5; // 宠物档案保存失败
 }
 
 // CombatHealDetail 标记本效果属于治疗; 实际资源变化统一读取所属效果的 unit_delta_list.
@@ -474,12 +475,17 @@ message CombatBattleSettlement {
   repeated CombatSettlementItemReward item_reward_list = 4; // 当前接收角色实际获得的道具汇总
 }
 
-// CombatRoundResultNotify 下发本回合完整执行结果, 战斗结束时同时携带结算数据.
+// CombatRoundResultNotify 向唯一接收角色下发本回合完整执行结果, 战斗结束时同时携带该角色的结算数据.
 //0x100008#gateway->client#战斗回合结果-通知
 message CombatRoundResultNotify {
   string battle_id = 1; // 战斗唯一 UUID 字符串
   uint32 round = 2; // 结算的回合号
+  uint64 recipient_character_uuid = 3; // 本消息唯一接收角色 UUID
   repeated CombatEvent event_list = 10; // 客户端按列表和事件内效果顺序播放的完整本回合表现
+  // 下一回合由服务端自动延续指令的玩家单位, 包含待释放的蓄力宠物.
+  // 客户端播放本回合结束后先标记这些单位指令已确定, 再启动选招, 自动战斗或超时补交.
+  // 列表为空表示下一回合没有自动续招单位; 携带settlement时不使用此字段.
+  repeated CombatUnitKey next_round_auto_action_unit_key_list = 11;
   CombatBattleSettlement settlement = 21; // 仅战斗结束时携带; 字段存在即表示战斗结束
 }
 

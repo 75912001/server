@@ -32,6 +32,8 @@ enum AssetIDRange {
   AssetIDRange_Character_End = 1999999;
 
   AssetIDRange_Map_Start = 1; // 地图
+    AssetIDRange_Map_Test_Start = 80000;
+    AssetIDRange_Map_Test_End = 89999;
     AssetIDRange_Map_Training_Start = 90000;
     AssetIDRange_Map_Training_End = 99999;
   AssetIDRange_Map_End = 999999;

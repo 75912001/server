@@ -21,8 +21,6 @@ enum MsgID {
   CharacterOnlineRes_CMD = 4099; //0x001003#gateway->client#角色上线-回复
   CharacterOfflineReq_CMD = 4100; //0x001004#client->gateway#角色下线-请求
   CharacterOfflineRes_CMD = 4101; //0x001005#gateway->client#角色下线-回复
-  CharacterSceneEnterReq_CMD = 4102; //0x001006#client->gateway#进入场景-请求
-  CharacterSceneEnterRes_CMD = 4103; //0x001007#gateway->client#进入场景-回复
   CharacterBaseChangedNotify_CMD = 4104; //0x001008#gateway->client#角色基础数据变化-通知
   CharacterSettingSetReq_CMD = 4105; //0x001009#client->gateway#修改角色设置-请求
   CharacterSettingSetRes_CMD = 4106; //0x00100A#gateway->client#修改角色设置-回复
@@ -30,15 +28,6 @@ enum MsgID {
   CharacterAttributeAddRes_CMD = 4108; //0x00100C#gateway->client#增加角色基础属性-回复
   CharacterAttributeResetReq_CMD = 4109; //0x00100D#client->gateway#重置角色基础属性-请求
   CharacterAttributeResetRes_CMD = 4110; //0x00100E#gateway->client#重置角色基础属性-回复
-  CharacterEquipmentReplaceReq_CMD = 4111; //0x00100F#client->gateway#替换角色装备-请求
-  CharacterEquipmentReplaceRes_CMD = 4112; //0x001010#gateway->client#替换角色装备-回复
-  CharacterSceneMoveReq_CMD = 4113; //0x001011#client->gateway#提交角色场景移动序列-请求
-  CharacterSceneMoveNotify_CMD = 4114; //0x001012#gateway->client#角色场景移动-通知
-  CharacterSceneTurnReq_CMD = 4115; //0x001013#client->gateway#角色原地转向-请求
-  CharacterSceneTurnNotify_CMD = 4116; //0x001014#gateway->client#附近角色原地转向-通知
-  CharacterSceneSnapshotNotify_CMD = 4117; //0x001015#gateway->client#当前视野角色快照-通知
-  CharacterSceneVisibleEnterNotify_CMD = 4118; //0x001016#gateway->client#角色进入当前视野-通知
-  CharacterSceneVisibleLeaveNotify_CMD = 4119; //0x001017#gateway->client#角色离开当前视野-通知
   CombatAutoEncounterSetReq_CMD = 1048577; //0x100001#client->gateway#设置自动遇敌-请求
   CombatAutoEncounterSetRes_CMD = 1048578; //0x100002#gateway->client#设置自动遇敌-回复
   CombatBattleStartNotify_CMD = 1048580; //0x100004#gateway->client#战斗开始-通知
@@ -47,6 +36,8 @@ enum MsgID {
   CombatRoundResultNotify_CMD = 1048584; //0x100008#gateway->client#战斗回合结果-通知
   CombatFlowCompleteReq_CMD = 1048585; //0x100009#client->gateway#战斗流程完成-请求
   CombatFlowCompleteRes_CMD = 16777232; //0x1000010#gateway->client#战斗流程完成-回复
+  CharacterEquipmentReplaceReq_CMD = 4111; //0x00100F#client->gateway#替换角色装备-请求
+  CharacterEquipmentReplaceRes_CMD = 4112; //0x001010#gateway->client#替换角色装备-回复
   GMCommandReq_CMD = 61440; //0x00f000#client->gateway#执行GM命令-请求
   GMCommandRes_CMD = 61441; //0x00f001#gateway->client#执行GM命令-回复
   ItemUseReq_CMD = 12288; //0x003000#client->gateway#使用角色道具-请求
@@ -65,6 +56,11 @@ enum MsgID {
   CharacterMailDeleteReq_CMD = 20484; //0x005004#client->gateway#删除角色邮件-请求
   CharacterMailDeleteRes_CMD = 20485; //0x005005#gateway->client#删除角色邮件-回复
   CharacterSystemMailNotify_CMD = 20486; //0x005006#gateway->client#新增角色系统邮件-通知
+  CharacterMapEnterReq_CMD = 4124; //0x00101C#client->gateway#进入地图-请求
+  CharacterMapEnterRes_CMD = 4125; //0x00101D#gateway->client#进入地图-回复
+  CharacterMapEventNotify_CMD = 4126; //0x00101E#gateway->client#地图角色事件-通知
+  NpcInteractionReq_CMD = 24576; //0x006000#client->gateway#执行NPC功能-请求
+  NpcInteractionRes_CMD = 24577; //0x006001#gateway->client#执行NPC功能-回复
   PetCarryStatusSetReq_CMD = 8192; //0x002000#client->gateway#修改随身宠物状态-请求
   PetCarryStatusSetRes_CMD = 8193; //0x002001#gateway->client#修改随身宠物状态-回复
   CharacterPetChangedNotify_CMD = 8194; //0x002002#gateway->client#角色随身宠物变化-通知
@@ -74,4 +70,18 @@ enum MsgID {
   PetWarehouseWithdrawRes_CMD = 8198; //0x002006#gateway->client#将仓库宠物取出-回复
   PetNickSetReq_CMD = 8199; //0x002007#client->gateway#修改随身宠物昵称-请求
   PetNickSetRes_CMD = 8200; //0x002008#gateway->client#修改随身宠物昵称-回复
+  PetSkillSetReq_CMD = 8201; //0x002009#client->gateway#学习替换或遗忘随身宠物技能-请求
+  PetSkillSetRes_CMD = 8202; //0x00200A#gateway->client#学习替换或遗忘随身宠物技能-回复
+  TaskAcceptReq_CMD = 28672; //0x007000#client->gateway#接取任务-请求
+  TaskAcceptRes_CMD = 28673; //0x007001#gateway->client#接取任务-回复
+  TaskSubmitReq_CMD = 28674; //0x007002#client->gateway#提交任务步骤-请求
+  TaskSubmitRes_CMD = 28675; //0x007003#gateway->client#提交任务步骤-回复
+  TaskStepRewardClaimReq_CMD = 28676; //0x007004#client->gateway#领取任务步骤奖励-请求
+  TaskStepRewardClaimRes_CMD = 28677; //0x007005#gateway->client#领取任务步骤奖励-回复
+  CharacterTaskChangedNotify_CMD = 28678; //0x007006#gateway->client#角色任务记录变化-通知
+  TaskBattleChallengeReq_CMD = 28679; //0x007007#client->gateway#挑战任务步骤-请求
+  TaskBattleChallengeRes_CMD = 28680; //0x007008#gateway->client#挑战任务步骤-回复
+  CharacterTeamOperationReq_CMD = 4121; //0x001019#client->gateway#角色队伍操作-请求
+  CharacterTeamOperationRes_CMD = 4122; //0x00101A#gateway->client#角色队伍操作-回复
+  CharacterTeamChangedNotify_CMD = 4123; //0x00101B#gateway->client#角色队伍变化-通知
 }

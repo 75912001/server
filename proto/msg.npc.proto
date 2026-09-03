@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package account;
+option go_package = "server/proto/pb;pb";
+
+// 消息范围 [0x006000, 0x006fff]
+
+// NpcFunctionID 标识客户端展示方式和操作输入契约.
+// 原版 functionset 仅是转换来源, 不直接作为客户端或服务端公开协议.
+enum NpcFunctionID {
+  NpcFunctionID_Unspecified = 0;
+  NpcFunctionID_Dialog = 1;
+  NpcFunctionID_ItemShop = 2;
+  NpcFunctionID_PetShop = 3;
+  NpcFunctionID_PetSkillShop = 4;
+  NpcFunctionID_Warehouse = 5;
+  NpcFunctionID_Heal = 6;
+  NpcFunctionID_Transfer = 7;
+  NpcFunctionID_BattleChallenge = 8;
+  NpcFunctionID_Reward = 9;
+  NpcFunctionID_Exchange = 10;
+  NpcFunctionID_Family = 11;
+  NpcFunctionID_Fortune = 12;
+  NpcFunctionID_Quiz = 13;
+  NpcFunctionID_Gamble = 14;
+  NpcFunctionID_Ranking = 15;
+  NpcFunctionID_Auction = 16;
+  NpcFunctionID_PetService = 17;
+  NpcFunctionID_SavePoint = 18;
+  NpcFunctionID_Quest = 19;
+  NpcFunctionID_LegacyUnverified = 20; // 已导入原版配置但尚未转换为现代功能契约, 不允许启用
+  NpcFunctionID_Max = 21;
+}
+
+// NpcNoInput 用于配置已经完整决定执行内容、不需要客户端补充参数的功能.
+message NpcNoInput {}
+
+message NpcShopPurchaseInput {
+  uint32 product_id = 1; // 当前功能选项内的稳定商品 ID
+  uint32 quantity = 2; // 购买数量
+}
+
+enum NpcBattleChallengeOperation {
+  NpcBattleChallengeOperation_Unspecified = 0;
+  NpcBattleChallengeOperation_Start = 1;
+  NpcBattleChallengeOperation_Continue = 2;
+  NpcBattleChallengeOperation_Abandon = 3;
+}
+
+message NpcBattleChallengeInput {
+  NpcBattleChallengeOperation operation = 1; // 本次挑战操作
+}
+
+message NpcExchangeInput {
+  uint32 recipe_id = 1; // 当前功能选项内的稳定兑换配方 ID
+  uint32 quantity = 2; // 执行兑换的次数
+}
+
+//0x006000#client->gateway#执行NPC功能-请求
+message NpcInteractionReq {
+  uint64 character_uuid = 1; // 发起操作的角色 UUID, 必须属于当前已认证账号并已上线
+  uint32 npc_entity_id = 2; // 当前地图 map.entity.yaml 内的稳定 NPC 实体 ID
+  uint32 option_id = 3; // 当前 NPC 内唯一且稳定的功能选项 ID
+
+  oneof input {
+    NpcNoInput no_input = 10;
+    NpcShopPurchaseInput shop_purchase = 11;
+    NpcBattleChallengeInput battle_challenge = 12;
+    NpcExchangeInput exchange = 13;
+  }
+}
+
+//0x006001#gateway->client#执行NPC功能-回复
+message NpcInteractionRes {
+  uint64 character_uuid = 1; // 实际执行操作的角色 UUID
+  uint32 npc_entity_id = 2; // 服务端校验通过的当前地图 NPC 实体 ID
+  uint32 option_id = 3; // 服务端校验并执行的功能选项 ID
+  NpcFunctionID function_id = 4; // 服务端从 NPC 配置解析出的功能类型
+}
