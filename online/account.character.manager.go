@@ -3,6 +3,7 @@ package main
 import (
 	pb "server/proto/pb"
 
+	xactor "github.com/75912001/xlib/actor"
 	xtimer "github.com/75912001/xlib/timer"
 )
 
@@ -14,18 +15,19 @@ type characterMgr struct {
 	characters map[uint64]*character
 }
 
-// character 保存单个角色的在线状态、交互开关、自动遇敌状态和 CombatRoom 消息入口.
+// character 保存单个角色的在线状态、交互开关、自动遇敌状态和 CombatRoom actor 消息入口.
 // record 属于 Account.accountRecord, 其余字段只在当前账号会话内有效, 不写入 cache.
 type character struct {
 	account     *Account
 	record      *pb.CharacterRecord
 	online      bool
+	sceneID     uint32
 	teamEnabled bool
 	duelEnabled bool
 
 	autoEncounterEnabled bool
 	autoEncounterTimer   *xtimer.Second
-	combatRoom           *CombatRoom
+	combatRoom           *xactor.Actor[string]
 }
 
 // newCharacterMgr 基于 RPC 边界已校验的账号档案构建全部有效角色单元.
@@ -58,12 +60,18 @@ func (m *characterMgr) find(characterUUID uint64) *character {
 	return m.characters[characterUUID]
 }
 
-// clearRuntime 清理全部角色的自动遇敌 timer, CombatRoom 引用和在线状态.
+// clearRuntime 先清理全部在线角色的队伍关系和场景表现, 再释放自动遇敌 timer、CombatRoom actor 指针及在线状态.
 func (m *characterMgr) clearRuntime() {
 	if m == nil {
 		return
 	}
 	for _, character := range m.characters {
+		if character != nil && character.online && character.record != nil && character.record.GetBase() != nil {
+			base := character.record.GetBase()
+			key := sceneCharacterKey{aid: m.account.aid, characterUUID: base.GetUuid()}
+			m.account.dischargeCharacterTeam(key)
+			m.account.removeCharacterPresence(character.sceneID, key)
+		}
 		character.clearRuntime()
 		character.online = false
 	}

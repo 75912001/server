@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"server/common/gameconfig"
+	commonpet "server/common/pet"
 	pb "server/proto/pb"
 
 	xcontrol "github.com/75912001/xlib/control"
@@ -35,22 +36,37 @@ const (
 	// 该上限属于战斗内临时槽, 与角色背包30条目的持久化上限不是同一个概念.
 	combatPVEGetItemMax = 3
 
-	// 战斗技能ID只来自skill.yaml. 8000004至8000007虽然是有效配置,
+	// 战斗技能ID只来自skill.yaml. 8000005至8000007虽然是有效配置,
 	// 但当前online没有对应处理器, 请求会返回不支持技能错误.
-	combatSkillAttack     = 8000001
-	combatSkillDefense    = 8000002
-	combatSkillEscape     = 8000003
+	combatSkillAttack     = gameconfig.BattleSkillIDAttack
+	combatSkillDefense    = gameconfig.BattleSkillIDDefense
+	combatSkillEscape     = gameconfig.BattleSkillIDEscape
+	combatSkillCapture    = gameconfig.BattleSkillIDCapture
 	combatSkillStandby    = 8100000
 	combatSkillGuardBreak = 8100003
 )
 
-// combatTargetAttributeSnapshot保存敌方AI目标选择需要的原始腕力和速度.
+// combatTargetAttributeSnapshot保存敌方AI目标选择和中毒结算需要的原始四维.
 //
 // CombatUnit只保存合成后的攻击和敏捷, 无法无损反推出原始四维. 建房时按稳定
-// 单位键暂存这两个值并复制到运行态, 不进入协议或持久化数据.
+// 单位键暂存四个值并复制到运行态, 不进入协议或持久化数据.
 type combatTargetAttributeSnapshot struct {
-	strength  uint64
-	dexterity uint64
+	vitality  int64
+	strength  int64
+	toughness int64
+	dexterity int64
+}
+
+type combatRoomTryBindInput struct {
+	characterUUID   uint64
+	expectedSceneID uint32
+	room            *CombatRoom
+}
+
+type combatRoomTryBindResult struct {
+	online bool
+	bound  bool
+	err    error
 }
 
 // combatUnitRuntimeState将不可变的单位开战数据与战斗运行态分离.
@@ -63,6 +79,15 @@ type combatUnitRuntimeState struct {
 	enemyExperience   uint32
 	enemyDuelPoint    int32
 	enemyDropAssetIDs []uint32
+	// skillSlots保存玩家宠物来自实例档案的固定七槽快照.
+	skillSlots []uint32
+	// enemyAI保存敌人条目指定AI的独立快照, 不进入客户端协议或玩家宠物档案.
+	enemyAI *gameconfig.BattleAIEntry
+	// 捕获权限、基础概率和个体档案输入在建房时冻结; nil 表示当前敌人组不允许捕获.
+	captureSnapshot *commonpet.CaptureSnapshot
+	captureBase     int32
+	// 角色有效魅力已包含装备修正, 用于原版捕获公式.
+	charm uint32
 
 	// 玩家侧累计结果只在战斗结束时持久化.
 	battleDropAssetIDs    []uint32
@@ -80,9 +105,22 @@ type combatUnitRuntimeState struct {
 	escaped bool
 	guard   bool
 
-	// 原始腕力和速度只用于敌方AI按8.5规则选择目标.
-	rawStrength  uint64
-	rawDexterity uint64
+	// 基础四维供敌方AI和中毒结算使用. 角色沿用档案点数, 宠物为100倍固定点;
+	// 毒伤先按单位类型还原点数, 不使用合成后的生命、攻击、防御和敏捷反推.
+	rawVitality  int64
+	rawStrength  int64
+	rawToughness int64
+	rawDexterity int64
+	// poisonTurns表示剩余毒伤次数: 行动前扣血并减1, 最后一次同时解除状态.
+	poisonTurns uint32
+	// 毒抗来自开战时的宠物模板或角色装备有效值, 不在战斗中重读配置.
+	poisonResistance int64
+	// 状态攻击的减攻保留至本回合结束, 反击继续使用该攻击力但不附毒.
+	roundAttackPercentModifier int32
+	// charge独立于异常状态, 保存尚未完成的蓄力指令; 剩余0仍表示下一次行动需要释放.
+	charge *combatChargeState
+	// chargeAttackPower仅在突击释放的一击内覆盖攻击力, 不修改开战快照或后续反击属性.
+	chargeAttackPower *int64
 
 	// 基础物理、逃跑和击飞结算所需的跨回合状态.
 	escapeAttempts          uint32
@@ -115,9 +153,12 @@ func applyPetBattleTraits(state *combatUnitRuntimeState, pet *gameconfig.PetEntr
 	}
 	state.ultimateKnockbackImmune = pet.Attribute.UltimateKnockbackImmune
 	state.inanimate = pet.Attribute.Inanimate
+	if pet.Attribute.PoisonResist != nil {
+		state.poisonResistance = int64(*pet.Attribute.PoisonResist)
+	}
 }
 
-// onAutoEncounterSetReq 按角色 UUID 设置自动遇敌开关, 开启前校验目标角色和场景状态, 战斗宠物可选.
+// onAutoEncounterSetReq 按角色 UUID 设置自动遇敌开关, 普通队员不能操作, 开启前校验目标角色和场景状态.
 func (p *Account) onAutoEncounterSetReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	// 客户端包体属于不可信边界, 反序列化失败直接返回参数错误, 不改变当前开关和定时器状态.
 	var req pb.CombatAutoEncounterSetReq
@@ -139,16 +180,27 @@ func (p *Account) onAutoEncounterSetReq(gateway *Gateway, pkt *pb.OnlineClientPa
 		p.sendClientErr(gateway, uint32(pb.MsgID_CombatAutoEncounterSetRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
+	key := sceneCharacterKey{aid: p.aid, characterUUID: characterUUID}
+	member, leader := GCharacterTeamMgr.membership(key)
+	if member && !leader {
+		p.sendClientErr(gateway, uint32(pb.MsgID_CombatAutoEncounterSetRes_CMD), xerror.FailedPrecondition.Code())
+		return
+	}
 
-	// 只有"开启"需要预先检查战斗条件. "关闭"必须始终可执行, 便于客户端及时停止后续遭遇.
+	// 普通队员已在上方拒绝; 其余角色只有"开启"需要预先检查战斗条件.
 	if req.GetEnabled() {
-		characterRecord, _, err := character.currentBattleCharacterAndPet()
+		_, _, err := character.currentBattleCharacterAndPet()
 		if err != nil {
 			p.sendClientErr(gateway, uint32(pb.MsgID_CombatAutoEncounterSetRes_CMD), xerror.FailedPrecondition.Code())
 			return
 		}
-		sceneEntry := p.getCharacterScene(characterRecord)
-		if nil == sceneEntry {
+		sceneID := character.sceneID
+		if _, ok := GScenePresenceMgr.get(sceneID, key); !ok {
+			p.sendClientErr(gateway, uint32(pb.MsgID_CombatAutoEncounterSetRes_CMD), xerror.FailedPrecondition.Code())
+			return
+		}
+		sceneEntry := p.getCharacterScene(character)
+		if !characterMapEncounterEnabled(sceneEntry) {
 			p.sendClientErr(gateway, uint32(pb.MsgID_CombatAutoEncounterSetRes_CMD), xerror.FailedPrecondition.Code())
 			return
 		}
@@ -195,7 +247,7 @@ func (p *Account) onCombatRoundActionReq(gateway *Gateway, pkt *pb.OnlineClientP
 		p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundActionRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
-	character.combatRoom.PostRoundAction(combatRoomParticipantKey{
+	postCombatRoomRoundAction(character.combatRoom, combatRoomParticipantKey{
 		aid:           p.aid,
 		characterUUID: characterUUID,
 	}, gateway, &req)
@@ -328,16 +380,40 @@ func (r *CombatRoom) characterCombatSkillAction(unit *pb.CombatUnit, input *comb
 		action.targetKey = cloneCombatUnitKey(unit.GetKey())
 	case combatSkillEscape:
 		action.kind = combatActionKindEscape
+	case combatSkillCapture:
+		if !combatUnitIsPlayerCharacter(unit) {
+			return nil, fmt.Errorf("only player characters can capture")
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindCapture
+		action.targetKey = target
 	default:
 		return nil, fmt.Errorf("unsupported character combat skill: %d", skillID)
 	}
 	return action, nil
 }
 
-// enemyPetCombatSkillAction将敌方AI选中的技能槽交给统一的宠物技能解析器.
+// enemyPetCombatSkillAction将敌方AI选中的技能ID交给统一的宠物技能解析器.
 func (r *CombatRoom) enemyPetCombatSkillAction(unit *pb.CombatUnit, skillID uint32, selectedTarget *pb.CombatUnitKey) (*combatAction, error) {
-	if unit == nil || selectedTarget == nil {
+	if unit == nil {
 		return nil, fmt.Errorf("enemy pet skill action is missing")
+	}
+	if skillID == combatSkillEscape {
+		if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Skill == nil ||
+			!gameconfig.GGameConfig.Skill.IsExist(skillID) {
+			return nil, fmt.Errorf("combat skill is not configured: %d", skillID)
+		}
+		if !r.petUnitOwnsConfiguredSkill(unit, skillID) {
+			return nil, fmt.Errorf("pet does not own combat skill: pet:%d skill:%d", unit.GetPetId(), skillID)
+		}
+		return &combatAction{
+			unitKey: cloneCombatUnitKey(unit.GetKey()),
+			kind:    combatActionKindEscape,
+			skillID: skillID,
+		}, nil
 	}
 	return r.petCombatSkillAction(unit, &combatSkillInput{
 		SkillId:       skillID,
@@ -357,7 +433,7 @@ func (r *CombatRoom) petCombatSkillAction(unit *pb.CombatUnit, input *combatSkil
 	if skill == nil {
 		return nil, fmt.Errorf("combat skill is not configured: %d", skillID)
 	}
-	if !petUnitOwnsConfiguredSkill(unit, skillID) {
+	if !r.petUnitOwnsConfiguredSkill(unit, skillID) {
 		return nil, fmt.Errorf("pet does not own combat skill: pet:%d skill:%d", unit.GetPetId(), skillID)
 	}
 
@@ -393,28 +469,79 @@ func (r *CombatRoom) petCombatSkillAction(unit *pb.CombatUnit, input *combatSkil
 		action.kind = combatActionKindContinuationAttack
 		action.targetKey = target
 		action.segmentCount = *skill.ContinuationAttack.SegmentCount
+	case skill.MightyAttack != nil:
+		if skill.MightyAttack.DamageMultiplier == nil || skill.MightyAttack.TargetDodgeBonus == nil {
+			return nil, fmt.Errorf("mighty attack skill config is incomplete: %d", skillID)
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindMightyAttack
+		action.targetKey = target
+		action.mightyDamageMultiplier = *skill.MightyAttack.DamageMultiplier
+		action.mightyTargetDodgeBonus = *skill.MightyAttack.TargetDodgeBonus
+	case skill.PoisonAttack != nil:
+		if skill.PoisonAttack.DurationActions == nil || skill.PoisonAttack.AttackPercentModifier == nil {
+			return nil, fmt.Errorf("poison attack skill config is incomplete: %d", skillID)
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindPoisonAttack
+		action.targetKey = target
+		action.poisonDurationActions = *skill.PoisonAttack.DurationActions
+		action.poisonAttackPercentModifier = *skill.PoisonAttack.AttackPercentModifier
+	case skill.ChargeAttack != nil:
+		if skill.ChargeAttack.ChargeRounds == nil || skill.ChargeAttack.AttackPercentModifier == nil {
+			return nil, fmt.Errorf("charge attack skill config is incomplete: %d", skillID)
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindChargeAttack
+		action.targetKey = target
+		action.chargeRounds = *skill.ChargeAttack.ChargeRounds
+		action.chargeAttackPercentModifier = *skill.ChargeAttack.AttackPercentModifier
+	case skill.ShowMercy != nil:
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindShowMercy
+		action.targetKey = target
 	default:
 		return nil, fmt.Errorf("unsupported pet combat skill: %d", skillID)
 	}
 	return action, nil
 }
 
-// petUnitOwnsConfiguredSkill校验技能是否存在于该宠物物种的技能槽.
-//
-// 当前PetRecord没有单独持久化学习技能, 因此以CombatUnit.pet_id对应的
-// pet.yaml skill列表为权威来源. 本函数只做本地配置查询, 不修改技能槽,
-// 也不为未配置技能的宠物提供默认行为.
-func petUnitOwnsConfiguredSkill(unit *pb.CombatUnit, skillID uint32) bool {
-	if unit == nil || unit.GetPetId() == 0 || skillID == 0 ||
-		gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Pet == nil {
+// petUnitOwnsConfiguredSkill对玩家宠物校验实例七槽, 对敌人校验独立AI技能列表.
+// 玩家七槽复制到CombatUnit供客户端选招, 敌方AI仅保留在服务端运行态;
+// 两者在战斗期间都不再查询宠物模板或实时档案.
+func (r *CombatRoom) petUnitOwnsConfiguredSkill(unit *pb.CombatUnit, skillID uint32) bool {
+	if r == nil || unit == nil || unit.GetPetId() == 0 || skillID == 0 {
 		return false
 	}
-	pet := gameconfig.GGameConfig.Pet.Get(unit.GetPetId())
-	if pet == nil {
+	state := r.stateByKey(unit.GetKey())
+	if state == nil {
 		return false
 	}
-	for _, configuredSkillID := range pet.SkillSlots {
-		if configuredSkillID == skillID {
+	if combatKind(unit) != combatUnitKindPet {
+		if state.enemyAI == nil {
+			return false
+		}
+		for _, skill := range state.enemyAI.Skills {
+			if *skill.ID == skillID {
+				return true
+			}
+		}
+		return false
+	}
+	for _, ownedSkillID := range state.skillSlots {
+		if ownedSkillID == skillID {
 			return true
 		}
 	}
@@ -478,25 +605,23 @@ func arrangeCombatPVEEnemyUnits(enemyUnits []*pb.CombatUnit) {
 // 从而锁定8.5在“目标数量、候选权重、逐敌人等级”三个阶段的抽数顺序.
 type combatPVERandomRange func(min uint32, max uint32) uint32
 
-// selectCombatPVESceneEnemyGroup复刻ENEMY_getEnemy选择遇敌组的累计权重算法.
+// selectCombatPVEMapEnemyGroup 使用当前地图的全局遇敌规则,
+// 复刻ENEMY_getEnemy选择敌组的累计权重算法.
 //
-// 8.5先把当前遇敌区域内所有可用组的权重相加, 再执行一次RAND(0,total-1).
+// 8.5先把当前地图内所有可用组的权重相加, 再执行一次RAND(0,total-1).
 // 权重为0的组仍可保留在配置中, 但没有自己的随机区间, 因而不会被抽中.
-// 道具出现条件、禁止出现条件和事件敌组覆盖依赖尚未接入的地图/NPC状态,
-// 不在该纯权重函数中伪造, 继续由后续单角色PVE地图条件工作包实现.
-func selectCombatPVESceneEnemyGroup(
+func selectCombatPVEMapEnemyGroup(
 	scene *gameconfig.SceneEntry,
 	random combatPVERandomRange,
 ) (gameconfig.SceneEnemyGroupEntry, error) {
-	if scene == nil || scene.ID == nil {
-		return gameconfig.SceneEnemyGroupEntry{}, fmt.Errorf("scene or scene id is nil")
+	if scene == nil || scene.ID == nil || scene.Encounter == nil || scene.Encounter.Enabled == nil || !*scene.Encounter.Enabled {
+		return gameconfig.SceneEnemyGroupEntry{}, fmt.Errorf("scene encounter is disabled")
 	}
 	if random == nil {
 		return gameconfig.SceneEnemyGroupEntry{}, fmt.Errorf("combat PVE random source is nil")
 	}
-
 	totalWeight := uint64(0)
-	for index, group := range scene.EnemyGroups {
+	for index, group := range scene.Encounter.EnemyGroups {
 		if group.ID == nil || group.Weight == nil {
 			return gameconfig.SceneEnemyGroupEntry{}, fmt.Errorf(
 				"scene enemy group is incomplete: scene:%d index:%d", *scene.ID, index,
@@ -509,10 +634,9 @@ func selectCombatPVESceneEnemyGroup(
 			"scene enemy group total weight is invalid: scene:%d total:%d", *scene.ID, totalWeight,
 		)
 	}
-
 	roll := random(0, uint32(totalWeight)-1)
 	currentWeight := uint64(0)
-	for _, group := range scene.EnemyGroups {
+	for _, group := range scene.Encounter.EnemyGroups {
 		currentWeight += uint64(*group.Weight)
 		if uint64(roll) < currentWeight {
 			return group, nil
@@ -598,7 +722,7 @@ func selectCombatPVEEnemyEntries(
 
 // combatPVEEnemyLevel返回本次创建敌人的等级.
 //
-// 条目显式level优先; 普通组否则按levelRange或玩家等级加roleLevelOffset抽取.
+// 优先使用成员的固定level或独立levelRange; 普通组未指定时按组级levelRange或玩家等级加roleLevelOffset抽取.
 // 最终范围限制在协议等级[1,140]内.
 func combatPVEEnemyLevel(
 	group *gameconfig.EnemyGroupEntry,
@@ -617,7 +741,10 @@ func combatPVEEnemyLevel(
 	}
 	levelMin := int(pb.LevelRange_LevelRange_Min)
 	levelMax := int(pb.LevelRange_LevelRange_Max)
-	if group.LevelRange != nil && group.LevelRange.Min != nil && group.LevelRange.Max != nil {
+	if enemy.LevelRange != nil && enemy.LevelRange.Min != nil && enemy.LevelRange.Max != nil {
+		levelMin = *enemy.LevelRange.Min
+		levelMax = *enemy.LevelRange.Max
+	} else if group.LevelRange != nil && group.LevelRange.Min != nil && group.LevelRange.Max != nil {
 		levelMin = *group.LevelRange.Min
 		levelMax = *group.LevelRange.Max
 	} else if group.RoleLevelOffset != nil &&
@@ -648,18 +775,21 @@ func combatPVEEnemyLevel(
 // combatPVEEnemyAttributes保存一只敌人在本场战斗内的原始四维和WORK/FIX结果.
 //
 // 8.5的敌人不是账号中的持久宠物, 不保存PetRecord, 也不执行宠物按Rank逐级升级.
-// 这组数据只在ENEMY_createEnemy等价流程中生成一次, 随后冻结到CombatUnit和
+// 原版Char.data使用C int, 所以随机后的基础值和Raw四维允许为0或负数. 这组数据
+// 只在ENEMY_createEnemy等价流程中生成一次, 随后冻结到CombatUnit和
 // combatUnitRuntimeState, 保证同一场战斗中的HP、攻、防、敏及状态公式共用同一份
 // 随机个体属性.
 type combatPVEEnemyAttributes struct {
-	rawVitality  uint32
-	rawStrength  uint32
-	rawToughness uint32
-	rawDexterity uint32
+	// 保存十点初始分配之前的四维, 对应原版捕获后继续成长的 CHAR_ALLOCPOINT.
+	savedBase    [4]int32
+	rawVitality  int32
+	rawStrength  int32
+	rawToughness int32
+	rawDexterity int32
 	hp           uint32
 	attack       uint32
-	defense      uint32
-	agility      uint32
+	defense      int32
+	agility      int32
 }
 
 // createCombatPVEEnemyAttributes复刻8.5 ENEMY_createEnemy的无装备敌人属性生成链.
@@ -668,7 +798,8 @@ type combatPVEEnemyAttributes struct {
 //  1. 按体力、腕力、耐力、速度顺序各执行一次RAND(0,4), 映射为-2至+2.
 //  2. 在四项已经偏移的基础值上执行10次RAND(0,3), 每次为命中的一项加1.
 //  3. 旧服用atoi读取enemybase的LVUPPOINT, 因而文本4.50实际取整数4.
-//  4. 使用(initNum+(level-1)*lvupPointEffective)*最终基础值一次性计算raw四维.
+//  4. 使用int64中间值计算(initNum+(level-1)*lvupPointEffective)*最终基础值,
+//     再核验并保存为原版C int等价的int32 Raw四维.
 //  5. 按CHAR_initcharWorkInt的表达式顺序向零截断, 生成最大HP、攻击、防御和敏捷.
 //
 // 当前敌人组和宠物模板没有敌人装备或style字段, 因此本函数只生成无装备属性.
@@ -712,11 +843,11 @@ func createCombatPVEEnemyAttributes(
 			*enemyPet.ID, lvupPointSource)
 	}
 
-	// pet.yaml保留原文本的数值语义. 对正数直接转为uint64等价于旧服atoi在小数点
+	// pet.yaml保留原文本的数值语义. 对正数直接转为int64等价于旧服atoi在小数点
 	// 处停止解析, 例如4.50得到4. 不能把该字段四舍五入或直接按4.5参与计算.
-	lvupPointEffective := uint64(lvupPointSource)
-	factor := uint64(*growth.InitNum) + uint64(level-1)*lvupPointEffective
-	if factor == 0 || factor > uint64(math.MaxInt32) {
+	lvupPointEffective := int64(lvupPointSource)
+	factor := int64(*growth.InitNum) + int64(level-1)*lvupPointEffective
+	if factor <= 0 || factor > int64(math.MaxInt32) {
 		return attributes, fmt.Errorf("enemy growth factor is outside C int range: pet:%d level:%d factor:%d",
 			*enemyPet.ID, level, factor)
 	}
@@ -731,12 +862,15 @@ func createCombatPVEEnemyAttributes(
 		// RAND(0,4)-2必须分别调用四次. 合并成一次品阶偏移会让四维完全相关,
 		// 既改变个体分布, 也会破坏后续共享随机流的顺序.
 		baseValues[index] += int64(random(0, 4)) - 2
-		if baseValues[index] <= 0 || baseValues[index] > int64(math.MaxInt32) {
+		if baseValues[index] < int64(math.MinInt32) || baseValues[index] > int64(math.MaxInt32) {
 			return attributes, fmt.Errorf(
 				"enemy randomized base attribute is outside C int range: pet:%d index:%d value:%d",
 				*enemyPet.ID, index, baseValues[index],
 			)
 		}
+	}
+	for index, value := range baseValues {
+		attributes.savedBase[index] = int32(value)
 	}
 	for point := 0; point < combatPVEEnemyInitialBonusPointCount; point++ {
 		index := random(0, 3)
@@ -753,16 +887,16 @@ func createCombatPVEEnemyAttributes(
 		}
 	}
 
-	rawValues := [4]uint32{}
+	rawValues := [4]int32{}
 	for index, baseValue := range baseValues {
-		rawValue := factor * uint64(baseValue)
-		if rawValue > uint64(math.MaxInt32) {
+		rawValue := factor * baseValue
+		if rawValue < int64(math.MinInt32) || rawValue > int64(math.MaxInt32) {
 			return attributes, fmt.Errorf(
 				"enemy raw attribute is outside C int range: pet:%d index:%d value:%d",
 				*enemyPet.ID, index, rawValue,
 			)
 		}
-		rawValues[index] = uint32(rawValue)
+		rawValues[index] = int32(rawValue)
 	}
 	attributes.rawVitality = rawValues[0]
 	attributes.rawStrength = rawValues[1]
@@ -771,36 +905,51 @@ func createCombatPVEEnemyAttributes(
 
 	// 旧服先在C int中完成rawVital*4及四项求和, 再乘double 0.01并赋给
 	// float hp. 这里先检查32位有符号整数范围, 再显式经过float32舍入后截断.
-	hpInput := uint64(attributes.rawVitality)*4 +
-		uint64(attributes.rawStrength) +
-		uint64(attributes.rawToughness) +
-		uint64(attributes.rawDexterity)
-	if hpInput > uint64(math.MaxInt32) {
+	hpInput := int64(attributes.rawVitality)*4 +
+		int64(attributes.rawStrength) +
+		int64(attributes.rawToughness) +
+		int64(attributes.rawDexterity)
+	if hpInput < int64(math.MinInt32) || hpInput > int64(math.MaxInt32) {
 		return combatPVEEnemyAttributes{}, fmt.Errorf(
 			"enemy max HP input is outside C int range: pet:%d value:%d", *enemyPet.ID, hpInput,
 		)
 	}
-	attributes.hp = uint32(float32(float64(hpInput) * 0.01))
+	calculatedHP := int64(float32(float64(hpInput) * 0.01))
+	if calculatedHP <= 0 {
+		return combatPVEEnemyAttributes{}, fmt.Errorf("enemy max HP is not positive: pet:%d level:%d value:%d",
+			*enemyPet.ID, level, calculatedHP)
+	}
+	attributes.hp = uint32(calculatedHP)
 
 	// FIXSTR/FIXTOUGH在旧服以double表达式计算后直接传入int参数. 保留各乘法
 	// 的原始顺序, 避免先合并常量或改用float32造成整数边界相差1.
-	attributes.attack = uint32(
+	calculatedAttack := int64(
 		float64(attributes.rawStrength)*0.01*1.0 +
 			float64(attributes.rawToughness)*0.01*0.1 +
 			float64(attributes.rawVitality)*0.01*0.1 +
 			float64(attributes.rawDexterity)*0.01*0.05,
 	)
-	attributes.defense = uint32(
+	if calculatedAttack <= 0 || calculatedAttack > int64(math.MaxInt32) {
+		return combatPVEEnemyAttributes{}, fmt.Errorf("enemy attack is outside C int range: pet:%d value:%d",
+			*enemyPet.ID, calculatedAttack)
+	}
+	calculatedDefense := int64(
 		float64(attributes.rawToughness)*0.01*1.0 +
 			float64(attributes.rawStrength)*0.01*0.1 +
 			float64(attributes.rawVitality)*0.01*0.1 +
 			float64(attributes.rawDexterity)*0.01*0.05,
 	)
-	attributes.agility = uint32(float64(attributes.rawDexterity) * 0.01)
-	if attributes.hp == 0 {
-		return combatPVEEnemyAttributes{}, fmt.Errorf("enemy max HP is zero: pet:%d level:%d",
-			*enemyPet.ID, level)
+	calculatedAgility := int64(float64(attributes.rawDexterity) * 0.01)
+	if calculatedDefense < int64(math.MinInt32) || calculatedDefense > int64(math.MaxInt32) ||
+		calculatedAgility < int64(math.MinInt32) || calculatedAgility > int64(math.MaxInt32) {
+		return combatPVEEnemyAttributes{}, fmt.Errorf(
+			"enemy signed combat attribute is outside C int range: pet:%d defense:%d agility:%d",
+			*enemyPet.ID, calculatedDefense, calculatedAgility,
+		)
 	}
+	attributes.attack = uint32(calculatedAttack)
+	attributes.defense = int32(calculatedDefense)
+	attributes.agility = int32(calculatedAgility)
 	return attributes, nil
 }
 
@@ -820,7 +969,210 @@ func combatPVEEnemyExperience(petID uint32, level uint32) (uint32, error) {
 	return experience, nil
 }
 
-// restartAutoEncounterTimer 重建自动遇敌定时器, 并在回调中创建完整 CombatRoom 后启动房间 actor.
+// startCombatPVE 使用指定敌人组创建并启动一场PVE战斗.
+func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error {
+	if c == nil || c.account == nil || c.record == nil || c.record.GetBase() == nil {
+		return fmt.Errorf("character is incomplete")
+	}
+	if gateway == nil {
+		return fmt.Errorf("gateway is nil")
+	}
+	if enemyGroupID == 0 {
+		return fmt.Errorf("enemy group id is zero")
+	}
+	p := c.account
+	characterUUID := c.record.GetBase().GetUuid()
+	leaderKey := sceneCharacterKey{aid: p.aid, characterUUID: characterUUID}
+	candidateMembers := GCharacterTeamMgr.orderedMembers(leaderKey)
+	if len(candidateMembers) == 0 {
+		candidateMembers = []characterTeamMember{{key: leaderKey, gatewayKey: gateway.Key}}
+	} else if candidateMembers[0].key != leaderKey {
+		return fmt.Errorf("only the current team leader can start combat")
+	}
+	leaderAdmission, err := c.newCombatRoomParticipantAdmission(gateway)
+	if err != nil {
+		return err
+	}
+	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Enemy == nil || gameconfig.GGameConfig.Pet == nil {
+		return fmt.Errorf("enemy group or pet config is not loaded")
+	}
+	enemyGroup := gameconfig.GGameConfig.Enemy.Get(enemyGroupID)
+	if enemyGroup == nil {
+		return fmt.Errorf("enemy group not found: %d", enemyGroupID)
+	}
+	if len(enemyGroup.Enemies) == 0 {
+		return fmt.Errorf("enemy group is empty: %d", enemyGroupID)
+	}
+
+	characterUnit := leaderAdmission.participant.playerCharacter
+	petUnit := leaderAdmission.participant.playerPet
+	characterLevel := characterUnit.GetAttribute().GetLevel()
+	selectedEnemies, err := selectCombatPVEEnemyEntries(enemyGroup, xutil.RandomU32)
+	if err != nil {
+		return err
+	}
+	// 使用 xlib 生成密码学安全的 UUID 字符串, 作为客户端不解析的战斗唯一标识.
+	battleID := xutil.UUIDRandomString()
+	battleStart := &pb.CombatBattleStartNotify{BattleId: battleID}
+	// 敌方AI目标选择需要CombatUnit协议未携带的原始腕力和速度. 这里按
+	// 稳定单位键暂存开战快照, 等全部单位完成校验后与unitStates一起发布.
+	targetAttributes := make(map[string]combatTargetAttributeSnapshot)
+	enemyUnits := make([]*pb.CombatUnit, 0, len(selectedEnemies))
+	pveEnemyKeys := make(map[string]struct{}, len(selectedEnemies))
+	enemyExperiences := make(map[string]uint32, len(selectedEnemies))
+	enemyAIs := make(map[string]*gameconfig.BattleAIEntry, len(selectedEnemies))
+	captureSnapshots := make(map[string]*commonpet.CaptureSnapshot, len(selectedEnemies))
+	for index, enemy := range selectedEnemies {
+		if enemy.ID == nil {
+			return fmt.Errorf("selected enemy pet id is nil")
+		}
+		petID := *enemy.ID
+		if enemy.BattleAI == nil {
+			return fmt.Errorf("selected enemy AI is not assembled: group:%d pet:%d", enemyGroupID, petID)
+		}
+		level, err := combatPVEEnemyLevel(enemyGroup, enemy, characterLevel, xutil.RandomU32)
+		if err != nil {
+			return err
+		}
+		enemyPet := gameconfig.GGameConfig.Pet.Get(petID)
+		if enemyPet == nil {
+			return fmt.Errorf("enemy pet config not found: pet:%d", petID)
+		}
+		enemyAttributes, err := createCombatPVEEnemyAttributes(enemyPet, level, xutil.RandomU32)
+		if err != nil {
+			return err
+		}
+		enemyExperience, err := combatPVEEnemyExperience(petID, level)
+		if err != nil {
+			return err
+		}
+		// 敌方没有账号内的持久化宠物 UUID, 使用从 1 开始的本场序号生成战斗内唯一的单位键.
+		enemyUnit := &pb.CombatUnit{
+			Camp:     pb.CombatCamp_CombatCamp_Defender,
+			Position: uint32(index),
+			Key:      &pb.CombatUnitKey{PetUuid: uint64(index) + 1},
+			PetId:    petID,
+			Attribute: &pb.CombatUnitAttribute{
+				Hp:        enemyAttributes.hp,
+				Attack:    enemyAttributes.attack,
+				Defense:   enemyAttributes.defense,
+				Agility:   enemyAttributes.agility,
+				Elemental: combatPetElementalPoints(enemyPet),
+				Level:     level,
+			},
+		}
+		enemyUnits = append(enemyUnits, enemyUnit)
+		enemyKey := combatUnitKeyMapKey(enemyUnit.GetKey())
+		pveEnemyKeys[enemyKey] = struct{}{}
+		enemyExperiences[enemyKey] = enemyExperience
+		enemyAIs[enemyKey] = cloneEnemyBattleAI(enemy.BattleAI)
+		if enemyGroup.Captured != nil && *enemyGroup.Captured && enemyPet.SupportsOrdinaryCreation() {
+			snapshot, snapshotErr := commonpet.NewCaptureSnapshot(enemyPet, level, enemyAttributes.savedBase, [4]int32{
+				enemyAttributes.rawVitality, enemyAttributes.rawStrength, enemyAttributes.rawToughness, enemyAttributes.rawDexterity,
+			})
+			if snapshotErr != nil {
+				return fmt.Errorf("freeze capture pet:%d: %w", petID, snapshotErr)
+			}
+			captureSnapshots[enemyKey] = snapshot
+		}
+		targetAttributes[enemyKey] = combatTargetAttributeSnapshot{
+			vitality:  int64(enemyAttributes.rawVitality),
+			strength:  int64(enemyAttributes.rawStrength),
+			toughness: int64(enemyAttributes.rawToughness),
+			dexterity: int64(enemyAttributes.rawDexterity),
+		}
+	}
+	// 8.5在全部敌人和玩家侧单位完成入场后交换敌方前后五格.
+	// 这里保留创建时的临时单位键, 只改写最终position并按旧Entry扫描顺序排列.
+	arrangeCombatPVEEnemyUnits(enemyUnits)
+	battleStart.UnitList = append(battleStart.UnitList, characterUnit)
+	if petUnit != nil {
+		battleStart.UnitList = append(battleStart.UnitList, petUnit)
+	}
+	battleStart.UnitList = append(battleStart.UnitList, enemyUnits...)
+	// 从不可变开战快照派生可变状态. 当前MP按开战上限满值初始化;
+	// 后续扣血和扣MP只更新unitStates, 不污染已经发送给客户端的
+	// battleStart开战通知.
+	unitStates := make(map[string]*combatUnitRuntimeState, len(battleStart.GetUnitList()))
+	for unitKey, state := range leaderAdmission.unitStates {
+		unitStates[unitKey] = state
+	}
+	for _, unit := range enemyUnits {
+		if unit == nil || unit.GetKey() == nil {
+			continue
+		}
+		maxHP := uint64(unit.GetAttribute().GetHp())
+		maxMP := uint64(unit.GetAttribute().GetMaxMp())
+		state := &combatUnitRuntimeState{
+			unit:    unit,
+			enemyAI: enemyAIs[combatUnitKeyMapKey(unit.GetKey())],
+			hp:      maxHP,
+			maxHP:   maxHP,
+			mp:      maxMP,
+			maxMP:   maxMP,
+			alive:   maxHP > 0,
+		}
+		targetAttribute := targetAttributes[combatUnitKeyMapKey(unit.GetKey())]
+		state.rawVitality = targetAttribute.vitality
+		state.rawStrength = targetAttribute.strength
+		state.rawToughness = targetAttribute.toughness
+		state.rawDexterity = targetAttribute.dexterity
+		unitKey := combatUnitKeyMapKey(unit.GetKey())
+		_, state.pveEnemy = pveEnemyKeys[unitKey]
+		state.enemyExperience = enemyExperiences[unitKey]
+		state.captureSnapshot = captureSnapshots[unitKey]
+		if unit.GetPetId() != 0 {
+			petEntry := gameconfig.GGameConfig.Pet.Get(unit.GetPetId())
+			applyPetBattleTraits(state, petEntry)
+			if petEntry.Attribute != nil && petEntry.Attribute.Get != nil {
+				state.captureBase = *petEntry.Attribute.Get
+			}
+		}
+		unitStates[combatUnitKeyMapKey(unit.GetKey())] = state
+	}
+
+	// 队长读取、建房和指针绑定都发生在当前 Account actor 的同一次消息中,
+	// 其他账号消息无法在中间改写其角色运行态. 房间启动前再逐个接收冻结名单中的队员.
+	room, err := newCombatRoom(battleID, enemyGroupID, leaderAdmission.participant, battleStart, enemyUnits, unitStates)
+	if err != nil {
+		return err
+	}
+	c.combatRoom = room.actor
+	p.refreshCharacterPresence(c)
+	for _, candidate := range candidateMembers[1:] {
+		memberAccount := GAccountMgr.GetByAID(candidate.key.aid)
+		if memberAccount == nil {
+			continue
+		}
+		bindInput := combatRoomTryBindInput{
+			characterUUID:   candidate.key.characterUUID,
+			expectedSceneID: c.sceneID,
+			room:            room,
+		}
+		var bindResult combatRoomTryBindResult
+		var bindErr error
+		if memberAccount == p {
+			bindResult = p.tryBindCombatRoom(bindInput)
+		} else {
+			bindResult, bindErr = memberAccount.PostTryBindCombatRoomSync(bindInput)
+		}
+		if bindErr != nil {
+			xlog.GLog.Warnf("combat member bind sync failed battle:%s aid:%d character:%d err:%v", battleID, candidate.key.aid, candidate.key.characterUUID, bindErr)
+			continue
+		}
+		if bindResult.bound {
+			continue
+		}
+		xlog.GLog.Warnf("combat member admission failed battle:%s aid:%d character:%d online:%t err:%v", battleID, candidate.key.aid, candidate.key.characterUUID, bindResult.online, bindResult.err)
+		if bindResult.online {
+			p.removeFailedCombatAdmissionMember(leaderKey, candidate.key)
+		}
+	}
+	postCombatRoomStart(c.combatRoom)
+	return nil
+}
+
+// restartAutoEncounterTimer 重建自动遇敌定时器, 并在回调中按当前场景选择敌人组.
 func (c *character) restartAutoEncounterTimer(gateway *Gateway) {
 	p := c.account
 	// 始终先撤销旧任务, 保证同一角色最多只有一个有效的自动遇敌回调.
@@ -837,312 +1189,17 @@ func (c *character) restartAutoEncounterTimer(gateway *Gateway) {
 		if !c.online || !c.autoEncounterEnabled || c.combatRoom != nil {
 			return nil
 		}
-		// 使用统一错误出口处理建房失败, 确保任一步失败都不会发布半初始化的 CombatRoom.
 		var encounterErr error
-	startBattle:
-		for {
-			if gateway == nil {
-				encounterErr = fmt.Errorf("gateway is nil")
-				break
-			}
-			character, battlePet, err := c.currentBattleCharacterAndPet()
+		sceneEntry := p.getCharacterScene(c)
+		if !characterMapEncounterEnabled(sceneEntry) {
+			encounterErr = fmt.Errorf("scene encounter is disabled")
+		} else {
+			selectedGroup, err := selectCombatPVEMapEnemyGroup(sceneEntry, xutil.RandomU32)
 			if err != nil {
 				encounterErr = err
-				break
+			} else {
+				encounterErr = c.startCombatPVE(gateway, uint32(*selectedGroup.ID))
 			}
-			sceneEntry := p.getCharacterScene(character)
-			if nil == sceneEntry {
-				encounterErr = fmt.Errorf("scene entry is nil")
-				break
-			}
-			if gameconfig.GGameConfig == nil ||
-				gameconfig.GGameConfig.Scene == nil ||
-				gameconfig.GGameConfig.Enemy == nil ||
-				gameconfig.GGameConfig.Pet == nil {
-				encounterErr = fmt.Errorf("scene, enemy group or pet config is not loaded")
-				break
-			}
-			scene := gameconfig.GGameConfig.Scene.Get(*sceneEntry.ID)
-			if scene == nil {
-				encounterErr = fmt.Errorf("scene not found: %d", *sceneEntry.ID)
-				break
-			}
-			selectedGroup, err := selectCombatPVESceneEnemyGroup(scene, xutil.RandomU32)
-			if err != nil {
-				encounterErr = err
-				break
-			}
-			enemyGroup := gameconfig.GGameConfig.Enemy.Get(uint32(*selectedGroup.ID))
-			if enemyGroup == nil {
-				encounterErr = fmt.Errorf("scene enemy group not found: scene:%d group:%d", *sceneEntry.ID, *selectedGroup.ID)
-				break
-			}
-
-			// 使用 xlib 生成密码学安全的 UUID 字符串, 作为客户端不解析的战斗唯一标识.
-			battleID := xutil.UUIDRandomString()
-			battleStart := &pb.CombatBattleStartNotify{BattleId: battleID}
-			// 敌方AI目标选择需要CombatUnit协议未携带的原始腕力和速度. 这里按
-			// 稳定单位键暂存开战快照, 等全部单位完成校验后与unitStates一起发布.
-			targetAttributes := make(map[string]combatTargetAttributeSnapshot)
-			if character == nil || character.GetBase().GetUuid() == 0 || character.GetBase().GetAssetId() == 0 {
-				encounterErr = fmt.Errorf("character record invalid")
-				break
-			}
-			// 角色属性在开战时固化为战斗快照. 四维全为 0 视为角色数据尚未正确初始化.
-			vitality := uint64(character.GetBase().GetVitality())
-			strength := uint64(character.GetBase().GetStrength())
-			toughness := uint64(character.GetBase().GetToughness())
-			dexterity := uint64(character.GetBase().GetDexterity())
-			if vitality+strength+toughness+dexterity == 0 {
-				encounterErr = fmt.Errorf("character attribute missing character:%d", character.GetBase().GetUuid())
-				break
-			}
-			if gameconfig.GGameConfig.Exp == nil {
-				encounterErr = fmt.Errorf("exp config is not loaded")
-				break
-			}
-			characterLevel, err := gameconfig.GGameConfig.Exp.GetLevel(character.GetBase().GetExp())
-			if err != nil {
-				encounterErr = err
-				break
-			}
-			effectiveAttribute, err := characterEffectiveAttribute(character)
-			if err != nil {
-				encounterErr = fmt.Errorf("character effective attribute invalid character:%d: %w", character.GetBase().GetUuid(), err)
-				break
-			}
-			// 装备运气使用实例创建时固化的数值, 只写入本场有效快照, 不回写基础运气.
-			var equipmentLuckModifierList []int32
-			characterWeaponAttackNumberMin := uint32(0)
-			characterWeaponAttackNumberMax := uint32(0)
-			if weapon := character.GetEquipment().GetWeapon(); weapon != nil {
-				equipmentLuckModifierList = append(equipmentLuckModifierList, equipmentFixedModifierValueInt32(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_LuckModifier))
-				weaponEntry, err := configuredWeaponEntry(weapon.GetAssetId())
-				if err != nil {
-					encounterErr = fmt.Errorf("character weapon config invalid character:%d: %w", character.GetBase().GetUuid(), err)
-					break
-				}
-				characterWeaponAttackNumberMin = weaponEntry.AttackNumberMin
-				characterWeaponAttackNumberMax = weaponEntry.AttackNumberMax
-			}
-			luckSnapshot, err := newCombatLuckSnapshot(character.GetBase().GetLuckState().GetBaseLuck(), equipmentLuckModifierList)
-			if err != nil {
-				encounterErr = fmt.Errorf("character luck invalid character:%d: %w", character.GetBase().GetUuid(), err)
-				break
-			}
-			equipmentSnapshot := &pb.CharacterEquipmentRecord{}
-			if equipment := character.GetEquipment(); equipment != nil {
-				equipmentSnapshot = proto.Clone(equipment).(*pb.CharacterEquipmentRecord)
-			}
-			characterUnit := &pb.CombatUnit{
-				Camp:        pb.CombatCamp_CombatCamp_Initiator,
-				Position:    initiatorCharacterPosition,
-				Key:         &pb.CombatUnitKey{Aid: p.aid, CharacterUuid: character.GetBase().GetUuid()},
-				CharacterId: uint32(character.GetBase().GetAssetId()),
-				Equipment:   equipmentSnapshot,
-				Attribute: &pb.CombatUnitAttribute{
-					Hp:        effectiveAttribute.GetMaxHp(),
-					Attack:    effectiveAttribute.GetAttack(),
-					Defense:   effectiveAttribute.GetDefense(),
-					Agility:   effectiveAttribute.GetAgility(),
-					MaxMp:     effectiveAttribute.GetMaxMp(),
-					Elemental: proto.Clone(effectiveAttribute.GetElemental()).(*pb.ElementalPoints),
-					Level:     characterLevel,
-					Luck:      luckSnapshot,
-				},
-			}
-			targetAttributes[combatUnitKeyMapKey(characterUnit.GetKey())] = combatTargetAttributeSnapshot{
-				strength:  strength,
-				dexterity: dexterity,
-			}
-			var petUnit *pb.CombatUnit
-			if battlePet != nil {
-				if battlePet.GetUuid() == 0 {
-					encounterErr = fmt.Errorf("pet record invalid")
-					break
-				}
-				petAssetID := battlePet.GetAssetId()
-				if petAssetID == 0 {
-					encounterErr = fmt.Errorf("pet asset id is invalid pet:%d asset:%d", battlePet.GetUuid(), petAssetID)
-					break
-				}
-				petEntry := gameconfig.GGameConfig.Pet.Get(petAssetID)
-				if petEntry == nil {
-					encounterErr = fmt.Errorf("pet config not found: %d", petAssetID)
-					break
-				}
-				petLevel, err := gameconfig.GGameConfig.Exp.GetLevel(battlePet.GetExp())
-				if err != nil {
-					encounterErr = err
-					break
-				}
-				// 玩家宠物使用持久化的运行期原始四维和公共宠物公式生成战斗属性.
-				// 敌人使用独立的8.5 ENEMY_createEnemy生成链, 不复用玩家宠物的Rank逐级成长.
-				rawVitality := battlePet.GetRawVitality()
-				rawStrength := battlePet.GetRawStrength()
-				rawToughness := battlePet.GetRawToughness()
-				rawDexterity := battlePet.GetRawDexterity()
-				if rawVitality == 0 && rawStrength == 0 && rawToughness == 0 && rawDexterity == 0 {
-					encounterErr = fmt.Errorf("pet runtime attribute missing pet:%d", battlePet.GetUuid())
-					break
-				}
-				petDefense := gameconfig.CalculatePetPanelDefense(rawVitality, rawStrength, rawToughness, rawDexterity)
-				petAgility := gameconfig.CalculatePetPanelAgility(rawDexterity)
-				if petDefense > math.MaxInt32 || petAgility > math.MaxInt32 {
-					encounterErr = fmt.Errorf("pet signed combat attribute overflows pet:%d defense:%d agility:%d", battlePet.GetUuid(), petDefense, petAgility)
-					break
-				}
-				petUnit = &pb.CombatUnit{
-					Camp:        pb.CombatCamp_CombatCamp_Initiator,
-					Position:    initiatorPetPosition,
-					Key:         &pb.CombatUnitKey{Aid: p.aid, CharacterUuid: character.GetBase().GetUuid(), PetUuid: battlePet.GetUuid()},
-					CharacterId: uint32(character.GetBase().GetAssetId()),
-					PetId:       petAssetID,
-					Attribute: &pb.CombatUnitAttribute{
-						Hp:        gameconfig.CalculatePetPanelHP(rawVitality, rawStrength, rawToughness, rawDexterity),
-						Attack:    gameconfig.CalculatePetPanelAttack(rawVitality, rawStrength, rawToughness, rawDexterity),
-						Defense:   int32(petDefense),
-						Agility:   int32(petAgility),
-						Loyalty:   battlePet.GetLoyalty(),
-						Elemental: combatPetElementalPoints(petEntry),
-						Level:     petLevel,
-					},
-				}
-				targetAttributes[combatUnitKeyMapKey(petUnit.GetKey())] = combatTargetAttributeSnapshot{
-					strength:  uint64(rawStrength),
-					dexterity: uint64(rawDexterity),
-				}
-			}
-
-			if len(enemyGroup.Enemies) == 0 {
-				encounterErr = fmt.Errorf("enemy group is empty")
-				break
-			}
-			selectedEnemies, err := selectCombatPVEEnemyEntries(enemyGroup, xutil.RandomU32)
-			if err != nil {
-				encounterErr = err
-				break
-			}
-
-			enemyUnits := make([]*pb.CombatUnit, 0, len(selectedEnemies))
-			pveEnemyKeys := make(map[string]struct{}, len(selectedEnemies))
-			enemyExperiences := make(map[string]uint32, len(selectedEnemies))
-			for index, enemy := range selectedEnemies {
-				if enemy.ID == nil {
-					encounterErr = fmt.Errorf("selected enemy pet id is nil")
-					break startBattle
-				}
-				petID := *enemy.ID
-				level, err := combatPVEEnemyLevel(enemyGroup, enemy, characterLevel, xutil.RandomU32)
-				if err != nil {
-					encounterErr = err
-					break startBattle
-				}
-				enemyPet := gameconfig.GGameConfig.Pet.Get(petID)
-				if enemyPet == nil {
-					encounterErr = fmt.Errorf("enemy pet config not found: pet:%d", petID)
-					break startBattle
-				}
-				enemyAttributes, err := createCombatPVEEnemyAttributes(enemyPet, level, xutil.RandomU32)
-				if err != nil {
-					encounterErr = err
-					break startBattle
-				}
-				enemyExperience, err := combatPVEEnemyExperience(petID, level)
-				if err != nil {
-					encounterErr = err
-					break startBattle
-				}
-				// 敌方没有账号内的持久化宠物 UUID, 使用从 1 开始的本场序号生成战斗内唯一的单位键.
-				enemyUnit := &pb.CombatUnit{
-					Camp:     pb.CombatCamp_CombatCamp_Defender,
-					Position: uint32(index),
-					Key:      &pb.CombatUnitKey{PetUuid: uint64(index) + 1},
-					PetId:    petID,
-					Attribute: &pb.CombatUnitAttribute{
-						Hp:        enemyAttributes.hp,
-						Attack:    enemyAttributes.attack,
-						Defense:   int32(enemyAttributes.defense),
-						Agility:   int32(enemyAttributes.agility),
-						Elemental: combatPetElementalPoints(enemyPet),
-						Level:     level,
-					},
-				}
-				enemyUnits = append(enemyUnits, enemyUnit)
-				enemyKey := combatUnitKeyMapKey(enemyUnit.GetKey())
-				pveEnemyKeys[enemyKey] = struct{}{}
-				enemyExperiences[enemyKey] = enemyExperience
-				targetAttributes[enemyKey] = combatTargetAttributeSnapshot{
-					strength:  uint64(enemyAttributes.rawStrength),
-					dexterity: uint64(enemyAttributes.rawDexterity),
-				}
-			}
-			// 8.5在全部敌人和玩家侧单位完成入场后交换敌方前后五格.
-			// 这里保留创建时的临时单位键, 只改写最终position并按旧Entry扫描顺序排列.
-			arrangeCombatPVEEnemyUnits(enemyUnits)
-			battleStart.UnitList = append(battleStart.UnitList, characterUnit)
-			if petUnit != nil {
-				battleStart.UnitList = append(battleStart.UnitList, petUnit)
-			}
-			battleStart.UnitList = append(battleStart.UnitList, enemyUnits...)
-			// 从不可变开战快照派生可变状态. 当前MP按开战上限满值初始化;
-			// 后续扣血和扣MP只更新unitStates, 不污染已经发送给客户端的
-			// battleStart开战通知.
-			unitStates := make(map[string]*combatUnitRuntimeState, len(battleStart.GetUnitList()))
-			for _, unit := range battleStart.GetUnitList() {
-				if unit == nil || unit.GetKey() == nil {
-					continue
-				}
-				maxHP := uint64(unit.GetAttribute().GetHp())
-				maxMP := uint64(unit.GetAttribute().GetMaxMp())
-				state := &combatUnitRuntimeState{
-					unit:  unit,
-					hp:    maxHP,
-					maxHP: maxHP,
-					mp:    maxMP,
-					maxMP: maxMP,
-					alive: maxHP > 0,
-				}
-				targetAttribute := targetAttributes[combatUnitKeyMapKey(unit.GetKey())]
-				state.rawStrength = targetAttribute.strength
-				state.rawDexterity = targetAttribute.dexterity
-				unitKey := combatUnitKeyMapKey(unit.GetKey())
-				_, state.pveEnemy = pveEnemyKeys[unitKey]
-				state.enemyExperience = enemyExperiences[unitKey]
-				if combatUnitKeyEqual(unit.GetKey(), characterUnit.GetKey()) {
-					state.characterDuelPoint = character.GetBase().GetDuelPoint()
-					state.criticalModifier = int64(effectiveAttribute.GetCriticalModifier())
-					state.otherDamagePower = int64(effectiveAttribute.GetOtherDamageModifier())
-					state.otherDefensePower = int64(effectiveAttribute.GetOtherDefenseModifier())
-					state.weaponType = effectiveAttribute.GetWeaponType()
-					state.weaponAttackNumberMin = characterWeaponAttackNumberMin
-					state.weaponAttackNumberMax = characterWeaponAttackNumberMax
-				}
-				if unit.GetPetId() != 0 {
-					applyPetBattleTraits(state, gameconfig.GGameConfig.Pet.Get(unit.GetPetId()))
-				}
-				unitStates[combatUnitKeyMapKey(unit.GetKey())] = state
-			}
-
-			// 所有配置和记录均验证成功后才发布 CombatRoom, 防止其他请求观察到半初始化房间.
-			participant := &combatRoomParticipant{
-				key: combatRoomParticipantKey{
-					aid:           p.aid,
-					characterUUID: characterUUID,
-				},
-				account:         p,
-				gateway:         gateway,
-				playerCharacter: characterUnit,
-				playerPet:       petUnit,
-			}
-			room, err := newCombatRoom(battleID, participant, battleStart, enemyUnits, unitStates)
-			if err != nil {
-				encounterErr = err
-				break
-			}
-			c.combatRoom = room
-			room.PostStart()
-			break
 		}
 		if encounterErr != nil {
 			// 自动遇敌失败后关闭开关, 避免配置或角色状态持续异常时形成无限重试和日志风暴.
@@ -1182,6 +1239,12 @@ func (r *CombatRoom) beginCombatRound() {
 		return
 	}
 	r.playerActions = make(map[string]*combatAction)
+	// 已开始的蓄力指令在新回合直接锁定, 不能被客户端选招或超时补防御覆盖.
+	for _, key := range r.requiredPlayerUnitKeys() {
+		if action := continuedCombatChargeAction(r.stateByKey(key)); action != nil {
+			r.playerActions[combatUnitKeyMapKey(key)] = action
+		}
+	}
 	r.resetRoundGuards()
 	battleID := r.battleID
 	round := r.round
@@ -1194,6 +1257,10 @@ func (r *CombatRoom) beginCombatRound() {
 		return nil
 	})
 	r.roundTimer = xtimer.GTimer.AddSecond(cb, time.Now().Add(combatRoundDuration).Unix(), r.actor)
+	// 全部可控单位都已确定指令时, 无需等待客户端提交或100秒超时.
+	if r.playerActionsReady() {
+		r.completeCombatRound(r.collectedPlayerActions())
+	}
 }
 
 func (r *CombatRoom) playerActionsWithTimeoutDefaults() []*combatAction {
@@ -1266,20 +1333,22 @@ func (r *CombatRoom) collectedPlayerActions() []*combatAction {
 	return actions
 }
 
-// clearRuntime 取消当前角色的自动遇敌任务, 通知 CombatRoom 离开并清空房间引用.
+// clearRuntime 将地图归零, 取消自动遇敌, 清除 CombatRoom actor 指针, 并异步通知房间移除本参与者.
 func (c *character) clearRuntime() {
 	if c == nil {
 		return
 	}
+	c.sceneID = 0
 	c.clearAutoEncounterTimer()
-	if c.combatRoom != nil && c.account != nil && c.record != nil {
-		c.combatRoom.PostLeave(combatRoomParticipantKey{
+	combatRoom := c.combatRoom
+	c.combatRoom = nil
+	c.autoEncounterEnabled = false
+	if combatRoom != nil && c.account != nil && c.record != nil {
+		postCombatRoomDetach(combatRoom, combatRoomParticipantKey{
 			aid:           c.account.aid,
 			characterUUID: c.record.GetBase().GetUuid(),
 		})
 	}
-	c.combatRoom = nil
-	c.autoEncounterEnabled = false
 }
 
 // currentBattleCharacterAndPet 返回当前角色及可选的唯一战斗状态宠物, 没有战斗宠物时返回 nil 且不报错.
@@ -1303,6 +1372,289 @@ func (c *character) currentBattleCharacterAndPet() (*pb.CharacterRecord, *pb.Pet
 	return character, nil, nil
 }
 
+// newCombatRoomParticipantAdmission 从 Account actor 拥有的档案生成一名玩家的满状态入场快照.
+// 本函数只做本地校验和计算, 不设置 combatRoom; 调用方必须在同一个 actor 消息中完成房间接收和指针绑定.
+func (c *character) newCombatRoomParticipantAdmission(gateway *Gateway) (combatRoomParticipantAdmission, error) {
+	var admission combatRoomParticipantAdmission
+	if c == nil || c.account == nil || gateway == nil {
+		return admission, fmt.Errorf("combat participant admission argument invalid")
+	}
+	p := c.account
+	character, battlePet, err := c.currentBattleCharacterAndPet()
+	if err != nil {
+		return admission, err
+	}
+	if character == nil || character.GetBase().GetUuid() == 0 || character.GetBase().GetAssetId() == 0 {
+		return admission, fmt.Errorf("character record invalid")
+	}
+	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Exp == nil || gameconfig.GGameConfig.Pet == nil {
+		return admission, fmt.Errorf("exp or pet config is not loaded")
+	}
+
+	vitality := int64(character.GetBase().GetVitality())
+	strength := int64(character.GetBase().GetStrength())
+	toughness := int64(character.GetBase().GetToughness())
+	dexterity := int64(character.GetBase().GetDexterity())
+	if vitality+strength+toughness+dexterity == 0 {
+		return admission, fmt.Errorf("character attribute missing character:%d", character.GetBase().GetUuid())
+	}
+	characterLevel, err := gameconfig.GGameConfig.Exp.GetLevel(character.GetBase().GetExp())
+	if err != nil {
+		return admission, err
+	}
+	effectiveAttribute, err := characterEffectiveAttribute(character)
+	if err != nil {
+		return admission, fmt.Errorf("character effective attribute invalid character:%d: %w", character.GetBase().GetUuid(), err)
+	}
+	if effectiveAttribute.GetMaxHp() == 0 || effectiveAttribute.GetElemental() == nil {
+		return admission, fmt.Errorf("character combat attribute invalid character:%d", character.GetBase().GetUuid())
+	}
+
+	var equipmentLuckModifierList []int32
+	characterWeaponAttackNumberMin := uint32(0)
+	characterWeaponAttackNumberMax := uint32(0)
+	if weapon := character.GetEquipment().GetWeapon(); weapon != nil {
+		equipmentLuckModifierList = append(equipmentLuckModifierList, equipmentFixedModifierValueInt32(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_LuckModifier))
+		weaponEntry, weaponErr := configuredWeaponEntry(weapon.GetAssetId())
+		if weaponErr != nil {
+			return admission, fmt.Errorf("character weapon config invalid character:%d: %w", character.GetBase().GetUuid(), weaponErr)
+		}
+		characterWeaponAttackNumberMin = weaponEntry.AttackNumberMin
+		characterWeaponAttackNumberMax = weaponEntry.AttackNumberMax
+	}
+	luckSnapshot, err := newCombatLuckSnapshot(character.GetBase().GetLuckState().GetBaseLuck(), equipmentLuckModifierList)
+	if err != nil {
+		return admission, fmt.Errorf("character luck invalid character:%d: %w", character.GetBase().GetUuid(), err)
+	}
+	equipmentSnapshot := &pb.CharacterEquipmentRecord{}
+	if equipment := character.GetEquipment(); equipment != nil {
+		equipmentSnapshot = proto.Clone(equipment).(*pb.CharacterEquipmentRecord)
+	}
+	characterUnit := &pb.CombatUnit{
+		Camp:        pb.CombatCamp_CombatCamp_Initiator,
+		Position:    initiatorCharacterPosition,
+		Key:         &pb.CombatUnitKey{Aid: p.aid, CharacterUuid: character.GetBase().GetUuid()},
+		CharacterId: uint32(character.GetBase().GetAssetId()),
+		Equipment:   equipmentSnapshot,
+		Attribute: &pb.CombatUnitAttribute{
+			Hp:        effectiveAttribute.GetMaxHp(),
+			Attack:    effectiveAttribute.GetAttack(),
+			Defense:   effectiveAttribute.GetDefense(),
+			Agility:   effectiveAttribute.GetAgility(),
+			MaxMp:     effectiveAttribute.GetMaxMp(),
+			Elemental: proto.Clone(effectiveAttribute.GetElemental()).(*pb.ElementalPoints),
+			Level:     characterLevel,
+			Luck:      luckSnapshot,
+		},
+	}
+	characterMaxHP := uint64(characterUnit.GetAttribute().GetHp())
+	characterMaxMP := uint64(characterUnit.GetAttribute().GetMaxMp())
+	characterState := &combatUnitRuntimeState{
+		unit:                  characterUnit,
+		hp:                    characterMaxHP,
+		maxHP:                 characterMaxHP,
+		mp:                    characterMaxMP,
+		maxMP:                 characterMaxMP,
+		alive:                 true,
+		rawVitality:           vitality,
+		rawStrength:           int64(strength),
+		rawToughness:          toughness,
+		rawDexterity:          int64(dexterity),
+		poisonResistance:      int64(effectiveAttribute.GetPoisonResistanceModifier()),
+		characterDuelPoint:    character.GetBase().GetDuelPoint(),
+		charm:                 effectiveAttribute.GetEffectiveCharm(),
+		criticalModifier:      int64(effectiveAttribute.GetCriticalModifier()),
+		otherDamagePower:      int64(effectiveAttribute.GetOtherDamageModifier()),
+		otherDefensePower:     int64(effectiveAttribute.GetOtherDefenseModifier()),
+		weaponType:            effectiveAttribute.GetWeaponType(),
+		weaponAttackNumberMin: characterWeaponAttackNumberMin,
+		weaponAttackNumberMax: characterWeaponAttackNumberMax,
+	}
+
+	participant := &combatRoomParticipant{
+		key: combatRoomParticipantKey{
+			aid:           p.aid,
+			characterUUID: character.GetBase().GetUuid(),
+		},
+		account:         p,
+		gateway:         gateway,
+		playerCharacter: characterUnit,
+	}
+	unitStates := map[string]*combatUnitRuntimeState{
+		combatUnitKeyMapKey(characterUnit.GetKey()): characterState,
+	}
+	if battlePet != nil {
+		if battlePet.GetUuid() == 0 || battlePet.GetAssetId() == 0 {
+			return admission, fmt.Errorf("pet record invalid")
+		}
+		petEntry := gameconfig.GGameConfig.Pet.Get(battlePet.GetAssetId())
+		if petEntry == nil {
+			return admission, fmt.Errorf("pet config not found: %d", battlePet.GetAssetId())
+		}
+		petLevel, levelErr := gameconfig.GGameConfig.Exp.GetLevel(battlePet.GetExp())
+		if levelErr != nil {
+			return admission, levelErr
+		}
+		rawVitality := battlePet.GetRawVitality()
+		rawStrength := battlePet.GetRawStrength()
+		rawToughness := battlePet.GetRawToughness()
+		rawDexterity := battlePet.GetRawDexterity()
+		petHP := gameconfig.CalculatePetPanelHP(rawVitality, rawStrength, rawToughness, rawDexterity)
+		petAttack := gameconfig.CalculatePetPanelAttack(rawVitality, rawStrength, rawToughness, rawDexterity)
+		petDefense := gameconfig.CalculatePetPanelDefense(rawVitality, rawStrength, rawToughness, rawDexterity)
+		petAgility := gameconfig.CalculatePetPanelAgility(rawDexterity)
+		if petHP <= 0 || petAttack <= 0 {
+			return admission, fmt.Errorf("pet combat attribute invalid pet:%d hp:%d attack:%d defense:%d agility:%d", battlePet.GetUuid(), petHP, petAttack, petDefense, petAgility)
+		}
+		petUnit := &pb.CombatUnit{
+			Camp:        pb.CombatCamp_CombatCamp_Initiator,
+			Position:    initiatorPetPosition,
+			Key:         &pb.CombatUnitKey{Aid: p.aid, CharacterUuid: character.GetBase().GetUuid(), PetUuid: battlePet.GetUuid()},
+			CharacterId: uint32(character.GetBase().GetAssetId()),
+			PetId:       battlePet.GetAssetId(),
+			SkillIdList: append([]uint32(nil), battlePet.GetSkillIdList()...),
+			Attribute: &pb.CombatUnitAttribute{
+				Hp:        uint32(petHP),
+				Attack:    uint32(petAttack),
+				Defense:   petDefense,
+				Agility:   petAgility,
+				Loyalty:   battlePet.GetLoyalty(),
+				Elemental: combatPetElementalPoints(petEntry),
+				Level:     petLevel,
+			},
+		}
+		petMaxHP := uint64(petUnit.GetAttribute().GetHp())
+		if petMaxHP == 0 {
+			return admission, fmt.Errorf("pet combat hp is zero pet:%d", battlePet.GetUuid())
+		}
+		petState := &combatUnitRuntimeState{
+			unit:         petUnit,
+			skillSlots:   append([]uint32(nil), battlePet.GetSkillIdList()...),
+			hp:           petMaxHP,
+			maxHP:        petMaxHP,
+			alive:        true,
+			rawVitality:  int64(rawVitality),
+			rawStrength:  int64(rawStrength),
+			rawToughness: int64(rawToughness),
+			rawDexterity: int64(rawDexterity),
+		}
+		applyPetBattleTraits(petState, petEntry)
+		participant.playerPet = petUnit
+		unitStates[combatUnitKeyMapKey(petUnit.GetKey())] = petState
+	}
+	admission.participant = participant
+	admission.unitStates = unitStates
+	return admission, nil
+}
+
+// tryBindCombatRoom 在所属 Account actor 的一次消息中完成读取、房间接收和指针绑定.
+// online=true 且 err!=nil 表示角色仍在线但入场失败, 发起队长应将普通成员移出原队伍.
+func (p *Account) tryBindCombatRoom(input combatRoomTryBindInput) combatRoomTryBindResult {
+	result := combatRoomTryBindResult{}
+	if p == nil || p.characterManager == nil || input.characterUUID == 0 {
+		result.err = fmt.Errorf("combat room bind argument invalid")
+		return result
+	}
+	character := p.characterManager.find(input.characterUUID)
+	if character == nil || !character.online {
+		result.err = fmt.Errorf("combat room character is offline")
+		return result
+	}
+	result.online = true
+	if input.room == nil || input.room.actor == nil || input.expectedSceneID == 0 || character.sceneID != input.expectedSceneID {
+		result.err = fmt.Errorf("combat room or character scene invalid")
+		return result
+	}
+	if character.combatRoom != nil {
+		result.err = fmt.Errorf("character is already in combat")
+		return result
+	}
+	gateway := GGatewayMgr.Get(p.gatewayKey)
+	if gateway == nil {
+		result.err = fmt.Errorf("character gateway is unavailable")
+		return result
+	}
+	admission, err := character.newCombatRoomParticipantAdmission(gateway)
+	if err != nil {
+		result.err = err
+		return result
+	}
+	if err = addCombatRoomParticipantSync(input.room.actor, admission); err != nil {
+		result.err = err
+		return result
+	}
+	character.combatRoom = input.room.actor
+	p.refreshCharacterPresence(character)
+	result.bound = true
+	return result
+}
+
+// leaveCombatRoomParticipant 只结束输入指定角色的参战状态, 不读取或改变房间内其他参与者.
+func (p *Account) leaveCombatRoomParticipant(input combatRoomParticipantLeaveInput) error {
+	if p == nil || p.characterManager == nil || input.characterUUID == 0 || input.combatRoom == nil || input.gateway == nil || input.result == nil {
+		return fmt.Errorf("combat room participant leave argument invalid")
+	}
+	character := p.characterManager.find(input.characterUUID)
+	if character == nil || character.combatRoom != input.combatRoom {
+		return nil
+	}
+	result := input.result
+	if result.GetRecipientCharacterUuid() != input.characterUUID {
+		character.combatRoom = nil
+		p.refreshCharacterPresence(character)
+		p.sendClientErr(input.gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Internal.Code())
+		return fmt.Errorf(
+			"combat participant leave recipient mismatch aid:%d character:%d recipient:%d",
+			p.aid,
+			input.characterUUID,
+			result.GetRecipientCharacterUuid(),
+		)
+	}
+	expectedLeaveReason := pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Unknown
+	switch input.kind {
+	case combatParticipantLeaveKindEscape:
+		expectedLeaveReason = pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Escape
+	case combatParticipantLeaveKindKnockback:
+		expectedLeaveReason = pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Defeated
+	}
+	characterKey := sceneCharacterKey{aid: p.aid, characterUUID: input.characterUUID}
+	if expectedLeaveReason == pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Unknown ||
+		!combatResultContainsCharacterUnitLeave(
+			result,
+			characterKey,
+			expectedLeaveReason,
+		) {
+		character.combatRoom = nil
+		p.refreshCharacterPresence(character)
+		p.sendClientErr(input.gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Internal.Code())
+		return fmt.Errorf("combat participant leave result invalid aid:%d character:%d kind:%d", p.aid, input.characterUUID, input.kind)
+	}
+
+	p.dischargeCharacterTeam(characterKey)
+	character.combatRoom = nil
+	result.Settlement = nil
+	if input.kind == combatParticipantLeaveKindKnockback {
+		p.removeCharacterPresence(character.sceneID, characterKey)
+		character.sceneID = 0
+		character.autoEncounterEnabled = false
+		character.clearAutoEncounterTimer()
+	} else {
+		p.refreshCharacterPresence(character)
+	}
+	p.sendClientRes(input.gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Success.Code(), result)
+	if input.kind == combatParticipantLeaveKindKnockback {
+		character.notifyAutoEncounterState(input.gateway)
+		presence, ok := p.characterPresence(input.gateway, character)
+		if ok {
+			p.sendCharacterMapPacket(presence, &pb.CharacterMapEnterRes{
+				CharacterUuid: input.characterUUID,
+				MapId:         0,
+			})
+		}
+	}
+	return nil
+}
+
 // combatParticipantBattleReward保存一名参与者在正常PVE胜利时可以进入
 // Account聚合根的最终战后奖励输入.
 //
@@ -1310,6 +1662,7 @@ func (c *character) currentBattleCharacterAndPet() (*pb.CharacterRecord, *pb.Pet
 // itemAssetIDs是战内getitem三格最终保留结果, 尚未经过现代背包容量判断.
 // 各类最终实际写入值都由聚合根持久化函数返回.
 type combatParticipantBattleReward struct {
+	victory                 bool
 	characterExperience     uint64
 	duelPointBattle         bool
 	characterDuelPointDelta int64
@@ -1349,6 +1702,7 @@ func (r *CombatRoom) playerCombatBattleReward(
 	if characterState == nil {
 		return reward, nil
 	}
+	reward.victory = participant.playerCharacter.GetCamp() == winnerCamp && characterState.alive && !characterState.escaped
 	if r.pveDuelPointBattle {
 		// DP战斗的BATTLE_GetProfit改调BATTLE_GetDuelPoint, 完全跳过
 		// BATTLE_GetExpGold. 玩家角色即使死亡也要应用先前累计的负DP;
@@ -1360,10 +1714,7 @@ func (r *CombatRoom) playerCombatBattleReward(
 		reward.characterDuelPointDelta = characterState.battleDuelPoint
 		return reward, nil
 	}
-	if participant.playerCharacter.GetCamp() != winnerCamp {
-		return reward, nil
-	}
-	if !characterState.alive || characterState.escaped {
+	if !reward.victory {
 		return reward, nil
 	}
 	reward.itemAssetIDs = append([]uint32(nil), characterState.battleDropAssetIDs...)
@@ -1388,12 +1739,14 @@ func (r *CombatRoom) playerCombatBattleReward(
 // 字段都由CombatRoom权威运行态产生, 不接受客户端经验、宠物UUID或状态.
 // battlePetExperience为0时battlePetUUID可以为0; 非0经验必须明确指定本场战宠.
 type combatParticipantPersistenceInput struct {
-	characterExperience     uint64
-	settleDuelPoint         bool
-	characterDuelPointDelta int64
-	battlePetUUID           uint64
-	battlePetExperience     uint64
-	itemAssetIDs            []uint32
+	settledAtMs               int64
+	battleVictoryEnemyGroupID uint32
+	characterExperience       uint64
+	settleDuelPoint           bool
+	characterDuelPointDelta   int64
+	battlePetUUID             uint64
+	battlePetExperience       uint64
+	itemAssetIDs              []uint32
 }
 
 // combatParticipantPersistenceResult返回实际发生的聚合根变化和上限结算结果.
@@ -1410,6 +1763,7 @@ type combatParticipantPersistenceResult struct {
 	discardedItemAssetIDs     []uint32
 	receivedItemFinalCountMap map[uint32]uint64
 	receivedEquipmentRecords  []*pb.EquipmentRecord
+	changedTaskRecordMap      map[uint32]*pb.CharacterTaskRecord
 }
 
 // combatCharacterDuelPointAfter复刻BATTLE_GetDuelPoint对CHAR_DUELPOINT的
@@ -1540,10 +1894,10 @@ func planCombatDropPersistence(
 
 // persistCombatParticipantResult原子持久化一名PVE参与者的战后服务器结果.
 //
-// 角色/战宠EXP、升级点、魅力、DP、宠物成长、普通道具、装备及账号
+// 角色/战宠EXP, 升级点, 魅力, DP, 声望, 宠物成长, 普通道具, 装备、任务记录及账号
 // used_uuid必须合并为一次cache写入, 防止只保存一部分. 函数先完成宠物
-// 存在性、UUID唯一性和掉落入包计划, 再修改聚合根; 任一步计算或cache失败时
-// 恢复全部字段并暴露错误. 返回结果没有任何变化时不调用persist.
+// 存在性、UUID唯一性、掉落入包和任务推进计划, 再修改聚合根; 任一步计算或
+// cache失败时恢复全部字段并暴露错误. 返回结果没有任何变化时不调用persist.
 func persistCombatParticipantResult(
 	accountRecord *pb.AccountRecord,
 	characterRecord *pb.CharacterRecord,
@@ -1551,7 +1905,8 @@ func persistCombatParticipantResult(
 	persist func() error,
 ) (combatParticipantPersistenceResult, error) {
 	var result combatParticipantPersistenceResult
-	if characterRecord == nil || characterRecord.GetBase() == nil || persist == nil {
+	if characterRecord == nil || characterRecord.GetBase() == nil || persist == nil ||
+		(input.battleVictoryEnemyGroupID != 0 && input.settledAtMs <= 0) {
 		return result, fmt.Errorf("combat participant persistence argument invalid")
 	}
 	base := characterRecord.GetBase()
@@ -1605,6 +1960,7 @@ func persistCombatParticipantResult(
 	if target != nil {
 		previousPet = proto.Clone(target).(*pb.PetRecord)
 	}
+	previousTaskRecordMap := cloneCharacterTaskRecordMap(characterRecord.GetTaskRecordMap())
 	rollback := func() {
 		proto.Reset(base)
 		proto.Merge(base, previousBase)
@@ -1624,6 +1980,7 @@ func persistCombatParticipantResult(
 			proto.Reset(target)
 			proto.Merge(target, previousPet)
 		}
+		characterRecord.TaskRecordMap = cloneCharacterTaskRecordMap(previousTaskRecordMap)
 	}
 
 	base.DuelPoint = duelPointAfter
@@ -1639,7 +1996,7 @@ func persistCombatParticipantResult(
 		result.characterExperience = settlement
 	}
 	if target != nil && input.battlePetExperience > 0 {
-		settlement, err := applyPetExperience(target, input.battlePetExperience)
+		settlement, err := applyPetExperience(target, base, input.battlePetExperience)
 		if err != nil {
 			rollback()
 			return combatParticipantPersistenceResult{}, fmt.Errorf(
@@ -1680,6 +2037,21 @@ func persistCombatParticipantResult(
 			accountRecord.UsedUuid = dropPlan.nextUsedUUID
 		}
 	}
+	if input.battleVictoryEnemyGroupID != 0 {
+		changedTaskRecordMap, err := newCharacterTaskManager(characterRecord).HandleBattleVictory(input.battleVictoryEnemyGroupID, input.settledAtMs)
+		if err != nil {
+			rollback()
+			return combatParticipantPersistenceResult{}, fmt.Errorf("advance combat task failed character:%d enemyGroup:%d: %w", base.GetUuid(), input.battleVictoryEnemyGroupID, err)
+		}
+		result.changedTaskRecordMap = changedTaskRecordMap
+	} else if len(characterRecord.GetTaskRecordMap()) > 0 && (input.characterExperience > 0 || len(dropPlan.accepted) > 0) {
+		changedTasks, err := newCharacterTaskManager(characterRecord).Refresh(input.settledAtMs)
+		if err != nil {
+			rollback()
+			return combatParticipantPersistenceResult{}, fmt.Errorf("refresh combat task state failed character:%d: %w", base.GetUuid(), err)
+		}
+		result.changedTaskRecordMap = changedTasks
+	}
 
 	result.baseChanged = !proto.Equal(base, previousBase)
 	result.itemBagChanged = !proto.Equal(characterRecord.GetItemBag(), previousItemBag)
@@ -1694,7 +2066,7 @@ func persistCombatParticipantResult(
 		result.changedPet = target
 	}
 	if !result.baseChanged && !result.itemBagChanged &&
-		result.changedPet == nil {
+		result.changedPet == nil && len(result.changedTaskRecordMap) == 0 {
 		return result, nil
 	}
 	if err := persist(); err != nil {
@@ -1718,7 +2090,7 @@ func (r *CombatRoom) resetRoundGuards() {
 	}
 }
 
-// requiredPlayerUnitKeys 返回当前回合仍存活且必须由玩家提交动作的单位键.
+// requiredPlayerUnitKeys 返回当前回合仍存活且需要锁定动作的玩家可控单位键, 包含服务端自动续招单位.
 func (r *CombatRoom) requiredPlayerUnitKeys() []*pb.CombatUnitKey {
 	if r == nil {
 		return nil
@@ -1855,7 +2227,7 @@ func (r *CombatRoom) addPVEEnemyDefeatProfit(attackerKeys []*pb.CombatUnitKey) {
 				continue
 			}
 			key := attacker.unit.GetKey()
-			// 当前单角色PVE中, 玩家角色和其战宠都必须带aid+character_uuid;
+			// 当前PVE中, 每名玩家角色及其战宠都必须带aid+character_uuid;
 			// 服务端生成的敌人key没有这两个字段. 该身份判断等价于旧服
 			// proflg要求“攻击方Side是PLAYER且对方Side不是PLAYER”.
 			if key.GetAid() == 0 || key.GetCharacterUuid() == 0 {
@@ -2022,6 +2394,11 @@ func (r *CombatRoom) addPVEDuelPointDefeatProfit(attackerKeys []*pb.CombatUnitKe
 // battleSettlementIfFinished 根据双方存活规则生成全局胜负结果; nil 表示战斗尚未结束.
 func (r *CombatRoom) battleSettlementIfFinished() *pb.CombatBattleSettlement {
 	if r == nil {
+		return nil
+	}
+	// 当本回合所有玩家都因逃跑或击飞离场时, 房间在当前回合结果投递后直接关闭,
+	// 不把“无人继续参战”伪造成一份仍会触发全局奖励或失败流程的战斗结算.
+	if r.allParticipantsLeavingThisRound() {
 		return nil
 	}
 	initiatorAlive := r.campBattleAlive(pb.CombatCamp_CombatCamp_Initiator)

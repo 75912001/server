@@ -40,11 +40,17 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	case pb.MsgID_CharacterOfflineReq_CMD:
 		p.onCharacterOfflineReq(gateway, pkt)
 		return
-	case pb.MsgID_CharacterSceneEnterReq_CMD:
-		p.onCharacterSceneEnterReq(gateway, pkt)
+	case pb.MsgID_CharacterMapEnterReq_CMD:
+		p.onCharacterMapEnterReq(gateway, pkt)
+		return
+	case pb.MsgID_NpcInteractionReq_CMD:
+		p.onNPCInteractionReq(gateway, pkt)
 		return
 	case pb.MsgID_CharacterSettingSetReq_CMD:
 		p.onCharacterSettingSetReq(gateway, pkt)
+		return
+	case pb.MsgID_CharacterTeamOperationReq_CMD:
+		p.onCharacterTeamOperationReq(gateway, pkt)
 		return
 	case pb.MsgID_CharacterAttributeAddReq_CMD:
 		p.onCharacterAttributeAddReq(gateway, pkt)
@@ -66,6 +72,9 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		return
 	case pb.MsgID_PetNickSetReq_CMD:
 		p.onPetNickSetReq(gateway, pkt)
+		return
+	case pb.MsgID_PetSkillSetReq_CMD:
+		p.onPetSkillSetReq(gateway, pkt)
 		return
 	case pb.MsgID_ItemWarehouseDepositReq_CMD:
 		p.onItemWarehouseDepositReq(gateway, pkt)
@@ -90,6 +99,18 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		return
 	case pb.MsgID_CharacterMailDeleteReq_CMD:
 		p.onCharacterMailDeleteReq(gateway, pkt)
+		return
+	case pb.MsgID_TaskAcceptReq_CMD:
+		p.onTaskAcceptReq(gateway, pkt)
+		return
+	case pb.MsgID_TaskSubmitReq_CMD:
+		p.onTaskSubmitReq(gateway, pkt)
+		return
+	case pb.MsgID_TaskStepRewardClaimReq_CMD:
+		p.onTaskStepRewardClaimReq(gateway, pkt)
+		return
+	case pb.MsgID_TaskBattleChallengeReq_CMD:
+		p.onTaskBattleChallengeReq(gateway, pkt)
 		return
 	case pb.MsgID_CombatAutoEncounterSetReq_CMD:
 		p.onAutoEncounterSetReq(gateway, pkt)
@@ -165,6 +186,9 @@ func (p *Account) sendCharacterBaseChangedNotify(gateway *Gateway, record *pb.Ch
 		CharacterBaseRecord: base,
 		EffectiveAttribute:  effective,
 	})
+	if character := p.characterManager.find(base.GetUuid()); character != nil {
+		p.refreshCharacterPresence(character)
+	}
 }
 
 func (p *Account) sendCharacterPetChangedNotify(gateway *Gateway, characterUUID uint64, petRecordList []*pb.PetRecord) {
@@ -192,6 +216,25 @@ func (p *Account) sendCharacterItemChangedNotify(gateway *Gateway, characterUUID
 		changedItemCountMap[itemID] = count
 	}
 	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterItemChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterItemChangedNotify{CharacterUuid: characterUUID, ItemCountMap: changedItemCountMap})
+}
+
+func (p *Account) sendCharacterTaskChangedNotify(gateway *Gateway, characterUUID uint64, taskRecordMap map[uint32]*pb.CharacterTaskRecord) {
+	if characterUUID == 0 || len(taskRecordMap) == 0 {
+		return
+	}
+	changedTaskRecordMap := make(map[uint32]*pb.CharacterTaskRecord, len(taskRecordMap))
+	for taskID, taskRecord := range taskRecordMap {
+		if taskRecord != nil {
+			changedTaskRecordMap[taskID] = proto.Clone(taskRecord).(*pb.CharacterTaskRecord)
+		}
+	}
+	if len(changedTaskRecordMap) == 0 {
+		return
+	}
+	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterTaskChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterTaskChangedNotify{
+		CharacterUuid:        characterUUID,
+		ChangedTaskRecordMap: changedTaskRecordMap,
+	})
 }
 
 func (p *Account) sendCharacterSystemMailNotify(gateway *Gateway, characterUUID uint64, mailRecord *pb.MailRecord) {
@@ -238,7 +281,6 @@ func newCharacterRecord(characterUUID uint64, resolvedCharacterNick string, req 
 			Toughness:         req.GetCharacterAttribute().GetToughness(),
 			Dexterity:         req.GetCharacterAttribute().GetDexterity(),
 			CreateTimestampMs: createTimestampMs,
-			SceneId:           2000001,
 			LuckState:         &pb.CharacterLuckState{},
 		},
 		ItemBag: &pb.ItemContainerRecord{
@@ -247,6 +289,7 @@ func newCharacterRecord(characterUUID uint64, resolvedCharacterNick string, req 
 		},
 		Equipment:     &pb.CharacterEquipmentRecord{},
 		PetRecordList: make([]*pb.PetRecord, 0, int(pb.PetRecordLimit_PetRecordLimit_MaxCarryCount)),
+		TaskRecordMap: make(map[uint32]*pb.CharacterTaskRecord),
 	}
 }
 
@@ -322,7 +365,14 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 	for _, pet := range defaultPetRecords {
 		newPet := gameconfig.GGameConfig.Pet.Get(pet.assetID)
 		petUUID := nextAccountRecordUUID(p.accountRecord)
-		petRecord := commonpet.NewRecord(newPet, petUUID, pet.level, pb.PetGrade_PetGrade_Mythic)
+		petRecord, err := commonpet.NewRecord(newPet, petUUID, pet.level, pb.PetGrade_PetGrade_Mythic)
+		if err != nil {
+			// 角色槽位尚未写入, 这里只需还原本轮已经分配的角色和宠物 UUID.
+			p.accountRecord.UsedUuid = previousUsedUUID
+			xlog.GLog.Errorf("create default pet failed aid:%d pet:%d err:%v", p.aid, pet.assetID, err)
+			p.sendClientErr(gateway, uint32(pb.MsgID_CharacterCreateRes_CMD), xerror.Internal.Code())
+			return
+		}
 		petRecord.CarryStatus = pet.carryStatus
 		characterRecord.PetRecordList = append(characterRecord.PetRecordList, petRecord)
 	}
@@ -383,12 +433,13 @@ func (p *Account) onCharacterOnlineReq(gateway *Gateway, pkt *pb.OnlineClientPac
 	}
 	character.clearRuntime()
 	character.online = true
+	luck := &pb.CharacterLuckState{
+		BaseLuck:               character.record.GetBase().GetLuckState().GetBaseLuck(),
+		LastRefreshTimestampMs: character.record.GetBase().GetLuckState().GetLastRefreshTimestampMs(),
+	}
 	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterOnlineRes_CMD), xerror.Success.Code(), &pb.CharacterOnlineRes{
-		CharacterUuid: characterUUID,
-		LuckState: &pb.CharacterLuckState{
-			BaseLuck:               character.record.GetBase().GetLuckState().GetBaseLuck(),
-			LastRefreshTimestampMs: character.record.GetBase().GetLuckState().GetLastRefreshTimestampMs(),
-		},
+		CharacterUuid:      characterUUID,
+		LuckState:          luck,
 		EffectiveAttribute: effective,
 	})
 }
@@ -415,55 +466,13 @@ func (p *Account) onCharacterOfflineReq(gateway *Gateway, pkt *pb.OnlineClientPa
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterOfflineRes_CMD), xerror.Internal.Code())
 		return
 	}
+	sceneID := character.sceneID
+	key := sceneCharacterKey{aid: p.aid, characterUUID: characterUUID}
+	p.dischargeCharacterTeam(key)
 	character.clearRuntime()
 	character.online = false
+	p.removeCharacterPresence(sceneID, key)
 	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterOfflineRes_CMD), xerror.Success.Code(), &pb.CharacterOfflineRes{
 		CharacterUuid: characterUUID,
-	})
-}
-
-func (p *Account) onCharacterSceneEnterReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
-	var req pb.CharacterSceneEnterReq
-	if err := proto.Unmarshal(pkt.GetBody(), &req); err != nil {
-		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.InvalidArgument.Code())
-		return
-	}
-	characterUUID := req.GetCharacterUuid()
-	character := p.characterManager.find(characterUUID)
-	if character == nil || character.record == nil { // 角色-不存在
-		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.NotFound.Code())
-		return
-	}
-	if !character.online { // 角色-不在线
-		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.FailedPrecondition.Code())
-		return
-	}
-	if character.combatRoom != nil { // 战斗中
-		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.FailedPrecondition.Code())
-		return
-	}
-	sceneEntry := gameconfig.GGameConfig.Scene.Get(req.GetSceneId())
-	if sceneEntry == nil { // 场景-不存在
-		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.InvalidArgument.Code())
-		return
-	}
-
-	character.record.Base.SceneId = req.GetSceneId()
-	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
-		xlog.GLog.Errorf("set account record after scene enter failed aid:%d character:%d scene:%d err:%v", p.aid, characterUUID, req.GetSceneId(), err)
-		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.Internal.Code())
-		return
-	}
-	if character.autoEncounterEnabled {
-		character.autoEncounterEnabled = false
-		character.clearAutoEncounterTimer()
-	}
-	// CharacterSceneEnter 成功后始终推送 session_id=0 的最终状态. 即使遇敌原本已关闭,
-	// 客户端也需要这条权威重置信号同步清除该角色的本地自动战斗开关.
-	character.notifyAutoEncounterState(gateway)
-	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterSceneEnterRes_CMD), xerror.Success.Code(), &pb.CharacterSceneEnterRes{
-		CharacterUuid:     characterUUID,
-		SceneId:           req.GetSceneId(),
-		ServerTimestampMs: time.Now().UnixMilli(),
 	})
 }

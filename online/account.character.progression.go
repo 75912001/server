@@ -10,19 +10,23 @@ import (
 )
 
 const (
-	characterAvailablePointPerLevel uint32 = 3
-	characterCharmPerLevel          uint32 = 2
-	characterInitialDuelPoint       uint32 = 100
-	characterInitialCharm           uint32 = 60
-	characterMaxCharm               uint32 = 100
+	characterAvailablePointPerLevel   uint32 = 3
+	characterCharmPerLevel            uint32 = 2
+	characterInitialDuelPoint         uint32 = 100
+	characterInitialCharm             uint32 = 60
+	characterMaxCharm                 uint32 = 100
+	characterMaxReputation            uint32 = 100_000_000
+	characterReputationExpDivisor     uint64 = 20_000
+	petOwnerReputationMinimumNewLevel uint32 = 31
 )
 
 type experienceSettlement struct {
-	PreviousExp uint64
-	CurrentExp  uint64
-	AppliedExp  uint64
-	OldLevel    uint32
-	NewLevel    uint32
+	PreviousExp     uint64
+	CurrentExp      uint64
+	AppliedExp      uint64
+	OldLevel        uint32
+	NewLevel        uint32
+	ReputationDelta uint32
 }
 
 func (p experienceSettlement) levelUpCount() uint32 {
@@ -70,12 +74,57 @@ func calculateExperienceSettlement(currentExp uint64, addedExp uint64) (experien
 	}, nil
 }
 
-// applyCharacterExperience 统一结算角色EXP、可分配点、DP和魅力.
+// characterLevelUpReputation 按原版人物公式逐级计算声望.
+// 当前累计经验表的等级最小经验等于原版 LevelUpTbl 的同级值.
+func characterLevelUpReputation(oldLevel uint32, newLevel uint32) (uint64, error) {
+	reputation := uint64(0)
+	for level := oldLevel + 1; level <= newLevel; level++ {
+		levelExp, err := gameconfig.GGameConfig.Exp.GetLevelMinExp(level)
+		if err != nil {
+			return 0, fmt.Errorf("get character reputation level %d experience: %w", level, err)
+		}
+		reputation += levelExp / characterReputationExpDivisor
+	}
+	return reputation, nil
+}
+
+// petOwnerLevelUpReputation 按原版宠物公式逐级计算主人声望.
+// 宠物到达新等级 L 时使用 LevelUpTbl[L-1], 且只有 L 大于 30 才结算.
+func petOwnerLevelUpReputation(oldLevel uint32, newLevel uint32) (uint64, error) {
+	firstLevel := oldLevel + 1
+	if firstLevel < petOwnerReputationMinimumNewLevel {
+		firstLevel = petOwnerReputationMinimumNewLevel
+	}
+	reputation := uint64(0)
+	for level := firstLevel; level <= newLevel; level++ {
+		levelExp, err := gameconfig.GGameConfig.Exp.GetLevelMinExp(level - 1)
+		if err != nil {
+			return 0, fmt.Errorf("get pet owner reputation level %d experience: %w", level, err)
+		}
+		reputation += levelExp / characterReputationExpDivisor
+	}
+	return reputation, nil
+}
+
+func addCharacterReputation(base *pb.CharacterBaseRecord, added uint64) uint32 {
+	current := uint64(base.GetReputation())
+	remaining := uint64(characterMaxReputation) - current
+	if added > remaining {
+		added = remaining
+	}
+	base.Reputation = uint32(current + added)
+	return uint32(added)
+}
+
+// applyCharacterExperience 统一结算角色EXP, 可分配点, DP, 魅力和声望.
 func applyCharacterExperience(record *pb.CharacterRecord, addedExp uint64) (experienceSettlement, error) {
 	if record == nil || record.GetBase() == nil {
 		return experienceSettlement{}, fmt.Errorf("character record is nil")
 	}
 	base := record.GetBase()
+	if base.GetReputation() > characterMaxReputation {
+		return experienceSettlement{}, fmt.Errorf("character reputation %d exceeds limit", base.GetReputation())
+	}
 	settlement, err := calculateExperienceSettlement(base.GetExp(), addedExp)
 	if err != nil {
 		return experienceSettlement{}, err
@@ -96,20 +145,32 @@ func applyCharacterExperience(record *pb.CharacterRecord, addedExp uint64) (expe
 	if charm > uint64(characterMaxCharm) {
 		charm = uint64(characterMaxCharm)
 	}
+	reputation, err := characterLevelUpReputation(settlement.OldLevel, settlement.NewLevel)
+	if err != nil {
+		return experienceSettlement{}, err
+	}
 
 	base.Exp = settlement.CurrentExp
 	base.AvailablePoint += uint32(availablePointDelta)
 	base.DuelPoint = uint32(duelPoint)
 	base.Charm = uint32(charm)
+	settlement.ReputationDelta = addCharacterReputation(base, reputation)
 	return settlement, nil
 }
 
-// applyPetExperience 复用同一EXP等级表, 并把宠物专属成长按实际提升等级数完整结算.
-func applyPetExperience(record *pb.PetRecord, addedExp uint64) (experienceSettlement, error) {
-	if record == nil {
-		return experienceSettlement{}, fmt.Errorf("pet record is nil")
+// applyPetExperience 复用同一EXP等级表, 并按实际提升等级数结算宠物成长和所属角色声望.
+func applyPetExperience(record *pb.PetRecord, ownerBase *pb.CharacterBaseRecord, addedExp uint64) (experienceSettlement, error) {
+	if record == nil || ownerBase == nil {
+		return experienceSettlement{}, fmt.Errorf("pet record or owner base is nil")
+	}
+	if ownerBase.GetReputation() > characterMaxReputation {
+		return experienceSettlement{}, fmt.Errorf("pet owner reputation %d exceeds limit", ownerBase.GetReputation())
 	}
 	settlement, err := calculateExperienceSettlement(record.GetExp(), addedExp)
+	if err != nil {
+		return experienceSettlement{}, err
+	}
+	reputation, err := petOwnerLevelUpReputation(settlement.OldLevel, settlement.NewLevel)
 	if err != nil {
 		return experienceSettlement{}, err
 	}
@@ -120,5 +181,6 @@ func applyPetExperience(record *pb.PetRecord, addedExp uint64) (experienceSettle
 		return experienceSettlement{}, err
 	}
 	record.Exp = settlement.CurrentExp
+	settlement.ReputationDelta = addCharacterReputation(ownerBase, reputation)
 	return settlement, nil
 }

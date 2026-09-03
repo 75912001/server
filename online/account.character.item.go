@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"time"
 
 	"server/common/gameconfig"
 	pb "server/proto/pb"
@@ -133,13 +134,14 @@ func itemContainerCount(container *pb.ItemContainerRecord) int {
 }
 
 type characterItemUsePlan struct {
-	characterUUID    uint64
-	itemID           uint32
-	targetPetUUID    uint64
-	previous         *pb.CharacterRecord
-	next             *pb.CharacterRecord
-	characterChanged bool
-	petChangedUUIDs  []uint64
+	characterUUID        uint64
+	itemID               uint32
+	targetPetUUID        uint64
+	previous             *pb.CharacterRecord
+	next                 *pb.CharacterRecord
+	characterChanged     bool
+	petChangedUUIDs      []uint64
+	changedTaskRecordMap map[uint32]*pb.CharacterTaskRecord
 }
 
 func prepareCharacterItemUsePlan(record *pb.CharacterRecord, itemID uint32, targetPetUUID uint64) (*characterItemUsePlan, error) {
@@ -193,13 +195,14 @@ func prepareCharacterItemUsePlan(record *pb.CharacterRecord, itemID uint32, targ
 			return nil, fmt.Errorf("%w: carried pet %d", errItemUseTargetNotFound, targetPetUUID)
 		}
 		if entry.Use.Exp != nil && *entry.Use.Exp > 0 {
-			settlement, err := applyPetExperience(targetPet, *entry.Use.Exp)
+			settlement, err := applyPetExperience(targetPet, next.GetBase(), *entry.Use.Exp)
 			if err != nil {
 				return nil, fmt.Errorf("%w: apply pet experience: %v", errItemUseRecordInvalid, err)
 			}
 			if settlement.AppliedExp == 0 {
 				return nil, fmt.Errorf("%w: pet %d is at maximum experience", errItemUseFailedPrecondition, targetPetUUID)
 			}
+			plan.characterChanged = settlement.ReputationDelta > 0
 		} else if entry.Use.Loyalty != nil && *entry.Use.Loyalty > 0 {
 			if targetPet.GetLoyalty() >= petMaxLoyalty {
 				return nil, fmt.Errorf("%w: pet %d is at maximum loyalty", errItemUseFailedPrecondition, targetPetUUID)
@@ -219,6 +222,10 @@ func prepareCharacterItemUsePlan(record *pb.CharacterRecord, itemID uint32, targ
 	}
 	if err := newCharacterItemManager(next).Consume(itemID, 1); err != nil {
 		return nil, err
+	}
+	plan.changedTaskRecordMap, err = newCharacterTaskManager(next).Refresh(time.Now().UnixMilli())
+	if err != nil {
+		return nil, fmt.Errorf("advance task after item use: %w", err)
 	}
 	return plan, nil
 }
@@ -308,6 +315,7 @@ func (p *Account) onItemUseReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		p.sendCharacterPetChangedNotify(gateway, plan.characterUUID, changedPetRecordList)
 	}
 	p.sendCharacterItemChangedNotify(gateway, plan.characterUUID, map[uint32]uint64{plan.itemID: newCharacterItemManager(plan.next).Count(plan.itemID)})
+	p.sendCharacterTaskChangedNotify(gateway, plan.characterUUID, plan.changedTaskRecordMap)
 	p.sendClientRes(gateway, uint32(pb.MsgID_ItemUseRes_CMD), xerror.Success.Code(), &pb.ItemUseRes{
 		CharacterUuid: req.GetCharacterUuid(),
 		ItemId:        req.GetItemId(),

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	pb "server/proto/pb"
@@ -18,6 +19,10 @@ const (
 	OnlineAccountActorCmdClientPacket xactor.CMD = 103
 	OnlineAccountActorCmdStop         xactor.CMD = 104
 	OnlineAccountActorCmdRoomFinished xactor.CMD = 105
+	OnlineAccountActorCmdTeamScene    xactor.CMD = 106
+	OnlineAccountActorCmdTryBindRoom  xactor.CMD = 107
+	OnlineAccountActorCmdRoomLeft     xactor.CMD = 108
+	OnlineAccountActorCmdCapturePet   xactor.CMD = 109
 )
 
 func (p *Account) PostBind(req *pb.OnlineBindAccountReq, accountRecord *pb.AccountRecord) (*pb.OnlineBindAccountRes, error) {
@@ -45,14 +50,39 @@ func (p *Account) PostClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket)
 	p.actor.SendMsg(xactor.NewMsg(context.Background(), OnlineAccountActorCmdClientPacket, gateway, pkt))
 }
 
-// PostCombatRoomFinishedSync 同步请求 Account actor 清除匹配房间引用并投递最终战报.
-func (p *Account) PostCombatRoomFinishedSync(characterUUID uint64, room *CombatRoom, gateway *Gateway, result *pb.CombatRoundResultNotify) error {
-	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineAccountActorCmdRoomFinished, characterUUID, room, gateway, result))
+// PostCombatRoomFinishedSync 同步请求 Account actor 清除匹配的 CombatRoom actor 指针并投递最终战报.
+func (p *Account) PostCombatRoomFinishedSync(input combatRoomFinishInput) error {
+	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineAccountActorCmdRoomFinished, input))
 	if err != nil {
 		return err
 	}
 	if finishErr, ok := resp.(error); ok {
 		return finishErr
+	}
+	return nil
+}
+
+// PostTryBindCombatRoomSync 请求目标 Account actor 原子生成入场快照并绑定 CombatRoom.
+func (p *Account) PostTryBindCombatRoomSync(input combatRoomTryBindInput) (combatRoomTryBindResult, error) {
+	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineAccountActorCmdTryBindRoom, input))
+	if err != nil {
+		return combatRoomTryBindResult{}, err
+	}
+	result, ok := resp.(combatRoomTryBindResult)
+	if !ok {
+		return combatRoomTryBindResult{}, fmt.Errorf("combat room bind response invalid")
+	}
+	return result, nil
+}
+
+// PostCombatRoomParticipantLeftSync 同步清除单个参与者的匹配房间指针并投递其最后一份回合战报.
+func (p *Account) PostCombatRoomParticipantLeftSync(input combatRoomParticipantLeaveInput) error {
+	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineAccountActorCmdRoomLeft, input))
+	if err != nil {
+		return err
+	}
+	if leaveErr, ok := resp.(error); ok {
+		return leaveErr
 	}
 	return nil
 }
@@ -128,46 +158,98 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 				continue
 			}
 			p.onClientPacket(gateway, pkt)
+		case OnlineAccountActorCmdTeamScene:
+			presence, ok := msg.Args[0].(sceneCharacterPresence)
+			if !ok {
+				continue
+			}
+			p.applyCharacterTeamSceneState(presence)
+		case OnlineAccountActorCmdTryBindRoom:
+			if len(msg.Args) != 1 {
+				continue
+			}
+			input, ok := msg.Args[0].(combatRoomTryBindInput)
+			if !ok {
+				continue
+			}
+			resp = p.tryBindCombatRoom(input)
+		case OnlineAccountActorCmdCapturePet:
+			if len(msg.Args) != 1 {
+				continue
+			}
+			input, ok := msg.Args[0].(combatRoomCaptureInput)
+			if !ok {
+				continue
+			}
+			resp = p.captureCombatPet(input)
+		case OnlineAccountActorCmdRoomLeft:
+			if len(msg.Args) != 1 {
+				continue
+			}
+			input, ok := msg.Args[0].(combatRoomParticipantLeaveInput)
+			if !ok {
+				continue
+			}
+			resp = p.leaveCombatRoomParticipant(input)
 		case OnlineAccountActorCmdRoomFinished:
-			if len(msg.Args) != 4 {
+			if len(msg.Args) != 1 {
 				continue
 			}
-			characterUUID, characterUUIDOK := msg.Args[0].(uint64)
-			room, roomOK := msg.Args[1].(*CombatRoom)
-			gateway, gatewayOK := msg.Args[2].(*Gateway)
-			result, resultOK := msg.Args[3].(*pb.CombatRoundResultNotify)
-			if !characterUUIDOK || !roomOK || !gatewayOK || !resultOK {
+			finishInput, ok := msg.Args[0].(combatRoomFinishInput)
+			if !ok || finishInput.combatRoom == nil || finishInput.gateway == nil || finishInput.result == nil {
 				continue
 			}
+			characterUUID := finishInput.characterUUID
+			combatRoom := finishInput.combatRoom
+			gateway := finishInput.gateway
+			result := finishInput.result
 			character := p.characterManager.find(characterUUID)
-			if character == nil || character.combatRoom != room {
+			if result.GetRecipientCharacterUuid() != characterUUID {
+				if character != nil && character.combatRoom == combatRoom {
+					character.combatRoom = nil
+					p.refreshCharacterPresence(character)
+				}
+				p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Internal.Code())
+				resp = fmt.Errorf(
+					"combat result recipient mismatch aid:%d character:%d recipient:%d",
+					p.aid,
+					characterUUID,
+					result.GetRecipientCharacterUuid(),
+				)
+				continue
+			}
+			if character == nil || character.combatRoom != combatRoom {
 				resp = true
 				continue
 			}
-			participantKey := combatRoomParticipantKey{
-				aid:           p.aid,
-				characterUUID: characterUUID,
+			characterKey := sceneCharacterKey{aid: p.aid, characterUUID: characterUUID}
+			if combatResultDischargesCharacterTeam(result, characterKey) {
+				p.dischargeCharacterTeam(characterKey)
 			}
-			battleReward, rewardErr := room.playerCombatBattleReward(
-				participantKey,
-				result.GetSettlement().GetBattleResult(),
-			)
-			if rewardErr != nil {
+			if finishInput.rewardErr != nil {
 				character.combatRoom = nil
+				p.refreshCharacterPresence(character)
 				p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Internal.Code())
-				resp = rewardErr
+				resp = finishInput.rewardErr
 				continue
+			}
+			battleReward := finishInput.battleReward
+			battleVictoryEnemyGroupID := uint32(0)
+			if battleReward.victory {
+				battleVictoryEnemyGroupID = finishInput.enemyGroupID
 			}
 			persistenceResult, persistErr := persistCombatParticipantResult(
 				p.accountRecord,
 				character.record,
 				combatParticipantPersistenceInput{
-					characterExperience:     battleReward.characterExperience,
-					settleDuelPoint:         battleReward.duelPointBattle,
-					characterDuelPointDelta: battleReward.characterDuelPointDelta,
-					battlePetUUID:           battleReward.battlePetUUID,
-					battlePetExperience:     battleReward.battlePetExperience,
-					itemAssetIDs:            battleReward.itemAssetIDs,
+					settledAtMs:               time.Now().UnixMilli(),
+					battleVictoryEnemyGroupID: battleVictoryEnemyGroupID,
+					characterExperience:       battleReward.characterExperience,
+					settleDuelPoint:           battleReward.duelPointBattle,
+					characterDuelPointDelta:   battleReward.characterDuelPointDelta,
+					battlePetUUID:             battleReward.battlePetUUID,
+					battlePetExperience:       battleReward.battlePetExperience,
+					itemAssetIDs:              battleReward.itemAssetIDs,
 				},
 				func() error {
 					return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
@@ -175,6 +257,7 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 			)
 			if persistErr != nil {
 				character.combatRoom = nil
+				p.refreshCharacterPresence(character)
 				p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Internal.Code())
 				resp = persistErr
 				continue
@@ -211,6 +294,9 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 							ExpDelta: persistenceResult.characterExperience.AppliedExp,
 						},
 					)
+				}
+				if len(persistenceResult.changedTaskRecordMap) > 0 {
+					p.sendCharacterTaskChangedNotify(gateway, characterUUID, persistenceResult.changedTaskRecordMap)
 				}
 				if persistenceResult.battlePetExperience.AppliedExp > 0 {
 					result.Settlement.ExpRewardList = append(
@@ -251,6 +337,7 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 				}
 			}
 			character.combatRoom = nil
+			p.refreshCharacterPresence(character)
 			p.sendClientRes(gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Success.Code(), result)
 			resp = true
 		case OnlineAccountActorCmdStop:

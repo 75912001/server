@@ -38,6 +38,9 @@ func (p *OnlineServer) PreStart(ctx context.Context) error {
 	if err != nil {
 		return errors.WithMessagef(err, "load game config failed, dir:%s %v", GCfgCustomGameConfigDir, xruntime.Location())
 	}
+	if err := validateEnemyCombatSkillConfig(); err != nil {
+		return errors.WithMessagef(err, "validate enemy combat skill config failed, dir:%s %v", GCfgCustomGameConfigDir, xruntime.Location())
+	}
 
 	xgrpcprotoregistry.Init()
 	xgrpcselector.Init()

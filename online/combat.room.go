@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	pb "server/proto/pb"
 
 	xactor "github.com/75912001/xlib/actor"
 	xcontrol "github.com/75912001/xlib/control"
+	xerror "github.com/75912001/xlib/error"
 	xlog "github.com/75912001/xlib/log"
 	xmap "github.com/75912001/xlib/map"
 	xtimer "github.com/75912001/xlib/timer"
@@ -17,7 +19,8 @@ import (
 const (
 	combatRoomActorCmdStart       xactor.CMD = 201
 	combatRoomActorCmdRoundAction xactor.CMD = 202
-	combatRoomActorCmdLeave       xactor.CMD = 203
+	combatRoomActorCmdDetach      xactor.CMD = 203
+	combatRoomActorCmdAddMember   xactor.CMD = 204
 )
 
 type combatRoomParticipantKey struct {
@@ -34,17 +37,63 @@ type combatRoomParticipant struct {
 	playerPet       *pb.CombatUnit
 }
 
+// combatRoomParticipantAdmission 是 Account actor 完成档案读取后交给房间的完整入场快照.
+// unitStates 与 participant 中的单位共享不可变 CombatUnit 指针, 由房间接收后独占运行态.
+type combatRoomParticipantAdmission struct {
+	participant *combatRoomParticipant
+	unitStates  map[string]*combatUnitRuntimeState
+}
+
+type combatRoomUnitLeave struct {
+	unitKeys []*pb.CombatUnitKey
+	reason   pb.CombatUnitLeaveReason
+}
+
+type combatParticipantLeaveKind uint8
+
+const (
+	combatParticipantLeaveKindUnknown combatParticipantLeaveKind = iota
+	combatParticipantLeaveKindEscape
+	combatParticipantLeaveKindKnockback
+)
+
+// combatRoomFinishInput 封装 CombatRoom actor 交给 Account actor 的结算消息.
+// enemyGroupID和battleReward是建房及结算值快照, result是接收角色独占副本;
+// Account据此推进角色任务, 但不读取CombatRoom运行态.
+type combatRoomFinishInput struct {
+	characterUUID uint64
+	combatRoom    *xactor.Actor[string]
+	gateway       *Gateway
+	result        *pb.CombatRoundResultNotify
+	enemyGroupID  uint32
+	battleReward  combatParticipantBattleReward
+	rewardErr     error
+}
+
+// combatRoomParticipantLeaveInput 封装仍需收到当前回合结果、但不会继续留在房间的参与者.
+type combatRoomParticipantLeaveInput struct {
+	characterUUID uint64
+	combatRoom    *xactor.Actor[string]
+	gateway       *Gateway
+	result        *pb.CombatRoundResultNotify
+	kind          combatParticipantLeaveKind
+}
+
 // CombatRoom 是一场战斗的权威运行实例.
-// 所有可变字段只允许由房间 actor 读写; character 只持有房间指针并调用 PostXXX 发送消息.
+// 所有可变字段只允许由房间 actor 读写; character 只持有 actor 指针, 仅通过消息投递交互.
 type CombatRoom struct {
 	actor      *xactor.Actor[string]
 	roundTimer *xtimer.Second
 
 	battleID string
-	round    uint32
+	// enemyGroupID在PVE建房时由服务端配置冻结, 仅用于战斗胜利后的任务事件.
+	enemyGroupID uint32
+	round        uint32
 
-	participantOrder []combatRoomParticipantKey
-	participants     map[combatRoomParticipantKey]*combatRoomParticipant
+	participantOrder       []combatRoomParticipantKey
+	participants           map[combatRoomParticipantKey]*combatRoomParticipant
+	pendingUnitLeaves      []combatRoomUnitLeave
+	roundParticipantLeaves map[combatRoomParticipantKey]combatParticipantLeaveKind
 
 	battleStart   *pb.CombatBattleStartNotify
 	enemyUnits    []*pb.CombatUnit
@@ -67,9 +116,10 @@ type CombatRoomMgr struct {
 	rooms *xmap.MapMutexMgr[string, *CombatRoom]
 }
 
-// newCombatRoom 完整构造并注册房间, 注册成功后启动房间 actor 再返回.
+// newCombatRoom 使用队长入场快照完整构造并注册房间, actor 启动后仍可在首回合前追加成功队员.
 func newCombatRoom(
 	battleID string,
+	enemyGroupID uint32,
 	participant *combatRoomParticipant,
 	battleStart *pb.CombatBattleStartNotify,
 	enemyUnits []*pb.CombatUnit,
@@ -79,23 +129,28 @@ func newCombatRoom(
 	if err != nil {
 		return nil, fmt.Errorf("combat random seed create failed: %w", err)
 	}
-	return newCombatRoomWithSeed(battleID, participant, battleStart, enemyUnits, unitStates, seed)
+	return newCombatRoomWithSeed(battleID, enemyGroupID, participant, battleStart, enemyUnits, unitStates, seed)
 }
 
 // newCombatRoomWithSeed 使用指定种子构造房间, 只供确定性测试和newCombatRoom生产入口复用.
 func newCombatRoomWithSeed(
 	battleID string,
+	enemyGroupID uint32,
 	participant *combatRoomParticipant,
 	battleStart *pb.CombatBattleStartNotify,
 	enemyUnits []*pb.CombatUnit,
 	unitStates map[string]*combatUnitRuntimeState,
 	seed uint64,
 ) (*CombatRoom, error) {
+	if enemyGroupID == 0 {
+		return nil, fmt.Errorf("combat enemy group id is zero")
+	}
 	if err := validateCombatRoomCreateArguments(battleID, participant, battleStart); err != nil {
 		return nil, err
 	}
 	room := &CombatRoom{
 		battleID:         battleID,
+		enemyGroupID:     enemyGroupID,
 		round:            1,
 		participantOrder: []combatRoomParticipantKey{participant.key},
 		participants: map[combatRoomParticipantKey]*combatRoomParticipant{
@@ -141,7 +196,7 @@ func combatRoomIsPVEDuelPointBattle(states map[string]*combatUnitRuntimeState) b
 	return false
 }
 
-// validateCombatRoomCreateArguments 校验房间构造所需的参与者路由和角色快照; 玩家战宠允许为空.
+// validateCombatRoomCreateArguments 校验房间构造所需的队长路由和角色快照; 玩家战宠允许为空.
 func validateCombatRoomCreateArguments(battleID string, participant *combatRoomParticipant, battleStart *pb.CombatBattleStartNotify) error {
 	if battleID == "" || participant == nil || participant.account == nil || participant.gateway == nil || participant.key.aid == 0 || participant.key.characterUUID == 0 || participant.playerCharacter == nil || battleStart == nil {
 		return fmt.Errorf("combat room create argument invalid")
@@ -149,31 +204,47 @@ func validateCombatRoomCreateArguments(battleID string, participant *combatRoomP
 	return nil
 }
 
-// PostStart 请求房间向参与者推送开战快照并开始首回合.
-func (r *CombatRoom) PostStart() {
-	if r == nil || r.actor == nil {
+// postCombatRoomStart 请求房间向参与者推送开战快照并开始首回合.
+func postCombatRoomStart(combatRoom *xactor.Actor[string]) {
+	if combatRoom == nil {
 		return
 	}
-	r.actor.SendMsg(xactor.NewMsg(context.Background(), combatRoomActorCmdStart))
+	combatRoom.SendMsg(xactor.NewMsg(context.Background(), combatRoomActorCmdStart))
 }
 
-// PostRoundAction 将指定参与者的单位动作投递给房间 actor.
-func (r *CombatRoom) PostRoundAction(key combatRoomParticipantKey, gateway *Gateway, req *pb.CombatRoundActionReq) {
-	if r == nil || r.actor == nil {
-		return
+// addCombatRoomParticipantSync 在首回合启动前由房间 actor 分配紧凑站位并接收入场快照.
+func addCombatRoomParticipantSync(combatRoom *xactor.Actor[string], admission combatRoomParticipantAdmission) error {
+	if combatRoom == nil {
+		return fmt.Errorf("combat room actor is nil")
 	}
-	r.actor.SendMsg(xactor.NewMsg(context.Background(), combatRoomActorCmdRoundAction, key, gateway, req))
+	resp, err := combatRoom.SendMsgSync(xactor.NewMsg(context.Background(), combatRoomActorCmdAddMember, admission))
+	if err != nil {
+		return err
+	}
+	if addErr, ok := resp.(error); ok {
+		return addErr
+	}
+	return nil
 }
 
-// PostLeave 通知房间移除指定参与者及其单位, 再按剩余玩家角色判断战斗是否结束.
-func (r *CombatRoom) PostLeave(key combatRoomParticipantKey) {
-	if r == nil || r.actor == nil {
+// postCombatRoomRoundAction 将指定参与者的单位动作投递给房间 actor.
+func postCombatRoomRoundAction(combatRoom *xactor.Actor[string], key combatRoomParticipantKey, gateway *Gateway, req *pb.CombatRoundActionReq) {
+	if combatRoom == nil {
 		return
 	}
-	r.actor.SendMsg(xactor.NewMsg(context.Background(), combatRoomActorCmdLeave, key))
+	combatRoom.SendMsg(xactor.NewMsg(context.Background(), combatRoomActorCmdRoundAction, key, gateway, req))
+}
+
+// postCombatRoomDetach 通知房间记录角色下线或运行态清理产生的外部脱离, 与技能逃跑分开处理.
+func postCombatRoomDetach(combatRoom *xactor.Actor[string], key combatRoomParticipantKey) {
+	if combatRoom == nil {
+		return
+	}
+	combatRoom.SendMsg(xactor.NewMsg(context.Background(), combatRoomActorCmdDetach, key))
 }
 
 func (r *CombatRoom) behavior(messages ...any) (xactor.Behavior, any, error) {
+	var resp any
 	for _, raw := range messages {
 		if event, ok := raw.(*xcontrol.Event); ok {
 			if r.roundTimer != nil && event.ISwitch.IsOn() {
@@ -187,7 +258,7 @@ func (r *CombatRoom) behavior(messages ...any) (xactor.Behavior, any, error) {
 		if !ok {
 			continue
 		}
-		if msg.Cmd != combatRoomActorCmdStart && r.roundTimer == nil {
+		if msg.Cmd == combatRoomActorCmdRoundAction && r.roundTimer == nil {
 			continue
 		}
 		switch msg.Cmd {
@@ -203,16 +274,27 @@ func (r *CombatRoom) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if keyOK && gatewayOK && reqOK {
 				r.onCombatRoundActionReq(key, gateway, req)
 			}
-		case combatRoomActorCmdLeave:
+		case combatRoomActorCmdDetach:
 			if len(msg.Args) != 1 {
 				continue
 			}
 			if key, ok := msg.Args[0].(combatRoomParticipantKey); ok {
-				r.onParticipantLeave(key)
+				r.detachParticipant(key)
 			}
+		case combatRoomActorCmdAddMember:
+			if len(msg.Args) != 1 {
+				resp = fmt.Errorf("combat room add participant argument invalid")
+				continue
+			}
+			admission, ok := msg.Args[0].(combatRoomParticipantAdmission)
+			if !ok {
+				resp = fmt.Errorf("combat room add participant type invalid")
+				continue
+			}
+			resp = r.addParticipant(admission)
 		}
 	}
-	return r.behavior, nil, nil
+	return r.behavior, resp, nil
 }
 
 func (r *CombatRoom) participant(key combatRoomParticipantKey) *combatRoomParticipant {
@@ -220,6 +302,138 @@ func (r *CombatRoom) participant(key combatRoomParticipantKey) *combatRoomPartic
 		return nil
 	}
 	return r.participants[key]
+}
+
+func (r *CombatRoom) markParticipantLeaving(key combatRoomParticipantKey, kind combatParticipantLeaveKind) {
+	if r == nil || kind == combatParticipantLeaveKindUnknown || r.participant(key) == nil {
+		return
+	}
+	if r.roundParticipantLeaves == nil {
+		r.roundParticipantLeaves = make(map[combatRoomParticipantKey]combatParticipantLeaveKind)
+	}
+	if r.roundParticipantLeaves[key] == combatParticipantLeaveKindUnknown {
+		r.roundParticipantLeaves[key] = kind
+	}
+}
+
+func (r *CombatRoom) allParticipantsLeavingThisRound() bool {
+	if r == nil || len(r.participants) == 0 || len(r.roundParticipantLeaves) != len(r.participants) {
+		return false
+	}
+	for key := range r.participants {
+		if r.roundParticipantLeaves[key] == combatParticipantLeaveKindUnknown {
+			return false
+		}
+	}
+	return true
+}
+
+func (r *CombatRoom) finalizeRoundParticipantLeaves() {
+	if r == nil || len(r.roundParticipantLeaves) == 0 {
+		return
+	}
+	for key := range r.roundParticipantLeaves {
+		participant := r.participant(key)
+		if participant == nil {
+			continue
+		}
+		r.removeParticipant(participant)
+		delete(r.participants, key)
+	}
+	r.roundParticipantLeaves = nil
+}
+
+// addParticipant 只接受尚未启动首回合的成功绑定成员, 并按成功顺序压缩角色和战宠站位.
+func (r *CombatRoom) addParticipant(admission combatRoomParticipantAdmission) error {
+	if r == nil || r.roundTimer != nil || r.battleStart == nil || r.participants == nil || r.unitStates == nil {
+		return fmt.Errorf("combat room is not accepting participants")
+	}
+	participant := admission.participant
+	if err := validateCombatRoomParticipantAdmission(participant, admission.unitStates); err != nil {
+		return err
+	}
+	if len(r.participantOrder) >= combatCampRowPositionCount {
+		return fmt.Errorf("combat room participant limit reached")
+	}
+	if r.participant(participant.key) != nil {
+		return fmt.Errorf("combat room participant already exists aid:%d character:%d", participant.key.aid, participant.key.characterUUID)
+	}
+	for unitKey := range admission.unitStates {
+		if r.unitStates[unitKey] != nil {
+			return fmt.Errorf("combat room participant unit already exists: %s", unitKey)
+		}
+	}
+
+	position := uint32(len(r.participantOrder))
+	participant.playerCharacter.Position = position
+	if participant.playerPet != nil {
+		participant.playerPet.Position = position + combatCampRowPositionCount
+	}
+
+	insertIndex := len(r.battleStart.UnitList)
+	for index, unit := range r.battleStart.UnitList {
+		if unit != nil && unit.GetCamp() == pb.CombatCamp_CombatCamp_Defender {
+			insertIndex = index
+			break
+		}
+	}
+	oldUnitList := r.battleStart.UnitList
+	playerUnits := make([]*pb.CombatUnit, 0, insertIndex+2)
+	playerUnits = append(playerUnits, oldUnitList[:insertIndex]...)
+	playerUnits = append(playerUnits, participant.playerCharacter)
+	if participant.playerPet != nil {
+		playerUnits = append(playerUnits, participant.playerPet)
+	}
+	sort.SliceStable(playerUnits, func(left int, right int) bool {
+		return playerUnits[left].GetPosition() < playerUnits[right].GetPosition()
+	})
+	unitList := make([]*pb.CombatUnit, 0, len(oldUnitList)+2)
+	unitList = append(unitList, playerUnits...)
+	unitList = append(unitList, oldUnitList[insertIndex:]...)
+	r.battleStart.UnitList = unitList
+	r.participantOrder = append(r.participantOrder, participant.key)
+	r.participants[participant.key] = participant
+	for unitKey, state := range admission.unitStates {
+		r.unitStates[unitKey] = state
+	}
+	if err := r.validatePhysicalState(); err != nil {
+		for unitKey := range admission.unitStates {
+			delete(r.unitStates, unitKey)
+		}
+		delete(r.participants, participant.key)
+		r.participantOrder = r.participantOrder[:len(r.participantOrder)-1]
+		r.battleStart.UnitList = oldUnitList
+		return err
+	}
+	return nil
+}
+
+func validateCombatRoomParticipantAdmission(participant *combatRoomParticipant, unitStates map[string]*combatUnitRuntimeState) error {
+	if participant == nil || participant.account == nil || participant.gateway == nil || participant.key.aid == 0 || participant.key.characterUUID == 0 || participant.playerCharacter == nil {
+		return fmt.Errorf("combat room participant admission invalid")
+	}
+	characterKey := participant.playerCharacter.GetKey()
+	if characterKey.GetAid() != participant.key.aid || characterKey.GetCharacterUuid() != participant.key.characterUUID || characterKey.GetPetUuid() != 0 || participant.playerCharacter.GetCamp() != pb.CombatCamp_CombatCamp_Initiator {
+		return fmt.Errorf("combat room participant character identity invalid")
+	}
+	units := []*pb.CombatUnit{participant.playerCharacter}
+	if participant.playerPet != nil {
+		petKey := participant.playerPet.GetKey()
+		if petKey.GetAid() != participant.key.aid || petKey.GetCharacterUuid() != participant.key.characterUUID || petKey.GetPetUuid() == 0 || participant.playerPet.GetCamp() != pb.CombatCamp_CombatCamp_Initiator {
+			return fmt.Errorf("combat room participant pet identity invalid")
+		}
+		units = append(units, participant.playerPet)
+	}
+	if len(unitStates) != len(units) {
+		return fmt.Errorf("combat room participant state count invalid")
+	}
+	for _, unit := range units {
+		state := unitStates[combatUnitKeyMapKey(unit.GetKey())]
+		if state == nil || state.unit != unit || state.unit.GetAttribute() == nil || state.unit.GetAttribute().GetLevel() == 0 || !state.alive || state.hp == 0 || state.hp != state.maxHP {
+			return fmt.Errorf("combat room participant state invalid")
+		}
+	}
+	return nil
 }
 
 func (r *CombatRoom) start() {
@@ -239,38 +453,39 @@ func (r *CombatRoom) start() {
 	}
 }
 
-// onParticipantLeave 移除离线参与者及其单位; 只要玩家阵营仍有存活角色, 战斗继续.
-func (r *CombatRoom) onParticipantLeave(key combatRoomParticipantKey) {
+// detachParticipant 处理外部脱离: 立即从本回合和奖励集合移除成员, 但让其余参与者继续战斗.
+func (r *CombatRoom) detachParticipant(key combatRoomParticipantKey) {
 	participant := r.participant(key)
 	if participant == nil {
 		return
 	}
-	leavingCamp := participant.playerCharacter.GetCamp()
-	r.removeParticipant(participant)
+	unitKeys := r.removeParticipant(participant)
 	delete(r.participants, key)
-
-	if r.battleSettlementIfFinished() != nil {
-		result := &pb.CombatRoundResultNotify{
-			BattleId:   r.battleID,
-			Round:      r.round,
-			Settlement: r.escapeSettlement(leavingCamp),
-		}
-		r.finishCombat(result)
+	if len(unitKeys) > 0 {
+		r.pendingUnitLeaves = append(r.pendingUnitLeaves, combatRoomUnitLeave{
+			unitKeys: unitKeys,
+			reason:   pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Detached,
+		})
+	}
+	if len(r.participants) == 0 {
+		r.closeCombatRoom()
 		return
 	}
-	if r.playerActionsReady() {
+	if r.roundTimer != nil && (r.battleSettlementIfFinished() != nil || r.playerActionsReady()) {
 		r.completeCombatRound(r.collectedPlayerActions())
 	}
 }
 
-func (r *CombatRoom) removeParticipant(participant *combatRoomParticipant) {
+func (r *CombatRoom) removeParticipant(participant *combatRoomParticipant) []*pb.CombatUnitKey {
 	if participant == nil {
-		return
+		return nil
 	}
+	unitKeys := make([]*pb.CombatUnitKey, 0, 2)
 	for _, unit := range []*pb.CombatUnit{participant.playerCharacter, participant.playerPet} {
 		if unit == nil {
 			continue
 		}
+		unitKeys = append(unitKeys, cloneCombatUnitKey(unit.GetKey()))
 		delete(r.playerActions, combatUnitKeyMapKey(unit.GetKey()))
 		state := r.stateByKey(unit.GetKey())
 		if state == nil {
@@ -279,20 +494,81 @@ func (r *CombatRoom) removeParticipant(participant *combatRoomParticipant) {
 		state.hp = 0
 		state.alive = false
 		state.guard = false
+		state.charge = nil
+		state.battleExperience = 0
+		state.battleDuelPoint = 0
+		state.battleDropAssetIDs = nil
 	}
+	return unitKeys
 }
 
-func (r *CombatRoom) escapeSettlement(loserCamp pb.CombatCamp) *pb.CombatBattleSettlement {
-	battleResult := pb.CombatBattleResult_CombatBattleResult_InitiatorWin
-	if loserCamp == pb.CombatCamp_CombatCamp_Initiator {
-		battleResult = pb.CombatBattleResult_CombatBattleResult_DefenderWin
+// takePendingUnitLeaveEvents 把 actor 顺序内已经发生的外部脱离转换为本回合最前面的协议事件.
+func (r *CombatRoom) takePendingUnitLeaveEvents() []*pb.CombatEvent {
+	if r == nil || len(r.pendingUnitLeaves) == 0 {
+		return nil
 	}
-	return &pb.CombatBattleSettlement{
-		BattleResult: battleResult,
+	events := make([]*pb.CombatEvent, 0, len(r.pendingUnitLeaves))
+	for _, leave := range r.pendingUnitLeaves {
+		if len(leave.unitKeys) == 0 {
+			continue
+		}
+		events = append(events, &pb.CombatEvent{
+			ActionStepList: []*pb.CombatActionStep{{
+				Cause: pb.CombatActionCause_CombatActionCause_Passive,
+				EffectList: []*pb.CombatEffect{{
+					AffectedUnitKeyList: cloneCombatUnitKeyList(leave.unitKeys),
+					Detail: &pb.CombatEffect_UnitLeave{UnitLeave: &pb.CombatUnitLeaveDetail{
+						Reason: leave.reason,
+					}},
+				}},
+			}},
+		})
 	}
+	r.pendingUnitLeaves = nil
+	return events
 }
 
-// finishCombat 在回合定时器取消后同步清理各 Account 引用并投递最终战报, 再注销和停止房间.
+// combatRoundResultForRecipient 为单个接收角色创建独立战报, 防止个人结算在参与者之间共享.
+func combatRoundResultForRecipient(result *pb.CombatRoundResultNotify, characterUUID uint64) *pb.CombatRoundResultNotify {
+	if result == nil {
+		return nil
+	}
+	participantResult := proto.Clone(result).(*pb.CombatRoundResultNotify)
+	participantResult.RecipientCharacterUuid = characterUUID
+	return participantResult
+}
+
+// sendRoundResultAndFinalizeParticipantLeaves 投递普通回合战报, 并让本回合主动离场者只收到这一份战报后退出房间.
+func (r *CombatRoom) sendRoundResultAndFinalizeParticipantLeaves(result *pb.CombatRoundResultNotify) {
+	if r == nil || result == nil {
+		return
+	}
+	for _, key := range r.participantOrder {
+		participant := r.participant(key)
+		if participant == nil || participant.account == nil {
+			continue
+		}
+		participantResult := combatRoundResultForRecipient(result, participant.key.characterUUID)
+		leaveKind := r.roundParticipantLeaves[key]
+		if leaveKind == combatParticipantLeaveKindUnknown {
+			participant.account.sendClientRes(participant.gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Success.Code(), participantResult)
+			continue
+		}
+		participantResult.Settlement = nil
+		if err := participant.account.PostCombatRoomParticipantLeftSync(combatRoomParticipantLeaveInput{
+			characterUUID: participant.key.characterUUID,
+			combatRoom:    r.actor,
+			gateway:       participant.gateway,
+			result:        participantResult,
+			kind:          leaveKind,
+		}); err != nil {
+			xlog.GLog.Errorf("combat room account leave sync failed battle:%s aid:%d character:%d err:%v", r.battleID, participant.key.aid, participant.key.characterUUID, err)
+		}
+	}
+	r.finalizeRoundParticipantLeaves()
+}
+
+// finishCombat 在回合定时器取消后生成各参与者的不可变奖励输入, 同步清理匹配的 Account actor 指针并投递最终战报, 再注销和停止房间.
 func (r *CombatRoom) finishCombat(result *pb.CombatRoundResultNotify) {
 	if r == nil || r.roundTimer == nil {
 		return
@@ -311,19 +587,59 @@ func (r *CombatRoom) finishCombat(result *pb.CombatRoundResultNotify) {
 		if participant == nil || participant.account == nil {
 			continue
 		}
-		participantResult := proto.Clone(result).(*pb.CombatRoundResultNotify)
-		if err := participant.account.PostCombatRoomFinishedSync(participant.key.characterUUID, r, participant.gateway, participantResult); err != nil {
+		participantResult := combatRoundResultForRecipient(result, participant.key.characterUUID)
+		if leaveKind := r.roundParticipantLeaves[key]; leaveKind != combatParticipantLeaveKindUnknown {
+			participantResult.Settlement = nil
+			if err := participant.account.PostCombatRoomParticipantLeftSync(combatRoomParticipantLeaveInput{
+				characterUUID: participant.key.characterUUID,
+				combatRoom:    r.actor,
+				gateway:       participant.gateway,
+				result:        participantResult,
+				kind:          leaveKind,
+			}); err != nil {
+				xlog.GLog.Errorf("combat room account leave during finish sync failed battle:%s aid:%d character:%d err:%v", r.battleID, participant.key.aid, participant.key.characterUUID, err)
+			}
+			continue
+		}
+		battleReward, rewardErr := r.playerCombatBattleReward(
+			participant.key,
+			result.GetSettlement().GetBattleResult(),
+		)
+		if err := participant.account.PostCombatRoomFinishedSync(combatRoomFinishInput{
+			characterUUID: participant.key.characterUUID,
+			combatRoom:    r.actor,
+			gateway:       participant.gateway,
+			result:        participantResult,
+			enemyGroupID:  r.enemyGroupID,
+			battleReward:  battleReward,
+			rewardErr:     rewardErr,
+		}); err != nil {
 			xlog.GLog.Errorf("combat room account finish sync failed battle:%s aid:%d character:%d err:%v", r.battleID, participant.key.aid, participant.key.characterUUID, err)
 		}
 	}
+	r.finalizeRoundParticipantLeaves()
+	r.closeCombatRoom()
+}
+
+// closeCombatRoom 注销房间并释放全部战斗运行态; 调用者必须先完成需要读取房间状态的结算计算.
+func (r *CombatRoom) closeCombatRoom() {
+	if r == nil {
+		return
+	}
+	r.clearRoundTimer()
 	if current, ok := GCombatRoomMgr.rooms.Find(r.battleID); ok && current == r {
 		GCombatRoomMgr.rooms.Del(r.battleID)
 	}
 	r.participantOrder = nil
 	r.participants = nil
+	r.pendingUnitLeaves = nil
+	r.roundParticipantLeaves = nil
 	r.battleStart = nil
+	r.enemyGroupID = 0
 	r.enemyUnits = nil
 	r.unitStates = nil
 	r.playerActions = nil
-	r.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
+	if r.actor != nil {
+		r.actor.SendMsg(xactor.NewMsg(context.Background(), xactor.SystemReservedCommand_Stop))
+	}
 }

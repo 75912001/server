@@ -112,7 +112,7 @@ func (p *Account) onCharacterAttributeResetReq(gateway *Gateway, pkt *pb.OnlineC
 		return
 	}
 
-	plan, err := prepareCharacterAttributeResetPlan(character.record, req.GetCharacterAttribute(), req.GetAvailablePoint())
+	plan, err := prepareCharacterAttributeResetPlan(character.record, req.GetCharacterAttribute())
 	if err != nil {
 		resultID := xerror.Internal.Code()
 		switch {
@@ -194,8 +194,8 @@ func prepareCharacterAttributeAddPlan(record *pb.CharacterRecord, attributeType 
 	}, nil
 }
 
-// prepareCharacterAttributeResetPlan 校验客户端提交的最终分配, 并只在档案副本上写入目标值.
-func prepareCharacterAttributeResetPlan(record *pb.CharacterRecord, target *pb.CharacterAttributePoints, availablePoint uint32) (*characterAttributeResetPlan, error) {
+// prepareCharacterAttributeResetPlan 根据权威总点数校验客户端提交的四项最终属性, 并在档案副本上计算剩余可加点.
+func prepareCharacterAttributeResetPlan(record *pb.CharacterRecord, target *pb.CharacterAttributePoints) (*characterAttributeResetPlan, error) {
 	if record == nil || record.GetBase() == nil || record.GetBase().GetUuid() == 0 || target == nil {
 		return nil, errCharacterAttributeResetInvalidArgument
 	}
@@ -210,10 +210,10 @@ func prepareCharacterAttributeResetPlan(record *pb.CharacterRecord, target *pb.C
 	if targetAllocatedPoint < uint64(pb.CharacterLimit_CharacterLimit_CreateAttributeTotalPoint) {
 		return nil, fmt.Errorf("%w: target allocated point %d is below %d", errCharacterAttributeResetFailedPrecondition, targetAllocatedPoint, pb.CharacterLimit_CharacterLimit_CreateAttributeTotalPoint)
 	}
-	targetTotalPoint := targetAllocatedPoint + uint64(availablePoint)
-	if targetTotalPoint != currentTotalPoint {
-		return nil, fmt.Errorf("%w: target total point %d does not match current %d", errCharacterAttributeResetFailedPrecondition, targetTotalPoint, currentTotalPoint)
+	if targetAllocatedPoint > currentTotalPoint {
+		return nil, fmt.Errorf("%w: target allocated point %d exceeds current total %d", errCharacterAttributeResetFailedPrecondition, targetAllocatedPoint, currentTotalPoint)
 	}
+	availablePoint := uint32(currentTotalPoint - targetAllocatedPoint)
 
 	next := proto.Clone(record).(*pb.CharacterRecord)
 	nextBase := next.GetBase()

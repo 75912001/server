@@ -58,16 +58,14 @@ func (p *Account) onShopPurchaseReq(gateway *Gateway, pkt *pb.OnlineClientPacket
 		character.record,
 		req.GetItemId(),
 		req.GetQuantity(),
-		req.GetExpectedUnitCost(),
 	)
 	if err != nil {
 		xlog.GLog.Warnf(
-			"shop purchase rejected aid:%d character:%d item:%d quantity:%d expectedUnitCost:%d err:%v",
+			"shop purchase rejected aid:%d character:%d item:%d quantity:%d err:%v",
 			p.aid,
 			req.GetCharacterUuid(),
 			req.GetItemId(),
 			req.GetQuantity(),
-			req.GetExpectedUnitCost(),
 			err,
 		)
 		p.sendClientErr(gateway, uint32(pb.MsgID_ShopPurchaseRes_CMD), shopPurchaseResultID(err))
@@ -115,7 +113,6 @@ func (p *Account) onShopPurchaseReq(gateway *Gateway, pkt *pb.OnlineClientPacket
 		CharacterUuid:       plan.characterUUID,
 		ItemId:              plan.itemID,
 		Quantity:            plan.quantity,
-		UnitCost:            plan.unitCost,
 		TotalCost:           plan.totalCost,
 		AffectedItem:        proto.Clone(plan.affectedItem).(*pb.ItemElement),
 		UsedUuid:            plan.nextUsedUUID,
@@ -140,9 +137,8 @@ func prepareShopPurchasePlan(
 	characterRecord *pb.CharacterRecord,
 	itemID uint32,
 	quantity uint32,
-	expectedUnitCost uint64,
 ) (*shopPurchasePlan, error) {
-	if accountRecord == nil || characterRecord == nil || characterRecord.GetBase().GetUuid() == 0 || itemID == 0 || quantity == 0 || quantity > shopPurchaseMaxQuantity || expectedUnitCost == 0 {
+	if accountRecord == nil || characterRecord == nil || characterRecord.GetBase().GetUuid() == 0 || itemID == 0 || quantity == 0 || quantity > shopPurchaseMaxQuantity {
 		return nil, errShopPurchaseInvalidArgument
 	}
 	if itemID < uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Start) || itemID > uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_End) {
@@ -160,9 +156,6 @@ func prepareShopPurchasePlan(
 	}
 	if itemEntry.Cost == 0 {
 		return nil, fmt.Errorf("%w: item %d is not sellable", errShopPurchaseFailedPrecondition, itemID)
-	}
-	if itemEntry.Cost != expectedUnitCost {
-		return nil, fmt.Errorf("%w: item %d unit cost changed from %d to %d", errShopPurchaseFailedPrecondition, itemID, expectedUnitCost, itemEntry.Cost)
 	}
 	if itemEntry.Cost > math.MaxUint64/uint64(quantity) {
 		return nil, fmt.Errorf("%w: item %d total cost overflows uint64", errShopPurchaseRecordInvalid, itemID)
