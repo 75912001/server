@@ -3,6 +3,7 @@ package gameconfig
 func Load(dir string) (err error) {
 	GGameConfig = &Manager{
 		Skill:     newSkillConfig(),
+		AI:        newAIConfig(),
 		Pet:       newPetConfig(),
 		Character: newCharacterConfig(),
 		Enemy:     newEnemyGroupConfig(),
@@ -10,8 +11,13 @@ func Load(dir string) (err error) {
 		Scene:     newSceneConfig(),
 		Exp:       newExpConfig(),
 		Item:      newItemConfig(),
+		Reward:    newRewardConfig(),
+		Task:      newTaskConfig(),
 	}
 	if err := GGameConfig.Skill.load(dir); err != nil {
+		return err
+	}
+	if err := GGameConfig.AI.load(dir); err != nil {
 		return err
 	}
 	if err := GGameConfig.Pet.load(dir); err != nil {
@@ -35,8 +41,17 @@ func Load(dir string) (err error) {
 	if err := GGameConfig.Item.load(dir); err != nil {
 		return err
 	}
+	if err := GGameConfig.Reward.load(dir); err != nil {
+		return err
+	}
+	if err := GGameConfig.Task.load(dir); err != nil {
+		return err
+	}
 
 	if err := GGameConfig.Skill.check(); err != nil {
+		return err
+	}
+	if err := GGameConfig.AI.check(); err != nil {
 		return err
 	}
 	if err := GGameConfig.Pet.check(); err != nil {
@@ -60,8 +75,17 @@ func Load(dir string) (err error) {
 	if err := GGameConfig.Item.check(); err != nil {
 		return err
 	}
+	if err := GGameConfig.Reward.check(); err != nil {
+		return err
+	}
+	if err := GGameConfig.Task.check(); err != nil {
+		return err
+	}
 
 	if err := GGameConfig.Skill.assemble(); err != nil {
+		return err
+	}
+	if err := GGameConfig.AI.assemble(); err != nil {
 		return err
 	}
 	if err := GGameConfig.Pet.assemble(); err != nil {
@@ -83,6 +107,12 @@ func Load(dir string) (err error) {
 		return err
 	}
 	if err := GGameConfig.Item.assemble(); err != nil {
+		return err
+	}
+	if err := GGameConfig.Reward.assemble(); err != nil {
+		return err
+	}
+	if err := GGameConfig.Task.assemble(); err != nil {
 		return err
 	}
 

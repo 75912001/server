@@ -18,7 +18,7 @@ func isCharacterID(id uint32) bool {
 }
 
 func isSceneID(id uint32) bool {
-	return id >= uint32(pb.AssetIDRange_AssetIDRange_Scene_Start) && id <= uint32(pb.AssetIDRange_AssetIDRange_Scene_End)
+	return id >= uint32(pb.AssetIDRange_AssetIDRange_Map_Start) && id <= uint32(pb.AssetIDRange_AssetIDRange_Map_End)
 }
 
 func isItemID(id uint32) bool {

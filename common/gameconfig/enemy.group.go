@@ -41,8 +41,25 @@ type EnemyEntry struct {
 	ID *uint32 `yaml:"id"`
 	// Weight 来自 enemies[].weight, 表示普通敌人组随机选择权重, 缺省为0且代表必定出现; Boss 组不允许配置.
 	Weight *uint32 `yaml:"weight"`
-	// Level 来自 enemies[].level, 表示指定敌人等级; Boss 组必填, 普通组可选, 值必须处于协议等级范围.
+	// Level 来自 enemies[].level, 表示固定敌人等级; 与 LevelRange 互斥, Boss 组必须配置其中一个, 值必须处于协议等级范围.
 	Level *uint32 `yaml:"level"`
+	// LevelRange 来自 enemies[].levelRange, 表示本成员的随机等级闭区间; 普通组未配置成员等级时使用组级规则.
+	LevelRange *IntRange `yaml:"levelRange"`
+	// BattleAIID 来自 enemies[].battleAI, 必须显式引用ai.yaml; 敌人不单独配置技能.
+	BattleAIID *uint32 `yaml:"battleAI"`
+	// BattleAI 在assemble阶段挂载已校验的只读AI配置, 供建房时复制为独立快照.
+	BattleAI *BattleAIEntry `yaml:"-"`
+}
+
+// UnmarshalYAML拒绝旧的技能覆盖字段, 敌人技能必须由所引用的AI统一定义.
+func (p *EnemyEntry) UnmarshalYAML(node *yaml.Node) error {
+	for index := 0; index+1 < len(node.Content); index += 2 {
+		if node.Content[index].Value == "skill" {
+			return errors.New("enemy.group.yaml 不再允许 enemies[].skill, 请在 ai.yaml 配置战斗技能")
+		}
+	}
+	type enemyEntry EnemyEntry
+	return node.Decode((*enemyEntry)(p))
 }
 
 type IntRange struct {
@@ -174,16 +191,34 @@ func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 				return errors.Errorf("敌人组 enemy 缺少 id: group:%d index:%d %v", *group.ID, enemyIndex, xruntime.Location())
 			}
 			enemyID := *enemy.ID
+			if enemy.BattleAIID == nil || *enemy.BattleAIID == 0 {
+				return errors.Errorf("敌人组 enemy 缺少有效 battleAI 引用: group:%d enemy:%d %v",
+					*group.ID, enemyID, xruntime.Location())
+			}
+			if enemy.Level != nil && enemy.LevelRange != nil {
+				return errors.Errorf("敌人组 enemy 不能同时配置 level 和 levelRange: group:%d enemy:%d %v",
+					*group.ID, enemyID, xruntime.Location())
+			}
+			if enemy.Level != nil &&
+				(*enemy.Level < uint32(pb.LevelRange_LevelRange_Min) ||
+					uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level) {
+				return errors.Errorf("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v",
+					*group.ID, enemyID, *enemy.Level, xruntime.Location())
+			}
+			if enemy.LevelRange != nil &&
+				(enemy.LevelRange.Min == nil || enemy.LevelRange.Max == nil ||
+					*enemy.LevelRange.Min < int(pb.LevelRange_LevelRange_Min) ||
+					*enemy.LevelRange.Max > int(pb.LevelRange_LevelRange_Max) ||
+					*enemy.LevelRange.Min > *enemy.LevelRange.Max) {
+				return errors.Errorf("敌人组 enemy levelRange 无效: group:%d enemy:%d %v",
+					*group.ID, enemyID, xruntime.Location())
+			}
 			if *group.IsBoss {
 				if enemy.Weight != nil {
 					return errors.Errorf("Boss 敌人组不允许配置 weight: group:%d enemy:%d %v", *group.ID, enemyID, xruntime.Location())
 				}
-				if enemy.Level == nil {
-					return errors.Errorf("Boss 敌人组必须配置 level: group:%d enemy:%d %v", *group.ID, enemyID, xruntime.Location())
-				}
-				if *enemy.Level < uint32(pb.LevelRange_LevelRange_Min) ||
-					uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level {
-					return errors.Errorf("Boss 敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v", *group.ID, enemyID, *enemy.Level, xruntime.Location())
+				if enemy.Level == nil && enemy.LevelRange == nil {
+					return errors.Errorf("Boss 敌人组必须配置 level 或 levelRange: group:%d enemy:%d %v", *group.ID, enemyID, xruntime.Location())
 				}
 				continue
 			}
@@ -195,12 +230,6 @@ func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 			if *enemy.Weight > uint32(math.MaxInt32) {
 				return errors.Errorf("普通敌人组条目weight超出C int范围: group:%d enemy:%d weight:%d %v",
 					*group.ID, enemyID, *enemy.Weight, xruntime.Location())
-			}
-			if enemy.Level != nil &&
-				(*enemy.Level < uint32(pb.LevelRange_LevelRange_Min) ||
-					uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level) {
-				return errors.Errorf("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v",
-					*group.ID, enemyID, *enemy.Level, xruntime.Location())
 			}
 		}
 		if !*group.IsBoss {
@@ -239,9 +268,16 @@ func (p *EnemyGroupConfig) check() error {
 	var checkErr error
 	p.Foreach(func(_ uint32, group *EnemyGroupEntry) bool {
 		for _, enemy := range group.Enemies {
-			if !GGameConfig.Pet.IsExist(*enemy.ID) {
+			petID := *enemy.ID
+			pet := GGameConfig.Pet.Get(petID)
+			if pet == nil {
 				checkErr = errors.Errorf("敌人组引用了未定义宠物: group:%d pet:%d %v",
-					*group.ID, *enemy.ID, xruntime.Location())
+					*group.ID, petID, xruntime.Location())
+				return false
+			}
+			if GGameConfig.AI == nil || GGameConfig.AI.Get(*enemy.BattleAIID) == nil {
+				checkErr = errors.Errorf("敌人组引用了未定义AI: group:%d pet:%d ai:%d %v",
+					*group.ID, petID, *enemy.BattleAIID, xruntime.Location())
 				return false
 			}
 		}
@@ -251,5 +287,12 @@ func (p *EnemyGroupConfig) check() error {
 }
 
 func (p *EnemyGroupConfig) assemble() error {
+	p.Foreach(func(_ uint32, group *EnemyGroupEntry) bool {
+		for index := range group.Enemies {
+			enemy := &group.Enemies[index]
+			enemy.BattleAI = GGameConfig.AI.Get(*enemy.BattleAIID)
+		}
+		return true
+	})
 	return nil
 }

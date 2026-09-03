@@ -30,24 +30,24 @@ type PetPanelReferenceEntry struct {
 	GrowthRateMax         *float64                `yaml:"growthRateMax"`
 }
 
-// CalculatePetPanelHP 将服务端权威 Raw 四维换算为面板耐久.
-func CalculatePetPanelHP(rawVital uint32, rawStr uint32, rawTough uint32, rawDex uint32) uint32 {
-	return uint32((float64(rawVital)*4.0 + float64(rawStr) + float64(rawTough) + float64(rawDex)) * 0.01)
+// CalculatePetPanelHP 将服务端权威有符号Raw四维换算为面板耐久.
+func CalculatePetPanelHP(rawVital int32, rawStr int32, rawTough int32, rawDex int32) int32 {
+	return int32((float64(rawVital)*4.0 + float64(rawStr) + float64(rawTough) + float64(rawDex)) * 0.01)
 }
 
-// CalculatePetPanelAttack 将服务端权威 Raw 四维换算为面板攻击.
-func CalculatePetPanelAttack(rawVital uint32, rawStr uint32, rawTough uint32, rawDex uint32) uint32 {
-	return uint32(float64(rawStr)*0.01 + float64(rawTough)*0.001 + float64(rawVital)*0.001 + float64(rawDex)*0.0005)
+// CalculatePetPanelAttack 将服务端权威有符号Raw四维换算为面板攻击.
+func CalculatePetPanelAttack(rawVital int32, rawStr int32, rawTough int32, rawDex int32) int32 {
+	return int32(float64(rawStr)*0.01 + float64(rawTough)*0.001 + float64(rawVital)*0.001 + float64(rawDex)*0.0005)
 }
 
-// CalculatePetPanelDefense 将服务端权威 Raw 四维换算为面板防御.
-func CalculatePetPanelDefense(rawVital uint32, rawStr uint32, rawTough uint32, rawDex uint32) uint32 {
-	return uint32(float64(rawTough)*0.01 + float64(rawStr)*0.001 + float64(rawVital)*0.001 + float64(rawDex)*0.0005)
+// CalculatePetPanelDefense 将服务端权威有符号Raw四维换算为面板防御.
+func CalculatePetPanelDefense(rawVital int32, rawStr int32, rawTough int32, rawDex int32) int32 {
+	return int32(float64(rawTough)*0.01 + float64(rawStr)*0.001 + float64(rawVital)*0.001 + float64(rawDex)*0.0005)
 }
 
-// CalculatePetPanelAgility 将服务端权威 Raw 速度换算为面板敏捷.
-func CalculatePetPanelAgility(rawDex uint32) uint32 {
-	return uint32(float64(rawDex) * 0.01)
+// CalculatePetPanelAgility 将服务端权威有符号Raw速度换算为面板敏捷.
+func CalculatePetPanelAgility(rawDex int32) int32 {
+	return int32(float64(rawDex) * 0.01)
 }
 
 // PetRankGrowthRange 返回正式宠物升级使用的 Rank 随机成长倍率闭区间.
@@ -98,50 +98,50 @@ func calculatePetPanelAverage(growth *PetGrowthEntry, level uint32, gradeOffset 
 	initialRaw := averagePetPanelRaw(savedBase, float64(*growth.InitNum))
 	upgradeRaw := averagePetPanelRaw(savedBase, rankAverage)
 	for rawIndex := 0; rawIndex < petPanelAttributeCount; rawIndex++ {
-		initialRaw[rawIndex] += upgradeRaw[rawIndex] * (level - 1)
+		initialRaw[rawIndex] += int32(int64(upgradeRaw[rawIndex]) * int64(level-1))
 	}
 	return newPetPanelAttributeEntry([petPanelAttributeCount]uint32{
-		CalculatePetPanelHP(initialRaw[0], initialRaw[1], initialRaw[2], initialRaw[3]),
-		CalculatePetPanelAttack(initialRaw[0], initialRaw[1], initialRaw[2], initialRaw[3]),
-		CalculatePetPanelDefense(initialRaw[0], initialRaw[1], initialRaw[2], initialRaw[3]),
-		CalculatePetPanelAgility(initialRaw[3]),
+		uint32(CalculatePetPanelHP(initialRaw[0], initialRaw[1], initialRaw[2], initialRaw[3])),
+		uint32(CalculatePetPanelAttack(initialRaw[0], initialRaw[1], initialRaw[2], initialRaw[3])),
+		uint32(CalculatePetPanelDefense(initialRaw[0], initialRaw[1], initialRaw[2], initialRaw[3])),
+		uint32(CalculatePetPanelAgility(initialRaw[3])),
 	})
 }
 
-func averagePetPanelRaw(savedBase [petPanelAttributeCount]uint32, multiplier float64) [petPanelAttributeCount]uint32 {
+func averagePetPanelRaw(savedBase [petPanelAttributeCount]int32, multiplier float64) [petPanelAttributeCount]int32 {
 	distributions := [][petPanelAttributeCount]uint32{
 		{2, 3, 3, 2},
 		{2, 2, 3, 3},
 		{3, 2, 2, 3},
 		{3, 3, 2, 2},
 	}
-	totals := [petPanelAttributeCount]uint64{}
+	totals := [petPanelAttributeCount]int64{}
 	for _, distribution := range distributions {
 		raw := petPanelRaw(savedBase, distribution, multiplier)
 		for rawIndex := 0; rawIndex < petPanelAttributeCount; rawIndex++ {
-			totals[rawIndex] += uint64(raw[rawIndex])
+			totals[rawIndex] += int64(raw[rawIndex])
 		}
 	}
-	average := [petPanelAttributeCount]uint32{}
+	average := [petPanelAttributeCount]int32{}
 	for rawIndex := 0; rawIndex < petPanelAttributeCount; rawIndex++ {
-		average[rawIndex] = uint32(totals[rawIndex] / uint64(len(distributions)))
+		average[rawIndex] = int32(totals[rawIndex] / int64(len(distributions)))
 	}
 	return average
 }
 
-func petSavedBase(growth *PetGrowthEntry, gradeOffset int32) [petPanelAttributeCount]uint32 {
-	return [petPanelAttributeCount]uint32{
-		uint32(int32(*growth.BaseVital) + gradeOffset),
-		uint32(int32(*growth.BaseStr) + gradeOffset),
-		uint32(int32(*growth.BaseTough) + gradeOffset),
-		uint32(int32(*growth.BaseDex) + gradeOffset),
+func petSavedBase(growth *PetGrowthEntry, gradeOffset int32) [petPanelAttributeCount]int32 {
+	return [petPanelAttributeCount]int32{
+		int32(*growth.BaseVital) + gradeOffset,
+		int32(*growth.BaseStr) + gradeOffset,
+		int32(*growth.BaseTough) + gradeOffset,
+		int32(*growth.BaseDex) + gradeOffset,
 	}
 }
 
-func petPanelRaw(savedBase [petPanelAttributeCount]uint32, distribution [petPanelAttributeCount]uint32, multiplier float64) [petPanelAttributeCount]uint32 {
-	raw := [petPanelAttributeCount]uint32{}
+func petPanelRaw(savedBase [petPanelAttributeCount]int32, distribution [petPanelAttributeCount]uint32, multiplier float64) [petPanelAttributeCount]int32 {
+	raw := [petPanelAttributeCount]int32{}
 	for index := 0; index < petPanelAttributeCount; index++ {
-		raw[index] = uint32(float64(savedBase[index]+distribution[index]) * multiplier)
+		raw[index] = int32(float64(savedBase[index]+int32(distribution[index])) * multiplier)
 	}
 	return raw
 }

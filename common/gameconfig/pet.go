@@ -21,6 +21,8 @@ type PetEntry struct {
 	ID *uint32 `yaml:"id"`
 	// Name 来自 pet.<family>[].name, 仅用于配置核验错误日志定位具体宠物.
 	Name *string `yaml:"name"`
+	// CreationMode 区分普通宠物模板和融合蛋模板. 省略表示普通创建; fusionEgg 只保留原版模板数据, 必须走后续独立融合流程.
+	CreationMode PetCreationMode `yaml:"creationMode,omitempty"`
 	// Rarity 来自 pet.<family>[].rarity, 使用协议 PetRarity 的整数值, 当前范围为普通到神话.
 	Rarity *uint32 `yaml:"rarity"`
 	// Elemental 来自 pet.<family>[].elemental, key 转为协议元素类型, 值范围[0,10], 总和必须为10.
@@ -31,52 +33,31 @@ type PetEntry struct {
 	Growth *PetGrowthEntry `yaml:"growth"`
 	// PanelReference 保存供客户端图鉴直接展示的预计算四维和总成长参考值; 服务端启动时按权威成长规则重新计算并逐项核验.
 	PanelReference *PetPanelReferenceEntry `yaml:"panelReference"`
-	// SkillSlots 来自 pet.<family>[].skill, 按配置顺序保存技能槽位; 0 表示空槽, 非0值必须引用 skill.yaml 中存在的技能ID.
+	// SkillSlots 保存新宠物出生时的固定七槽技能; 0表示空槽, 创建后以实例技能为准.
 	SkillSlots []uint32 `yaml:"skill"`
-	// BattleAI来自pet.<family>[].battleAI, 是玩家宠物模板和自动遇敌单位共用的AI配置.
-	BattleAI *PetBattleAIEntry `yaml:"battleAI"`
 }
 
-type PetBattleAITargetScope string
+// UnmarshalYAML拒绝旧的宠物AI字段, 防止迁移遗漏被YAML解析器静默忽略.
+func (p *PetEntry) UnmarshalYAML(node *yaml.Node) error {
+	for index := 0; index+1 < len(node.Content); index += 2 {
+		if node.Content[index].Value == "battleAI" {
+			return errors.New("pet.yaml 不再允许 battleAI, 请在 enemy.group.yaml 的敌人条目中配置")
+		}
+	}
+	type petEntry PetEntry
+	return node.Decode((*petEntry)(p))
+}
+
+type PetCreationMode string
 
 const (
-	PetBattleAITargetScopeAllOpponents     PetBattleAITargetScope = "allOpponents"
-	PetBattleAITargetScopePlayerCharacters PetBattleAITargetScope = "playerCharacters"
-	PetBattleAITargetScopePlayerPets       PetBattleAITargetScope = "playerPets"
-	PetBattleAITargetScopePartyLeader      PetBattleAITargetScope = "partyLeader"
+	PetCreationModeOrdinary  PetCreationMode = ""
+	PetCreationModeFusionEgg PetCreationMode = "fusionEgg"
 )
 
-type PetBattleAITargetSelection string
-
-const (
-	PetBattleAITargetSelectionRandom          PetBattleAITargetSelection = "random"
-	PetBattleAITargetSelectionHighestHP       PetBattleAITargetSelection = "highestHp"
-	PetBattleAITargetSelectionLowestHP        PetBattleAITargetSelection = "lowestHp"
-	PetBattleAITargetSelectionHighestAttack   PetBattleAITargetSelection = "highestAttack"
-	PetBattleAITargetSelectionHighestAgility  PetBattleAITargetSelection = "highestAgility"
-	PetBattleAITargetSelectionLowestAgility   PetBattleAITargetSelection = "lowestAgility"
-	PetBattleAITargetSelectionElementalSubdue PetBattleAITargetSelection = "elementalSubdue"
-)
-
-type PetBattleAIEntry struct {
-	// AttackWeight 是普通攻击相对权重, 范围[0,2147483647].
-	AttackWeight *uint32 `yaml:"attackWeight"`
-	// DefenseWeight 是本回合防御相对权重, 范围[0,2147483647].
-	DefenseWeight *uint32 `yaml:"defenseWeight"`
-	// EscapeWeight 是PVE逃跑相对权重, 范围[0,2147483647]. 逃跑是基础动作, 不是宠物技能.
-	EscapeWeight *uint32 `yaml:"escapeWeight"`
-	// SkillSlotWeights对应8.5 BATTLE_ai_normal的wa[0]至wa[6], 数组下标直接对应
-	// PetEntry.SkillSlots的七个技能槽. 字段省略时等价于七项全0; 一旦配置就必须
-	// 完整提供七项, 非0权重不能引用不存在或值为0的空技能槽.
-	SkillSlotWeights []uint32 `yaml:"skillSlotWeights"`
-	// TargetScope 限制普通攻击的候选目标类型.
-	TargetScope *PetBattleAITargetScope `yaml:"targetScope"`
-	// TargetSelection 定义在候选目标中选择最终目标的方式.
-	TargetSelection *PetBattleAITargetSelection `yaml:"targetSelection"`
-	// TargetRandomRollMax对应8.5 battle_ai.c的rn[0], 只允许非random目标策略配置.
-	// 服务端先执行RAND(0, value): 结果为0时再随机选择候选, 其余结果使用策略最优目标.
-	// 因此值1表示50%随机、50%最优, 值0表示每次都随机且仍保留两次RAND调用.
-	TargetRandomRollMax *uint32 `yaml:"targetRandomRollMax"`
+// SupportsOrdinaryCreation 返回该模板能否进入普通宠物生成链路.
+func (p *PetEntry) SupportsOrdinaryCreation() bool {
+	return p != nil && p.CreationMode == PetCreationModeOrdinary
 }
 
 type PetElementalEntry map[pb.AssetElemental]*uint32
@@ -143,16 +124,61 @@ type PetGrowthEntry struct {
 	InitNum *uint32 `yaml:"initNum"`
 	// LvupPointSource 来自 growth.lvupPointSource, 表示原始升级成长点字段, 必须大于0.
 	LvupPointSource *float64 `yaml:"lvupPointSource"`
-	// BaseVital 来自 growth.baseVital, 表示宠物模板固定基础体力值, 加品阶最小偏移后必须仍大于0.
+	// BaseVital 来自 growth.baseVital, 表示宠物模板固定基础体力值; 品阶和随机点使用有符号中间值计算.
 	BaseVital *uint32 `yaml:"baseVital"`
-	// BaseStr 来自 growth.baseStr, 表示宠物模板固定基础腕力/攻击值, 加品阶最小偏移后必须仍大于0.
+	// BaseStr 来自 growth.baseStr, 表示宠物模板固定基础腕力/攻击值; 品阶和随机点使用有符号中间值计算.
 	BaseStr *uint32 `yaml:"baseStr"`
-	// BaseTough 来自 growth.baseTough, 表示宠物模板固定基础耐力/防御值, 加品阶最小偏移后必须仍大于0.
+	// BaseTough 来自 growth.baseTough, 表示宠物模板固定基础耐力/防御值; 品阶和随机点使用有符号中间值计算.
 	BaseTough *uint32 `yaml:"baseTough"`
-	// BaseDex 来自 growth.baseDex, 表示宠物模板固定基础速度/敏捷值, 加品阶最小偏移后必须仍大于0.
+	// BaseDex 来自 growth.baseDex, 表示宠物模板固定基础速度/敏捷值; 品阶和随机点使用有符号中间值计算.
 	BaseDex *uint32 `yaml:"baseDex"`
 	// Rank 是加载 pet.yaml 后根据配置基础四维总和生成的成长档位, 不是 YAML 输入字段; 后续升级直接使用该值.
 	Rank uint32 `yaml:"-"`
+}
+
+// validatePetSignedRawRange验证普通创建和逐级升级的全部随机结果都能写入PetRecord的int32 Raw字段.
+// 基础值本身允许在叠加品阶偏移后为0或负数; 这里只拒绝真正越过协议整数边界的配置.
+func validatePetSignedRawRange(pet *PetEntry) error {
+	initNum := int64(*pet.Growth.InitNum)
+	if initNum <= 0 || initNum > math.MaxInt32 {
+		return errors.Errorf("宠物 growth.initNum 超出有符号计算范围: ID:%d value:%d %v",
+			*pet.ID, *pet.Growth.InitNum, xruntime.Location())
+	}
+
+	rankMin, rankMax := PetRankGrowthRange(pet.Growth.Rank)
+	upgradeCount := int64(pb.LevelRange_LevelRange_Max - pb.LevelRange_LevelRange_Min)
+	attributes := []struct {
+		name  string
+		value uint32
+	}{
+		{name: "baseVital", value: *pet.Growth.BaseVital},
+		{name: "baseStr", value: *pet.Growth.BaseStr},
+		{name: "baseTough", value: *pet.Growth.BaseTough},
+		{name: "baseDex", value: *pet.Growth.BaseDex},
+	}
+	for _, attribute := range attributes {
+		minimumSavedBase := int64(attribute.value) + int64(petSavedBaseGradeOffsetMin)
+		maximumSavedBase := int64(attribute.value) + int64(petSavedBaseGradeOffsetMax)
+		if minimumSavedBase < math.MinInt32 || maximumSavedBase > math.MaxInt32 {
+			return errors.Errorf("宠物 growth.%s 品阶偏移后超出int32: ID:%d value:%d %v",
+				attribute.name, *pet.ID, attribute.value, xruntime.Location())
+		}
+
+		minimumUpgradeMultiplier := rankMin
+		if minimumSavedBase < 0 {
+			minimumUpgradeMultiplier = rankMax
+		}
+		minimumUpgrade := int64(float64(minimumSavedBase) * minimumUpgradeMultiplier)
+		maximumRandomBase := maximumSavedBase + 10
+		maximumUpgrade := int64(float64(maximumRandomBase) * rankMax)
+		minimumRaw := minimumSavedBase*initNum + minimumUpgrade*upgradeCount
+		maximumRaw := maximumRandomBase*initNum + maximumUpgrade*upgradeCount
+		if minimumRaw < math.MinInt32 || maximumRaw > math.MaxInt32 {
+			return errors.Errorf("宠物 growth.%s 在1至%d级随机范围内超出int32: ID:%d min:%d max:%d %v",
+				attribute.name, pb.LevelRange_LevelRange_Max, *pet.ID, minimumRaw, maximumRaw, xruntime.Location())
+		}
+	}
+	return nil
 }
 
 func newPetConfig() *PetConfig {
@@ -215,6 +241,11 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 		}
 		if pet.Name == nil || strings.TrimSpace(*pet.Name) == "" {
 			return errors.Errorf("宠物缺少 name: pet:%d %v", *pet.ID, xruntime.Location())
+		}
+		switch pet.CreationMode {
+		case PetCreationModeOrdinary, PetCreationModeFusionEgg:
+		default:
+			return errors.Errorf("宠物 creationMode 非法: ID:%d mode:%q %v", *pet.ID, pet.CreationMode, xruntime.Location())
 		}
 		if pet.Rarity == nil {
 			return errors.Errorf("宠物缺少 rarity: pet:%d %v", *pet.ID, xruntime.Location())
@@ -319,23 +350,10 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 		if pet.Growth.BaseDex == nil {
 			return errors.Errorf("宠物缺少 growth.baseDex: pet:%d %v", *pet.ID, xruntime.Location())
 		}
-		if int32(*pet.Growth.BaseVital)+petSavedBaseGradeOffsetMin <= 0 {
-			return errors.Errorf("宠物 growth.baseVital 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v",
-				*pet.ID, *pet.Growth.BaseVital, petSavedBaseGradeOffsetMin, xruntime.Location())
-		}
-		if int32(*pet.Growth.BaseStr)+petSavedBaseGradeOffsetMin <= 0 {
-			return errors.Errorf("宠物 growth.baseStr 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v",
-				*pet.ID, *pet.Growth.BaseStr, petSavedBaseGradeOffsetMin, xruntime.Location())
-		}
-		if int32(*pet.Growth.BaseTough)+petSavedBaseGradeOffsetMin <= 0 {
-			return errors.Errorf("宠物 growth.baseTough 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v",
-				*pet.ID, *pet.Growth.BaseTough, petSavedBaseGradeOffsetMin, xruntime.Location())
-		}
-		if int32(*pet.Growth.BaseDex)+petSavedBaseGradeOffsetMin <= 0 {
-			return errors.Errorf("宠物 growth.baseDex 加品阶最小偏移后必须大于0: ID:%d value:%d min:%d %v",
-				*pet.ID, *pet.Growth.BaseDex, petSavedBaseGradeOffsetMin, xruntime.Location())
-		}
 		pet.Growth.Rank = petRankFromBaseSum(uint64(*pet.Growth.BaseVital) + uint64(*pet.Growth.BaseStr) + uint64(*pet.Growth.BaseTough) + uint64(*pet.Growth.BaseDex))
+		if err := validatePetSignedRawRange(pet); err != nil {
+			return err
+		}
 
 		if pet.SkillSlots == nil {
 			return errors.Errorf("宠物缺少 skill: pet:%d %v", *pet.ID, xruntime.Location())
@@ -358,92 +376,9 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 			return errors.Errorf("宠物 skill 至少需要一个非0技能: ID:%d %v", *pet.ID, xruntime.Location())
 		}
 
-		if err := pet.BattleAI.check(*pet.ID, pet.SkillSlots); err != nil {
-			return err
-		}
-
 		if !p.AddIfNotExist(*pet.ID, pet) {
 			return errors.Errorf("宠物ID重复: %d %v", *pet.ID, xruntime.Location())
 		}
-	}
-	return nil
-}
-
-// check校验单个敌方PVE基础AI配置.
-//
-// battleAI属于PetEntry自己的独立功能节点, 因此所有必填字段、数值边界和字段间
-// 约束都在这里返回error. configure只负责补充宠物ID上下文并调用本方法, 避免把
-// 每个功能的参数规则重新散落到宠物主加载循环中.
-func (p *PetBattleAIEntry) check(petID uint32, skillSlots []uint32) error {
-	if p == nil {
-		return errors.Errorf("宠物缺少 battleAI: pet:%d %v", petID, xruntime.Location())
-	}
-	if p.AttackWeight == nil {
-		return errors.Errorf("宠物缺少 battleAI.attackWeight: pet:%d %v", petID, xruntime.Location())
-	}
-	if p.DefenseWeight == nil {
-		return errors.Errorf("宠物缺少 battleAI.defenseWeight: pet:%d %v", petID, xruntime.Location())
-	}
-	if p.EscapeWeight == nil {
-		return errors.Errorf("宠物缺少 battleAI.escapeWeight: pet:%d %v", petID, xruntime.Location())
-	}
-	weightSum := uint64(*p.AttackWeight) + uint64(*p.DefenseWeight) + uint64(*p.EscapeWeight)
-	if *p.AttackWeight > math.MaxInt32 || *p.DefenseWeight > math.MaxInt32 || *p.EscapeWeight > math.MaxInt32 {
-		return errors.Errorf("宠物 battleAI 权重单项和总和必须在[0,2147483647]: pet:%d attack:%d defense:%d escape:%d %v",
-			petID, *p.AttackWeight, *p.DefenseWeight, *p.EscapeWeight, xruntime.Location())
-	}
-	if p.SkillSlotWeights != nil {
-		if len(p.SkillSlotWeights) != int(pb.PetSkillLimit_PetSkillLimit_MaxSlotCount) {
-			return errors.Errorf("宠物 battleAI.skillSlotWeights 必须完整配置%d个槽位: pet:%d count:%d %v",
-				pb.PetSkillLimit_PetSkillLimit_MaxSlotCount, petID, len(p.SkillSlotWeights), xruntime.Location())
-		}
-		for slotIndex, weight := range p.SkillSlotWeights {
-			if weight > math.MaxInt32 {
-				return errors.Errorf("宠物 battleAI.skillSlotWeights 权重超出[0,2147483647]: pet:%d slot:%d weight:%d %v",
-					petID, slotIndex, weight, xruntime.Location())
-			}
-			if weight > 0 && (slotIndex >= len(skillSlots) || skillSlots[slotIndex] == 0) {
-				return errors.Errorf("宠物 battleAI.skillSlotWeights 非0权重引用空技能槽: pet:%d slot:%d weight:%d %v",
-					petID, slotIndex, weight, xruntime.Location())
-			}
-			weightSum += uint64(weight)
-		}
-	}
-	if weightSum > math.MaxInt32 {
-		return errors.Errorf("宠物 battleAI 动作权重总和超出[0,2147483647]: pet:%d total:%d %v",
-			petID, weightSum, xruntime.Location())
-	}
-	if p.TargetScope == nil || (*p.TargetScope != PetBattleAITargetScopeAllOpponents &&
-		*p.TargetScope != PetBattleAITargetScopePlayerCharacters &&
-		*p.TargetScope != PetBattleAITargetScopePlayerPets &&
-		*p.TargetScope != PetBattleAITargetScopePartyLeader) {
-		return errors.Errorf("宠物 battleAI.targetScope 非法: pet:%d value:%v %v",
-			petID, p.TargetScope, xruntime.Location())
-	}
-	if p.TargetSelection == nil || (*p.TargetSelection != PetBattleAITargetSelectionRandom &&
-		*p.TargetSelection != PetBattleAITargetSelectionHighestHP &&
-		*p.TargetSelection != PetBattleAITargetSelectionLowestHP &&
-		*p.TargetSelection != PetBattleAITargetSelectionHighestAttack &&
-		*p.TargetSelection != PetBattleAITargetSelectionHighestAgility &&
-		*p.TargetSelection != PetBattleAITargetSelectionLowestAgility &&
-		*p.TargetSelection != PetBattleAITargetSelectionElementalSubdue) {
-		return errors.Errorf("宠物 battleAI.targetSelection 非法: pet:%d value:%v %v",
-			petID, p.TargetSelection, xruntime.Location())
-	}
-	if *p.TargetSelection == PetBattleAITargetSelectionRandom {
-		if p.TargetRandomRollMax != nil {
-			return errors.Errorf("宠物 random目标策略不能配置 battleAI.targetRandomRollMax: pet:%d value:%d %v",
-				petID, *p.TargetRandomRollMax, xruntime.Location())
-		}
-		return nil
-	}
-	if p.TargetRandomRollMax == nil {
-		return errors.Errorf("宠物非random目标策略缺少 battleAI.targetRandomRollMax: pet:%d selection:%s %v",
-			petID, *p.TargetSelection, xruntime.Location())
-	}
-	if *p.TargetRandomRollMax > math.MaxInt32 {
-		return errors.Errorf("宠物 battleAI.targetRandomRollMax 超出[0,2147483647]: pet:%d value:%d %v",
-			petID, *p.TargetRandomRollMax, xruntime.Location())
 	}
 	return nil
 }
