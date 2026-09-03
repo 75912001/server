@@ -4,6 +4,7 @@
 # character.isRole: 是否为玩家角色 (布尔值, 默认false)
 # character.color: 角色颜色
 # character.sprite: 按武器保存动作配置ID, 引用 character.sprite.yaml 中相同的 sprite[].id
+# character[].testStatus: 可选的角色编辑器测试状态. 缺省或0为未测试, 1为通过, 2为未通过; 状态0不落盘.
 
 # 角色 [1000000,1999999]
 character:

@@ -7,9 +7,11 @@ skill:
   - id: 8000001
     name: 攻击
     description: 通常攻击
+    cost: 1000
   - id: 8000002
     name: 防御
     description: 通常防御
+    cost: 1000
   - id: 8000003
     name: 逃跑
     description: 尝试逃离战斗
@@ -28,52 +30,132 @@ skill:
   ##########
   - id: 8100000
     name: 待机
-    description: 待机
+    description: 本回合什么也不做
+    cost: 500
   - id: 8100003
     name: 破除防御
-    description: 破除防御
+    description: 目标防御时绕过防御减伤进行物理攻击, 否则攻击落空
+    cost: 1500
   - id: 8100010
     name: 连续攻击
-    description: 连续攻击
+    description: 两次连续攻击
+    cost: 2000
     continuationAttack:
       segmentCount: 2
   - id: 8100011
     name: 三段攻击
-    description: 三段攻击
+    description: 三次连续攻击
+    cost: 5000
     continuationAttack:
       segmentCount: 3
   - id: 8100012
     name: 四段攻击
-    description: T四段攻击
+    description: 四次连续攻击
+    cost: 15000
     continuationAttack:
       segmentCount: 4
   - id: 8100013
     name: 五段攻击
-    description: T五段攻击
+    description: 五次连续攻击
+    cost: 25000
     continuationAttack:
       segmentCount: 5
   - id: 8100014
     name: 六段攻击
-    description: 六段攻击
+    description: 六次连续攻击
+    cost: 225000
     continuationAttack:
       segmentCount: 6
   - id: 8100015
     name: 七段攻击
-    description: T七段攻击
+    description: 七次连续攻击
+    cost: 625000
     continuationAttack:
       segmentCount: 7
   - id: 8100016
     name: 八段攻击
-    description: T八段攻击
+    description: 八次连续攻击
+    cost: 625000
     continuationAttack:
       segmentCount: 8
   - id: 8100017
     name: 九段攻击
-    description: T九段攻击
+    description: 九次连续攻击
+    cost: 1625000
     continuationAttack:
       segmentCount: 9
   - id: 8100018
     name: 十段攻击
-    description: T十段攻击
+    description: 十次连续攻击
+    cost: 2005000
     continuationAttack:
       segmentCount: 10
+  - id: 8100030
+    name: 突击
+    description: 1回合储存力量　　　 下次攻击时　　　 就会有两倍的攻击力
+    cost: 4000
+    # 内部说明: 第1回合蓄力, 第2回合自动执行一次物理攻击, 基础攻击力提高90%.
+    # 加值在释放时按原版C double计算并截断, 不是最终伤害乘倍率; 不参加合击或自身反击.
+    # 服务端保留技能和目标, 后续回合客户端跳过宠物选择; 目标失效时仅在释放时重新选敌人.
+    chargeAttack:
+      chargeRounds: 1
+      attackPercentModifier: 90
+  - id: 8100031
+    name: 双重突击
+    description: 2回合储存力量 　　　下次攻击时 　　　就会有两倍以上的攻击力
+    cost: 8000
+    # 内部说明: 第1, 2回合蓄力, 第3回合自动执行一次物理攻击, 基础攻击力提高110%.
+    # 双重表示蓄力2回合, 不表示攻击2次; 蓄力期间不新增动画, 释放沿用普通物理攻击表现.
+    # 蓄力递减到0的当回合仍不攻击, 下一回合才释放; 后续蓄力和释放回合均跳过宠物选择.
+    chargeAttack:
+      chargeRounds: 2
+      attackPercentModifier: 110
+  - id: 8100040
+    name: 一击必杀
+    description: 给予2倍的攻击伤害但是命中率下降
+    cost: 2500
+    # 内部说明: 伤害倍率为2倍, 在暴击, 防御减伤和最低伤害判定后应用.
+    # 本次攻击中, 目标基础闪避率增加30个百分点, 再按75%封顶; 使用者自身闪避不变.
+    # 命中率的实际降幅受基础闪避封顶及后置装备修正影响; 防御目标跳过闪避判定.
+    # 仅修正本次主动攻击, 不参加合击; 反击不继承伤害倍率和闪避加值.
+    mightyAttack:
+      damageMultiplier: 2
+      targetDodgeBonus: 30
+  - id: 8100041
+    name: 一击必杀改
+    description: 给予3倍的攻击伤害但是命中率下降
+    cost: 25000
+    # 内部说明: 伤害倍率为3倍, 在暴击, 防御减伤和最低伤害判定后应用.
+    # 本次攻击中, 目标基础闪避率增加40个百分点, 再按75%封顶; 使用者自身闪避不变.
+    # 命中率的实际降幅受基础闪避封顶及后置装备修正影响; 防御目标跳过闪避判定.
+    # 仅修正本次主动攻击, 不参加合击; 反击不继承伤害倍率和闪避加值.
+    mightyAttack:
+      damageMultiplier: 3
+      targetDodgeBonus: 40
+  - id: 8100042
+    name: 一击必杀改2
+    description: 给予4倍的攻击伤害但是命中率下降
+    cost: 25000
+    # 内部说明: 伤害倍率为4倍, 在暴击, 防御减伤和最低伤害判定后应用.
+    # 本次攻击中, 目标基础闪避率增加50个百分点, 再按75%封顶; 使用者自身闪避不变.
+    # 命中率的实际降幅受基础闪避封顶及后置装备修正影响; 防御目标跳过闪避判定.
+    # 仅修正本次主动攻击, 不参加合击; 反击不继承伤害倍率和闪避加值.
+    mightyAttack:
+      damageMultiplier: 4
+      targetDodgeBonus: 50
+  - id: 8100061
+    name: 猛毒攻击
+    description: 攻击力降低30%进行物理攻击, 命中后有概率使目标中毒, 持续5次行动结算
+    cost: 4000
+    poisonAttack:
+      durationActions: 5
+      attackPercentModifier: -30
+
+  - id: 8100626
+    name: 手下留情
+    description: 使对方Hp剩下一点 不会将对方致死
+    cost: 10000
+    # 先按普通物理攻击结算, 仅在本次伤害致死时限制为目标当前HP减1.
+    # HP为1时允许0伤害并保留原命中类型; 不参加合击, 使用者本回合不能反击.
+    # 只影响本次攻击, 目标仍可能反击; 捕获与针刺等特殊反应由各自机制独立接入.
+    showMercy: {}

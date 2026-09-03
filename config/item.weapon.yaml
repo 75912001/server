@@ -1,11 +1,11 @@
 # 武器-配置
-# 本文件由 docs/weapon.excel_to_item.yaml.py 从8份独立武器Excel完整生成, 不要手工编辑.
-# 仅生成同时具有武器id和原版id的行; 任一ID为空时跳过.
+# 本文件由 sa.desktop/addons/make_weapon 从 docs/item.weapon.catalog.yaml 确定性生成, 不要手工编辑.
+# 仅导出 status=published 且通过完整字段和资源校验的条目.
 # 字段契约、ID区间和商店规则见 config/README.md.
 
 items:
   # 武器.爪
-  # 数据源: docs/item.equipment.weapon.爪.8.0.xlsx, 工作表: 武器.爪
+  # 数据源: docs/item.weapon.catalog.yaml
   weaponClaw:
     3900100:
       name: "小的爪"
@@ -12669,7 +12669,7 @@ items:
       confusion_min: -5
       confusion_max: -5
   # 武器.斧
-  # 数据源: docs/item.equipment.weapon.斧.8.0.xlsx, 工作表: 武器.斧
+  # 数据源: docs/item.weapon.catalog.yaml
   weaponAxe:
     3910100:
       name: "小斧头"
@@ -23934,7 +23934,7 @@ items:
       quick_min: 100
       quick_max: 100
   # 武器.棍
-  # 数据源: docs/item.equipment.weapon.棍.8.0.xlsx, 工作表: 武器.棍
+  # 数据源: docs/item.weapon.catalog.yaml
   weaponStaff:
     3920100:
       name: "小棍棒"
@@ -36332,7 +36332,7 @@ items:
       critical_min: 2
       critical_max: 2
   # 武器.枪
-  # 数据源: docs/item.equipment.weapon.枪.8.0.xlsx, 工作表: 武器.枪
+  # 数据源: docs/item.weapon.catalog.yaml
   weaponSpear:
     3930100:
       name: "小的枪"
@@ -48503,7 +48503,7 @@ items:
       critical_min: 1
       critical_max: 1
   # 武器.弓
-  # 数据源: docs/item.equipment.weapon.弓.8.0.xlsx, 工作表: 武器.弓
+  # 数据源: docs/item.weapon.catalog.yaml
   weaponBow:
     3940100:
       name: "小的弓箭"
@@ -64099,7 +64099,7 @@ items:
       confusion_min: -10
       confusion_max: -10
   # 武器.回旋镖
-  # 数据源: docs/item.equipment.weapon.回旋镖.8.0.xlsx, 工作表: 武器.回旋镖
+  # 数据源: docs/item.weapon.catalog.yaml
   weaponBoomerang:
     3950100:
       name: "小的回旋标"
@@ -79635,7 +79635,7 @@ items:
       confusion_min: -10
       confusion_max: -10
   # 武器.投掷斧
-  # 数据源: docs/item.equipment.weapon.投掷斧.8.0.xlsx, 工作表: 武器.投掷斧
+  # 数据源: docs/item.weapon.catalog.yaml
   weaponThrowingAxe:
     3960100:
       name: "小的投掷斧头"
@@ -95144,7 +95144,7 @@ items:
       magicid: 188
       magicusemp: 20
   # 武器.投掷石
-  # 数据源: docs/item.equipment.weapon.投掷石.8.0.xlsx, 工作表: 武器.投掷石
+  # 数据源: docs/item.weapon.catalog.yaml
   weaponThrowingStone:
     3970100:
       name: "小的石"

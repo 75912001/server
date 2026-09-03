@@ -1,0 +1,28 @@
+# 运行任务-配置
+# 多个任务可并行进行, 单个任务的步骤按数组顺序串行推进, 步骤ID必须从1连续递增.
+# completionMode省略时默认为automatic; rewardId为0时完成步骤即视为奖励已领取.
+
+tasks:
+  - id: 60
+    name: 阿布洞窟
+    description: "战胜阿布洞窟地下7楼守护者. 完成后, 永久获得购买阿布水的资格."
+    isMain: false
+    sort: 60
+    acceptConditions: []
+    steps:
+      - id: 1
+        name: 挑战守护者
+        description: 战胜阿布洞窟地下7楼守护者.
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 1000701
+        challenge:
+          enemyGroupId: 1000701
+          npcPetIds:
+            - 4900295
+            - 4900294
+            - 4900296
+          battleBgmIndex: 6
+        consumeItems: []
+        rewardId: 0

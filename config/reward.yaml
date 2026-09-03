@@ -1,0 +1,5 @@
+# 任务奖励包-配置
+# 奖励包ID必须为正数且唯一; task.yaml中的rewardId为0时表示该步骤没有奖励.
+# 当前仅支持普通道具或角色资产, 每项使用itemId和quantity描述.
+
+rewards: []

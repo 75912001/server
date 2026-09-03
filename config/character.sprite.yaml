@@ -1,11 +1,8 @@
 # 角色-配置-动作
 # 任何修改此文件的行为都需要通知客户端和服务端开发人员
 #
-# sprite[].combatRadius: 角色当前显示资源的战斗占位半径, 必填.
-# - 必须配置为大于0的正整数, 单位为像素, 不提供默认值或运行时估算.
-# - 圆心是角色动画的脚底锚点, 不使用当前帧的图片边缘、图片中心或裁剪尺寸.
-# - 近战攻击停靠距离等于攻击者当前sprite半径与受击者当前sprite半径之和.
-# - 同一角色切换武器、骑乘、变身或其他显示资源后, 应读取当前实际sprite配置的半径.
+# sprite[].testStatus: 可选的角色编辑器测试状态. 缺省或0为未测试, 1为通过, 2为未通过; 状态0不落盘.
+# - 状态只记录整套sprite在全部角色本体、武器和骑宠引用上下文中的人工验证结果, 不参与运行时播放.
 #
 # sprite[].attackImpactFrameNumberList: 攻击动画触发表现命中的播放帧位置列表, 必填.
 # - 帧位置从1开始计数, 必须是严格递增的正整数, 同一列表由八个方向共享.
@@ -41,7 +38,6 @@
 
 sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
   - id: 0 # unarmed: #[10177,10520] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -181,7 +177,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [10513,10514,10515,10516,10517,10518]
       happy: [10519,10520]
   - id: 1 # axe: #[9289,9584] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -321,7 +316,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [9577,9578,9579,9580,9581,9582]
       happy: [9583,9584]
   - id: 2 # stick: #[9881,10176] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -461,7 +455,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [10169,10170,10171,10172,10173,10174]
       happy: [10175,10176]
   - id: 3 # spear: #[10521,10816] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -601,7 +594,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [10809,10810,10811,10812,10813,10814]
       happy: [10815,10816]
   - id: 4 # bow: #[9585,9880] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 14
       wave: 7
@@ -742,7 +734,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [9879,9880]
 ######
   - id: 5 # unarmed: #[11705,12048] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -882,7 +873,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [12041,12042,12043,12044,12045,12046]
       happy: [12047,12048]
   - id: 6 # axe: #[10817,11112] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -1022,7 +1012,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [11105,11106,11107,11108,11109,11110]
       happy: [11111,11112]
   - id: 7 # stick: #[11409,11704] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -1162,7 +1151,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [11697,11698,11699,11700,11701,11702]
       happy: [11703,11704]
   - id: 8 # spear: #[12049,12344] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -1302,7 +1290,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [12337,12338,12339,12340,12341,12342]
       happy: [12343,12344]
   - id: 9 # bow: #[11113,11408] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 14
       wave: 7
@@ -1443,7 +1430,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [11407,11408]
 ######
   - id: 10 # unarmed: #[13233,13576] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -1583,7 +1569,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [13569,13570,13571,13572,13573,13574]
       happy: [13575,13576]
   - id: 11 # axe: #[12345,12640] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -1723,7 +1708,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [12633,12634,12635,12636,12637,12638]
       happy: [12639,12640]
   - id: 12 # stick: #[12937,13232] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -1863,7 +1847,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [13225,13226,13227,13228,13229,13230]
       happy: [13231,13232]
   - id: 13 # spear: #[13577,13872] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -2003,7 +1986,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [13865,13866,13867,13868,13869,13870]
       happy: [13871,13872]
   - id: 14 # bow: #[12641,12936] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 14
       wave: 7
@@ -2144,7 +2126,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [12935,12936]
 ######
   - id: 15 # unarmed: #[14761,15104] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -2284,7 +2265,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [15097,15098,15099,15100,15101,15102]
       happy: [15103,15104]
   - id: 16 # axe: #[13873,14168] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -2424,7 +2404,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [14161,14162,14163,14164,14165,14166]
       happy: [14167,14168]
   - id: 17 # stick: #[14465,14760] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -2564,7 +2543,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [14753,14754,14755,14756,14757,14758]
       happy: [14759,14760]
   - id: 18 # spear: #[15105,15400] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 7
@@ -2704,7 +2682,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [15393,15394,15395,15396,15397,15398]
       happy: [15399,15400]
   - id: 19 # bow: #[14169,14464] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 14
       wave: 7
@@ -2845,7 +2822,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [14463,14464]
 ############################################################
   - id: 20 # unarmed: #[16289,16632] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -2985,7 +2961,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [16625,16626,16627,16628,16629,16630]
       happy: [16631,16632,16632,16632,16632,16632,16631,16632,16632,16631,16632,16632,16632,16632,16632,16632,16632,16632]
   - id: 21 # axe: #[15401,15696] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -3125,7 +3100,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [15689,15690,15691,15692,15693,15694]
       happy: [15695,15696,15696,15696,15696,15696,15695,15696,15696,15695,15696,15696,15696,15696,15696,15696,15696,15696]
   - id: 22 # stick: #[15993,16288] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -3265,7 +3239,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [16281,16282,16283,16284,16285,16286]
       happy: [16287,16288,16288,16288,16288,16288,16287,16288,16288,16287,16288,16288,16288,16288,16288,16288,16288,16288]
   - id: 23 # spear: #[16633,16928] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 25
       wave: 3.333333
@@ -3406,7 +3379,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [16921,16922,16923,16924,16925,16926]
       happy: [16927,16928,16928,16928,16928,16928,16927,16928,16928,16927,16928,16928,16928,16928,16928,16928,16928,16928]
   - id: 24 # bow: #[15697,15992] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -3547,7 +3519,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [15991,15992,15992,15992,15992,15992,15991,15992,15992,15991,15992,15992,15992,15992,15992,15992,15992,15992]
 ######
   - id: 25 # unarmed: #[17817,18160] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 3.333333
@@ -3687,7 +3658,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [18153,18154,18155,18156,18157,18158]
       happy: [18159,18160,18160,18160,18160,18160,18159,18160,18160,18159,18160,18160,18160,18160,18160,18160,18160,18160]
   - id: 26 # axe: #[16929,17224] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -3827,7 +3797,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [17217,17218,17219,17220,17221,17222]
       happy: [17223,17224,17224,17224,17224,17224,17223,17224,17224,17223,17224,17224,17224,17224,17224,17224,17224,17224]
   - id: 27 # stick: #[17521,17816] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -3967,7 +3936,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [17809,17810,17811,17812,17813,17814]
       happy: [17815,17816,17816,17816,17816,17816,17815,17816,17816,17815,17816,17816,17816,17816,17816,17816,17816,17816]
   - id: 28 # spear: #[18161,18456] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 25
       wave: 3.333333
@@ -4108,7 +4076,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [18449,18450,18451,18452,18453,18454]
       happy: [18455,18456,18456,18456,18456,18456,18455,18456,18456,18455,18456,18456,18456,18456,18456,18456,18456,18456]
   - id: 29 # bow: #[17225,17520] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -4249,7 +4216,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [17519,17520,17520,17520,17520,17520,17519,17520,17520,17519,17520,17520,17520,17520,17520,17520,17520,17520]
 ######
   - id: 30 # unarmed: #[19345,19688] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.5
       wave: 3.333333
@@ -4389,7 +4355,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [19681,19682,19683,19684,19685,19686]
       happy: [19687,19688,19688,19688,19688,19688,19687,19688,19688,19687,19688,19688,19688,19688,19688,19688,19688,19688]
   - id: 31 # axe: #[18457,18752] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -4529,7 +4494,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [18745,18746,18747,18748,18749,18750]
       happy: [18751,18752,18752,18752,18752,18752,18751,18752,18752,18751,18752,18752,18752,18752,18752,18752,18752,18752]
   - id: 32 # stick: #[19049,19344] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -4669,7 +4633,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [19337,19338,19339,19340,19341,19342]
       happy: [19343,19344,19344,19344,19344,19344,19343,19344,19344,19343,19344,19344,19344,19344,19344,19344,19344,19344]
   - id: 33 # spear: #[19689,19984] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 25
       wave: 3.333333
@@ -4810,7 +4773,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [19977,19978,19979,19980,19981,19982]
       happy: [19983,19984,19984,19984,19984,19984,19983,19984,19984,19983,19984,19984,19984,19984,19984,19984,19984,19984]
   - id: 34 # bow: #[18753,19048] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -4951,7 +4913,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [19047,19048,19048,19048,19048,19048,19047,19048,19048,19047,19048,19048,19048,19048,19048,19048,19048,19048]
 ######
   - id: 35 # unarmed: #[20873,21216] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 24.5
       wave: 3.333333
@@ -5091,7 +5052,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [21209,21210,21211,21212,21213,21214]
       happy: [21215,21216,21216,21216,21216,21216,21215,21216,21216,21215,21216,21216,21216,21216,21216,21216,21216,21216]
   - id: 36 # axe: #[19985,20280] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -5231,7 +5191,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [20273,20274,20275,20276,20277,20278]
       happy: [20279,20280,20280,20280,20280,20280,20279,20280,20280,20279,20280,20280,20280,20280,20280,20280,20280,20280]
   - id: 37 # stick: #[20577,20872] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -5371,7 +5330,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [20865,20866,20867,20868,20869,20870]
       happy: [20871,20872,20872,20872,20872,20872,20871,20872,20872,20871,20872,20872,20872,20872,20872,20872,20872,20872]
   - id: 38 # spear: #[21217,21512] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 3.333333
@@ -5520,7 +5478,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [21505,21506,21507,21508,21509,21510]
       happy: [21511,21512,21512,21512,21512,21512,21511,21512,21512,21511,21512,21512,21512,21512,21512,21512,21512,21512]
   - id: 39 # bow: #[20281,20576] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -5661,7 +5618,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [20575,20576,20576,20576,20576,20576,20575,20576,20576,20575,20576,20576,20576,20576,20576,20576,20576,20576]
 ############################################################
   - id: 40 # unarmed: #[22401,22744] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -5801,7 +5757,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [22737,22738,22739,22740,22741,22742]
       happy: [22743,22744,22743,22743]
   - id: 41 # axe: #[21513,21808] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -5941,7 +5896,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [21801,21802,21803,21804,21805,21806]
       happy: [21807,21808,21807,21807]
   - id: 42 # stick: #[22105,22400] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -6081,7 +6035,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [22393,22394,22395,22396,22397,22398]
       happy: [22399,22400,22399,22399]
   - id: 43 # spear: #[22745,23040] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -6221,7 +6174,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [23033,23034,23035,23036,23037,23038]
       happy: [23039,23040,23039,23039]
   - id: 44 # bow: #[21809,22104] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15.833333
       wave: 6.666667
@@ -6362,7 +6314,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [22103,22104,22103,22103]
 ######
   - id: 45 # unarmed: #[23929,24272] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -6502,7 +6453,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [24265,24266,24267,24268,24269,24270]
       happy: [24271,24272,24271,24271]
   - id: 46 # axe: #[23041,23336] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -6642,7 +6592,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [23329,23330,23331,23332,23333,23334]
       happy: [23335,23336,23335,23335]
   - id: 47 # stick: #[23633,23928] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -6782,7 +6731,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [23921,23922,23923,23924,23925,23926]
       happy: [23927,23928,23927,23927]
   - id: 48 # spear: #[24273,24568] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -6922,7 +6870,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [24561,24562,24563,24564,24565,24566]
       happy: [24567,24568,24567,24567]
   - id: 49 # bow: #[23337,23632] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15.833333
       wave: 6.666667
@@ -7063,7 +7010,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [23631,23632,23631,23631]
 ######
   - id: 50 # unarmed: #[25457,25800] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -7203,7 +7149,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [25793,25794,25795,25796,25797,25798]
       happy: [25799,25800,25799,25799]
   - id: 51 # axe: #[24569,24864] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -7343,7 +7288,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [24857,24858,24859,24860,24861,24862]
       happy: [24863,24864,24863,24863]
   - id: 52 # stick: #[25161,25456] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -7483,7 +7427,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [25449,25450,25451,25452,25453,25454]
       happy: [25455,25456,25455,25455]
   - id: 53 # spear: #[25801,26096] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -7623,7 +7566,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [26089,26090,26091,26092,26093,26094]
       happy: [26095,26096,26095,26095]
   - id: 54 # bow: #[24865,25160] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15.833333
       wave: 6.666667
@@ -7764,7 +7706,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [25159,25160,25159,25159]
 ######
   - id: 55 # unarmed: #[26985,27328] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -7904,7 +7845,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [27321,27322,27323,27324,27325,27326]
       happy: [27327,27328,27327,27327]
   - id: 56 # axe: #[26097,26392] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -8044,7 +7984,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [26385,26386,26387,26388,26389,26390]
       happy: [26391,26392,26391,26391]
   - id: 57 # stick: #[26689,26984] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -8184,7 +8123,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [26977,26978,26979,26980,26981,26982]
       happy: [26983,26984,26983,26983]
   - id: 58 # spear: #[27329,27624] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 6.666667
@@ -8324,7 +8262,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [27617,27618,27619,27620,27621,27622]
       happy: [27623,27624,27623,27623]
   - id: 59 # bow: #[26393,26688] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15.833333
       wave: 6.666667
@@ -8465,7 +8402,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [26687,26688,26687,26687]
 ############################################################
   - id: 60 # unarmed: #[28513,28856] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 14
       wave: 5
@@ -8605,7 +8541,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [28849,28850,28851,28852,28853,28854]
       happy: [28855,28855,28856,28856,28855,28855,28856,28856,28855,28856,28855,28856]
   - id: 61 # axe: #[27625,27920] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -8745,7 +8680,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [27913,27914,27915,27916,27917,27918]
       happy: [27919,27919,27920,27920,27919,27919,27920,27920,27919,27920,27919,27920]
   - id: 62 # stick: #[28217,28512] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -8885,7 +8819,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [28505,28506,28507,28508,28509,28510]
       happy: [28511,28511,28512,28512,28511,28511,28512,28512,28511,28512,28511,28512]
   - id: 63 # spear: #[28857,29152] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -9040,7 +8973,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [29145,29146,29147,29148,29149,29150]
       happy: [29151,29151,29152,29152,29151,29151,29152,29152,29151,29152,29151,29152]
   - id: 64 # bow: #[27921,28216] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -9181,7 +9113,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [28215,28215,28216,28216,28215,28215,28216,28216,28215,28216,28215,28216]
 ######
   - id: 65 # unarmed: #[30041,30384] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 14
       wave: 5
@@ -9321,7 +9252,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [30377,30378,30379,30380,30381,30382]
       happy: [30383,30383,30384,30384,30383,30383,30384,30384,30383,30384,30383,30384]
   - id: 66 # axe: #[29153,29448] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -9461,7 +9391,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [29441,29442,29443,29444,29445,29446]
       happy: [29447,29447,29448,29448,29447,29447,29448,29448,29447,29448,29447,29448]
   - id: 67 # stick: #[29745,30040] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -9601,7 +9530,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [30033,30034,30035,30036,30037,30038]
       happy: [30039,30039,30040,30040,30039,30039,30040,30040,30039,30040,30039,30040]
   - id: 68 # spear: #[30385,30680] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -9756,7 +9684,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [30673,30674,30675,30676,30677,30678]
       happy: [30679,30679,30680,30680,30679,30679,30680,30680,30679,30680,30679,30680]
   - id: 69 # bow: #[29449,29744] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -9897,7 +9824,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [29743,29743,29744,29744,29743,29743,29744,29744,29743,29744,29743,29744]
 ######
   - id: 70 # unarmed: #[31569,31912] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 14
       wave: 5
@@ -10037,7 +9963,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [31905,31906,31907,31908,31909,31910]
       happy: [31911,31911,31912,31912,31911,31911,31912,31912,31911,31912,31911,31912]
   - id: 71 # axe: #[30681,30976] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -10177,7 +10102,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [30969,30970,30971,30972,30973,30974]
       happy: [30975,30975,30976,30976,30975,30975,30976,30976,30975,30976,30975,30976]
   - id: 72 # stick: #[31273,31568] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -10317,7 +10241,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [31561,31562,31563,31564,31565,31566]
       happy: [31567,31567,31568,31568,31567,31567,31568,31568,31567,31568,31567,31568]
   - id: 73 # spear: #[31913,32208] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -10472,7 +10395,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [32201,32202,32203,32204,32205,32206]
       happy: [32207,32207,32208,32208,32207,32207,32208,32208,32207,32208,32207,32208]
   - id: 74 # bow: #[30977,31272] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -10613,7 +10535,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [31271,31271,31272,31272,31271,31271,31272,31272,31271,31272,31271,31272]
 ######
   - id: 75 # unarmed: #[33097,33440] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 14
       wave: 5
@@ -10753,7 +10674,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [33433,33434,33435,33436,33437,33438]
       happy: [33439,33439,33440,33440,33439,33439,33440,33440,33439,33440,33439,33440]
   - id: 76 # axe: #[32209,32504] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -10893,7 +10813,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [32497,32498,32499,32500,32501,32502]
       happy: [32503,32503,32504,32504,32503,32503,32504,32504,32503,32504,32503,32504]
   - id: 77 # stick: #[32801,33096] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -11033,7 +10952,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [33089,33090,33091,33092,33093,33094]
       happy: [33095,33095,33096,33096,33095,33095,33096,33096,33095,33096,33095,33096]
   - id: 78 # spear: #[33441,33736] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -11188,7 +11106,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [33729,33730,33731,33732,33733,33734]
       happy: [33735,33735,33736,33736,33735,33735,33736,33736,33735,33736,33735,33736]
   - id: 79 # bow: #[32505,32800] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -11329,7 +11246,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [32799,32799,32800,32800,32799,32799,32800,32800,32799,32800,32799,32800]
 ############################################################
   - id: 80 # unarmed: #[34625,34968] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -11469,7 +11385,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [34961,34962,34963,34964,34965,34966]
       happy: [34967,34968]
   - id: 81 # axe: #[33737,34032] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -11609,7 +11524,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [34025,34026,34027,34028,34029,34030]
       happy: [34031,34032]
   - id: 82 # stick: #[34329,34624] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -11749,7 +11663,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [34617,34618,34619,34620,34621,34622]
       happy: [34623,34624]
   - id: 83 # spear: #[34969,35264] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -11889,7 +11802,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [35257,35258,35259,35260,35261,35262]
       happy: [35263,35264]
   - id: 84 # bow: #[34033,34328] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -12030,7 +11942,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [34327,34328]
 ######
   - id: 85 # unarmed: #[36153,36496] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -12170,7 +12081,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [36489,36490,36491,36492,36493,36494]
       happy: [36495,36496]
   - id: 86 # axe: #[35265,35560] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -12310,7 +12220,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [35553,35554,35555,35556,35557,35558]
       happy: [35559,35560]
   - id: 87 # stick: #[35857,36152] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -12450,7 +12359,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [36145,36146,36147,36148,36149,36150]
       happy: [36151,36152]
   - id: 88 # spear: #[36497,36792] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -12590,7 +12498,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [36785,36786,36787,36788,36789,36790]
       happy: [36791,36792]
   - id: 89 # bow: #[35561,35856] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -12731,7 +12638,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [35855,35856]
 ######
   - id: 90 # unarmed: #[37681,38024] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -12871,7 +12777,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [38017,38018,38019,38020,38021,38022]
       happy: [38023,38024]
   - id: 91 # axe: #[36793,37088] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -13011,7 +12916,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [37081,37082,37083,37084,37085,37086]
       happy: [37087,37088]
   - id: 92 # stick: #[37385,37680] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -13151,7 +13055,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [37673,37674,37675,37676,37677,37678]
       happy: [37679,37680]
   - id: 93 # spear: #[38025,38320] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -13291,7 +13194,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [38313,38314,38315,38316,38317,38318]
       happy: [38319,38320]
   - id: 94 # bow: #[37089,37384] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -13432,7 +13334,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [37383,37384]
 ######
   - id: 95 # unarmed: #[39209,39552] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -13572,7 +13473,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [39545,39546,39547,39548,39549,39550]
       happy: [39551,39552]
   - id: 96 # axe: #[38321,38616] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -13712,7 +13612,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [38609,38610,38611,38612,38613,38614]
       happy: [38615,38616]
   - id: 97 # stick: #[38913,39208] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -13852,7 +13751,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [39201,39202,39203,39204,39205,39206]
       happy: [39207,39208]
   - id: 98 # spear: #[39553,39848] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8
       wave: 3.333333
@@ -13992,7 +13890,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [39841,39842,39843,39844,39845,39846]
       happy: [39847,39848]
   - id: 99 # bow: #[38617,38912] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -14133,7 +14030,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [38911,38912]
 ############################################################
   - id: 100 # unarmed: #[40733,41076] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 18.666667
       wave: 3.333333
@@ -14273,7 +14169,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [41069,41070,41071,41072,41073,41074]
       happy: [41075,41076]
   - id: 101 # axe: #[39849,40144] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -14413,7 +14308,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [40137,40138,40139,40140,40141,40142]
       happy: [40143,40144]
   - id: 102 # stick: #[40441,40736] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -14557,7 +14451,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [40725,40726,40727,40728,40729,40730]
       happy: [40731,40732]
   - id: 103 # spear: #[41077,41372] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 3.333333
@@ -14697,7 +14590,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [41365,41366,41367,41368,41369,41370]
       happy: [41371,41372]
   - id: 104 # bow: #[40145,40440] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -14838,7 +14730,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [40439,40440]
 ######
   - id: 105 # unarmed: #[42261,42604] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 18.666667
       wave: 3.333333
@@ -14978,7 +14869,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [42597,42598,42599,42600,42601,42602]
       happy: [42603,42604]
   - id: 106 # axe: #[41373,41668] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -15118,7 +15008,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [41661,41662,41663,41664,41665,41666]
       happy: [41667,41668]
   - id: 107 # stick: #[41965,42260] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -15258,7 +15147,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [42253,42254,42255,42256,42257,42258]
       happy: [42259,42260]
   - id: 108 # spear: #[42605,42900] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 3.333333
@@ -15398,7 +15286,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [42893,42894,42895,42896,42897,42898]
       happy: [42899,42900]
   - id: 109 # bow: #[41669,41964] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -15539,7 +15426,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [41963,41964]
 ######
   - id: 110 # unarmed: #[43789,44132] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 18.666667
       wave: 3.333333
@@ -15679,7 +15565,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [44125,44126,44127,44128,44129,44130]
       happy: [44131,44132]
   - id: 111 # axe: #[42901,43196] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -15819,7 +15704,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [43189,43190,43191,43192,43193,43194]
       happy: [43195,43196]
   - id: 112 # stick: #[43493,43788] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -15959,7 +15843,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [43781,43782,43783,43784,43785,43786]
       happy: [43787,43788]
   - id: 113 # spear: #[44133,44428] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 3.333333
@@ -16099,7 +15982,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [44421,44422,44423,44424,44425,44426]
       happy: [44427,44428]
   - id: 114 # bow: #[43197,43492] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -16240,7 +16122,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [43491,43492]
 ######
   - id: 115 # unarmed: #[45317,45660] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17.5
       wave: 3.333333
@@ -16390,7 +16271,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [45653,45654,45655,45656,45657,45658]
       happy: [45659,45660]
   - id: 116 # axe: #[44429,44724] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -16530,7 +16410,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [44717,44718,44719,44720,44721,44722]
       happy: [44723,44724]
   - id: 117 # stick: #[45021,45316] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -16670,7 +16549,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [45309,45310,45311,45312,45313,45314]
       happy: [45315,45316]
   - id: 118 # spear: #[45661,45956] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 3.333333
@@ -16810,7 +16688,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [45949,45950,45951,45952,45953,45954]
       happy: [45955,45956]
   - id: 119 # bow: #[44725,45020] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16.25
       wave: 3.333333
@@ -16951,7 +16828,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [45019,45020]
 ############################################################
   - id: 120 # unarmed: #[46845,47188] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -17091,7 +16967,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [47181,47182,47183,47184,47185,47186]
       happy: [47187,47188,47188]
   - id: 121 # axe: #[45957,46252] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -17231,7 +17106,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [46245,46246,46247,46248,46249,46250]
       happy: [46251,46252,46252]
   - id: 122 # stick: #[46549,46844] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -17371,7 +17245,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [46837,46838,46839,46840,46841,46842]
       happy: [46843,46844,46844]
   - id: 123 # spear: #[47189,47484] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -17511,7 +17384,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [47477,47478,47479,47480,47481,47482]
       happy: [47483,47484,47484]
   - id: 124 # bow: #[46253,46548] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -17652,7 +17524,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [46547,46548,46548]
 ######
   - id: 125 # unarmed: #[48373,48716] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -17792,7 +17663,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [48709,48710,48711,48712,48713,48714]
       happy: [48715,48716,48716]
   - id: 126 # axe: #[47485,47780] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -17932,7 +17802,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [47773,47774,47775,47776,47777,47778]
       happy: [47779,47780,47780]
   - id: 127 # stick: #[48077,48372] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -18072,7 +17941,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [48365,48366,48367,48368,48369,48370]
       happy: [48371,48372,48372]
   - id: 128 # spear: #[48717,49012] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -18212,7 +18080,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [49005,49006,49007,49008,49009,49010]
       happy: [49011,49012,49012]
   - id: 129 # bow: #[47781,48076] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -18353,7 +18220,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [48075,48076,48076]
 ######
   - id: 130 # unarmed: #[49901,50244] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -18493,7 +18359,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [50237,50238,50239,50240,50241,50242]
       happy: [50243,50244,50244]
   - id: 131 # axe: #[49013,49308] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -18633,7 +18498,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [49301,49302,49303,49304,49305,49306]
       happy: [49307,49308,49308]
   - id: 132 # stick: #[49605,49900] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -18773,7 +18637,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [49893,49894,49895,49896,49897,49898]
       happy: [49899,49900,49900]
   - id: 133 # spear: #[50245,50540] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -18913,7 +18776,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [50533,50534,50535,50536,50537,50538]
       happy: [50539,50540,50540]
   - id: 134 # bow: #[49309,49604] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -19054,7 +18916,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [49603,49604,49604]
 ######
   - id: 135 # unarmed: #[51429,51772] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -19194,7 +19055,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [51765,51766,51767,51768,51769,51770]
       happy: [51771,51772,51772]
   - id: 136 # axe: #[50541,50836] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -19334,7 +19194,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [50829,50830,50831,50832,50833,50834]
       happy: [50835,50836,50836]
   - id: 137 # stick: #[51133,51428] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -19474,7 +19333,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [51421,51422,51423,51424,51425,51426]
       happy: [51427,51428,51428]
   - id: 138 # spear: #[51773,52068] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -19614,7 +19472,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [52061,52062,52063,52064,52065,52066]
       happy: [52067,52068,52068]
   - id: 139 # bow: #[50837,51132] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 11
       wave: 5
@@ -19755,7 +19612,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [51131,51132,51132]
 ############################################################
   - id: 140 # unarmed: #[52957,53300] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 27
       wave: 5
@@ -19895,7 +19751,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [53293,53294,53295,53296,53297,53298]
       happy: [53299,53300,53300]
   - id: 141 # axe: #[52069,52364] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 23.75
       wave: 5
@@ -20035,7 +19890,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [52357,52358,52359,52360,52361,52362]
       happy: [52363,52364,52364]
   - id: 142 # stick: #[52661,52956] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 23.75
       wave: 5
@@ -20175,7 +20029,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [52949,52950,52951,52952,52953,52954]
       happy: [52955,52956,52956]
   - id: 143 # spear: #[53301,53596] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 5
@@ -20315,7 +20168,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [53589,53590,53591,53592,53593,53594]
       happy: [53595,53596,53596]
   - id: 144 # bow: #[52365,52660] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 5
@@ -20456,7 +20308,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [52659,52660,52660]
 ######
   - id: 145 # unarmed: #[54485,54828] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 27
       wave: 5
@@ -20596,7 +20447,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [54821,54822,54823,54824,54825,54826]
       happy: [54827,54828,54828]
   - id: 146 # axe: #[53597,53892] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 23.75
       wave: 5
@@ -20736,7 +20586,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [53885,53886,53887,53888,53889,53890]
       happy: [53891,53892,53892]
   - id: 147 # stick: #[54189,54484] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 23.75
       wave: 5
@@ -20876,7 +20725,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [54477,54478,54479,54480,54481,54482]
       happy: [54483,54484,54484]
   - id: 148 # spear: #[54829,55124] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 5
@@ -21016,7 +20864,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [55117,55118,55119,55120,55121,55122]
       happy: [55123,55124,55124]
   - id: 149 # bow: #[53893,54188] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 5
@@ -21157,7 +21004,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [54187,54188,54188]
 ######
   - id: 150 # unarmed: #[56013,56356] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 27
       wave: 5
@@ -21297,7 +21143,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [56349,56350,56351,56352,56353,56354]
       happy: [56355,56356,56356]
   - id: 151 # axe: #[55125,55420] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 23.75
       wave: 5
@@ -21437,7 +21282,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [55413,55414,55415,55416,55417,55418]
       happy: [55419,55420,55420]
   - id: 152 # stick: #[55717,56012] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 23.75
       wave: 5
@@ -21577,7 +21421,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [56005,56006,56007,56008,56009,56010]
       happy: [56011,56012,56012]
   - id: 153 # spear: #[56357,56652] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 5
@@ -21717,7 +21560,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [56645,56646,56647,56648,56649,56650]
       happy: [56651,56652,56652]
   - id: 154 # bow: #[55421,55716] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 5
@@ -21858,7 +21700,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [55715,55716,55716]
 ######
   - id: 155 # unarmed: #[57541,57884] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 27
       wave: 5
@@ -21998,7 +21839,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [57877,57878,57879,57880,57881,57882]
       happy: [57883,57884,57884]
   - id: 156 # axe: #[56653,56948] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 23.75
       wave: 5
@@ -22138,7 +21978,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [56941,56942,56943,56944,56945,56946]
       happy: [56947,56948,56948]
   - id: 157 # stick: #[57245,57540] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 23.75
       wave: 5
@@ -22278,7 +22117,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [57533,57534,57535,57536,57537,57538]
       happy: [57539,57540,57540]
   - id: 158 # spear: #[57885,58180] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 5
@@ -22418,7 +22256,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [58173,58174,58175,58176,58177,58178]
       happy: [58179,58180,58180]
   - id: 159 # bow: #[56949,57244] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 5
@@ -22559,7 +22396,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [57243,57244,57244]
 ############################################################
   - id: 160 # unarmed: #[59069,59412] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.5
       wave: 5
@@ -22699,7 +22535,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [59405,59406,59407,59408,59409,59410]
       happy: [59411,59412]
   - id: 161 # axe: #[58181,58476] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 5
@@ -22839,7 +22674,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [58469,58470,58471,58472,58473,58474]
       happy: [58475,58476]
   - id: 162 # stick: #[58773,59068] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 5
@@ -22979,7 +22813,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [59061,59062,59063,59064,59065,59066]
       happy: [59067,59068]
   - id: 163 # spear: #[59413,59708] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -23119,7 +22952,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [59701,59702,59703,59704,59705,59706]
       happy: [59707,59708]
   - id: 164 # bow: #[58477,58772] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9.333333
       wave: 5
@@ -23260,7 +23092,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [58771,58772]
 ######
   - id: 165 # unarmed: #[60597,60940] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.5
       wave: 5
@@ -23400,7 +23231,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [60933,60934,60935,60936,60937,60938]
       happy: [60939,60940]
   - id: 166 # axe: #[59709,60004] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 5
@@ -23540,7 +23370,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [59997,59998,59999,60000,60001,60002]
       happy: [60003,60004]
   - id: 167 # stick: #[60301,60596] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 5
@@ -23680,7 +23509,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [60589,60590,60591,60592,60593,60594]
       happy: [60595,60596]
   - id: 168 # spear: #[60941,61236] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -23820,7 +23648,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [61229,61230,61231,61232,61233,61234]
       happy: [61235,61236]
   - id: 169 # bow: #[60005,60300] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9.333333
       wave: 5
@@ -23961,7 +23788,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [60299,60300]
 ######
   - id: 170 # unarmed: #[62125,62468] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.5
       wave: 5
@@ -24101,7 +23927,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [62461,62462,62463,62464,62465,62466]
       happy: [62467,62468]
   - id: 171 # axe: #[61237,61532] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 5
@@ -24241,7 +24066,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [61525,61526,61527,61528,61529,61530]
       happy: [61531,61532]
   - id: 172 # stick: #[61829,62124] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 5
@@ -24381,7 +24205,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [62117,62118,62119,62120,62121,62122]
       happy: [62123,62124]
   - id: 173 # spear: #[62469,62764] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -24521,7 +24344,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [62757,62758,62759,62760,62761,62762]
       happy: [62763,62764]
   - id: 174 # bow: #[61533,61828] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9.333333
       wave: 5
@@ -24662,7 +24484,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [61827,61828]
 ######
   - id: 175 # unarmed: #[63653,63996] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.5
       wave: 5
@@ -24802,7 +24623,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [63989,63990,63991,63992,63993,63994]
       happy: [63995,63996]
   - id: 176 # axe: #[62765,63060] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 5
@@ -24942,7 +24762,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [63053,63054,63055,63056,63057,63058]
       happy: [63059,63060]
   - id: 177 # stick: #[63357,63652] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 5
@@ -25082,7 +24901,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [63645,63646,63647,63648,63649,63650]
       happy: [63651,63652]
   - id: 178 # spear: #[63997,64292] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 19
       wave: 5
@@ -25222,7 +25040,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [64285,64286,64287,64288,64289,64290]
       happy: [64291,64292]
   - id: 179 # bow: #[63061,63356] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9.333333
       wave: 5
@@ -25363,7 +25180,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [63355,63356]
 ############################################################
   - id: 180 # unarmed: #[65181,65524] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -25503,7 +25319,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [65517,65518,65519,65520,65521,65522]
       happy: [65523,65524,65523,65523]
   - id: 181 # axe: #[64293,64588] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -25643,7 +25458,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [64581,64582,64583,64584,64585,64586]
       happy: [64587,64588,64587,64587]
   - id: 182 # stick: #[64885,65180] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -25783,7 +25597,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [65173,65174,65175,65176,65177,65178]
       happy: [65179,65180,65179,65179]
   - id: 183 # spear: #[65525,65820] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -25923,7 +25736,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [65813,65814,65815,65816,65817,65818]
       happy: [65819,65820,65819,65819]
   - id: 184 # bow: #[64589,64884] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 6.666667
@@ -26064,7 +25876,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [64883,64884,64883,64883]
 ######
   - id: 185 # unarmed: #[66709,67052] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -26204,7 +26015,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [67045,67046,67047,67048,67049,67050]
       happy: [67051,67052,67051,67051]
   - id: 186 # axe: #[65821,66116] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -26344,7 +26154,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [66109,66110,66111,66112,66113,66114]
       happy: [66115,66116,66115,66115]
   - id: 187 # stick: #[66413,66708] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -26484,7 +26293,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [66701,66702,66703,66704,66705,66706]
       happy: [66707,66708,66707,66707]
   - id: 188 # spear: #[67053,67348] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -26624,7 +26432,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [67341,67342,67343,67344,67345,67346]
       happy: [67347,67348,67347,67347]
   - id: 189 # bow: #[66117,66412] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 6.666667
@@ -26765,7 +26572,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [66411,66412,66411,66411]
 ######
   - id: 190 # unarmed: #[68237,68580] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -26905,7 +26711,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [68573,68574,68575,68576,68577,68578]
       happy: [68579,68580,68579,68579]
   - id: 191 # axe: #[67349,67644] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -27045,7 +26850,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [67637,67638,67639,67640,67641,67642]
       happy: [67643,67644,67643,67643]
   - id: 192 # stick: #[67941,68236] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -27185,7 +26989,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [68229,68230,68231,68232,68233,68234]
       happy: [68235,68236,68235,68235]
   - id: 193 # spear: #[68581,68876] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -27325,7 +27128,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [68869,68870,68871,68872,68873,68874]
       happy: [68875,68876,68875,68875]
   - id: 194 # bow: #[67645,67940] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 6.666667
@@ -27466,7 +27268,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [67939,67940,67939,67939]
 ######
   - id: 195 # unarmed: #[69765,70108] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -27606,7 +27407,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [70101,70102,70103,70104,70105,70106]
       happy: [70107,70108,70107,70107]
   - id: 196 # axe: #[68877,69172] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -27746,7 +27546,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [69165,69166,69167,69168,69169,69170]
       happy: [69171,69172,69171,69171]
   - id: 197 # stick: #[69469,69764] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -27886,7 +27685,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [69757,69758,69759,69760,69761,69762]
       happy: [69763,69764,69763,69763]
   - id: 198 # spear: #[70109,70404] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 13
       wave: 6.666667
@@ -28026,7 +27824,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [70397,70398,70399,70400,70401,70402]
       happy: [70403,70404,70403,70403]
   - id: 199 # bow: #[69173,69468] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 6.666667
@@ -28167,7 +27964,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [69467,69468,69467,69467]
 ############################################################
   - id: 200 # unarmed: #[71293,71636] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -28307,7 +28103,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [71629,71630,71631,71632,71633,71634]
       happy: [71635,71636,71636,71636]
   - id: 201 # axe: #[70405,70700] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -28456,7 +28251,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [70693,70694,70695,70696,70697,70698]
       happy: [70699,70700,70700,70700]
   - id: 202 # stick: #[70997,71292] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -28605,7 +28399,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [71285,71286,71287,71288,71289,71290]
       happy: [71291,71292,71292,71292]
   - id: 203 # spear: #[71637,71932] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -28754,7 +28547,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [71925,71926,71927,71928,71929,71930]
       happy: [71931,71932,71932,71932]
   - id: 204 # bow: #[70701,70996] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -28904,7 +28696,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [70995,70996,70996,70996]
 ######
   - id: 205 # unarmed: #[72821,73164] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -29044,7 +28835,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [73157,73158,73159,73160,73161,73162]
       happy: [73163,73164,73164,73164]
   - id: 206 # axe: #[71933,72228] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -29193,7 +28983,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [72221,72222,72223,72224,72225,72226]
       happy: [72227,72228,72228,72228]
   - id: 207 # stick: #[72525,72820] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -29342,7 +29131,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [72813,72814,72815,72816,72817,72818]
       happy: [72819,72820,72820,72820]
   - id: 208 # spear: #[73165,73460] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -29491,7 +29279,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [73453,73454,73455,73456,73457,73458]
       happy: [73459,73460,73460,73460]
   - id: 209 # bow: #[72229,72524] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -29641,7 +29428,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [72523,72524,72524,72524]
 ######
   - id: 210 # unarmed: #[74349,74692] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -29781,7 +29567,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [74685,74686,74687,74688,74689,74690]
       happy: [74691,74692,74692,74692]
   - id: 211 # axe: #[73461,73756] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -29930,7 +29715,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [73749,73750,73751,73752,73753,73754]
       happy: [73755,73756,73756,73756]
   - id: 212 # stick: #[74053,74348] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -30079,7 +29863,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [74341,74342,74343,74344,74345,74346]
       happy: [74347,74348,74348,74348]
   - id: 213 # spear: #[74693,74988] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -30228,7 +30011,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [74981,74982,74983,74984,74985,74986]
       happy: [74987,74988,74988,74988]
   - id: 214 # bow: #[73757,74052] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -30378,7 +30160,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [74051,74052,74052,74052]
 ######
   - id: 215 # unarmed: #[75877,76220] 344 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -30518,7 +30299,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [76213,76214,76215,76216,76217,76218]
       happy: [76219,76220,76220,76220]
   - id: 216 # axe: #[74989,75284] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 17
       wave: 5
@@ -30667,7 +30447,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [75277,75278,75279,75280,75281,75282]
       happy: [75283,75284,75284,75284]
   - id: 217 # stick: #[75581,75876] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -30816,7 +30595,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [75869,75870,75871,75872,75873,75874]
       happy: [75875,75876,75876,75876]
   - id: 218 # spear: #[76221,76516] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -30965,7 +30743,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [76509,76510,76511,76512,76513,76514]
       happy: [76515,76516,76516,76516]
   - id: 219 # bow: #[75285,75580] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 21.25
       wave: 5
@@ -31115,7 +30892,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [75579,75580,75580,75580]
 ############################################################
   - id: 220 # unarmed: #[77405,77773] 368 个文件 (NOTE: 中间 77508 没用到, 实际用到文件数量为 368)
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 3.333333
@@ -31256,7 +31032,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [77766,77767,77768,77769,77770,77771]
       happy: [77772,77773,77773,77773,77772,77773,77772,77773]
   - id: 221 # axe: #[76517,76812] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -31396,7 +31171,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [76805,76806,76807,76808,76809,76810]
       happy: [76811,76812,76812,76812,76811,76812,76811,76812]
   - id: 222 # stick: #[77109,77404] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -31536,7 +31310,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [77397,77398,77399,77400,77401,77402]
       happy: [77403,77404,77404,77404,77403,77404,77403,77404]
   - id: 223 # spear: #[77774,78069] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -31676,7 +31449,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [78062,78063,78064,78065,78066,78067]
       happy: [78068,78069,78069,78069,78068,78069,78068,78069]
   - id: 224 # bow: #[76813,77108] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -31817,7 +31589,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [77107,77108,77108,77108,77107,77108,77107,77108]
 ######
   - id: 225 # unarmed: #[78958,79325] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 3.333333
@@ -31958,7 +31729,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [79318,79319,79320,79321,79322,79323]
       happy: [79324,79325,79325,79325,79324,79325,79324,79325]
   - id: 226 # axe: #[78070,78365] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -32098,7 +31868,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [78358,78359,78360,78361,78362,78363]
       happy: [78364,78365,78365,78365,78364,78365,78364,78365]
   - id: 227 # stick: #[78662,78957] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -32238,7 +32007,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [78950,78951,78952,78953,78954,78955]
       happy: [78956,78957,78957,78957,78956,78957,78956,78957]
   - id: 228 # spear: #[79326,79621] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -32378,7 +32146,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [79614,79615,79616,79617,79618,79619]
       happy: [79620,79621,79621,79621,79620,79621,79620,79621]
   - id: 229 # bow: #[78366,78661] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -32519,7 +32286,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [78660,78661,78661,78661,78660,78661,78660,78661]
 ######
   - id: 230 # unarmed: #[80510,80877] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 3.333333
@@ -32660,7 +32426,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [80870,80871,80872,80873,80874,80875]
       happy: [80876,80877,80877,80877,80876,80877,80876,80877]
   - id: 231 # axe: #[79622,79917] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -32800,7 +32565,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [79910,79911,79912,79913,79914,79915]
       happy: [79916,79917,79917,79917,79916,79917,79916,79917]
   - id: 232 # stick: #[80214,80509] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -32940,7 +32704,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [80502,80503,80504,80505,80506,80507]
       happy: [80508,80509,80509,80509,80508,80509,80508,80509]
   - id: 233 # spear: #[80878,81173] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -33080,7 +32843,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [81166,81167,81168,81169,81170,81171]
       happy: [81172,81173,81173,81173,81172,81173,81172,81173]
   - id: 234 # bow: #[79918,80213] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -33221,7 +32983,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [80212,80213,80213,80213,80212,80213,80212,80213]
 ######
   - id: 235 # unarmed: #[82062,82430] 368 个文件 (NOTE: 中间 82211 没用到, 实际用到文件数量为 368)
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 15
       wave: 3.333333
@@ -33362,7 +33123,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [82423,82424,82425,82426,82427,82428]
       happy: [82429,82430,82430,82430,82429,82430,82429,82430]
   - id: 236 # axe: #[81174,81469] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -33502,7 +33262,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [81462,81463,81464,81465,81466,81467]
       happy: [81468,81469,81469,81469,81468,81469,81468,81469]
   - id: 237 # stick: #[81766,82061] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -33642,7 +33401,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [82054,82055,82056,82057,82058,82059]
       happy: [82060,82061,82061,82061,82060,82061,82060,82061]
   - id: 238 # spear: #[82431,82726] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -33782,7 +33540,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [82719,82720,82721,82722,82723,82724]
       happy: [82725,82726,82726,82726,82725,82726,82725,82726]
   - id: 239 # bow: #[81470,81765] 296 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 3.333333
@@ -33923,7 +33680,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [81764,81765,81765,81765,81764,81765,81764,81765]
 
   - id: 684 # bow: #[186969,187344] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -34064,7 +33820,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [187343,187344]
 ######
   - id: 685 # unarmed: #[187345,187720] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -34204,7 +33959,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [187713,187714,187715,187716,187717,187718]
       happy: [187719,187720]
   - id: 686 # axe: #[187721,188096] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -34344,7 +34098,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [188089,188090,188091,188092,188093,188094]
       happy: [188095,188096]
   - id: 687 # stick: #[188097,188472] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -34484,7 +34237,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [188465,188466,188467,188468,188469,188470]
       happy: [188471,188472]
   - id: 688 # spear: #[188473,188856] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -34625,7 +34377,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [188846,188847,188848,188849,188850,188851,188852,188853,188854]
       happy: [188855,188856]
   - id: 689 # bow: #[188857,189240] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -34767,7 +34518,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [189239,189240]
 ######
   - id: 690 # unarmed: #[189241,189624] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -34908,7 +34658,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [189614,189615,189616,189617,189618,189619,189620,189621,189622]
       happy: [189623,189624]
   - id: 691 # axe: #[189625,190008] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -35049,7 +34798,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [189998,189999,190000,190001,190002,190003,190004,190005,190006]
       happy: [190007,190008]
   - id: 692 # stick: #[190009,190376] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -35190,7 +34938,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [190369,190370,190371,190372,190373,190374]
       happy: [190375,190376]
   - id: 693 # spear: #[190377,190744] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -35331,7 +35078,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [190737,190738,190739,190740,190741,190742]
       happy: [190743,190744]
   - id: 694 # bow: #[190745,191120] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -35472,7 +35218,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [191119,191120]
 ######
   - id: 695 # unarmed: #[191121,191496] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -35612,7 +35357,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [191489,191490,191491,191492,191493,191494]
       happy: [191495,191496]
   - id: 696 # axe: #[191497,191872] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -35752,7 +35496,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [191865,191866,191867,191868,191869,191870]
       happy: [191871,191872]
   - id: 697 # stick: #[191873,192248] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -35892,7 +35635,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [192241,192242,192243,192244,192245,192246]
       happy: [192247,192248]
   - id: 698 # spear: #[192249,192632] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -36033,7 +35775,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [192622,192623,192624,192625,192626,192627,192628,192629,192630]
       happy: [192631,192632]
   - id: 699 # bow: #[192633,193016] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -36175,7 +35916,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [193015,193016]
 ######
   - id: 700 # unarmed: #[193017,193400] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -36316,7 +36056,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [193390,193391,193392,193393,193394,193395,193396,193397,193398]
       happy: [193399,193400]
   - id: 701 # axe: #[193401,193784] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -36457,7 +36196,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [193774,193775,193776,193777,193778,193779,193780,193781,193782]
       happy: [193783,193784]
   - id: 702 # stick: #[193785,194152] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -36598,7 +36336,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [194145,194146,194147,194148,194149,194150]
       happy: [194151,194152]
   - id: 703 # spear: #[194153,194520] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -36739,7 +36476,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [194513,194514,194515,194516,194517,194518]
       happy: [194519,194520]
   - id: 704 # bow: #[194521,194896] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -36880,7 +36616,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [194895,194896]
 ######
   - id: 705 # unarmed: #[194897,195272] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -37020,7 +36755,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [195265,195266,195267,195268,195269,195270]
       happy: [195271,195272]
   - id: 706 # axe: #[195273,195648] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -37160,7 +36894,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [195641,195642,195643,195644,195645,195646]
       happy: [195647,195648]
   - id: 707 # stick: #[195649,196024] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -37300,7 +37033,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [196017,196018,196019,196020,196021,196022]
       happy: [196023,196024]
   - id: 708 # spear: #[196025,196408] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -37441,7 +37173,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [196398,196399,196400,196401,196402,196403,196404,196405,196406]
       happy: [196407,196408]
   - id: 709 # bow: #[196409,196792] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -37583,7 +37314,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [196791,196792]
 ######
   - id: 710 # unarmed: #[196793,197176] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -37724,7 +37454,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [197166,197167,197168,197169,197170,197171,197172,197173,197174]
       happy: [197175,197176]
   - id: 711 # axe: #[197177,197560] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -37865,7 +37594,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [197550,197551,197552,197553,197554,197555,197556,197557,197558]
       happy: [197559,197560]
   - id: 712 # stick: #[197561,197928] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -38006,7 +37734,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [197921,197922,197923,197924,197925,197926]
       happy: [197927,197928]
   - id: 713 # spear: #[197929,198296] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -38147,7 +37874,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [198289,198290,198291,198292,198293,198294]
       happy: [198295,198296]
   - id: 714 # bow: #[198297,198672] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -38288,7 +38014,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [198671,198672]
 ######
   - id: 715 # unarmed: #[198673,199048] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -38428,7 +38153,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [199041,199042,199043,199044,199045,199046]
       happy: [199047,199048]
   - id: 716 # axe: #[199049,199424] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -38568,7 +38292,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [199417,199418,199419,199420,199421,199422]
       happy: [199423,199424]
   - id: 717 # stick: #[199425,199800] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -38708,7 +38431,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [199793,199794,199795,199796,199797,199798]
       happy: [199799,199800]
   - id: 718 # spear: #[199801,200184] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -38849,7 +38571,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [200174,200175,200176,200177,200178,200179,200180,200181,200182]
       happy: [200183,200184]
   - id: 719 # bow: #[200185,200568] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -38991,7 +38712,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [200567,200568]
 ######
   - id: 720 # unarmed: #[200569,200952] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -39132,7 +38852,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [200942,200943,200944,200945,200946,200947,200948,200949,200950]
       happy: [200951,200952]
   - id: 721 # axe: #[200953,201336] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -39273,7 +38992,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [201326,201327,201328,201329,201330,201331,201332,201333,201334]
       happy: [201335,201336]
   - id: 722 # stick: #[201337,201704] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -39414,7 +39132,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [201697,201698,201699,201700,201701,201702]
       happy: [201703,201704]
   - id: 723 # spear: #[201705,202072] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -39555,7 +39272,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [202065,202066,202067,202068,202069,202070]
       happy: [202071,202072]
   - id: 724 # bow: #[202073,202448] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -39696,7 +39412,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [202447,202448]
 ######
   - id: 725 # unarmed: #[202449,202824] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -39836,7 +39551,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [202817,202818,202819,202820,202821,202822]
       happy: [202823,202824]
   - id: 726 # axe: #[202825,203200] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -39976,7 +39690,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [203193,203194,203195,203196,203197,203198]
       happy: [203199,203200]
   - id: 727 # stick: #[203201,203576] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -40116,7 +39829,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [203569,203570,203571,203572,203573,203574]
       happy: [203575,203576]
   - id: 728 # spear: #[203577,203960] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -40257,7 +39969,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [203950,203951,203952,203953,203954,203955,203956,203957,203958]
       happy: [203959,203960]
   - id: 729 # bow: #[203961,204344] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -40399,7 +40110,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [204343,204344]
 ######
   - id: 730 # unarmed: #[204345,204728] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -40540,7 +40250,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [204718,204719,204720,204721,204722,204723,204724,204725,204726]
       happy: [204727,204728]
   - id: 731 # axe: #[204729,205112] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -40681,7 +40390,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [205102,205103,205104,205105,205106,205107,205108,205109,205110]
       happy: [205111,205112]
   - id: 732 # stick: #[205113,205480] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -40822,7 +40530,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [205473,205474,205475,205476,205477,205478]
       happy: [205479,205480]
   - id: 733 # spear: #[205481,205848] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -40963,7 +40670,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [205841,205842,205843,205844,205845,205846]
       happy: [205847,205848]
   - id: 734 # bow: #[205849,206224] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -41104,7 +40810,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [206223,206224]
 ######
   - id: 735 # unarmed: #[206225,206600] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -41244,7 +40949,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [206593,206594,206595,206596,206597,206598]
       happy: [206599,206600]
   - id: 736 # axe: #[206601,206976] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -41384,7 +41088,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [206969,206970,206971,206972,206973,206974]
       happy: [206975,206976]
   - id: 737 # stick: #[206977,207352] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -41524,7 +41227,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [207345,207346,207347,207348,207349,207350]
       happy: [207351,207352]
   - id: 738 # spear: #[207353,207736] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -41665,7 +41367,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [207726,207727,207728,207729,207730,207731,207732,207733,207734]
       happy: [207735,207736]
   - id: 739 # bow: #[207737,208120] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -41807,7 +41508,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [208119,208120]
 ######
   - id: 740 # unarmed: #[208121,208504] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -41948,7 +41648,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [208494,208495,208496,208497,208498,208499,208500,208501,208502]
       happy: [208503,208504]
   - id: 741 # axe: #[208505,208888] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -42089,7 +41788,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [208878,208879,208880,208881,208882,208883,208884,208885,208886]
       happy: [208887,208888]
   - id: 742 # stick: #[208889,209256] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -42230,7 +41928,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [209249,209250,209251,209252,209253,209254]
       happy: [209255,209256]
   - id: 743 # spear: #[209257,209624] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -42371,7 +42068,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [209617,209618,209619,209620,209621,209622]
       happy: [209623,209624]
   - id: 744 # bow: #[209625,210000] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -42512,7 +42208,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [209999,210000]
 ######
   - id: 745 # unarmed: #[210001,210376] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -42652,7 +42347,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [210369,210370,210371,210372,210373,210374]
       happy: [210375,210376]
   - id: 746 # axe: #[210377,210752] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -42792,7 +42486,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [210745,210746,210747,210748,210749,210750]
       happy: [210751,210752]
   - id: 747 # stick: #[210753,211128] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -42932,7 +42625,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [211121,211122,211123,211124,211125,211126]
       happy: [211127,211128]
   - id: 748 # spear: #[211129,211512] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -43073,7 +42765,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [211502,211503,211504,211505,211506,211507,211508,211509,211510]
       happy: [211511,211512]
   - id: 749 # bow: #[211513,211896] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -43215,7 +42906,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [211895,211896]
 ######
   - id: 750 # unarmed: #[211897,212280] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -43356,7 +43046,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [212270,212271,212272,212273,212274,212275,212276,212277,212278]
       happy: [212279,212280]
   - id: 751 # axe: #[212281,212664] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -43497,7 +43186,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [212654,212655,212656,212657,212658,212659,212660,212661,212662]
       happy: [212663,212664]
   - id: 752 # stick: #[212665,213032] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -43638,7 +43326,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [213025,213026,213027,213028,213029,213030]
       happy: [213031,213032]
   - id: 753 # spear: #[213033,213400] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -43779,7 +43466,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [213393,213394,213395,213396,213397,213398]
       happy: [213399,213400]
   - id: 754 # bow: #[213401,213776] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -43920,7 +43606,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [213775,213776]
 ######
   - id: 755 # unarmed: #[213777,214152] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -44060,7 +43745,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [214145,214146,214147,214148,214149,214150]
       happy: [214151,214152]
   - id: 756 # axe: #[214153,214528] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -44200,7 +43884,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [214521,214522,214523,214524,214525,214526]
       happy: [214527,214528]
   - id: 757 # stick: #[214529,214904] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -44340,7 +44023,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [214897,214898,214899,214900,214901,214902]
       happy: [214903,214904]
   - id: 758 # spear: #[214905,215288] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -44481,7 +44163,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [215278,215279,215280,215281,215282,215283,215284,215285,215286]
       happy: [215287,215288]
   - id: 759 # bow: #[215289,215672] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -44623,7 +44304,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [215671,215672]
 ######
   - id: 760 # unarmed: #[215673,216056] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -44764,7 +44444,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [216046,216047,216048,216049,216050,216051,216052,216053,216054]
       happy: [216055,216056]
   - id: 761 # axe: #[216057,216440] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -44905,7 +44584,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [216430,216431,216432,216433,216434,216435,216436,216437,216438]
       happy: [216439,216440]
   - id: 762 # stick: #[216441,216808] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -45046,7 +44724,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [216801,216802,216803,216804,216805,216806]
       happy: [216807,216808]
   - id: 763 # spear: #[216809,217176] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -45187,7 +44864,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [217169,217170,217171,217172,217173,217174]
       happy: [217175,217176]
   - id: 764 # bow: #[217177,217552] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -45328,7 +45004,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [217551,217552]
 ######
   - id: 765 # unarmed: #[217553,217928] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -45468,7 +45143,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [217921,217922,217923,217924,217925,217926]
       happy: [217927,217928]
   - id: 766 # axe: #[217929,218304] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -45608,7 +45282,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [218297,218298,218299,218300,218301,218302]
       happy: [218303,218304]
   - id: 767 # stick: #[218305,218680] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -45748,7 +45421,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [218673,218674,218675,218676,218677,218678]
       happy: [218679,218680]
   - id: 768 # spear: #[218681,219064] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -45889,7 +45561,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [219054,219055,219056,219057,219058,219059,219060,219061,219062]
       happy: [219063,219064]
   - id: 769 # bow: #[219065,219448] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -46031,7 +45702,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [219447,219448]
 ######
   - id: 770 # unarmed: #[219449,219832] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -46172,7 +45842,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [219822,219823,219824,219825,219826,219827,219828,219829,219830]
       happy: [219831,219832]
   - id: 772 # stick: #[220217,220584] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -46313,7 +45982,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [220577,220578,220579,220580,220581,220582]
       happy: [220583,220584]
   - id: 773 # spear: #[220585,220952] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -46454,7 +46122,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [220945,220946,220947,220948,220949,220950]
       happy: [220951,220952]
   - id: 774 # bow: #[220953,221328] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -46595,7 +46262,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [221327,221328]
 ######
   - id: 775 # unarmed: #[221329,221704] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -46735,7 +46401,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [221697,221698,221699,221700,221701,221702]
       happy: [221703,221704]
   - id: 776 # axe: #[221705,222080] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -46875,7 +46540,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [222073,222074,222075,222076,222077,222078]
       happy: [222079,222080]
   - id: 777 # stick: #[222081,222456] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -47015,7 +46679,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [222449,222450,222451,222452,222453,222454]
       happy: [222455,222456]
   - id: 778 # spear: #[222457,222840] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -47156,7 +46819,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [222830,222831,222832,222833,222834,222835,222836,222837,222838]
       happy: [222839,222840]
   - id: 779 # bow: #[222841,223224] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -47298,7 +46960,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [223223,223224]
 ######
   - id: 780 # unarmed: #[223225,223608] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -47439,7 +47100,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [223598,223599,223600,223601,223602,223603,223604,223605,223606]
       happy: [223607,223608]
   - id: 781 # axe: #[223609,223992] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -47580,7 +47240,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [223982,223983,223984,223985,223986,223987,223988,223989,223990]
       happy: [223991,223992]
   - id: 782 # stick: #[223993,224360] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -47721,7 +47380,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [224353,224354,224355,224356,224357,224358]
       happy: [224359,224360]
   - id: 783 # spear: #[224361,224728] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -47862,7 +47520,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [224721,224722,224723,224724,224725,224726]
       happy: [224727,224728]
   - id: 784 # bow: #[224729,225104] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -48003,7 +47660,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [225103,225104]
 ######
   - id: 785 # unarmed: #[225105,225480] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -48143,7 +47799,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [225473,225474,225475,225476,225477,225478]
       happy: [225479,225480]
   - id: 786 # axe: #[225481,225856] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -48283,7 +47938,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [225849,225850,225851,225852,225853,225854]
       happy: [225855,225856]
   - id: 787 # stick: #[225857,226232] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -48423,7 +48077,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [226225,226226,226227,226228,226229,226230]
       happy: [226231,226232]
   - id: 788 # spear: #[226233,226616] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -48564,7 +48217,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [226606,226607,226608,226609,226610,226611,226612,226613,226614]
       happy: [226615,226616]
   - id: 789 # bow: #[226617,227000] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -48706,7 +48358,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [226999,227000]
 ######
   - id: 790 # unarmed: #[227001,227384] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -48847,7 +48498,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [227374,227375,227376,227377,227378,227379,227380,227381,227382]
       happy: [227383,227384]
   - id: 791 # axe: #[227385,227768] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -48988,7 +48638,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [227758,227759,227760,227761,227762,227763,227764,227765,227766]
       happy: [227767,227768]
   - id: 792 # stick: #[227769,228136] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -49129,7 +48778,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [228129,228130,228131,228132,228133,228134]
       happy: [228135,228136]
   - id: 793 # spear: #[228137,228504] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -49270,7 +48918,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [228497,228498,228499,228500,228501,228502]
       happy: [228503,228504]
   - id: 794 # bow: #[228505,228880] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -49411,7 +49058,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [228879,228880]
 ######
   - id: 795 # unarmed: #[228881,229256] 376 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -49551,7 +49197,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [229249,229250,229251,229252,229253,229254]
       happy: [229255,229256]
   - id: 796 # axe: #[229257,229632] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -49691,7 +49336,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [229625,229626,229627,229628,229629,229630]
       happy: [229631,229632]
   - id: 797 # stick: #[229633,230008] 328 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 20
       wave: 7
@@ -49831,7 +49475,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [230001,230002,230003,230004,230005,230006]
       happy: [230007,230008]
   - id: 798 # spear: #[230009,230392] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -49972,7 +49615,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [230382,230383,230384,230385,230386,230387,230388,230389,230390]
       happy: [230391,230392]
   - id: 799 # bow: #[230393,230776] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -50114,7 +49756,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [230775,230776]
 ######
   - id: 800 # unarmed: #[230777,231160] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -50255,7 +49896,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [231150,231151,231152,231153,231154,231155,231156,231157,231158]
       happy: [231159,231160]
   - id: 801 # axe: #[231161,231544] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
@@ -50396,7 +50036,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [231534,231535,231536,231537,231538,231539,231540,231541,231542]
       happy: [231543,231544]
   - id: 802 # stick: #[231545,231912] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -50537,7 +50176,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [231905,231906,231907,231908,231909,231910]
       happy: [231911,231912]
   - id: 803 # spear: #[231913,232280] 304 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.333333
       wave: 7
@@ -50679,7 +50317,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [232279,232280]
 ######
   - id: 865 # unarmed: #[247091,247458] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -50820,7 +50457,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [247451,247452,247453,247454,247455,247456]
       happy: [247457,247458]
   - id: 866 # axe: #[247459,247842] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -50961,7 +50597,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [247833,247834,247835,247836,247837,247838,247839,247840]
       happy: [247841,247842]
   - id: 867 # stick: #[247843,248210] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -51102,7 +50737,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [248203,248204,248205,248206,248207,248208]
       happy: [248209,248210]
   - id: 868 # spear: #[248211,248578] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -51243,7 +50877,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [248571,248572,248573,248574,248575,248576]
       happy: [248577,248578]
   - id: 869 # bow: #[248579,248970] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -51385,7 +51018,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [248969,248970]
 ######
   - id: 870 # unarmed: #[248971,249386] 416 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -51525,7 +51157,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [249380,249381,249382,249383,249384]
       happy: [249385,249386]
   - id: 871 # axe: #[249387,249754] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -51666,7 +51297,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [249747,249748,249749,249750,249751,249752]
       happy: [249753,249754]
   - id: 872 # stick: #[249755,250122] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -51807,7 +51437,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [250115,250116,250117,250118,250119,250120]
       happy: [250121,250122]
   - id: 873 # spear: #[250123,250490] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -51948,7 +51577,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [250483,250484,250485,250486,250487,250488]
       happy: [250489,250490]
   - id: 874 # bow: #[250491,250874] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -52090,7 +51718,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [250873,250874]
 ######
   - id: 875 # unarmed: #[250875,251242] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -52231,7 +51858,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [251235,251236,251237,251238,251239,251240]
       happy: [251241,251242]
   - id: 876 # axe: #[251243,251610] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -52372,7 +51998,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [251603,251604,251605,251606,251607,251608]
       happy: [251609,251610]
   - id: 877 # stick: #[251611,252002] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -52513,7 +52138,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [251995,251996,251997,251998,251999]
       happy: [252001,252002]
   - id: 878 # spear: #[252003,252418] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -52653,7 +52277,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [252412,252413,252414,252415,252416]
       happy: [252417,252418]
   - id: 879 # bow: #[252419,252786] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -52795,7 +52418,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [252785,252786]
 ######
   - id: 880 # unarmed: #[252787,253154] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -52936,7 +52558,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [253147,253148,253149,253150,253151,253152]
       happy: [253153,253154]
   - id: 881 # axe: #[253155,253522] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -53077,7 +52698,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [253515,253516,253517,253518,253519,253520]
       happy: [253521,253522]
   - id: 882 # stick: #[253523,253906] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -53218,7 +52838,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [253897,253898,253899,253900,253901,253902,253903,253904]
       happy: [253905,253906]
   - id: 883 # spear: #[253907,254274] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -53359,7 +52978,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [254267,254268,254269,254270,254271,254272]
       happy: [254273,254274]
   - id: 884 # bow: #[254275,254642] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -53501,7 +53119,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [254641,254642]
 ######
   - id: 885 # unarmed: #[254643,255034] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -53642,7 +53259,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [255027,255028,255029,255030,255031]
       happy: [255033,255034]
   - id: 886 # axe: #[255035,255450] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -53782,7 +53398,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [255444,255445,255446,255447,255448]
       happy: [255449,255450]
   - id: 887 # stick: #[255451,255818] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -53923,7 +53538,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [255811,255812,255813,255814,255815,255816]
       happy: [255817,255818]
   - id: 888 # spear: #[255819,256186] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -54064,7 +53678,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [256179,256180,256181,256182,256183,256184]
       happy: [256185,256186]
   - id: 889 # bow: #[256187,256554] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -54206,7 +53819,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [256553,256554]
 ######
   - id: 890 # unarmed: #[256555,256938] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -54347,7 +53959,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [256929,256930,256931,256932,256933,256934,256935,256936]
       happy: [256937,256938]
   - id: 891 # axe: #[256939,257306] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -54488,7 +54099,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [257299,257300,257301,257302,257303,257304]
       happy: [257305,257306]
   - id: 892 # stick: #[257307,257674] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -54629,7 +54239,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [257667,257668,257669,257670,257671,257672]
       happy: [257673,257674]
   - id: 893 # spear: #[257675,258066] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -54770,7 +54379,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [258059,258060,258061,258062,258063]
       happy: [258065,258066]
   - id: 894 # bow: #[258067,258482] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -54911,7 +54519,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [258481,258482]
 ######
   - id: 895 # unarmed: #[258483,258850] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -55052,7 +54659,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [258843,258844,258845,258846,258847,258848]
       happy: [258849,258850]
   - id: 896 # axe: #[258851,259218] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -55193,7 +54799,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [259211,259212,259213,259214,259215,259216]
       happy: [259217,259218]
   - id: 897 # stick: #[259219,259586] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -55334,7 +54939,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [259579,259580,259581,259582,259583,259584]
       happy: [259585,259586]
   - id: 898 # spear: #[259587,259970] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -55475,7 +55079,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [259961,259962,259963,259964,259965,259966,259967,259968]
       happy: [259969,259970]
   - id: 899 # bow: #[259971,260338] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -55617,7 +55220,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [260337,260338]
 ######
   - id: 900 # unarmed: #[260339,260706] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -55758,7 +55360,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [260699,260700,260701,260702,260703,260704]
       happy: [260705,260706]
   - id: 901 # axe: #[260707,261098] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -55899,7 +55500,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [261091,261092,261093,261094,261095]
       happy: [261097,261098]
   - id: 902 # stick: #[261099,261514] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -56039,7 +55639,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [261508,261509,261510,261511,261512]
       happy: [261513,261514]
   - id: 903 # spear: #[261515,261882] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -56180,7 +55779,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [261875,261876,261877,261878,261879,261880]
       happy: [261881,261882]
   - id: 904 # bow: #[261883,262250] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -56322,7 +55920,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [262249,262250]
 ######
   - id: 905 # unarmed: #[262251,262618] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -56463,7 +56060,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [262611,262612,262613,262614,262615,262616]
       happy: [262617,262618]
   - id: 906 # axe: #[262619,263002] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -56604,7 +56200,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [262993,262994,262995,262996,262997,262998,262999,263000]
       happy: [263001,263002]
   - id: 907 # stick: #[263003,263370] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -56745,7 +56340,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [263363,263364,263365,263366,263367,263368]
       happy: [263369,263370]
   - id: 908 # spear: #[263371,263738] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -56886,7 +56480,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [263731,263732,263733,263734,263735,263736]
       happy: [263737,263738]
   - id: 909 # bow: #[263739,264130] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -57028,7 +56621,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [264129,264130]
 ######
   - id: 910 # unarmed: #[264131,264546] 416 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -57168,7 +56760,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [264540,264541,264542,264543,264544]
       happy: [264545,264546]
   - id: 911 # axe: #[264547,264914] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -57309,7 +56900,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [264907,264908,264909,264910,264911,264912]
       happy: [264913,264914]
   - id: 912 # stick: #[264915,265282] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -57450,7 +57040,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [265275,265276,265277,265278,265279,265280]
       happy: [265281,265282]
   - id: 913 # spear: #[265283,265650] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -57591,7 +57180,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [265643,265644,265645,265646,265647,265648]
       happy: [265649,265650]
   - id: 914 # bow: #[265651,266034] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -57733,7 +57321,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [266033,266034]
 ######
   - id: 915 # unarmed: #[266035,266402] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -57874,7 +57461,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [266395,266396,266397,266398,266399,266400]
       happy: [266401,266402]
   - id: 916 # axe: #[266403,266770] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -58015,7 +57601,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [266763,266764,266765,266766,266767,266768]
       happy: [266769,266770]
   - id: 917 # stick: #[266771,267162] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -58156,7 +57741,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [267155,267156,267157,267158,267159]
       happy: [267161,267162]
   - id: 918 # spear: #[267163,267578] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -58296,7 +57880,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [267572,267573,267574,267575,267576]
       happy: [267577,267578]
   - id: 919 # bow: #[267579,267946] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -58438,7 +58021,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [267945,267946]
 ######
   - id: 920 # unarmed: #[267947,268314] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -58579,7 +58161,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [268307,268308,268309,268310,268311,268312]
       happy: [268313,268314]
   - id: 921 # axe: #[268315,268682] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -58720,7 +58301,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [268675,268676,268677,268678,268679,268680]
       happy: [268681,268682]
   - id: 922 # stick: #[268683,269066] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -58861,7 +58441,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [269057,269058,269059,269060,269061,269062,269063,269064]
       happy: [269065,269066]
   - id: 923 # spear: #[269067,269434] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -59002,7 +58581,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [269427,269428,269429,269430,269431,269432]
       happy: [269433,269434]
   - id: 924 # bow: #[269435,269802] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -59144,7 +58722,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [269801,269802]
 ######
   - id: 925 # unarmed: #[269803,270194] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -59285,7 +58862,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [270187,270188,270189,270190,270191]
       happy: [270193,270194]
   - id: 926 # axe: #[270195,270610] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -59425,7 +59001,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [270604,270605,270606,270607,270608]
       happy: [270609,270610]
   - id: 927 # stick: #[270611,270978] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -59566,7 +59141,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [270971,270972,270973,270974,270975,270976]
       happy: [270977,270978]
   - id: 928 # spear: #[270979,271346] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -59707,7 +59281,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [271339,271340,271341,271342,271343,271344]
       happy: [271345,271346]
   - id: 929 # bow: #[271347,271714] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -59849,7 +59422,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [271713,271714]
 ######
   - id: 930 # unarmed: #[271715,272098] 384 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -59990,7 +59562,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [272089,272090,272091,272092,272093,272094,272095,272096]
       happy: [272097,272098]
   - id: 931 # axe: #[272099,272466] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -60131,7 +59702,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [272459,272460,272461,272462,272463,272464]
       happy: [272465,272466]
   - id: 932 # stick: #[272467,272834] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -60272,7 +59842,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [272827,272828,272829,272830,272831,272832]
       happy: [272833,272834]
   - id: 933 # spear: #[272835,273226] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -60413,7 +59982,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [273219,273220,273221,273222,273223]
       happy: [273225,273226]
   - id: 934 # bow: #[273227,273642] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -60554,7 +60122,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [273641,273642]
 ######
   - id: 935 # unarmed: #[273643,274010] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -60695,7 +60262,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [274003,274004,274005,274006,274007,274008]
       happy: [274009,274010]
   - id: 936 # axe: #[274011,274378] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -60836,7 +60402,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [274371,274372,274373,274374,274375,274376]
       happy: [274377,274378]
   - id: 937 # stick: #[274379,274746] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -60977,7 +60542,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [274739,274740,274741,274742,274743,274744]
       happy: [274745,274746]
   - id: 938 # spear: #[274747,275130] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -61118,7 +60682,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [275121,275122,275123,275124,275125,275126,275127,275128]
       happy: [275129,275130]
   - id: 939 # bow: #[275131,275498] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -61260,7 +60823,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [275497,275498]
 ######
   - id: 940 # unarmed: #[275499,275866] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -61401,7 +60963,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [275859,275860,275861,275862,275863,275864]
       happy: [275865,275866]
   - id: 941 # axe: #[275867,276258] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -61542,7 +61103,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [276251,276252,276253,276254,276255]
       happy: [276257,276258]
   - id: 942 # stick: #[276259,276674] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -61682,7 +61242,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [276668,276669,276670,276671,276672]
       happy: [276673,276674]
   - id: 943 # spear: #[276675,277042] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -61823,7 +61382,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [277035,277036,277037,277038,277039,277040]
       happy: [277041,277042]
   - id: 944 # bow: #[277043,277410] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -61965,7 +61523,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [277409,277410]
 ######
   - id: 945 # unarmed: #[277411,277778] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -62106,7 +61663,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [277771,277772,277773,277774,277775,277776]
       happy: [277777,277778]
   - id: 946 # axe: #[277779,278162] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -62247,7 +61803,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [278153,278154,278155,278156,278157,278158,278159,278160]
       happy: [278161,278162]
   - id: 947 # stick: #[278163,278530] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -62388,7 +61943,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [278523,278524,278525,278526,278527,278528]
       happy: [278529,278530]
   - id: 948 # spear: #[278531,278898] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -62529,7 +62083,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [278891,278892,278893,278894,278895,278896]
       happy: [278897,278898]
   - id: 949 # bow: #[278899,279290] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -62671,7 +62224,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [279289,279290]
 ######
   - id: 950 # unarmed: #[279291,279706] 416 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -62811,7 +62363,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [279700,279701,279702,279703,279704]
       happy: [279705,279706]
   - id: 951 # axe: #[279707,280074] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -62952,7 +62503,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [280067,280068,280069,280070,280071,280072]
       happy: [280073,280074]
   - id: 952 # stick: #[280075,280442] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -63093,7 +62643,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [280435,280436,280437,280438,280439,280440]
       happy: [280441,280442]
   - id: 953 # spear: #[280443,280810] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.727273
       wave: 3.333333
@@ -63234,7 +62783,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [280803,280804,280805,280806,280807,280808]
       happy: [280809,280810]
   - id: 954 # bow: #[280811,281194] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -63376,7 +62924,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [281193,281194]
 ######
   - id: 955 # unarmed: #[281195,281562] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 10
       wave: 3.333333
@@ -63517,7 +63064,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [281555,281556,281557,281558,281559,281560]
       happy: [281561,281562]
   - id: 956 # axe: #[281563,281930] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 8.461538
       wave: 3.333333
@@ -63658,7 +63204,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [281923,281924,281925,281926,281927,281928]
       happy: [281929,281930]
   - id: 957 # stick: #[281931,282322] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 7.5
       wave: 3.333333
@@ -63799,7 +63344,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [282315,282316,282317,282318,282319]
       happy: [282321,282322]
   - id: 958 # spear: #[282323,282738] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12.666667
       wave: 3.333333
@@ -63939,7 +63483,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [282732,282733,282734,282735,282736]
       happy: [282737,282738]
   - id: 959 # bow: #[282739,283106] 320 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 16
       wave: 3.333333
@@ -64081,7 +63624,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       happy: [283105,283106]
 ######
   - id: 960 # unarmed: #[283107,283474] 368 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 12
       wave: 3.333333
@@ -64222,7 +63764,6 @@ sprite: # 角色动作配置, ID 对应 character.yaml 中各武器引用
       walk: [283467,283468,283469,283470,283471,283472]
       happy: [283473,283474]
   - id: 771 # axe: #[219833,220216] 336 个文件
-    combatRadius: 25
     framesPerSecondByAction:
       attack: 9
       wave: 5
