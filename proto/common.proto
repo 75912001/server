@@ -3,22 +3,6 @@ syntax = "proto3";
 package account;
 option go_package = "server/proto/pb;pb";
 
-message KV {
-  uint32 key = 1;
-  uint32 value = 2;
-}
-
-message Rect {
-  Point pos = 1;
-  int32 width = 3;
-  int32 height = 4;
-}
-
-message Point {
-  int32 x = 1;
-  int32 y = 2;
-}
-
 // Character Key 唯一标识角色
 message CharacterKey {
   uint64 aid = 1; // 账号 ID; 玩家单位为 AccountRecord.aid
