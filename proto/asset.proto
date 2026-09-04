@@ -3,112 +3,93 @@ syntax = "proto3";
 package account;
 option go_package = "server/proto/pb;pb";
 
-enum AssetType {
-  AssetType_Record = 0;
-  AssetType_Character = 1;
-  AssetType_Scene = 2;
-  AssetType_Item = 3;
-  AssetType_Pet = 4;
-  AssetType_NPC = 5;
-  AssetType_Decoration = 6;
-  AssetType_Building = 7;
-  AssetType_Skill = 8;
-}
-
 enum AssetID {
-  AssetID_Unspecified = 0;
-  AssetID_Stone = 3490000;
-  AssetID_Silver = 3490001;
-  AssetID_Gold = 3490002;
-}
-
-enum AssetIDRange {
   option allow_alias = true;
 
-  AssetIDRange_Unknow = 0;
-  AssetIDRange_Record_Start = 1;
-  AssetIDRange_Record_End = 999999;
-  AssetIDRange_Character_Start = 1000000;
-  AssetIDRange_Character_End = 1999999;
-
-  AssetIDRange_Map_Start = 1; // 地图
+  AssetID_Unspecified = 0;
+  // 地图
+  AssetIDRange_Map_Start = 1;
+    // 地图-测试
     AssetIDRange_Map_Test_Start = 80000;
     AssetIDRange_Map_Test_End = 89999;
+    // 地图-练级
     AssetIDRange_Map_Training_Start = 90000;
     AssetIDRange_Map_Training_End = 99999;
+    // 地图-任务
     AssetIDRange_Map_Task_Start = 1000000;
     AssetIDRange_Map_Task_End = 1999999;
   AssetIDRange_Map_End = 1999999;
 
+  // 角色
+  AssetIDRange_Character_Start = 1000000;
+  AssetIDRange_Character_End = 1999999;
+  // 道具
   AssetIDRange_Item_Start = 3000000; // 道具
-  AssetIDRange_Item_Item_Start = 3000000;
-  AssetIDRange_CharacterAsset_Start = 3490000;
-  AssetIDRange_CharacterAsset_End = 3499999;
-  AssetIDRange_Item_Item_End = 3499999;
-  AssetIDRange_Item_Equipment_Start = 3500000;
-	AssetIDRange_Item_Equipment_Accessory_Start = 3600000; // 首饰-开始
-		AssetIDRange_Item_Equipment_Accessory_Earring_Start = 3610000; // 首饰.耳环-开始
-		AssetIDRange_Item_Equipment_Accessory_Earring_End = 3619999; // 首饰.耳环-结束	
-		AssetIDRange_Item_Equipment_Accessory_Amulet_Start = 3620000; // 首饰.护身符-开始
-		AssetIDRange_Item_Equipment_Accessory_Amulet_End = 3629999; // 首饰.护身符-结束	
-		AssetIDRange_Item_Equipment_Accessory_Ring_Start = 3630000; // 首饰.戒指-开始
-		AssetIDRange_Item_Equipment_Accessory_Ring_End = 3639999; // 首饰.戒指-结束	
-		AssetIDRange_Item_Equipment_Accessory_Musical_Start = 3640000; // 首饰.乐器-开始
-		AssetIDRange_Item_Equipment_Accessory_Musical_End = 3649999; // 首饰.乐器-结束	
-		AssetIDRange_Item_Equipment_Accessory_Bracelet_Start = 3650000; // 首饰.手环-开始
-		AssetIDRange_Item_Equipment_Accessory_Bracelet_End = 3659999; // 首饰.手环-结束
-		AssetIDRange_Item_Equipment_Accessory_Necklace_Start = 3660000; // 首饰.项链-开始
-		AssetIDRange_Item_Equipment_Accessory_Necklace_End = 3669999; // 首饰.项链-结束
-    AssetIDRange_Item_Equipment_Accessory_End = 3699999; // 首饰-结束
-
-    AssetIDRange_Item_Equipment_Weapon_Start = 3900000; // 武器
-      // 爪
-      AssetIDRange_Item_Equipment_Weapon_Claw_Start = 3900000;
-      AssetIDRange_Item_Equipment_Weapon_Claw_End = 3909999;
-      // 斧
-      AssetIDRange_Item_Equipment_Weapon_Axe_Start = 3910000;
-      AssetIDRange_Item_Equipment_Weapon_Axe_End = 3919999;
-      // 棍
-      AssetIDRange_Item_Equipment_Weapon_Staff_Start = 3920000;
-      AssetIDRange_Item_Equipment_Weapon_Staff_End = 3929999;
-      // 枪
-      AssetIDRange_Item_Equipment_Weapon_Spear_Start = 3930000;
-      AssetIDRange_Item_Equipment_Weapon_Spear_End = 3939999;
-      // 弓
-      AssetIDRange_Item_Equipment_Weapon_Bow_Start = 3940000;
-      AssetIDRange_Item_Equipment_Weapon_Bow_End = 3949999;
-      // 回旋镖
-      AssetIDRange_Item_Equipment_Weapon_Boomerang_Start = 3950000;
-      AssetIDRange_Item_Equipment_Weapon_Boomerang_End = 3959999;
-      // 投掷斧
-      AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_Start = 3960000;
-      AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_End = 3969999;
-      // 投掷石
-      AssetIDRange_Item_Equipment_Weapon_ThrowingStone_Start = 3970000;
-      AssetIDRange_Item_Equipment_Weapon_ThrowingStone_End = 3979999;
-
-    AssetIDRange_Item_Equipment_Weapon_End = 3999999;
-
-
-  AssetIDRange_Item_Equipment_End = 3999999;
+    // 道具-货币
+    AssetIDRange_Item_Currency_Start = 3000000; // 货币
+        AssetID_Currency_Stone = 3490000; // 角色资产: 石币
+        AssetID_Currency_Silver = 3490001; // 角色资产: 银币
+        AssetID_Currency_Gold = 3490002; // 角色资产: 金币
+    AssetIDRange_Item_Currency_End = 3499999;
+    // 道具-装备
+    AssetIDRange_Item_Equipment_Start = 3500000;
+      // 道具-装备-首饰
+      AssetIDRange_Item_Equipment_Accessory_Start = 3600000; // 首饰-开始
+        // 道具-装备-首饰-耳环
+        AssetIDRange_Item_Equipment_Accessory_Earring_Start = 3610000; // 首饰.耳环-开始
+        AssetIDRange_Item_Equipment_Accessory_Earring_End = 3619999; // 首饰.耳环-结束
+        // 道具-装备-首饰-护身符
+        AssetIDRange_Item_Equipment_Accessory_Amulet_Start = 3620000; // 首饰.护身符-开始
+        AssetIDRange_Item_Equipment_Accessory_Amulet_End = 3629999; // 首饰.护身符-结束
+        // 道具-装备-首饰-戒指
+        AssetIDRange_Item_Equipment_Accessory_Ring_Start = 3630000; // 首饰.戒指-开始
+        AssetIDRange_Item_Equipment_Accessory_Ring_End = 3639999; // 首饰.戒指-结束
+        // 道具-装备-首饰-乐器
+        AssetIDRange_Item_Equipment_Accessory_Musical_Start = 3640000; // 首饰.乐器-开始
+        AssetIDRange_Item_Equipment_Accessory_Musical_End = 3649999; // 首饰.乐器-结束
+        // 道具-装备-首饰-手环
+        AssetIDRange_Item_Equipment_Accessory_Bracelet_Start = 3650000; // 首饰.手环-开始
+        AssetIDRange_Item_Equipment_Accessory_Bracelet_End = 3659999; // 首饰.手环-结束
+        // 道具-装备-首饰-项链
+        AssetIDRange_Item_Equipment_Accessory_Necklace_Start = 3660000; // 首饰.项链-开始
+        AssetIDRange_Item_Equipment_Accessory_Necklace_End = 3669999; // 首饰.项链-结束
+      AssetIDRange_Item_Equipment_Accessory_End = 3699999; // 首饰-结束
+      // 道具-装备-武器
+      AssetIDRange_Item_Equipment_Weapon_Start = 3900000; // 武器
+        // 道具-装备-武器-爪
+        AssetIDRange_Item_Equipment_Weapon_Claw_Start = 3900000;
+        AssetIDRange_Item_Equipment_Weapon_Claw_End = 3909999;
+        // 道具-装备-武器-斧
+        AssetIDRange_Item_Equipment_Weapon_Axe_Start = 3910000;
+        AssetIDRange_Item_Equipment_Weapon_Axe_End = 3919999;
+        // 道具-装备-武器-棍
+        AssetIDRange_Item_Equipment_Weapon_Staff_Start = 3920000;
+        AssetIDRange_Item_Equipment_Weapon_Staff_End = 3929999;
+        // 道具-装备-武器-枪
+        AssetIDRange_Item_Equipment_Weapon_Spear_Start = 3930000;
+        AssetIDRange_Item_Equipment_Weapon_Spear_End = 3939999;
+        // 道具-装备-武器-弓
+        AssetIDRange_Item_Equipment_Weapon_Bow_Start = 3940000;
+        AssetIDRange_Item_Equipment_Weapon_Bow_End = 3949999;
+        // 道具-装备-武器-回旋镖
+        AssetIDRange_Item_Equipment_Weapon_Boomerang_Start = 3950000;
+        AssetIDRange_Item_Equipment_Weapon_Boomerang_End = 3959999;
+        // 道具-装备-武器-投掷斧
+        AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_Start = 3960000;
+        AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_End = 3969999;
+        // 道具-装备-武器-投掷石
+        AssetIDRange_Item_Equipment_Weapon_ThrowingStone_Start = 3970000;
+        AssetIDRange_Item_Equipment_Weapon_ThrowingStone_End = 3979999;
+      AssetIDRange_Item_Equipment_Weapon_End = 3999999;
+    AssetIDRange_Item_Equipment_End = 3999999;
   AssetIDRange_Item_End = 3999999;
+
+  // 宠物
   AssetIDRange_Pet_Start = 4000000;
   AssetIDRange_Pet_End = 4999999;
-  AssetIDRange_NPC_Start = 5000000;
-  AssetIDRange_NPC_End = 5999999;
-  AssetIDRange_Decoration_Start = 6000000;
-  AssetIDRange_Decoration_End = 6999999;
-  AssetIDRange_Building_Start = 7000000;
-  AssetIDRange_Building_End = 7999999;
+  // 技能
   AssetIDRange_Skill_Start = 8000000;
   AssetIDRange_Skill_End = 9999999;
-}
-
-// [1, 999999] 账号档案资产 ID 范围
-enum AssetIDRecord {
-  AssetIDRecord_Unknow = 0;
-  AssetIDRecord_Direction = 10;
-  AssetIDRecord_Action = 11;
 }
 
 enum AssetElemental {
