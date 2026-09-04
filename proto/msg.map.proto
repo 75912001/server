@@ -17,7 +17,7 @@ message MapCharacterInfo {
   bool in_combat = 8; // 是否正在战斗; 地图列表据此显示 [vs] 并禁用加入
 }
 
-// CharacterMapGroup 是练级地图第一层展示节点.
+// CharacterMapGroup 是可进入地图的第一层展示节点.
 // 单人节点只有一项; 队伍节点第一项固定为队长, 后续项保持服务端队伍顺序.
 message CharacterMapGroup {
   repeated MapCharacterInfo character_list = 1;
@@ -26,7 +26,7 @@ message CharacterMapGroup {
 //0x00101C#client->gateway#进入地图-请求
 message CharacterMapEnterReq {
   uint64 character_uuid = 1; // 发起进入操作的当前账号角色 UUID
-  uint32 map_id = 2; // 0 表示离开当前地图; 非 0 表示当前版本允许进入的练级地图 ID
+  uint32 map_id = 2; // 0 表示离开当前地图; 非 0 表示当前版本允许进入的测试、练级或任务地图 ID
 }
 
 //0x00101D#gateway->client#进入地图-回复

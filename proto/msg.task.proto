@@ -3,6 +3,9 @@ syntax = "proto3";
 package account;
 option go_package = "server/proto/pb;pb";
 
+import "msg.item.proto";
+import "msg.pet.proto";
+
 // 消息范围 [0x007000, 0x007fff]
 
 // CharacterTaskStepRecord 保存单个串行任务步骤的权威状态.
@@ -77,4 +80,13 @@ message TaskBattleChallengeRes {
   uint64 character_uuid = 1; // 发起挑战的角色UUID
   uint32 task_id = 2; // 服务端校验通过的任务ID
   uint32 step_id = 3; // 服务端校验通过的步骤ID
+}
+
+//0x007009#gateway->client#任务库存变化-通知
+message CharacterTaskInventoryChangedNotify {
+  uint64 character_uuid = 1; // 库存变化所属角色UUID
+  ItemContainerRecord item_bag = 2; // 任务结算后的完整角色背包
+  repeated PetRecord pet_record_list = 3; // 任务结算后的完整随身宠物列表
+  uint64 used_uuid = 4; // 任务结算后账号已分配UUID游标
+  map<uint32, uint64> asset_count_map = 5; // 任务结算后的完整角色独立资产表
 }

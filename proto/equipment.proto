@@ -9,9 +9,9 @@ import "record.proto";
 // Unknow 仅作为 proto3 默认值和未初始化占位, Max 仅作为枚举边界.
 enum EquipmentType {
   EquipmentType_Unknow = 0; // 未知装备部位, proto3 默认值
-  EquipmentType_Necklace = 1; // 项链
+  EquipmentType_Accessory1 = 1; // 首饰位1
   EquipmentType_Helmet = 2; // 头盔
-  EquipmentType_Ring = 3; // 戒指
+  EquipmentType_Accessory2 = 3; // 首饰位2
   EquipmentType_Weapon = 4; // 武器
   EquipmentType_Chest = 5; // 胸甲
   EquipmentType_Shield = 6; // 盾牌
@@ -19,6 +19,19 @@ enum EquipmentType {
   EquipmentType_Belt = 8; // 腰带
   EquipmentType_Boots = 9; // 靴子
   EquipmentType_Max = 10; // 装备部位枚举边界, 不作为业务值存储
+}
+
+// AccessoryType 表示首饰类别, 数值沿用原版 ITEM_TYPE.
+// 六类首饰共用两个首饰位, 同时穿戴时类别必须不同; 0和Max不作为业务值.
+enum AccessoryType {
+  AccessoryType_Unknow = 0; // 未初始化或尚未确认的首饰类型, 不能发布或穿戴
+  AccessoryType_Bracelet = 8; // 手环
+  AccessoryType_Musical = 9; // 乐器
+  AccessoryType_Necklace = 10; // 项链
+  AccessoryType_Ring = 11; // 戒指
+  AccessoryType_Earring = 13; // 耳环
+  AccessoryType_Amulet = 15; // 护身符
+  AccessoryType_Max = 16; // 枚举边界, 编号空档也不属于合法首饰类型
 }
 
 // EquipmentRecord 保存单件装备的实例档案.
@@ -66,9 +79,9 @@ enum EquipmentRecordSecondary {
 
 // CharacterEquipmentRecord 保存角色当前穿戴的装备; 未穿戴部位保持未设置.
 message CharacterEquipmentRecord {
-  EquipmentRecord necklace = 1; // 当前穿戴的项链
+  EquipmentRecord accessory1 = 1; // 首饰位1当前穿戴的装备
   EquipmentRecord helmet = 2; // 当前穿戴的头盔
-  EquipmentRecord ring = 3; // 当前穿戴的戒指
+  EquipmentRecord accessory2 = 3; // 首饰位2当前穿戴的装备, 类型不能与首饰位1相同
   EquipmentRecord weapon = 4; // 当前穿戴的武器
   EquipmentRecord chest = 5; // 当前穿戴的胸甲
   EquipmentRecord shield = 6; // 当前穿戴的盾牌

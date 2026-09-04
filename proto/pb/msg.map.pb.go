@@ -124,7 +124,7 @@ func (x *MapCharacterInfo) GetInCombat() bool {
 	return false
 }
 
-// CharacterMapGroup 是练级地图第一层展示节点.
+// CharacterMapGroup 是可进入地图的第一层展示节点.
 // 单人节点只有一项; 队伍节点第一项固定为队长, 后续项保持服务端队伍顺序.
 type CharacterMapGroup struct {
 	state         protoimpl.MessageState
@@ -180,7 +180,7 @@ type CharacterMapEnterReq struct {
 	unknownFields protoimpl.UnknownFields
 
 	CharacterUuid uint64 `protobuf:"varint,1,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"` // 发起进入操作的当前账号角色 UUID
-	MapId         uint32 `protobuf:"varint,2,opt,name=map_id,json=mapId,proto3" json:"map_id,omitempty"`                         // 0 表示离开当前地图; 非 0 表示当前版本允许进入的练级地图 ID
+	MapId         uint32 `protobuf:"varint,2,opt,name=map_id,json=mapId,proto3" json:"map_id,omitempty"`                         // 0 表示离开当前地图; 非 0 表示当前版本允许进入的测试、练级或任务地图 ID
 }
 
 func (x *CharacterMapEnterReq) Reset() {

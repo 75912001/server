@@ -81,6 +81,7 @@ enum MsgID {
   CharacterTaskChangedNotify_CMD = 28678; //0x007006#gateway->client#角色任务记录变化-通知
   TaskBattleChallengeReq_CMD = 28679; //0x007007#client->gateway#挑战任务步骤-请求
   TaskBattleChallengeRes_CMD = 28680; //0x007008#gateway->client#挑战任务步骤-回复
+  CharacterTaskInventoryChangedNotify_CMD = 28681; //0x007009#gateway->client#任务库存变化-通知
   CharacterTeamOperationReq_CMD = 4121; //0x001019#client->gateway#角色队伍操作-请求
   CharacterTeamOperationRes_CMD = 4122; //0x00101A#gateway->client#角色队伍操作-回复
   CharacterTeamChangedNotify_CMD = 4123; //0x00101B#gateway->client#角色队伍变化-通知

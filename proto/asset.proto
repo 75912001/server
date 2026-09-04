@@ -36,7 +36,9 @@ enum AssetIDRange {
     AssetIDRange_Map_Test_End = 89999;
     AssetIDRange_Map_Training_Start = 90000;
     AssetIDRange_Map_Training_End = 99999;
-  AssetIDRange_Map_End = 999999;
+    AssetIDRange_Map_Task_Start = 1000000;
+    AssetIDRange_Map_Task_End = 1999999;
+  AssetIDRange_Map_End = 1999999;
 
   AssetIDRange_Item_Start = 3000000; // 道具
   AssetIDRange_Item_Item_Start = 3000000;
@@ -44,6 +46,20 @@ enum AssetIDRange {
   AssetIDRange_CharacterAsset_End = 3499999;
   AssetIDRange_Item_Item_End = 3499999;
   AssetIDRange_Item_Equipment_Start = 3500000;
+	AssetIDRange_Item_Equipment_Accessory_Start = 3600000; // 首饰-开始
+		AssetIDRange_Item_Equipment_Accessory_Earring_Start = 3610000; // 首饰.耳环-开始
+		AssetIDRange_Item_Equipment_Accessory_Earring_End = 3619999; // 首饰.耳环-结束	
+		AssetIDRange_Item_Equipment_Accessory_Amulet_Start = 3620000; // 首饰.护身符-开始
+		AssetIDRange_Item_Equipment_Accessory_Amulet_End = 3629999; // 首饰.护身符-结束	
+		AssetIDRange_Item_Equipment_Accessory_Ring_Start = 3630000; // 首饰.戒指-开始
+		AssetIDRange_Item_Equipment_Accessory_Ring_End = 3639999; // 首饰.戒指-结束	
+		AssetIDRange_Item_Equipment_Accessory_Musical_Start = 3640000; // 首饰.乐器-开始
+		AssetIDRange_Item_Equipment_Accessory_Musical_End = 3649999; // 首饰.乐器-结束	
+		AssetIDRange_Item_Equipment_Accessory_Bracelet_Start = 3650000; // 首饰.手环-开始
+		AssetIDRange_Item_Equipment_Accessory_Bracelet_End = 3659999; // 首饰.手环-结束
+		AssetIDRange_Item_Equipment_Accessory_Necklace_Start = 3660000; // 首饰.项链-开始
+		AssetIDRange_Item_Equipment_Accessory_Necklace_End = 3669999; // 首饰.项链-结束
+    AssetIDRange_Item_Equipment_Accessory_End = 3699999; // 首饰-结束
 
     AssetIDRange_Item_Equipment_Weapon_Start = 3900000; // 武器
       // 爪

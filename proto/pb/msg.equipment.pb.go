@@ -27,7 +27,7 @@ type CharacterEquipmentReplaceReq struct {
 	unknownFields protoimpl.UnknownFields
 
 	CharacterUuid uint64        `protobuf:"varint,1,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"`                            // 角色 UUID, 必须属于当前账号、已上线且不在战斗中
-	EquipmentType EquipmentType `protobuf:"varint,2,opt,name=equipment_type,json=equipmentType,proto3,enum=account.EquipmentType" json:"equipment_type,omitempty"` // 目标装备部位; 当前仅支持武器
+	EquipmentType EquipmentType `protobuf:"varint,2,opt,name=equipment_type,json=equipmentType,proto3,enum=account.EquipmentType" json:"equipment_type,omitempty"` // 目标装备部位; 支持武器、首饰位1和首饰位2
 	EquipmentUuid uint64        `protobuf:"varint,3,opt,name=equipment_uuid,json=equipmentUuid,proto3" json:"equipment_uuid,omitempty"`                            // 背包装备 UUID; 0 表示卸下目标部位装备
 }
 

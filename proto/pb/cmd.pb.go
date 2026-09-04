@@ -25,85 +25,86 @@ const (
 type MsgID int32
 
 const (
-	MsgID_MsgIDUnknown_CMD                 MsgID = 0        // proto3 首值必须为 0
-	MsgID_AccountVerifyReq_CMD             MsgID = 1        //0x000001#client->gateway#账号登录验证-请求
-	MsgID_AccountVerifyRes_CMD             MsgID = 2        //0x000002#gateway->client#账号登录验证-回复
-	MsgID_AccountOfflineReq_CMD            MsgID = 3        //0x000003#client->gateway#账号主动下线-请求
-	MsgID_AccountHeartbeatReq_CMD          MsgID = 17       //0x000011#client->gateway#心跳-请求
-	MsgID_AccountHeartbeatRes_CMD          MsgID = 18       //0x0000012#gateway->client#心跳-回复
-	MsgID_AccountRecordReq_CMD             MsgID = 19       //0x000013#client->gateway#请求账号档案-请求
-	MsgID_AccountRecordRes_CMD             MsgID = 20       //0x000014#gateway->client#请求账号档案-回复
-	MsgID_AccountRobotPingReq_CMD          MsgID = 23       //0x000017#client->gateway#机器人压测-请求
-	MsgID_AccountRobotPingRes_CMD          MsgID = 24       //0x000018#gateway->client#机器人压测-回复
-	MsgID_CharacterCreateReq_CMD           MsgID = 4096     //0x001000#client->gateway#创建角色-请求
-	MsgID_CharacterCreateRes_CMD           MsgID = 4097     //0x001001#gateway->client#创建角色-回复
-	MsgID_CharacterOnlineReq_CMD           MsgID = 16386    //0x004002#client->gateway#角色上线-请求
-	MsgID_CharacterOnlineRes_CMD           MsgID = 4099     //0x001003#gateway->client#角色上线-回复
-	MsgID_CharacterOfflineReq_CMD          MsgID = 4100     //0x001004#client->gateway#角色下线-请求
-	MsgID_CharacterOfflineRes_CMD          MsgID = 4101     //0x001005#gateway->client#角色下线-回复
-	MsgID_CharacterBaseChangedNotify_CMD   MsgID = 4104     //0x001008#gateway->client#角色基础数据变化-通知
-	MsgID_CharacterSettingSetReq_CMD       MsgID = 4105     //0x001009#client->gateway#修改角色设置-请求
-	MsgID_CharacterSettingSetRes_CMD       MsgID = 4106     //0x00100A#gateway->client#修改角色设置-回复
-	MsgID_CharacterAttributeAddReq_CMD     MsgID = 4107     //0x00100B#client->gateway#增加角色基础属性-请求
-	MsgID_CharacterAttributeAddRes_CMD     MsgID = 4108     //0x00100C#gateway->client#增加角色基础属性-回复
-	MsgID_CharacterAttributeResetReq_CMD   MsgID = 4109     //0x00100D#client->gateway#重置角色基础属性-请求
-	MsgID_CharacterAttributeResetRes_CMD   MsgID = 4110     //0x00100E#gateway->client#重置角色基础属性-回复
-	MsgID_CombatAutoEncounterSetReq_CMD    MsgID = 1048577  //0x100001#client->gateway#设置自动遇敌-请求
-	MsgID_CombatAutoEncounterSetRes_CMD    MsgID = 1048578  //0x100002#gateway->client#设置自动遇敌-回复
-	MsgID_CombatBattleStartNotify_CMD      MsgID = 1048580  //0x100004#gateway->client#战斗开始-通知
-	MsgID_CombatRoundActionReq_CMD         MsgID = 1048581  //0x100005#client->gateway#战斗回合出手-请求
-	MsgID_CombatRoundActionRes_CMD         MsgID = 1048582  //0x100006#gateway->client#战斗回合出手-广播给战斗房间的所有角色-回复
-	MsgID_CombatRoundResultNotify_CMD      MsgID = 1048584  //0x100008#gateway->client#战斗回合结果-通知
-	MsgID_CombatFlowCompleteReq_CMD        MsgID = 1048585  //0x100009#client->gateway#战斗流程完成-请求
-	MsgID_CombatFlowCompleteRes_CMD        MsgID = 16777232 //0x1000010#gateway->client#战斗流程完成-回复
-	MsgID_CharacterEquipmentReplaceReq_CMD MsgID = 4111     //0x00100F#client->gateway#替换角色装备-请求
-	MsgID_CharacterEquipmentReplaceRes_CMD MsgID = 4112     //0x001010#gateway->client#替换角色装备-回复
-	MsgID_GMCommandReq_CMD                 MsgID = 61440    //0x00f000#client->gateway#执行GM命令-请求
-	MsgID_GMCommandRes_CMD                 MsgID = 61441    //0x00f001#gateway->client#执行GM命令-回复
-	MsgID_ItemUseReq_CMD                   MsgID = 12288    //0x003000#client->gateway#使用角色道具-请求
-	MsgID_ItemUseRes_CMD                   MsgID = 12289    //0x003001#gateway->client#使用角色道具-回复
-	MsgID_CharacterItemChangedNotify_CMD   MsgID = 12290    //0x003002#gateway->client#角色道具变化-通知
-	MsgID_ItemWarehouseDepositReq_CMD      MsgID = 12291    //0x003003#client->gateway#将角色背包物品存入账号仓库-请求
-	MsgID_ItemWarehouseDepositRes_CMD      MsgID = 12292    //0x003004#gateway->client#将角色背包物品存入账号仓库-回复
-	MsgID_ItemWarehouseWithdrawReq_CMD     MsgID = 12293    //0x003005#client->gateway#将账号仓库物品取入角色背包-请求
-	MsgID_ItemWarehouseWithdrawRes_CMD     MsgID = 12294    //0x003006#gateway->client#将账号仓库物品取入角色背包-回复
-	MsgID_ShopPurchaseReq_CMD              MsgID = 12295    //0x003007#client->gateway#购买商店商品-请求
-	MsgID_ShopPurchaseRes_CMD              MsgID = 12296    //0x003008#gateway->client#购买商店商品-回复
-	MsgID_CharacterMailboxGetReq_CMD       MsgID = 20480    //0x005000#client->gateway#获取角色邮箱-请求
-	MsgID_CharacterMailboxGetRes_CMD       MsgID = 20481    //0x005001#gateway->client#获取角色邮箱-回复
-	MsgID_CharacterMailReadReq_CMD         MsgID = 20482    //0x005002#client->gateway#标记角色邮件已读-请求
-	MsgID_CharacterMailReadRes_CMD         MsgID = 20483    //0x005003#gateway->client#标记角色邮件已读-回复
-	MsgID_CharacterMailDeleteReq_CMD       MsgID = 20484    //0x005004#client->gateway#删除角色邮件-请求
-	MsgID_CharacterMailDeleteRes_CMD       MsgID = 20485    //0x005005#gateway->client#删除角色邮件-回复
-	MsgID_CharacterSystemMailNotify_CMD    MsgID = 20486    //0x005006#gateway->client#新增角色系统邮件-通知
-	MsgID_CharacterMapEnterReq_CMD         MsgID = 4124     //0x00101C#client->gateway#进入地图-请求
-	MsgID_CharacterMapEnterRes_CMD         MsgID = 4125     //0x00101D#gateway->client#进入地图-回复
-	MsgID_CharacterMapEventNotify_CMD      MsgID = 4126     //0x00101E#gateway->client#地图角色事件-通知
-	MsgID_NpcInteractionReq_CMD            MsgID = 24576    //0x006000#client->gateway#执行NPC功能-请求
-	MsgID_NpcInteractionRes_CMD            MsgID = 24577    //0x006001#gateway->client#执行NPC功能-回复
-	MsgID_PetCarryStatusSetReq_CMD         MsgID = 8192     //0x002000#client->gateway#修改随身宠物状态-请求
-	MsgID_PetCarryStatusSetRes_CMD         MsgID = 8193     //0x002001#gateway->client#修改随身宠物状态-回复
-	MsgID_CharacterPetChangedNotify_CMD    MsgID = 8194     //0x002002#gateway->client#角色随身宠物变化-通知
-	MsgID_PetWarehouseDepositReq_CMD       MsgID = 8195     //0x002003#client->gateway#将随身宠物存入仓库-请求
-	MsgID_PetWarehouseDepositRes_CMD       MsgID = 8196     //0x002004#gateway->client#将随身宠物存入仓库-回复
-	MsgID_PetWarehouseWithdrawReq_CMD      MsgID = 8197     //0x002005#client->gateway#将仓库宠物取出-请求
-	MsgID_PetWarehouseWithdrawRes_CMD      MsgID = 8198     //0x002006#gateway->client#将仓库宠物取出-回复
-	MsgID_PetNickSetReq_CMD                MsgID = 8199     //0x002007#client->gateway#修改随身宠物昵称-请求
-	MsgID_PetNickSetRes_CMD                MsgID = 8200     //0x002008#gateway->client#修改随身宠物昵称-回复
-	MsgID_PetSkillSetReq_CMD               MsgID = 8201     //0x002009#client->gateway#学习替换或遗忘随身宠物技能-请求
-	MsgID_PetSkillSetRes_CMD               MsgID = 8202     //0x00200A#gateway->client#学习替换或遗忘随身宠物技能-回复
-	MsgID_TaskAcceptReq_CMD                MsgID = 28672    //0x007000#client->gateway#接取任务-请求
-	MsgID_TaskAcceptRes_CMD                MsgID = 28673    //0x007001#gateway->client#接取任务-回复
-	MsgID_TaskSubmitReq_CMD                MsgID = 28674    //0x007002#client->gateway#提交任务步骤-请求
-	MsgID_TaskSubmitRes_CMD                MsgID = 28675    //0x007003#gateway->client#提交任务步骤-回复
-	MsgID_TaskStepRewardClaimReq_CMD       MsgID = 28676    //0x007004#client->gateway#领取任务步骤奖励-请求
-	MsgID_TaskStepRewardClaimRes_CMD       MsgID = 28677    //0x007005#gateway->client#领取任务步骤奖励-回复
-	MsgID_CharacterTaskChangedNotify_CMD   MsgID = 28678    //0x007006#gateway->client#角色任务记录变化-通知
-	MsgID_TaskBattleChallengeReq_CMD       MsgID = 28679    //0x007007#client->gateway#挑战任务步骤-请求
-	MsgID_TaskBattleChallengeRes_CMD       MsgID = 28680    //0x007008#gateway->client#挑战任务步骤-回复
-	MsgID_CharacterTeamOperationReq_CMD    MsgID = 4121     //0x001019#client->gateway#角色队伍操作-请求
-	MsgID_CharacterTeamOperationRes_CMD    MsgID = 4122     //0x00101A#gateway->client#角色队伍操作-回复
-	MsgID_CharacterTeamChangedNotify_CMD   MsgID = 4123     //0x00101B#gateway->client#角色队伍变化-通知
+	MsgID_MsgIDUnknown_CMD                        MsgID = 0        // proto3 首值必须为 0
+	MsgID_AccountVerifyReq_CMD                    MsgID = 1        //0x000001#client->gateway#账号登录验证-请求
+	MsgID_AccountVerifyRes_CMD                    MsgID = 2        //0x000002#gateway->client#账号登录验证-回复
+	MsgID_AccountOfflineReq_CMD                   MsgID = 3        //0x000003#client->gateway#账号主动下线-请求
+	MsgID_AccountHeartbeatReq_CMD                 MsgID = 17       //0x000011#client->gateway#心跳-请求
+	MsgID_AccountHeartbeatRes_CMD                 MsgID = 18       //0x0000012#gateway->client#心跳-回复
+	MsgID_AccountRecordReq_CMD                    MsgID = 19       //0x000013#client->gateway#请求账号档案-请求
+	MsgID_AccountRecordRes_CMD                    MsgID = 20       //0x000014#gateway->client#请求账号档案-回复
+	MsgID_AccountRobotPingReq_CMD                 MsgID = 23       //0x000017#client->gateway#机器人压测-请求
+	MsgID_AccountRobotPingRes_CMD                 MsgID = 24       //0x000018#gateway->client#机器人压测-回复
+	MsgID_CharacterCreateReq_CMD                  MsgID = 4096     //0x001000#client->gateway#创建角色-请求
+	MsgID_CharacterCreateRes_CMD                  MsgID = 4097     //0x001001#gateway->client#创建角色-回复
+	MsgID_CharacterOnlineReq_CMD                  MsgID = 16386    //0x004002#client->gateway#角色上线-请求
+	MsgID_CharacterOnlineRes_CMD                  MsgID = 4099     //0x001003#gateway->client#角色上线-回复
+	MsgID_CharacterOfflineReq_CMD                 MsgID = 4100     //0x001004#client->gateway#角色下线-请求
+	MsgID_CharacterOfflineRes_CMD                 MsgID = 4101     //0x001005#gateway->client#角色下线-回复
+	MsgID_CharacterBaseChangedNotify_CMD          MsgID = 4104     //0x001008#gateway->client#角色基础数据变化-通知
+	MsgID_CharacterSettingSetReq_CMD              MsgID = 4105     //0x001009#client->gateway#修改角色设置-请求
+	MsgID_CharacterSettingSetRes_CMD              MsgID = 4106     //0x00100A#gateway->client#修改角色设置-回复
+	MsgID_CharacterAttributeAddReq_CMD            MsgID = 4107     //0x00100B#client->gateway#增加角色基础属性-请求
+	MsgID_CharacterAttributeAddRes_CMD            MsgID = 4108     //0x00100C#gateway->client#增加角色基础属性-回复
+	MsgID_CharacterAttributeResetReq_CMD          MsgID = 4109     //0x00100D#client->gateway#重置角色基础属性-请求
+	MsgID_CharacterAttributeResetRes_CMD          MsgID = 4110     //0x00100E#gateway->client#重置角色基础属性-回复
+	MsgID_CombatAutoEncounterSetReq_CMD           MsgID = 1048577  //0x100001#client->gateway#设置自动遇敌-请求
+	MsgID_CombatAutoEncounterSetRes_CMD           MsgID = 1048578  //0x100002#gateway->client#设置自动遇敌-回复
+	MsgID_CombatBattleStartNotify_CMD             MsgID = 1048580  //0x100004#gateway->client#战斗开始-通知
+	MsgID_CombatRoundActionReq_CMD                MsgID = 1048581  //0x100005#client->gateway#战斗回合出手-请求
+	MsgID_CombatRoundActionRes_CMD                MsgID = 1048582  //0x100006#gateway->client#战斗回合出手-广播给战斗房间的所有角色-回复
+	MsgID_CombatRoundResultNotify_CMD             MsgID = 1048584  //0x100008#gateway->client#战斗回合结果-通知
+	MsgID_CombatFlowCompleteReq_CMD               MsgID = 1048585  //0x100009#client->gateway#战斗流程完成-请求
+	MsgID_CombatFlowCompleteRes_CMD               MsgID = 16777232 //0x1000010#gateway->client#战斗流程完成-回复
+	MsgID_CharacterEquipmentReplaceReq_CMD        MsgID = 4111     //0x00100F#client->gateway#替换角色装备-请求
+	MsgID_CharacterEquipmentReplaceRes_CMD        MsgID = 4112     //0x001010#gateway->client#替换角色装备-回复
+	MsgID_GMCommandReq_CMD                        MsgID = 61440    //0x00f000#client->gateway#执行GM命令-请求
+	MsgID_GMCommandRes_CMD                        MsgID = 61441    //0x00f001#gateway->client#执行GM命令-回复
+	MsgID_ItemUseReq_CMD                          MsgID = 12288    //0x003000#client->gateway#使用角色道具-请求
+	MsgID_ItemUseRes_CMD                          MsgID = 12289    //0x003001#gateway->client#使用角色道具-回复
+	MsgID_CharacterItemChangedNotify_CMD          MsgID = 12290    //0x003002#gateway->client#角色道具变化-通知
+	MsgID_ItemWarehouseDepositReq_CMD             MsgID = 12291    //0x003003#client->gateway#将角色背包物品存入账号仓库-请求
+	MsgID_ItemWarehouseDepositRes_CMD             MsgID = 12292    //0x003004#gateway->client#将角色背包物品存入账号仓库-回复
+	MsgID_ItemWarehouseWithdrawReq_CMD            MsgID = 12293    //0x003005#client->gateway#将账号仓库物品取入角色背包-请求
+	MsgID_ItemWarehouseWithdrawRes_CMD            MsgID = 12294    //0x003006#gateway->client#将账号仓库物品取入角色背包-回复
+	MsgID_ShopPurchaseReq_CMD                     MsgID = 12295    //0x003007#client->gateway#购买商店商品-请求
+	MsgID_ShopPurchaseRes_CMD                     MsgID = 12296    //0x003008#gateway->client#购买商店商品-回复
+	MsgID_CharacterMailboxGetReq_CMD              MsgID = 20480    //0x005000#client->gateway#获取角色邮箱-请求
+	MsgID_CharacterMailboxGetRes_CMD              MsgID = 20481    //0x005001#gateway->client#获取角色邮箱-回复
+	MsgID_CharacterMailReadReq_CMD                MsgID = 20482    //0x005002#client->gateway#标记角色邮件已读-请求
+	MsgID_CharacterMailReadRes_CMD                MsgID = 20483    //0x005003#gateway->client#标记角色邮件已读-回复
+	MsgID_CharacterMailDeleteReq_CMD              MsgID = 20484    //0x005004#client->gateway#删除角色邮件-请求
+	MsgID_CharacterMailDeleteRes_CMD              MsgID = 20485    //0x005005#gateway->client#删除角色邮件-回复
+	MsgID_CharacterSystemMailNotify_CMD           MsgID = 20486    //0x005006#gateway->client#新增角色系统邮件-通知
+	MsgID_CharacterMapEnterReq_CMD                MsgID = 4124     //0x00101C#client->gateway#进入地图-请求
+	MsgID_CharacterMapEnterRes_CMD                MsgID = 4125     //0x00101D#gateway->client#进入地图-回复
+	MsgID_CharacterMapEventNotify_CMD             MsgID = 4126     //0x00101E#gateway->client#地图角色事件-通知
+	MsgID_NpcInteractionReq_CMD                   MsgID = 24576    //0x006000#client->gateway#执行NPC功能-请求
+	MsgID_NpcInteractionRes_CMD                   MsgID = 24577    //0x006001#gateway->client#执行NPC功能-回复
+	MsgID_PetCarryStatusSetReq_CMD                MsgID = 8192     //0x002000#client->gateway#修改随身宠物状态-请求
+	MsgID_PetCarryStatusSetRes_CMD                MsgID = 8193     //0x002001#gateway->client#修改随身宠物状态-回复
+	MsgID_CharacterPetChangedNotify_CMD           MsgID = 8194     //0x002002#gateway->client#角色随身宠物变化-通知
+	MsgID_PetWarehouseDepositReq_CMD              MsgID = 8195     //0x002003#client->gateway#将随身宠物存入仓库-请求
+	MsgID_PetWarehouseDepositRes_CMD              MsgID = 8196     //0x002004#gateway->client#将随身宠物存入仓库-回复
+	MsgID_PetWarehouseWithdrawReq_CMD             MsgID = 8197     //0x002005#client->gateway#将仓库宠物取出-请求
+	MsgID_PetWarehouseWithdrawRes_CMD             MsgID = 8198     //0x002006#gateway->client#将仓库宠物取出-回复
+	MsgID_PetNickSetReq_CMD                       MsgID = 8199     //0x002007#client->gateway#修改随身宠物昵称-请求
+	MsgID_PetNickSetRes_CMD                       MsgID = 8200     //0x002008#gateway->client#修改随身宠物昵称-回复
+	MsgID_PetSkillSetReq_CMD                      MsgID = 8201     //0x002009#client->gateway#学习替换或遗忘随身宠物技能-请求
+	MsgID_PetSkillSetRes_CMD                      MsgID = 8202     //0x00200A#gateway->client#学习替换或遗忘随身宠物技能-回复
+	MsgID_TaskAcceptReq_CMD                       MsgID = 28672    //0x007000#client->gateway#接取任务-请求
+	MsgID_TaskAcceptRes_CMD                       MsgID = 28673    //0x007001#gateway->client#接取任务-回复
+	MsgID_TaskSubmitReq_CMD                       MsgID = 28674    //0x007002#client->gateway#提交任务步骤-请求
+	MsgID_TaskSubmitRes_CMD                       MsgID = 28675    //0x007003#gateway->client#提交任务步骤-回复
+	MsgID_TaskStepRewardClaimReq_CMD              MsgID = 28676    //0x007004#client->gateway#领取任务步骤奖励-请求
+	MsgID_TaskStepRewardClaimRes_CMD              MsgID = 28677    //0x007005#gateway->client#领取任务步骤奖励-回复
+	MsgID_CharacterTaskChangedNotify_CMD          MsgID = 28678    //0x007006#gateway->client#角色任务记录变化-通知
+	MsgID_TaskBattleChallengeReq_CMD              MsgID = 28679    //0x007007#client->gateway#挑战任务步骤-请求
+	MsgID_TaskBattleChallengeRes_CMD              MsgID = 28680    //0x007008#gateway->client#挑战任务步骤-回复
+	MsgID_CharacterTaskInventoryChangedNotify_CMD MsgID = 28681    //0x007009#gateway->client#任务库存变化-通知
+	MsgID_CharacterTeamOperationReq_CMD           MsgID = 4121     //0x001019#client->gateway#角色队伍操作-请求
+	MsgID_CharacterTeamOperationRes_CMD           MsgID = 4122     //0x00101A#gateway->client#角色队伍操作-回复
+	MsgID_CharacterTeamChangedNotify_CMD          MsgID = 4123     //0x00101B#gateway->client#角色队伍变化-通知
 )
 
 // Enum value maps for MsgID.
@@ -185,90 +186,92 @@ var (
 		28678:    "CharacterTaskChangedNotify_CMD",
 		28679:    "TaskBattleChallengeReq_CMD",
 		28680:    "TaskBattleChallengeRes_CMD",
+		28681:    "CharacterTaskInventoryChangedNotify_CMD",
 		4121:     "CharacterTeamOperationReq_CMD",
 		4122:     "CharacterTeamOperationRes_CMD",
 		4123:     "CharacterTeamChangedNotify_CMD",
 	}
 	MsgID_value = map[string]int32{
-		"MsgIDUnknown_CMD":                 0,
-		"AccountVerifyReq_CMD":             1,
-		"AccountVerifyRes_CMD":             2,
-		"AccountOfflineReq_CMD":            3,
-		"AccountHeartbeatReq_CMD":          17,
-		"AccountHeartbeatRes_CMD":          18,
-		"AccountRecordReq_CMD":             19,
-		"AccountRecordRes_CMD":             20,
-		"AccountRobotPingReq_CMD":          23,
-		"AccountRobotPingRes_CMD":          24,
-		"CharacterCreateReq_CMD":           4096,
-		"CharacterCreateRes_CMD":           4097,
-		"CharacterOnlineReq_CMD":           16386,
-		"CharacterOnlineRes_CMD":           4099,
-		"CharacterOfflineReq_CMD":          4100,
-		"CharacterOfflineRes_CMD":          4101,
-		"CharacterBaseChangedNotify_CMD":   4104,
-		"CharacterSettingSetReq_CMD":       4105,
-		"CharacterSettingSetRes_CMD":       4106,
-		"CharacterAttributeAddReq_CMD":     4107,
-		"CharacterAttributeAddRes_CMD":     4108,
-		"CharacterAttributeResetReq_CMD":   4109,
-		"CharacterAttributeResetRes_CMD":   4110,
-		"CombatAutoEncounterSetReq_CMD":    1048577,
-		"CombatAutoEncounterSetRes_CMD":    1048578,
-		"CombatBattleStartNotify_CMD":      1048580,
-		"CombatRoundActionReq_CMD":         1048581,
-		"CombatRoundActionRes_CMD":         1048582,
-		"CombatRoundResultNotify_CMD":      1048584,
-		"CombatFlowCompleteReq_CMD":        1048585,
-		"CombatFlowCompleteRes_CMD":        16777232,
-		"CharacterEquipmentReplaceReq_CMD": 4111,
-		"CharacterEquipmentReplaceRes_CMD": 4112,
-		"GMCommandReq_CMD":                 61440,
-		"GMCommandRes_CMD":                 61441,
-		"ItemUseReq_CMD":                   12288,
-		"ItemUseRes_CMD":                   12289,
-		"CharacterItemChangedNotify_CMD":   12290,
-		"ItemWarehouseDepositReq_CMD":      12291,
-		"ItemWarehouseDepositRes_CMD":      12292,
-		"ItemWarehouseWithdrawReq_CMD":     12293,
-		"ItemWarehouseWithdrawRes_CMD":     12294,
-		"ShopPurchaseReq_CMD":              12295,
-		"ShopPurchaseRes_CMD":              12296,
-		"CharacterMailboxGetReq_CMD":       20480,
-		"CharacterMailboxGetRes_CMD":       20481,
-		"CharacterMailReadReq_CMD":         20482,
-		"CharacterMailReadRes_CMD":         20483,
-		"CharacterMailDeleteReq_CMD":       20484,
-		"CharacterMailDeleteRes_CMD":       20485,
-		"CharacterSystemMailNotify_CMD":    20486,
-		"CharacterMapEnterReq_CMD":         4124,
-		"CharacterMapEnterRes_CMD":         4125,
-		"CharacterMapEventNotify_CMD":      4126,
-		"NpcInteractionReq_CMD":            24576,
-		"NpcInteractionRes_CMD":            24577,
-		"PetCarryStatusSetReq_CMD":         8192,
-		"PetCarryStatusSetRes_CMD":         8193,
-		"CharacterPetChangedNotify_CMD":    8194,
-		"PetWarehouseDepositReq_CMD":       8195,
-		"PetWarehouseDepositRes_CMD":       8196,
-		"PetWarehouseWithdrawReq_CMD":      8197,
-		"PetWarehouseWithdrawRes_CMD":      8198,
-		"PetNickSetReq_CMD":                8199,
-		"PetNickSetRes_CMD":                8200,
-		"PetSkillSetReq_CMD":               8201,
-		"PetSkillSetRes_CMD":               8202,
-		"TaskAcceptReq_CMD":                28672,
-		"TaskAcceptRes_CMD":                28673,
-		"TaskSubmitReq_CMD":                28674,
-		"TaskSubmitRes_CMD":                28675,
-		"TaskStepRewardClaimReq_CMD":       28676,
-		"TaskStepRewardClaimRes_CMD":       28677,
-		"CharacterTaskChangedNotify_CMD":   28678,
-		"TaskBattleChallengeReq_CMD":       28679,
-		"TaskBattleChallengeRes_CMD":       28680,
-		"CharacterTeamOperationReq_CMD":    4121,
-		"CharacterTeamOperationRes_CMD":    4122,
-		"CharacterTeamChangedNotify_CMD":   4123,
+		"MsgIDUnknown_CMD":                        0,
+		"AccountVerifyReq_CMD":                    1,
+		"AccountVerifyRes_CMD":                    2,
+		"AccountOfflineReq_CMD":                   3,
+		"AccountHeartbeatReq_CMD":                 17,
+		"AccountHeartbeatRes_CMD":                 18,
+		"AccountRecordReq_CMD":                    19,
+		"AccountRecordRes_CMD":                    20,
+		"AccountRobotPingReq_CMD":                 23,
+		"AccountRobotPingRes_CMD":                 24,
+		"CharacterCreateReq_CMD":                  4096,
+		"CharacterCreateRes_CMD":                  4097,
+		"CharacterOnlineReq_CMD":                  16386,
+		"CharacterOnlineRes_CMD":                  4099,
+		"CharacterOfflineReq_CMD":                 4100,
+		"CharacterOfflineRes_CMD":                 4101,
+		"CharacterBaseChangedNotify_CMD":          4104,
+		"CharacterSettingSetReq_CMD":              4105,
+		"CharacterSettingSetRes_CMD":              4106,
+		"CharacterAttributeAddReq_CMD":            4107,
+		"CharacterAttributeAddRes_CMD":            4108,
+		"CharacterAttributeResetReq_CMD":          4109,
+		"CharacterAttributeResetRes_CMD":          4110,
+		"CombatAutoEncounterSetReq_CMD":           1048577,
+		"CombatAutoEncounterSetRes_CMD":           1048578,
+		"CombatBattleStartNotify_CMD":             1048580,
+		"CombatRoundActionReq_CMD":                1048581,
+		"CombatRoundActionRes_CMD":                1048582,
+		"CombatRoundResultNotify_CMD":             1048584,
+		"CombatFlowCompleteReq_CMD":               1048585,
+		"CombatFlowCompleteRes_CMD":               16777232,
+		"CharacterEquipmentReplaceReq_CMD":        4111,
+		"CharacterEquipmentReplaceRes_CMD":        4112,
+		"GMCommandReq_CMD":                        61440,
+		"GMCommandRes_CMD":                        61441,
+		"ItemUseReq_CMD":                          12288,
+		"ItemUseRes_CMD":                          12289,
+		"CharacterItemChangedNotify_CMD":          12290,
+		"ItemWarehouseDepositReq_CMD":             12291,
+		"ItemWarehouseDepositRes_CMD":             12292,
+		"ItemWarehouseWithdrawReq_CMD":            12293,
+		"ItemWarehouseWithdrawRes_CMD":            12294,
+		"ShopPurchaseReq_CMD":                     12295,
+		"ShopPurchaseRes_CMD":                     12296,
+		"CharacterMailboxGetReq_CMD":              20480,
+		"CharacterMailboxGetRes_CMD":              20481,
+		"CharacterMailReadReq_CMD":                20482,
+		"CharacterMailReadRes_CMD":                20483,
+		"CharacterMailDeleteReq_CMD":              20484,
+		"CharacterMailDeleteRes_CMD":              20485,
+		"CharacterSystemMailNotify_CMD":           20486,
+		"CharacterMapEnterReq_CMD":                4124,
+		"CharacterMapEnterRes_CMD":                4125,
+		"CharacterMapEventNotify_CMD":             4126,
+		"NpcInteractionReq_CMD":                   24576,
+		"NpcInteractionRes_CMD":                   24577,
+		"PetCarryStatusSetReq_CMD":                8192,
+		"PetCarryStatusSetRes_CMD":                8193,
+		"CharacterPetChangedNotify_CMD":           8194,
+		"PetWarehouseDepositReq_CMD":              8195,
+		"PetWarehouseDepositRes_CMD":              8196,
+		"PetWarehouseWithdrawReq_CMD":             8197,
+		"PetWarehouseWithdrawRes_CMD":             8198,
+		"PetNickSetReq_CMD":                       8199,
+		"PetNickSetRes_CMD":                       8200,
+		"PetSkillSetReq_CMD":                      8201,
+		"PetSkillSetRes_CMD":                      8202,
+		"TaskAcceptReq_CMD":                       28672,
+		"TaskAcceptRes_CMD":                       28673,
+		"TaskSubmitReq_CMD":                       28674,
+		"TaskSubmitRes_CMD":                       28675,
+		"TaskStepRewardClaimReq_CMD":              28676,
+		"TaskStepRewardClaimRes_CMD":              28677,
+		"CharacterTaskChangedNotify_CMD":          28678,
+		"TaskBattleChallengeReq_CMD":              28679,
+		"TaskBattleChallengeRes_CMD":              28680,
+		"CharacterTaskInventoryChangedNotify_CMD": 28681,
+		"CharacterTeamOperationReq_CMD":           4121,
+		"CharacterTeamOperationRes_CMD":           4122,
+		"CharacterTeamChangedNotify_CMD":          4123,
 	}
 )
 
@@ -303,7 +306,7 @@ var File_cmd_proto protoreflect.FileDescriptor
 
 var file_cmd_proto_rawDesc = []byte{
 	0x0a, 0x09, 0x63, 0x6d, 0x64, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x07, 0x61, 0x63, 0x63,
-	0x6f, 0x75, 0x6e, 0x74, 0x2a, 0xaa, 0x13, 0x0a, 0x05, 0x4d, 0x73, 0x67, 0x49, 0x44, 0x12, 0x14,
+	0x6f, 0x75, 0x6e, 0x74, 0x2a, 0xd9, 0x13, 0x0a, 0x05, 0x4d, 0x73, 0x67, 0x49, 0x44, 0x12, 0x14,
 	0x0a, 0x10, 0x4d, 0x73, 0x67, 0x49, 0x44, 0x55, 0x6e, 0x6b, 0x6e, 0x6f, 0x77, 0x6e, 0x5f, 0x43,
 	0x4d, 0x44, 0x10, 0x00, 0x12, 0x18, 0x0a, 0x14, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x56,
 	0x65, 0x72, 0x69, 0x66, 0x79, 0x52, 0x65, 0x71, 0x5f, 0x43, 0x4d, 0x44, 0x10, 0x01, 0x12, 0x18,
@@ -451,15 +454,18 @@ var file_cmd_proto_rawDesc = []byte{
 	0x61, 0x6c, 0x6c, 0x65, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x71, 0x5f, 0x43, 0x4d, 0x44, 0x10, 0x87,
 	0xe0, 0x01, 0x12, 0x20, 0x0a, 0x1a, 0x54, 0x61, 0x73, 0x6b, 0x42, 0x61, 0x74, 0x74, 0x6c, 0x65,
 	0x43, 0x68, 0x61, 0x6c, 0x6c, 0x65, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x73, 0x5f, 0x43, 0x4d, 0x44,
-	0x10, 0x88, 0xe0, 0x01, 0x12, 0x22, 0x0a, 0x1d, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65,
-	0x72, 0x54, 0x65, 0x61, 0x6d, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65,
-	0x71, 0x5f, 0x43, 0x4d, 0x44, 0x10, 0x99, 0x20, 0x12, 0x22, 0x0a, 0x1d, 0x43, 0x68, 0x61, 0x72,
-	0x61, 0x63, 0x74, 0x65, 0x72, 0x54, 0x65, 0x61, 0x6d, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x52, 0x65, 0x73, 0x5f, 0x43, 0x4d, 0x44, 0x10, 0x9a, 0x20, 0x12, 0x23, 0x0a, 0x1e,
-	0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x54, 0x65, 0x61, 0x6d, 0x43, 0x68, 0x61,
-	0x6e, 0x67, 0x65, 0x64, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x5f, 0x43, 0x4d, 0x44, 0x10, 0x9b,
-	0x20, 0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x10, 0x88, 0xe0, 0x01, 0x12, 0x2d, 0x0a, 0x27, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65,
+	0x72, 0x54, 0x61, 0x73, 0x6b, 0x49, 0x6e, 0x76, 0x65, 0x6e, 0x74, 0x6f, 0x72, 0x79, 0x43, 0x68,
+	0x61, 0x6e, 0x67, 0x65, 0x64, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x5f, 0x43, 0x4d, 0x44, 0x10,
+	0x89, 0xe0, 0x01, 0x12, 0x22, 0x0a, 0x1d, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72,
+	0x54, 0x65, 0x61, 0x6d, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71,
+	0x5f, 0x43, 0x4d, 0x44, 0x10, 0x99, 0x20, 0x12, 0x22, 0x0a, 0x1d, 0x43, 0x68, 0x61, 0x72, 0x61,
+	0x63, 0x74, 0x65, 0x72, 0x54, 0x65, 0x61, 0x6d, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x52, 0x65, 0x73, 0x5f, 0x43, 0x4d, 0x44, 0x10, 0x9a, 0x20, 0x12, 0x23, 0x0a, 0x1e, 0x43,
+	0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x54, 0x65, 0x61, 0x6d, 0x43, 0x68, 0x61, 0x6e,
+	0x67, 0x65, 0x64, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x5f, 0x43, 0x4d, 0x44, 0x10, 0x9b, 0x20,
+	0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (

@@ -12,7 +12,7 @@ import "msg.item.proto";
 //0x00100F#client->gateway#替换角色装备-请求
 message CharacterEquipmentReplaceReq {
   uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号、已上线且不在战斗中
-  EquipmentType equipment_type = 2; // 目标装备部位; 当前仅支持武器
+  EquipmentType equipment_type = 2; // 目标装备部位; 支持武器、首饰位1和首饰位2
   uint64 equipment_uuid = 3; // 背包装备 UUID; 0 表示卸下目标部位装备
 }
 
