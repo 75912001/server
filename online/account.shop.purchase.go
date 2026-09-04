@@ -141,8 +141,10 @@ func prepareShopPurchasePlan(
 	if accountRecord == nil || characterRecord == nil || characterRecord.GetBase().GetUuid() == 0 || itemID == 0 || quantity == 0 || quantity > shopPurchaseMaxQuantity {
 		return nil, errShopPurchaseInvalidArgument
 	}
-	if itemID < uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Start) || itemID > uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_End) {
-		return nil, fmt.Errorf("%w: item %d is not a weapon", errShopPurchaseInvalidArgument, itemID)
+	isWeaponID := itemID >= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Start) && itemID <= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_End)
+	isAccessoryID := itemID >= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Accessory_Start) && itemID <= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Accessory_End)
+	if !isWeaponID && !isAccessoryID {
+		return nil, fmt.Errorf("%w: item %d is not supported equipment", errShopPurchaseInvalidArgument, itemID)
 	}
 	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Item == nil {
 		return nil, fmt.Errorf("%w: item config is not loaded", errShopPurchaseRecordInvalid)
@@ -153,6 +155,9 @@ func prepareShopPurchasePlan(
 	}
 	if itemEntry.ID == nil || *itemEntry.ID != itemID {
 		return nil, fmt.Errorf("%w: item %d config id mismatch", errShopPurchaseRecordInvalid, itemID)
+	}
+	if _, err := configuredEquipmentEntry(itemID); err != nil {
+		return nil, fmt.Errorf("%w: %v", errShopPurchaseRecordInvalid, err)
 	}
 	if itemEntry.Cost == 0 {
 		return nil, fmt.Errorf("%w: item %d is not sellable", errShopPurchaseFailedPrecondition, itemID)

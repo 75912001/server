@@ -40,23 +40,61 @@ var equipmentFixedModifierKeys = [...]pb.EquipmentRecordBase{
 	pb.EquipmentRecordBase_EquipmentRecordBase_CriticalModifier,
 }
 
-func configuredWeaponEntry(assetID uint32) (*gameconfig.ItemEntry, error) {
-	if assetID < uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Start) ||
-		assetID > uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_End) {
-		return nil, fmt.Errorf("asset id %d is not a weapon", assetID)
-	}
+var supportedCharacterEquipmentTypes = [...]pb.EquipmentType{
+	pb.EquipmentType_EquipmentType_Weapon,
+	pb.EquipmentType_EquipmentType_Accessory1,
+	pb.EquipmentType_EquipmentType_Accessory2,
+}
+
+func configuredEquipmentEntry(assetID uint32) (*gameconfig.ItemEntry, error) {
 	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Item == nil {
 		return nil, fmt.Errorf("item config is not loaded")
 	}
 	entry := gameconfig.GGameConfig.Item.Get(assetID)
 	if entry == nil || entry.ID == nil || *entry.ID != assetID {
-		return nil, fmt.Errorf("weapon config %d is missing or mismatched", assetID)
+		return nil, fmt.Errorf("equipment config %d is missing or mismatched", assetID)
 	}
-	if entry.WeaponType <= pb.CharacterWeaponType_CharacterWeaponType_Unknow ||
-		entry.WeaponType >= pb.CharacterWeaponType_CharacterWeaponType_Max {
-		return nil, fmt.Errorf("weapon config %d type %d is invalid", assetID, entry.WeaponType)
+	if assetID >= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Start) &&
+		assetID <= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_End) {
+		if entry.WeaponType <= pb.CharacterWeaponType_CharacterWeaponType_Unknow ||
+			entry.WeaponType >= pb.CharacterWeaponType_CharacterWeaponType_Max || entry.AccessoryType != pb.AccessoryType_AccessoryType_Unknow {
+			return nil, fmt.Errorf("weapon config %d type is invalid", assetID)
+		}
+	} else {
+		minimum, maximum := gameconfig.AccessoryIDRange(entry.AccessoryType)
+		if minimum == 0 || assetID < minimum || assetID > maximum || entry.WeaponType != pb.CharacterWeaponType_CharacterWeaponType_Unknow {
+			return nil, fmt.Errorf("accessory config %d type %d does not match its id range", assetID, entry.AccessoryType)
+		}
 	}
 	return entry, nil
+}
+
+func configuredWeaponEntry(assetID uint32) (*gameconfig.ItemEntry, error) {
+	entry, err := configuredEquipmentEntry(assetID)
+	if err != nil {
+		return nil, err
+	}
+	if entry.WeaponType == pb.CharacterWeaponType_CharacterWeaponType_Unknow {
+		return nil, fmt.Errorf("equipment %d is not a weapon", assetID)
+	}
+	return entry, nil
+}
+
+// 仅开放的部位返回字段指针, 使穿戴、卸下和响应始终访问同一个目标字段.
+func characterEquipmentSlot(equipment *pb.CharacterEquipmentRecord, equipmentType pb.EquipmentType) **pb.EquipmentRecord {
+	if equipment == nil {
+		return nil
+	}
+	switch equipmentType {
+	case pb.EquipmentType_EquipmentType_Weapon:
+		return &equipment.Weapon
+	case pb.EquipmentType_EquipmentType_Accessory1:
+		return &equipment.Accessory1
+	case pb.EquipmentType_EquipmentType_Accessory2:
+		return &equipment.Accessory2
+	default:
+		return nil
+	}
 }
 
 func equipmentModifierRange(entry *gameconfig.ItemEntry, key pb.EquipmentRecordBase) (int32, int32, bool) {
@@ -104,7 +142,7 @@ func newEquipmentRecord(equipmentUUID uint64, assetID uint32) (*pb.EquipmentReco
 	if equipmentUUID == 0 {
 		return nil, fmt.Errorf("equipment uuid is empty")
 	}
-	entry, err := configuredWeaponEntry(assetID)
+	entry, err := configuredEquipmentEntry(assetID)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +150,7 @@ func newEquipmentRecord(equipmentUUID uint64, assetID uint32) (*pb.EquipmentReco
 	for _, key := range equipmentFixedModifierKeys {
 		minimum, maximum, ok := equipmentModifierRange(entry, key)
 		if !ok || minimum > maximum {
-			return nil, fmt.Errorf("weapon %d modifier %s range is invalid", assetID, key)
+			return nil, fmt.Errorf("equipment %d modifier %s range is invalid", assetID, key)
 		}
 		width := uint64(int64(maximum) - int64(minimum))
 		value := int64(minimum) + int64(xutil.RandomU64(0, width))
@@ -130,7 +168,7 @@ func validateEquipmentRecord(record *pb.EquipmentRecord, expectedUUID uint64) er
 	if record == nil || expectedUUID == 0 || record.GetUuid() != expectedUUID {
 		return fmt.Errorf("equipment key %d does not match record uuid %d", expectedUUID, record.GetUuid())
 	}
-	entry, err := configuredWeaponEntry(record.GetAssetId())
+	entry, err := configuredEquipmentEntry(record.GetAssetId())
 	if err != nil {
 		return err
 	}
@@ -169,17 +207,32 @@ func validateEquipmentContainer(container *pb.ItemContainerRecord, capacity int,
 }
 
 func validateCharacterEquipment(record *pb.CharacterRecord, seenUUID map[uint64]struct{}, usedUUID uint64) error {
-	if record == nil || record.GetEquipment() == nil {
+	if record == nil {
+		return fmt.Errorf("character record is nil")
+	}
+	if err := validateCharacterEquipmentSlots(record.GetEquipment()); err != nil {
+		return err
+	}
+	for _, equipmentType := range supportedCharacterEquipmentTypes {
+		if equipped := *characterEquipmentSlot(record.GetEquipment(), equipmentType); equipped != nil {
+			if err := registerAccountRecordUUID(seenUUID, usedUUID, equipped.GetUuid()); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// 原版两个首饰位共享六类首饰, 禁止同类同时穿戴; 不能只比较实例UUID或道具ID.
+func validateCharacterEquipmentSlots(equipment *pb.CharacterEquipmentRecord) error {
+	if equipment == nil {
 		return fmt.Errorf("character equipment is nil")
 	}
-	equipment := record.GetEquipment()
 	unsupported := []struct {
 		name   string
 		record *pb.EquipmentRecord
 	}{
-		{name: "necklace", record: equipment.GetNecklace()},
 		{name: "helmet", record: equipment.GetHelmet()},
-		{name: "ring", record: equipment.GetRing()},
 		{name: "chest", record: equipment.GetChest()},
 		{name: "shield", record: equipment.GetShield()},
 		{name: "gloves", record: equipment.GetGloves()},
@@ -191,14 +244,31 @@ func validateCharacterEquipment(record *pb.CharacterRecord, seenUUID map[uint64]
 			return fmt.Errorf("unsupported equipped slot %s is populated", slot.name)
 		}
 	}
-	weapon := equipment.GetWeapon()
-	if weapon == nil {
-		return nil
+	accessoryType := pb.AccessoryType_AccessoryType_Unknow
+	for _, equipmentType := range supportedCharacterEquipmentTypes {
+		equipped := *characterEquipmentSlot(equipment, equipmentType)
+		if equipped == nil {
+			continue
+		}
+		if err := validateEquipmentRecord(equipped, equipped.GetUuid()); err != nil {
+			return err
+		}
+		entry := gameconfig.GGameConfig.Item.Get(equipped.GetAssetId())
+		if equipmentType == pb.EquipmentType_EquipmentType_Weapon {
+			if entry.WeaponType == pb.CharacterWeaponType_CharacterWeaponType_Unknow {
+				return fmt.Errorf("weapon slot contains accessory %d", equipped.GetAssetId())
+			}
+		} else {
+			if entry.AccessoryType == pb.AccessoryType_AccessoryType_Unknow {
+				return fmt.Errorf("accessory slot contains weapon %d", equipped.GetAssetId())
+			}
+			if entry.AccessoryType == accessoryType {
+				return fmt.Errorf("cannot equip two accessories of type %s", accessoryType)
+			}
+			accessoryType = entry.AccessoryType
+		}
 	}
-	if err := registerAccountRecordUUID(seenUUID, usedUUID, weapon.GetUuid()); err != nil {
-		return err
-	}
-	return validateEquipmentRecord(weapon, weapon.GetUuid())
+	return nil
 }
 
 func clampEquipmentValue(value int64, minimum int64, maximum int64) int64 {
@@ -222,6 +292,9 @@ func equipmentModifier(record *pb.EquipmentRecord, key pb.EquipmentRecordBase) i
 func characterEffectiveAttribute(record *pb.CharacterRecord) (*pb.CharacterEffectiveAttribute, error) {
 	if record == nil || record.GetBase() == nil || record.GetBase().GetUuid() == 0 || record.GetEquipment() == nil {
 		return nil, fmt.Errorf("character record is incomplete")
+	}
+	if err := validateCharacterEquipmentSlots(record.GetEquipment()); err != nil {
+		return nil, err
 	}
 	base := record.GetBase()
 	vitality := int64(base.GetVitality())
@@ -258,31 +331,30 @@ func characterEffectiveAttribute(record *pb.CharacterRecord) (*pb.CharacterEffec
 	elemental := [4]int64{int64(base.GetEarth()), int64(base.GetWater()), int64(base.GetFire()), int64(base.GetWind())}
 	weaponType := pb.CharacterWeaponType_CharacterWeaponType_Unarmed
 
-	weapon := record.GetEquipment().GetWeapon()
-	if weapon != nil {
-		if err := validateEquipmentRecord(weapon, weapon.GetUuid()); err != nil {
-			return nil, err
+	for _, equipmentType := range supportedCharacterEquipmentTypes {
+		equipped := *characterEquipmentSlot(record.GetEquipment(), equipmentType)
+		if equipped == nil {
+			continue
 		}
-		entry, err := configuredWeaponEntry(weapon.GetAssetId())
-		if err != nil {
-			return nil, err
+		entry := gameconfig.GGameConfig.Item.Get(equipped.GetAssetId())
+		if equipmentType == pb.EquipmentType_EquipmentType_Weapon {
+			weaponType = entry.WeaponType
 		}
-		weaponType = entry.WeaponType
-		maxHP += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_MaxHPModifier)
-		attack += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_AttackModifier)
-		defense += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_DefenceModifier)
-		agility += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_QuickModifier)
-		maxMP += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_MaxMPModifier)
-		luck += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_LuckModifier)
-		charm += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_CharmModifier)
-		avoid += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_AvoidModifier)
-		poison += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_PoisonResistanceModifier)
-		paralysis += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_ParalysisResistanceModifier)
-		sleep += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_SleepResistanceModifier)
-		stone += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_StoneResistanceModifier)
-		drunk += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_DrunkResistanceModifier)
-		confusion += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_ConfusionResistanceModifier)
-		critical += equipmentModifier(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_CriticalModifier)
+		maxHP += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_MaxHPModifier)
+		attack += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_AttackModifier)
+		defense += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_DefenceModifier)
+		agility += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_QuickModifier)
+		maxMP += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_MaxMPModifier)
+		luck += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_LuckModifier)
+		charm += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_CharmModifier)
+		avoid += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_AvoidModifier)
+		poison += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_PoisonResistanceModifier)
+		paralysis += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_ParalysisResistanceModifier)
+		sleep += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_SleepResistanceModifier)
+		stone += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_StoneResistanceModifier)
+		drunk += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_DrunkResistanceModifier)
+		confusion += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_ConfusionResistanceModifier)
+		critical += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_CriticalModifier)
 		otherDamage += int64(entry.OtherDamage)
 		otherDefense += int64(entry.OtherDefence)
 		if entry.Attribute >= 1 && entry.Attribute <= 4 {
@@ -353,7 +425,7 @@ type characterEquipmentReplacePlan struct {
 }
 
 func prepareCharacterEquipmentReplacePlan(accountRecord *pb.AccountRecord, characterRecord *pb.CharacterRecord, equipmentType pb.EquipmentType, equipmentUUID uint64) (*characterEquipmentReplacePlan, error) {
-	if accountRecord == nil || characterRecord == nil || characterRecord.GetBase().GetUuid() == 0 || equipmentType != pb.EquipmentType_EquipmentType_Weapon {
+	if accountRecord == nil || characterRecord == nil || characterRecord.GetBase().GetUuid() == 0 || characterEquipmentSlot(characterRecord.GetEquipment(), equipmentType) == nil {
 		return nil, errCharacterEquipmentInvalidArgument
 	}
 	characterSlot := -1
@@ -375,30 +447,53 @@ func prepareCharacterEquipmentReplacePlan(accountRecord *pb.AccountRecord, chara
 	if nextCharacter.ItemBag.EquipmentRecordMap == nil {
 		nextCharacter.ItemBag.EquipmentRecordMap = make(map[uint64]*pb.EquipmentRecord)
 	}
-	currentWeapon := nextCharacter.Equipment.GetWeapon()
+	targetSlot := characterEquipmentSlot(nextCharacter.Equipment, equipmentType)
+	currentEquipment := *targetSlot
 	if equipmentUUID == 0 {
-		if currentWeapon == nil {
-			return nil, fmt.Errorf("%w: weapon slot is already empty", errCharacterEquipmentFailedPrecondition)
+		if currentEquipment == nil {
+			return nil, fmt.Errorf("%w: equipment slot is already empty", errCharacterEquipmentFailedPrecondition)
 		}
 		if itemContainerCount(nextCharacter.GetItemBag()) >= int(pb.CharacterLimit_CharacterLimit_MaxItemBagCount) {
 			return nil, errCharacterEquipmentResourceExhausted
 		}
-		if _, exists := nextCharacter.ItemBag.EquipmentRecordMap[currentWeapon.GetUuid()]; exists {
-			return nil, fmt.Errorf("%w: weapon %d already exists in bag", errCharacterEquipmentRecordInvalid, currentWeapon.GetUuid())
+		if _, exists := nextCharacter.ItemBag.EquipmentRecordMap[currentEquipment.GetUuid()]; exists {
+			return nil, fmt.Errorf("%w: equipment %d already exists in bag", errCharacterEquipmentRecordInvalid, currentEquipment.GetUuid())
 		}
-		nextCharacter.ItemBag.EquipmentRecordMap[currentWeapon.GetUuid()] = currentWeapon
-		nextCharacter.Equipment.Weapon = nil
+		nextCharacter.ItemBag.EquipmentRecordMap[currentEquipment.GetUuid()] = currentEquipment
+		*targetSlot = nil
 	} else {
-		nextWeapon := nextCharacter.ItemBag.GetEquipmentRecordMap()[equipmentUUID]
-		if nextWeapon == nil {
+		nextEquipment := nextCharacter.ItemBag.GetEquipmentRecordMap()[equipmentUUID]
+		if nextEquipment == nil {
 			return nil, fmt.Errorf("%w: equipment %d is not in character bag", errCharacterEquipmentTargetNotFound, equipmentUUID)
 		}
-		if err := validateEquipmentRecord(nextWeapon, equipmentUUID); err != nil {
+		if err := validateEquipmentRecord(nextEquipment, equipmentUUID); err != nil {
 			return nil, fmt.Errorf("%w: %v", errCharacterEquipmentRecordInvalid, err)
 		}
-		entry, err := configuredWeaponEntry(nextWeapon.GetAssetId())
+		entry, err := configuredEquipmentEntry(nextEquipment.GetAssetId())
 		if err != nil {
 			return nil, fmt.Errorf("%w: %v", errCharacterEquipmentTargetNotFound, err)
+		}
+		if equipmentType == pb.EquipmentType_EquipmentType_Weapon {
+			if entry.WeaponType == pb.CharacterWeaponType_CharacterWeaponType_Unknow {
+				return nil, fmt.Errorf("%w: accessory cannot enter weapon slot", errCharacterEquipmentFailedPrecondition)
+			}
+		} else {
+			if entry.AccessoryType == pb.AccessoryType_AccessoryType_Unknow {
+				return nil, fmt.Errorf("%w: weapon cannot enter accessory slot", errCharacterEquipmentFailedPrecondition)
+			}
+			otherAccessory := nextCharacter.Equipment.GetAccessory1()
+			if equipmentType == pb.EquipmentType_EquipmentType_Accessory1 {
+				otherAccessory = nextCharacter.Equipment.GetAccessory2()
+			}
+			if otherAccessory != nil {
+				otherEntry, err := configuredEquipmentEntry(otherAccessory.GetAssetId())
+				if err != nil {
+					return nil, fmt.Errorf("%w: %v", errCharacterEquipmentRecordInvalid, err)
+				}
+				if entry.AccessoryType == otherEntry.AccessoryType {
+					return nil, fmt.Errorf("%w: cannot equip two accessories of type %s", errCharacterEquipmentFailedPrecondition, entry.AccessoryType)
+				}
+			}
 		}
 		if gameconfig.GGameConfig.Exp == nil {
 			return nil, fmt.Errorf("%w: exp config is not loaded", errCharacterEquipmentRecordInvalid)
@@ -408,20 +503,20 @@ func prepareCharacterEquipmentReplacePlan(accountRecord *pb.AccountRecord, chara
 			return nil, fmt.Errorf("%w: character level: %v", errCharacterEquipmentRecordInvalid, err)
 		}
 		if characterLevel < entry.Level {
-			return nil, fmt.Errorf("%w: character level %d is below weapon level %d", errCharacterEquipmentFailedPrecondition, characterLevel, entry.Level)
+			return nil, fmt.Errorf("%w: character level %d is below equipment level %d", errCharacterEquipmentFailedPrecondition, characterLevel, entry.Level)
 		}
-		// 当前角色档案尚未接入转职状态, 因此角色权威职业为None, 不能装备带neprof限制的武器.
+		// 当前角色档案尚未接入转职状态, 因此角色权威职业为None, 不能装备带neprof限制的装备.
 		if entry.Profession != pb.CharacterProfession_CharacterProfession_None {
-			return nil, fmt.Errorf("%w: weapon requires profession %s", errCharacterEquipmentFailedPrecondition, entry.Profession)
+			return nil, fmt.Errorf("%w: equipment requires profession %s", errCharacterEquipmentFailedPrecondition, entry.Profession)
 		}
 		delete(nextCharacter.ItemBag.EquipmentRecordMap, equipmentUUID)
-		if currentWeapon != nil {
-			if _, exists := nextCharacter.ItemBag.EquipmentRecordMap[currentWeapon.GetUuid()]; exists {
-				return nil, fmt.Errorf("%w: current weapon %d already exists in bag", errCharacterEquipmentRecordInvalid, currentWeapon.GetUuid())
+		if currentEquipment != nil {
+			if _, exists := nextCharacter.ItemBag.EquipmentRecordMap[currentEquipment.GetUuid()]; exists {
+				return nil, fmt.Errorf("%w: current equipment %d already exists in bag", errCharacterEquipmentRecordInvalid, currentEquipment.GetUuid())
 			}
-			nextCharacter.ItemBag.EquipmentRecordMap[currentWeapon.GetUuid()] = currentWeapon
+			nextCharacter.ItemBag.EquipmentRecordMap[currentEquipment.GetUuid()] = currentEquipment
 		}
-		nextCharacter.Equipment.Weapon = nextWeapon
+		*targetSlot = nextEquipment
 	}
 
 	effective, err := characterEffectiveAttribute(nextCharacter)
@@ -483,10 +578,10 @@ func (p *Account) onCharacterEquipmentReplaceReq(gateway *Gateway, packet *pb.On
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterEquipmentReplaceRes_CMD), xerror.Internal.Code())
 		return
 	}
-	// 响应只携带本次替换部位的装备; 卸下武器时该字段保持未设置.
+	// 响应只携带本次替换部位的装备; 卸下目标部位装备时该字段保持未设置.
 	var replacedEquipment *pb.EquipmentRecord
-	if weapon := plan.nextCharacter.GetEquipment().GetWeapon(); weapon != nil {
-		replacedEquipment = proto.Clone(weapon).(*pb.EquipmentRecord)
+	if equipped := *characterEquipmentSlot(plan.nextCharacter.GetEquipment(), plan.equipmentType); equipped != nil {
+		replacedEquipment = proto.Clone(equipped).(*pb.EquipmentRecord)
 	}
 	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterEquipmentReplaceRes_CMD), xerror.Success.Code(), &pb.CharacterEquipmentReplaceRes{
 		CharacterUuid:      plan.characterUUID,

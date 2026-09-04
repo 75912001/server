@@ -12,8 +12,13 @@ func isCharacterTrainingMapID(mapID uint32) bool {
 		mapID <= uint32(pb.AssetIDRange_AssetIDRange_Map_Training_End)
 }
 
+func isCharacterTaskMapID(mapID uint32) bool {
+	return mapID >= uint32(pb.AssetIDRange_AssetIDRange_Map_Task_Start) &&
+		mapID <= uint32(pb.AssetIDRange_AssetIDRange_Map_Task_End)
+}
+
 func isCharacterMapID(mapID uint32) bool {
-	return isCharacterTestMapID(mapID) || isCharacterTrainingMapID(mapID)
+	return isCharacterTestMapID(mapID) || isCharacterTrainingMapID(mapID) || isCharacterTaskMapID(mapID)
 }
 
 // joinCharacterMap 在单张可进入地图锁内先取得现有角色副本, 再按完整分组顺序追加新角色.

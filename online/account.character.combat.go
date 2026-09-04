@@ -1411,10 +1411,14 @@ func (c *character) newCombatRoomParticipantAdmission(gateway *Gateway) (combatR
 	}
 
 	var equipmentLuckModifierList []int32
+	for _, equipmentType := range supportedCharacterEquipmentTypes {
+		if equipped := *characterEquipmentSlot(character.GetEquipment(), equipmentType); equipped != nil {
+			equipmentLuckModifierList = append(equipmentLuckModifierList, equipmentFixedModifierValueInt32(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_LuckModifier))
+		}
+	}
 	characterWeaponAttackNumberMin := uint32(0)
 	characterWeaponAttackNumberMax := uint32(0)
 	if weapon := character.GetEquipment().GetWeapon(); weapon != nil {
-		equipmentLuckModifierList = append(equipmentLuckModifierList, equipmentFixedModifierValueInt32(weapon, pb.EquipmentRecordBase_EquipmentRecordBase_LuckModifier))
 		weaponEntry, weaponErr := configuredWeaponEntry(weapon.GetAssetId())
 		if weaponErr != nil {
 			return admission, fmt.Errorf("character weapon config invalid character:%d: %w", character.GetBase().GetUuid(), weaponErr)

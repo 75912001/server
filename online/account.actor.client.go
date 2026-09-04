@@ -237,6 +237,33 @@ func (p *Account) sendCharacterTaskChangedNotify(gateway *Gateway, characterUUID
 	})
 }
 
+func (p *Account) sendCharacterTaskInventoryChangedNotify(gateway *Gateway, plan *characterTaskMutationPlan) {
+	if plan == nil || !plan.inventoryChanged || plan.next == nil {
+		return
+	}
+	petRecordList := make([]*pb.PetRecord, 0, len(plan.next.GetPetRecordList()))
+	for _, petRecord := range plan.next.GetPetRecordList() {
+		if petRecord != nil {
+			petRecordList = append(petRecordList, proto.Clone(petRecord).(*pb.PetRecord))
+		}
+	}
+	itemBag := &pb.ItemContainerRecord{}
+	if plan.next.GetItemBag() != nil {
+		itemBag = proto.Clone(plan.next.GetItemBag()).(*pb.ItemContainerRecord)
+	}
+	assetCountMap := make(map[uint32]uint64, len(plan.next.GetAssetCountMap()))
+	for itemID, count := range plan.next.GetAssetCountMap() {
+		assetCountMap[itemID] = count
+	}
+	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterTaskInventoryChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterTaskInventoryChangedNotify{
+		CharacterUuid: plan.characterUUID,
+		ItemBag:       itemBag,
+		PetRecordList: petRecordList,
+		UsedUuid:      plan.nextUsedUUID,
+		AssetCountMap: assetCountMap,
+	})
+}
+
 func (p *Account) sendCharacterSystemMailNotify(gateway *Gateway, characterUUID uint64, mailRecord *pb.MailRecord) {
 	if characterUUID == 0 || mailRecord == nil {
 		return
