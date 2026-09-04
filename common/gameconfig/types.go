@@ -1,18 +1,19 @@
 package gameconfig
 
 const (
-	FileCharacter  = "character.yaml"
-	FileSkill      = "skill.yaml"
-	FileEnemyGroup = "enemy.group.yaml"
-	FileEnemyExp   = "enemy.exp.yaml"
-	FileExp        = "exp.yaml"
-	FileItem       = "item.yaml"
-	FileItemWeapon = "item.weapon.yaml"
-	FileReward     = "reward.yaml"
-	FileTask       = "task.yaml"
-	FileAI         = "ai.yaml"
-	FilePet        = "pet.yaml"
-	DirScene       = "scene"
+	FileCharacter     = "character.yaml"
+	FileSkill         = "skill.yaml"
+	FileEnemyGroup    = "enemy.group.yaml"
+	FileEnemyExp      = "enemy.exp.yaml"
+	FileExp           = "exp.yaml"
+	FileItem          = "item.yaml"
+	FileItemWeapon    = "item.weapon.yaml"
+	FileItemAccessory = "item.accessory.yaml"
+	FileReward        = "reward.yaml"
+	FileTask          = "task.yaml"
+	FileAI            = "ai.yaml"
+	FilePet           = "pet.yaml"
+	DirScene          = "scene"
 )
 
 var GGameConfig *Manager
@@ -34,10 +35,10 @@ type Manager struct {
 	Scene *SceneConfig
 	// Exp 是 exp.yaml 的等级经验配置, 用于按累计经验推导等级和下一等级门槛.
 	Exp *ExpConfig
-	// Item 合并 item.yaml 和 item.weapon.yaml 的道具与武器配置, 用于校验物品定义、使用效果和资源引用格式.
+	// Item 合并普通道具、武器和首饰配置, 用于校验物品定义、使用效果和资源引用格式.
 	Item *ItemConfig
-	// Reward 是 reward.yaml 的任务奖励包配置, 当前仅包含道具和数量.
+	// Reward 是 reward.yaml 的任务奖励包配置, 支持普通道具、装备实例和宠物实例.
 	Reward *RewardConfig
-	// Task 是 task.yaml 的运行任务配置, 用于接取、推进、提交和领取步骤奖励.
+	// Task 是 task.yaml 的运行任务配置, 用于接取、推进、宠物或道具提交、循环任务和步骤奖励.
 	Task *TaskConfig
 }

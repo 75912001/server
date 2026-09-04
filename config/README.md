@@ -14,9 +14,10 @@
 - `exp.yaml`: 角色和宠物等级经验配置.
 - `information.yaml`: 从 STW1.13 `Mission.txt` 转换的 UTF-8 石器情报树和正文, 由 sa.desktop 只读展示.
 - `item.yaml`: 普通道具和角色资产配置, 使用 `items.item.<id>` 分组; 非零 `sprite` 必须同时配置以 `item/` 开头的无扩展名 `atlas` 路径.
+- `item.accessory.yaml`: 六类首饰的运行输出, 使用 `items.accessory.<id>`. `accessory_type` 必须是协议中的耳环13, 护身符15, 戒指11, 乐器9, 手环8或项链10, ID 必须位于对应 proto 子区间. 类型缺失, 未知值, 枚举空档, 类型与 ID 不一致均拒绝加载; 未发布任何首饰时允许 `accessory: {}`. 首饰必须使用非零 sprite 和有效 atlas, 不能配置 use.
 - `item.weapon.yaml`: 八类武器配置, 使用 `items.<weaponGroup>.<id>` 分组; 武器ID必须位于对应协议分组区间. 武器条目可保存原版名称、说明、价格、装备等级、职业限制、套装编号、攻击次数、能力随机范围、元素和异常抗性; `cost > 0` 表示可在全局商店购买, `cost = 0` 表示不可购买; 未配置的数值字段默认为0, 非法范围会导致启动失败.
-- `task.yaml`: 运行任务、串行步骤、接取/开始/完成条件、提交扣除和奖励包引用.
-- `reward.yaml`: 可复用奖励包, 当前仅支持普通道具和角色资产的`itemId + quantity`数组.
+- `task.yaml`: 运行任务、串行步骤、循环规则、NPC/对话/地图入口、接取/开始/完成条件、提交扣除和奖励包引用.
+- `reward.yaml`: 可复用奖励包, `items`支持普通道具、角色资产和装备实例, `pets`支持指定等级与随机品质的宠物实例.
 - `pet.yaml`: 宠物主体、成长、图鉴面板参考值、出生技能槽和编辑器测试状态配置.
 - `pet.sprite.yaml`: 宠物八方向的 `attack/faint/hurt/defense/stand/walk` 六个动画帧、攻击表现和独立的编辑器测试状态配置.
 - `scene/*.yaml`: 与客户端 `map_id` 一致的地图尺寸、阻挡、平铺遇敌规则、NPC功能选项和传送配置.
@@ -32,13 +33,15 @@
 
 Godot `make_task` 的运行任务和奖励包页直接编辑本目录的`task.yaml`、`reward.yaml`. `../docs/任务/task.yaml`仍为原版调研资料, 不由服务端加载, 也不自动转换成运行任务. 编辑器保存前校验结构和跨表引用, 两文件事务提交并检测外部修改; 保存不会自动同步客户端或部署服务.
 
-任务使用`tasks: [...]`, 每项包含`id/name/description/isMain/sort/acceptConditions/steps`. 多个任务可并行接取, 同一任务只接一次, 内部步骤按数组顺序串行推进, 步骤ID从1连续递增. 步骤包含`id/name/description/startConditions/completionConditions/completionMode/consumeItems/rewardId`.
+任务使用`tasks: [...]`, 每项包含`id/name/description/isMain/repeatable/sort/acceptConditions/steps`, 并可保存客户端展示用的`npc/navigation/dialogue`. 多个任务可并行接取, 内部步骤按数组顺序串行推进, 步骤ID从1连续递增. 步骤包含`id/name/description/startConditions/completionConditions/completionMode/consumeItems/consumePets/dialogue/rewardId`, 也可配置挑战入口.
 
-条件数组全部使用AND语义. V1支持`characterLevel(level)`、`itemPossession(itemId, quantity)`、`taskCompleted(taskId)`、`battleVictory(enemyGroupId)`. 战斗胜利只用于automatic步骤的完成条件; 接取和开始条件不接受瞬时战斗事件. `completionMode`省略即`automatic`, `submit`由玩家主动提交. `itemPossession`只检查持有, 不扣除; `consumeItems`只允许配置在submit步骤中, 提交成功才扣除.
+条件数组全部使用AND语义. 支持`characterLevel(level)`、`itemPossession(itemId, quantity)`、`petPossession(petId, level, quantity)`、`taskCompleted(taskId)`、`taskRewardsClaimed(taskId)`和`battleVictory(enemyGroupId)`. `itemPossession`对装备按实例数量检查, `petPossession`要求宠物ID和实际等级同时匹配; 两者都只检查持有. 战斗胜利只用于automatic步骤的完成条件; 接取和开始条件不接受瞬时战斗事件. `completionMode`省略即`automatic`, `submit`由玩家主动提交. `consumeItems`和`consumePets`只允许配置在submit步骤中, 提交成功后才扣除符合条件的实例.
 
-奖励包使用`rewards: [...]`, 每项包含`id/name/items`. 道具数量必须大于0, 同一列表不得重复itemId. 任务步骤以非0`rewardId`引用奖励包; `rewardId: 0`必须显式填写, 表示无奖励, 步骤完成时同时记为已领取. 已领取状态不因后来扩展奖励包或补配奖励而重置.
+奖励包使用`rewards: [...]`, 每项包含`id/name/items/pets`. `items`可发普通道具、角色资产或独立装备实例; `pets`使用`petId/level/grade/quantity`, 当前`grade`只接受`random`. 数量必须大于0, 同类列表不得重复ID. 任务步骤以非0`rewardId`引用奖励包; `rewardId: 0`必须显式填写, 表示无奖励, 步骤完成时同时记为已领取. 已领取状态不因后来扩展奖励包或补配奖励而重置.
 
-V1仅有非主线任务60“阿布洞窟”, 无额外接取条件, 一个挑战步骤, 战胜敌群1000701后完成且无道具奖励. 完成记录作为以后购买阿布水的资格依据, 商店购买入口的资格检查尚待接入. 任务挑战BGM配置在`task.yaml`的`tasks[].steps[].challenge.battleBgmIndex`, 阿布洞窟使用索引6; 该字段仅供客户端选择音乐, 不放在`reward.yaml`或`enemy.group.yaml`. 场景NPC挑战仍使用客户端NPC表现配置, 服务端不选择或播放BGM.
+任务60“阿布洞窟”保留单步骤挑战: 战胜敌群1000701后完成且无额外奖励. 任务61`[任务][卡坦的愿望][1]`在地图1000702分两批交付4只25级宠物, 第一批奖励火难的戒指, 第二批交回戒指后奖励1级随机品质修宝. 任务62`[任务][卡坦的愿望][2]`要求任务61的全部奖励已经领取, 在地图1000703按相同两批流程奖励1级随机品质朵拉比斯; `repeatable: true`使最后一步领奖后重置记录并立即开始下一轮.
+
+任务挑战BGM配置在`task.yaml`的`tasks[].steps[].challenge.battleBgmIndex`, 阿布洞窟使用索引6; 该字段仅供客户端选择音乐, 不放在`reward.yaml`或`enemy.group.yaml`. 场景NPC挑战仍使用客户端NPC表现配置, 服务端不选择或播放BGM.
 
 步骤通过可选`challenge`配置挑战入口, 服务端只读取其中的`enemyGroupId`; `npcPetIds`和`battleBgmIndex`由客户端消费. 已接任务中已经开始的挑战步骤可重复挑战, 已完成后也保留入口, 无需新增重复挑战配置. 重打不重新接取任务, 不重置完成记录或步骤奖励领取状态.
 
@@ -58,6 +61,12 @@ Godot_v4.6.3-stable_win64_console.exe --headless --path . --script res://addons/
 ```
 
 显式同步客户端副本仍使用`./cp.config.from.server.sh item.weapon.yaml`, 不属于武器编辑器的保存或导出事务.
+
+## 首饰编辑目录和发布
+
+`../docs/item.armor.catalog.yaml` 是装备和首饰的编辑来源. 首饰在记录元数据中保存 `accessoryType`, 原表 `values` 的 89 个字段保留原值. Godot `make_armor` 右侧显示六类首饰及 proto ID 子区间, 类型和现代 ID 同次校验与保存.
+
+发布后先保存目录, 再使用编辑器的 `导出运行配置` 将首饰写入 `item.accessory.yaml`. 其他装备输出到客户端本地 `item.equipment.yaml`. 两份输出全部暂存并校验后才提交, 失败会回滚已提交部分. 未确认类型或未满足图集要求的首饰不能发布; 没有已发布首饰时保留空分组. 同步客户端使用 `./cp.config.from.server.sh item.accessory.yaml`, 不在导出时自动执行.
 
 ## 石器情报配置
 
@@ -89,7 +98,7 @@ sa.desktop 的 Godot `make_character` 编辑器直接把本目录的 `character.
 
 显式保存时先校验完整双表、资源、跨表引用、8方向x13动作帧、FPS、声音及事件边界, 再以双文件事务替换原文件. 外部修改会阻止覆盖, 单文件提交失败会回滚. 编辑器不会自动同步 `sa.desktop/config` 运行时副本.
 
-online 启动会加载 `character.yaml`、`skill.yaml`、`ai.yaml`、`enemy.group.yaml`、`enemy.exp.yaml`、`exp.yaml`、`item.yaml`、`item.weapon.yaml`、`reward.yaml`、`task.yaml`、`pet.yaml` 和 `scene/*.yaml`. 任一必需文件缺失、字段非法或跨表引用无效时, 服务必须直接启动失败.
+online 启动会加载 `character.yaml`、`skill.yaml`、`ai.yaml`、`enemy.group.yaml`、`enemy.exp.yaml`、`exp.yaml`、`item.yaml`, `item.weapon.yaml`, `item.accessory.yaml`, `reward.yaml`、`task.yaml`、`pet.yaml` 和 `scene/*.yaml`. 任一必需文件缺失、字段非法或跨表引用无效时, 服务必须直接启动失败.
 
 ## 统一技能配置
 
@@ -208,7 +217,7 @@ scene/*.yaml
        -> ai.yaml (战斗技能及权重 -> skill.yaml)
 ```
 
-- `scene/*.yaml` 不设置格式版本字段, 地图 ID 与客户端 `map_id` 一致; `collision.blockedRows` 保存服务端阻挡, `encounter.enabled` 和 `encounter.enemyGroups` 定义全地图遇敌开关与敌人组权重, `npcs` 保存NPC实体及其独立功能选项, `warps` 保存传送起点与目标. 当前目录包含80000、80001、80010、80020、80030、80040这6张测试地图, 以及从90001开始的14张练级地图: 90001和90010至90130按10递增. 正常角色地图进入允许测试范围`[80000,89999]`和练级范围`[90000,99999]`. 可进入地图必须启用遇敌并配置有效敌人组.
+- `scene/*.yaml` 不设置格式版本字段, 地图 ID 与客户端 `map_id` 一致; `collision.blockedRows` 保存服务端阻挡, `encounter.enabled` 和 `encounter.enemyGroups` 定义全地图遇敌开关与敌人组权重, `npcs` 保存NPC实体及其独立功能选项, `warps` 保存传送起点与目标. 当前目录包含80000、80001、80010、80020、80030、80040、80050、80060、80070这9张测试地图, 从90001开始的14张练级地图: 90001和90010至90130按10递增, 以及1000701、1000702、1000703这3张任务地图. 正常角色地图进入允许测试范围`[80000,89999]`、练级范围`[90000,99999]`和任务范围`[1000000,1999999]`. 可进入地图必须启用遇敌并配置有效敌人组.
 - `encounter.enabled` 必须显式配置; 启用遇敌时 `encounter.enemyGroups` 不能为空且总权重必须大于0.
 - `enemy.group.yaml enemies[].id` 引用宠物模板, `enemies[].battleAI` 必填且引用 `ai.yaml`.
 - `ai.yaml skills[].id` 引用 `skill.yaml`, 权重与技能 ID 在同一条记录中.

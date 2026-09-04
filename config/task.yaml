@@ -1,6 +1,7 @@
 # 运行任务-配置
 # 多个任务可并行进行, 单个任务的步骤按数组顺序串行推进, 步骤ID必须从1连续递增.
 # completionMode省略时默认为automatic; rewardId为0时完成步骤即视为奖励已领取.
+# repeatable为true时, 最后一步领奖成功后立即重置全部步骤并开始下一轮.
 
 tasks:
   - id: 60
@@ -25,4 +26,205 @@ tasks:
             - 4900296
           battleBgmIndex: 6
         consumeItems: []
+        consumePets: []
         rewardId: 0
+  - id: 61
+    name: "[任务][卡坦的愿望][1]"
+    description: "帮助卡坦收集4只25级鱼形恐龙. 分两次交付, 最终可获得1级随机品质修宝."
+    isMain: false
+    repeatable: false
+    sort: 61
+    npc:
+      name: 卡坦
+      frameId: 5879
+    navigation:
+      mapId: 1000702
+      label: "进入任务地图 1000702"
+    dialogue:
+      offer: |-
+        你好！初次见面。
+        我想收集LV25的恐龙而在世界中旅行。
+        但是有些恐龙尚未在我的恐龙名单中，这些是···
+        很像是鱼的恐龙，名字是～加格、邦恩吉、克邦凯斯、加克拉这4只。
+        若是、可以代替我收集的话
+        我就送你一只金色的恐龙。
+        如何呢？应该还不错吧？
+    acceptConditions: []
+    steps:
+      - id: 1
+        name: 收集加格和邦恩吉
+        description: "捕捉并交付1只25级加格和1只25级邦恩吉."
+        startConditions: []
+        completionConditions:
+          - kind: petPossession
+            petId: 4000311
+            level: 25
+            quantity: 1
+          - kind: petPossession
+            petId: 4000312
+            level: 25
+            quantity: 1
+        completionMode: submit
+        consumeItems: []
+        consumePets:
+          - petId: 4000311
+            level: 25
+            quantity: 1
+          - petId: 4000312
+            level: 25
+            quantity: 1
+        dialogue:
+          active: |-
+            答应我了吗。
+            那么，可以先帮我收集加格和邦恩吉吗？
+            但是我的宠物栏只剩下2个空位而已，所以请你一次只带两只来给我。
+            当然等级要是25的喔，那么就拜托啰。
+            任何时候我都会在这个沙漠的附近旅行。
+          ready: "我拜托你寻找的加格和邦恩吉你已经抓来了呀，那剩下的只剩克邦凯斯和加克拉，那就拜托你啰。"
+          completed: |-
+            对了，收下这个吧。
+            这是你抓到恐龙的证明喔。
+            掉落不见的话就没有办法承认你帮过我喔。
+        rewardId: 6101
+      - id: 2
+        name: 收集克邦凯斯和加克拉
+        description: "领取火难的戒指后, 捕捉并交付1只25级克邦凯斯和1只25级加克拉, 同时交回戒指."
+        startConditions:
+          - kind: itemPossession
+            itemId: 3630000
+            quantity: 1
+        completionConditions:
+          - kind: petPossession
+            petId: 4000309
+            level: 25
+            quantity: 1
+          - kind: petPossession
+            petId: 4000310
+            level: 25
+            quantity: 1
+          - kind: itemPossession
+            itemId: 3630000
+            quantity: 1
+        completionMode: submit
+        consumeItems:
+          - itemId: 3630000
+            quantity: 1
+        consumePets:
+          - petId: 4000309
+            level: 25
+            quantity: 1
+          - petId: 4000310
+            level: 25
+            quantity: 1
+        dialogue:
+          active: |-
+            寻找恐龙的事进行的还顺利吗？
+            还剩下克邦凯斯和加克拉这2只没有捕获
+            就拜托你啰。
+          ready: "我拜托你捕抓类似鱼状的恐龙你已经全部帮我抓来了！"
+          completed: |-
+            真的非常谢谢你！
+            作梦都没想到能够收集齐全，依照最初的约定，这只金色的恐龙就给你吧。
+            要好好的养育它喔。
+        rewardId: 6102
+  - id: 62
+    name: "[任务][卡坦的愿望][2]"
+    description: "再次帮助卡坦收集4只25级恐龙. 本阶段领奖后自动开始下一轮, 可以无限重复."
+    isMain: false
+    repeatable: true
+    sort: 62
+    npc:
+      name: 卡坦
+      frameId: 5879
+    navigation:
+      mapId: 1000703
+      label: "进入任务地图 1000703"
+    dialogue:
+      offer: |-
+        哎呀，你好呀好久不见了呢。
+        在不久前我又捡到一只大恐龙喔。
+
+        现在我的恐龙名单中又有新增尚未收集的恐龙，这些分别是···
+        火鸡、奇宝、霍尔克、克克洛斯这4只。
+        若是可以帮我收集的话我就把这只捡到的恐龙送给你。怎样呢？！
+    acceptConditions:
+      - kind: taskRewardsClaimed
+        taskId: 61
+    steps:
+      - id: 1
+        name: 收集火鸡和奇宝
+        description: "捕捉并交付1只25级火鸡和1只25级奇宝."
+        startConditions: []
+        completionConditions:
+          - kind: petPossession
+            petId: 4000333
+            level: 25
+            quantity: 1
+          - kind: petPossession
+            petId: 4000336
+            level: 25
+            quantity: 1
+        completionMode: submit
+        consumeItems: []
+        consumePets:
+          - petId: 4000333
+            level: 25
+            quantity: 1
+          - petId: 4000336
+            level: 25
+            quantity: 1
+        dialogue:
+          active: |-
+            愿意接受吗。
+            那么，首先是否可以帮我收集火鸡和奇宝呢?
+            当然等级也是25的喔，那么就拜托啰。
+            这段时间我仍然会在这个沙漠的附近旅行，找到了就抓来给我喔。
+          ready: |-
+            这是我拜托你去找的火鸡和奇宝，真是太好了！那剩下的就只有霍尔克和克克洛斯了。
+            再拜托你啰。
+          completed: |-
+            对了，把这个拿去吧！这是抓到恐龙的证明喔。
+            若是遗失，我可能就无法确定你曾帮过我喔。
+        rewardId: 6101
+      - id: 2
+        name: 收集克克洛斯和霍尔克
+        description: "领取火难的戒指后, 捕捉并交付1只25级克克洛斯和1只25级霍尔克, 同时交回戒指."
+        startConditions:
+          - kind: itemPossession
+            itemId: 3630000
+            quantity: 1
+        completionConditions:
+          - kind: petPossession
+            petId: 4000334
+            level: 25
+            quantity: 1
+          - kind: petPossession
+            petId: 4000335
+            level: 25
+            quantity: 1
+          - kind: itemPossession
+            itemId: 3630000
+            quantity: 1
+        completionMode: submit
+        consumeItems:
+          - itemId: 3630000
+            quantity: 1
+        consumePets:
+          - petId: 4000334
+            level: 25
+            quantity: 1
+          - petId: 4000335
+            level: 25
+            quantity: 1
+        dialogue:
+          active: |-
+            寻找恐龙的事进行的还顺利吗？
+            还剩下霍尔克和克克洛斯这2只还没有捕获，就拜托你啰。
+          ready: |-
+            我所拜托你的恐龙已经
+            全部收集齐全了呀！
+          completed: |-
+            真的非常谢谢你！作梦都没想到能够收集齐全。
+            依照最初的约定我将捡到的金色的恐龙给你吧。
+            要好好养育它喔。
+        rewardId: 6202

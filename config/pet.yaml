@@ -6237,6 +6237,7 @@ pet:
   海主人系:
     ############################################################
     - id: 4000317
+      testStatus: 1
       name: 邦奇
       sprite: 317
       enemyId: 326
@@ -6272,6 +6273,7 @@ pet:
         growthRateMax: 4.360
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000318
+      testStatus: 1
       name: 姆伊
       sprite: 318
       enemyId: 301
@@ -6306,6 +6308,7 @@ pet:
         growthRateMax: 4.201
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000319
+      testStatus: 1
       name: 海主人
       sprite: 319
       enemyId: 328
@@ -6341,6 +6344,7 @@ pet:
         growthRateMax: 4.353
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000320
+      testStatus: 1
       name: 多鲁宝
       sprite: 320
       enemyId: 329
@@ -6376,6 +6380,7 @@ pet:
         growthRateMax: 4.353
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000651
+      testStatus: 1
       name: 欧瑟菲
       sprite: 651
       enemyId: 1625
@@ -6411,6 +6416,7 @@ pet:
         growthRateMax: 4.705
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000652
+      testStatus: 1
       name: 莫拉司
       sprite: 652
       enemyId: 1626
@@ -6446,6 +6452,7 @@ pet:
         growthRateMax: 4.496
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000653
+      testStatus: 1
       name: 玛斯特
       sprite: 653
       enemyId: 1627
@@ -6481,6 +6488,7 @@ pet:
         growthRateMax: 4.576
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000654
+      testStatus: 1
       name: 沙瓦列
       sprite: 654
       enemyId: 1628
@@ -6520,6 +6528,7 @@ pet:
   雷龙系:
     ############################################################
     - id: 4000321
+      testStatus: 1
       name: 布洛多斯
       sprite: 321
       enemyId: 330
@@ -6555,6 +6564,7 @@ pet:
         growthRateMax: 4.518
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000322
+      testStatus: 1
       name: 布林帖斯
       sprite: 322
       enemyId: 331
@@ -6590,6 +6600,7 @@ pet:
         growthRateMax: 4.360
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000323
+      testStatus: 1
       name: 布拉奇多斯
       sprite: 323
       enemyId: 332
@@ -6625,6 +6636,7 @@ pet:
         growthRateMax: 4.669
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000324
+      testStatus: 1
       name: 斯天多斯
       sprite: 324
       enemyId: 333
@@ -6660,6 +6672,7 @@ pet:
         growthRateMax: 4.489
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000362
+      testStatus: 1
       name: 邦恩多斯
       sprite: 362
       enemyId: 483
@@ -6695,6 +6708,7 @@ pet:
         growthRateMax: 4.568
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000655
+      testStatus: 1
       name: 嘎吱拉
       sprite: 655
       enemyId: 1629
@@ -6730,6 +6744,7 @@ pet:
         growthRateMax: 5.734
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000656
+      testStatus: 1
       name: 哥斯哥斯
       sprite: 656
       enemyId: 1630
@@ -6765,6 +6780,7 @@ pet:
         growthRateMax: 5.072
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000657
+      testStatus: 1
       name: 蒙哥拉斯
       sprite: 657
       enemyId: 1631
@@ -6804,6 +6820,7 @@ pet:
   大象系:
     ############################################################
     - id: 4000325
+      testStatus: 1
       name: 玛恩摩
       sprite: 325
       enemyId: 334
@@ -6839,6 +6856,7 @@ pet:
         growthRateMax: 3.856
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000326
+      testStatus: 1
       name: 恩摩摩
       sprite: 326
       enemyId: 335
@@ -6874,6 +6892,7 @@ pet:
         growthRateMax: 3.899
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000327
+      testStatus: 1
       name: 玛摩那斯
       sprite: 327
       enemyId: 336
@@ -6909,6 +6928,7 @@ pet:
         growthRateMax: 3.820
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000328
+      testStatus: 1
       name: 玛恩摩洛斯
       sprite: 328
       enemyId: 337
@@ -6944,6 +6964,7 @@ pet:
         growthRateMax: 3.777
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000658
+      testStatus: 1
       name: 固力摩
       sprite: 658
       enemyId: 1632
@@ -6979,6 +7000,7 @@ pet:
         growthRateMax: 4.360
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000659
+      testStatus: 1
       name: 摩吉摩吉
       sprite: 659
       enemyId: 1633
@@ -7014,6 +7036,7 @@ pet:
         growthRateMax: 4.288
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000660
+      testStatus: 1
       name: 摩米索拉
       sprite: 660
       enemyId: 1634
@@ -7048,6 +7071,7 @@ pet:
         growthRateMax: 4.302
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000661
+      testStatus: 1
       name: 摩酷罗
       sprite: 661
       enemyId: 1635
@@ -7087,6 +7111,7 @@ pet:
   飞龙系:
     ############################################################
     - id: 4000329
+      testStatus: 1
       name: 帖拉格恩
       sprite: 329
       enemyId: 338
@@ -7122,6 +7147,7 @@ pet:
         growthRateMax: 5.072
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000330
+      testStatus: 1
       name: 洛卡伦恩
       sprite: 330
       enemyId: 339
@@ -7157,6 +7183,7 @@ pet:
         growthRateMax: 5.173
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000331
+      testStatus: 1
       name: 加宝格恩
       sprite: 331
       enemyId: 340
@@ -7192,6 +7219,7 @@ pet:
         growthRateMax: 5.129
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000332
+      testStatus: 1
       name: 朵拉比斯
       sprite: 332
       enemyId: 341
@@ -7226,6 +7254,7 @@ pet:
         growthRateMax: 5.194
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000662
+      testStatus: 1
       name: 可可恩
       sprite: 662
       enemyId: 1636
@@ -7261,6 +7290,7 @@ pet:
         growthRateMax: 5.158
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000663
+      testStatus: 1
       name: 克洛恩
       sprite: 663
       enemyId: 1637
@@ -7296,6 +7326,7 @@ pet:
         growthRateMax: 5.676
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000664
+      testStatus: 1
       name: 布兰恩
       sprite: 664
       enemyId: 1638
@@ -7331,6 +7362,7 @@ pet:
         growthRateMax: 5.381
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000665
+      testStatus: 1
       name: 迪布恩
       sprite: 665
       enemyId: 1639
@@ -7370,6 +7402,7 @@ pet:
   火鸡系:
     ############################################################
     - id: 4000333
+      testStatus: 1
       name: 火鸡
       sprite: 333
       enemyId: 190
@@ -7405,6 +7438,7 @@ pet:
         growthRateMax: 4.784
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000334
+      testStatus: 1
       name: 克克洛斯
       sprite: 334
       enemyId: 347
@@ -7439,6 +7473,7 @@ pet:
         growthRateMax: 4.964
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000335
+      testStatus: 1
       name: 霍尔克
       sprite: 335
       enemyId: 348
@@ -7474,6 +7509,7 @@ pet:
         growthRateMax: 4.978
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000336
+      testStatus: 1
       name: 奇宝
       sprite: 336
       enemyId: 194
@@ -7509,6 +7545,7 @@ pet:
         growthRateMax: 5.216
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000666
+      testStatus: 1
       name: 格里兰
       sprite: 666
       enemyId: 1640
@@ -7544,6 +7581,7 @@ pet:
         growthRateMax: 4.942
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000667
+      testStatus: 1
       name: 摩里
       sprite: 667
       enemyId: 1641
@@ -7579,6 +7617,7 @@ pet:
         growthRateMax: 4.770
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000668
+      testStatus: 1
       name: 瑞里西尔
       sprite: 668
       enemyId: 1642
@@ -7614,6 +7653,7 @@ pet:
         growthRateMax: 4.763
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000669
+      testStatus: 1
       name: 塔斯夫
       sprite: 669
       enemyId: 1643
@@ -7653,6 +7693,7 @@ pet:
   羚羊系:
     ############################################################
     - id: 4000341
+      testStatus: 1
       name: 布伊德
       sprite: 341
       enemyId: 354
@@ -7688,6 +7729,7 @@ pet:
         growthRateMax: 5.079
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000342
+      testStatus: 1
       name: 摩娜西普
       sprite: 342
       enemyId: 355
@@ -7722,6 +7764,7 @@ pet:
         growthRateMax: 5.058
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000343
+      testStatus: 1
       name: 卡伊霍恩
       sprite: 343
       enemyId: 356
@@ -7757,6 +7800,7 @@ pet:
         growthRateMax: 5.230
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000344
+      testStatus: 1
       name: 拉伊霍恩
       sprite: 344
       enemyId: 357
@@ -7792,6 +7836,7 @@ pet:
         growthRateMax: 5.079
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000393
+      testStatus: 1
       name: 邦达霍恩
       sprite: 393
       enemyId: 484
@@ -7827,6 +7872,7 @@ pet:
         growthRateMax: 5.115
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000674
+      testStatus: 1
       name: 布莱兹
       sprite: 674
       enemyId: 1648
@@ -7862,6 +7908,7 @@ pet:
         growthRateMax: 5.626
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000675
+      testStatus: 1
       name: 布依伦斯
       sprite: 675
       enemyId: 1649
@@ -7897,6 +7944,7 @@ pet:
         growthRateMax: 5.568
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000676
+      testStatus: 1
       name: 伊夫霍恩
       sprite: 676
       enemyId: 1650
@@ -7936,6 +7984,7 @@ pet:
   鱼龙系:
     ############################################################
     - id: 4000345
+      testStatus: 1
       name: 史多拉奇顿
       sprite: 345
       enemyId: 358
@@ -7971,6 +8020,7 @@ pet:
         growthRateMax: 4.396
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000346
+      testStatus: 1
       name: 萨美洛斯
       sprite: 346
       enemyId: 359
@@ -8005,6 +8055,7 @@ pet:
         growthRateMax: 4.396
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000347
+      testStatus: 1
       name: 阿利给洛斯
       sprite: 347
       enemyId: 360
@@ -8040,6 +8091,7 @@ pet:
         growthRateMax: 4.439
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000348
+      testStatus: 1
       name: 达伊诺洛斯
       sprite: 348
       enemyId: 361
@@ -8075,6 +8127,7 @@ pet:
         growthRateMax: 4.532
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000349
+      testStatus: 1
       name: 拉可拉斯
       sprite: 349
       enemyId: 362
@@ -8110,6 +8163,7 @@ pet:
         growthRateMax: 4.511
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000677
+      testStatus: 1
       name: 莱姆洛斯
       sprite: 677
       enemyId: 1651
@@ -8145,6 +8199,7 @@ pet:
         growthRateMax: 4.863
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000678
+      testStatus: 1
       name: 朱利洛斯
       sprite: 678
       enemyId: 1652
@@ -8180,6 +8235,7 @@ pet:
         growthRateMax: 4.734
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000679
+      testStatus: 1
       name: 辛普洛斯
       sprite: 679
       enemyId: 1653
@@ -8219,6 +8275,7 @@ pet:
   洛克斯系:
     ############################################################
     - id: 4000350
+      testStatus: 1
       name: 邦洛洛克斯
       sprite: 350
       enemyId: 152
@@ -8254,6 +8311,7 @@ pet:
         growthRateMax: 4.676
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000351
+      testStatus: 1
       name: 兰贝鲁斯
       sprite: 351
       enemyId: 364
@@ -8289,6 +8347,7 @@ pet:
         growthRateMax: 4.669
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000352
+      testStatus: 1
       name: 可利多洛斯
       sprite: 352
       enemyId: 365
@@ -8324,6 +8383,7 @@ pet:
         growthRateMax: 4.719
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000353
+      testStatus: 1
       name: 诺斯多洛斯
       sprite: 353
       enemyId: 366
@@ -8359,6 +8419,7 @@ pet:
         growthRateMax: 4.928
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000680
+      testStatus: 1
       name: 立杜鲁斯
       sprite: 680
       enemyId: 1654
@@ -8394,6 +8455,7 @@ pet:
         growthRateMax: 4.892
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000681
+      testStatus: 1
       name: 诺克斯
       sprite: 681
       enemyId: 1655
@@ -8429,6 +8491,7 @@ pet:
         growthRateMax: 4.978
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000682
+      testStatus: 1
       name: 巴克亚司
       sprite: 682
       enemyId: 1656
@@ -8464,6 +8527,7 @@ pet:
         growthRateMax: 4.935
       skill: [8000001,8000002,0,0,0,0,0]
     - id: 4000683
+      testStatus: 1
       name: 雷德力克斯
       sprite: 683
       enemyId: 1657
@@ -26276,6 +26340,7 @@ pet:
   # 阿布洞窟守护者系
   阿布洞窟守护者系:
     - id: 4900294
+      testStatus: 1
       name: 查罕·乌尔夫
       sprite: 394
       enemyId: 294
@@ -26311,6 +26376,7 @@ pet:
         growthRateMax: 4.101
       skill: [8000001,8000002,8100003,0,0,0,0]
     - id: 4900295
+      testStatus: 1
       name: 查罕·吉鲁
       sprite: 402
       enemyId: 295
@@ -26346,6 +26412,7 @@ pet:
         growthRateMax: 4.748
       skill: [8000001,8000002,8100003,0,0,0,0]
     - id: 4900296
+      testStatus: 1
       name: 查罕·鲁多
       sprite: 399
       enemyId: 296

@@ -1,5 +1,27 @@
 # 任务奖励包-配置
 # 奖励包ID必须为正数且唯一; task.yaml中的rewardId为0时表示该步骤没有奖励.
-# 当前仅支持普通道具或角色资产, 每项使用itemId和quantity描述.
+# items支持普通道具、角色资产和装备实例; pets支持指定等级、随机品质的宠物实例.
 
-rewards: []
+rewards:
+  - id: 6101
+    name: 卡坦的证明·火难的戒指
+    items:
+      - itemId: 3630000
+        quantity: 1
+    pets: []
+  - id: 6102
+    name: 卡坦的愿望·修宝
+    items: []
+    pets:
+      - petId: 4000293
+        level: 1
+        grade: random
+        quantity: 1
+  - id: 6202
+    name: 卡坦的愿望·朵拉比斯
+    items: []
+    pets:
+      - petId: 4000332
+        level: 1
+        grade: random
+        quantity: 1

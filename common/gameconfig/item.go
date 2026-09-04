@@ -22,19 +22,20 @@ type ItemConfig struct {
 }
 
 type ItemEntry struct {
-	ID           *uint32                `yaml:"-"`
-	Name         *string                `yaml:"name"`
-	SecretName   string                 `yaml:"secretname"`
-	EffectString string                 `yaml:"effectstring"`
-	Atlas        *string                `yaml:"atlas"`
-	Sprite       *uint32                `yaml:"sprite"`
-	Cost         uint64                 `yaml:"cost"`
-	Level        uint32                 `yaml:"level"`
-	Profession   pb.CharacterProfession `yaml:"neprof"`
-	OtherDamage  int32                  `yaml:"otdmags"`
-	OtherDefence int32                  `yaml:"otdefcs"`
-	SuitCode     uint32                 `yaml:"nsuit"`
-	WeaponType   pb.CharacterWeaponType `yaml:"-"`
+	ID            *uint32                `yaml:"-"`
+	Name          *string                `yaml:"name"`
+	SecretName    string                 `yaml:"secretname"`
+	EffectString  string                 `yaml:"effectstring"`
+	Atlas         *string                `yaml:"atlas"`
+	Sprite        *uint32                `yaml:"sprite"`
+	Cost          uint64                 `yaml:"cost"`
+	Level         uint32                 `yaml:"level"`
+	Profession    pb.CharacterProfession `yaml:"neprof"`
+	OtherDamage   int32                  `yaml:"otdmags"`
+	OtherDefence  int32                  `yaml:"otdefcs"`
+	SuitCode      uint32                 `yaml:"nsuit"`
+	WeaponType    pb.CharacterWeaponType `yaml:"-"`
+	AccessoryType pb.AccessoryType       `yaml:"accessory_type"`
 
 	AttackNumberMin uint32 `yaml:"attacknum_min"`
 	AttackNumberMax uint32 `yaml:"attacknum_max"`
@@ -85,6 +86,7 @@ type ItemUseEntry struct {
 
 type itemGroupDefinition struct {
 	name       string
+	fileName   string
 	start      uint32
 	end        uint32
 	weapon     bool
@@ -92,7 +94,8 @@ type itemGroupDefinition struct {
 }
 
 var itemGroupDefinitions = []itemGroupDefinition{
-	{name: "item", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Item_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Item_End)},
+	{name: "item", fileName: FileItem, start: uint32(pb.AssetIDRange_AssetIDRange_Item_Item_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Item_End)},
+	{name: "accessory", fileName: FileItemAccessory, start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Accessory_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Accessory_End)},
 	{name: "weaponClaw", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Claw_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Claw_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Claw},
 	{name: "weaponAxe", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Axe_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Axe_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Axe},
 	{name: "weaponStaff", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Staff_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Staff_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Stick},
@@ -107,7 +110,7 @@ func newItemConfig() *ItemConfig {
 	return &ItemConfig{MapMgr: xmap.NewMapMgr[uint32, *ItemEntry]()}
 }
 
-func loadItemGroups(dir string, fileName string, weapon bool) (map[string]map[uint32]*ItemEntry, error) {
+func loadItemGroups(dir string, fileName string) (map[string]map[uint32]*ItemEntry, error) {
 	var root struct {
 		Items map[string]map[uint32]*ItemEntry `yaml:"items"`
 	}
@@ -122,10 +125,14 @@ func loadItemGroups(dir string, fileName string, weapon bool) (map[string]map[ui
 		if !ok {
 			return nil, errors.Errorf("道具分组无效: file:%s group:%s %v", fileName, groupName, xruntime.Location())
 		}
-		if group.weapon != weapon {
+		expectedFile := group.fileName
+		if group.weapon {
+			expectedFile = FileItemWeapon
+		}
+		if expectedFile != fileName {
 			return nil, errors.Errorf("道具分组所属文件错误: file:%s group:%s %v", fileName, groupName, xruntime.Location())
 		}
-		if len(entries) == 0 {
+		if entries == nil || (len(entries) == 0 && group.name != "accessory") {
 			return nil, errors.Errorf("道具分组不能为空: file:%s group:%s %v", fileName, groupName, xruntime.Location())
 		}
 	}
@@ -133,19 +140,18 @@ func loadItemGroups(dir string, fileName string, weapon bool) (map[string]map[ui
 }
 
 func (p *ItemConfig) load(dir string) error {
-	itemGroups, err := loadItemGroups(dir, FileItem, false)
-	if err != nil {
-		return err
-	}
-	weaponGroups, err := loadItemGroups(dir, FileItemWeapon, true)
-	if err != nil {
-		return err
-	}
-	for groupName, entries := range weaponGroups {
-		if _, exists := itemGroups[groupName]; exists {
-			return errors.Errorf("道具分组跨文件重复: group:%s %v", groupName, xruntime.Location())
+	itemGroups := make(map[string]map[uint32]*ItemEntry)
+	for _, fileName := range []string{FileItem, FileItemWeapon, FileItemAccessory} {
+		groups, err := loadItemGroups(dir, fileName)
+		if err != nil {
+			return err
 		}
-		itemGroups[groupName] = entries
+		for groupName, entries := range groups {
+			if _, exists := itemGroups[groupName]; exists {
+				return errors.Errorf("道具分组跨文件重复: group:%s %v", groupName, xruntime.Location())
+			}
+			itemGroups[groupName] = entries
+		}
 	}
 
 	seenItemIDs := make(map[uint32]string)
@@ -169,6 +175,14 @@ func (p *ItemConfig) load(dir string) error {
 			itemIDValue := itemID
 			entry.ID = &itemIDValue
 			entry.WeaponType = group.weaponType
+			if group.name == "accessory" {
+				minimum, maximum := AccessoryIDRange(entry.AccessoryType)
+				if minimum == 0 || itemID < minimum || itemID > maximum {
+					return errors.Errorf("首饰类型与ID区间不匹配: id:%d accessory_type:%d range:[%d,%d] %v", itemID, entry.AccessoryType, minimum, maximum, xruntime.Location())
+				}
+			} else if entry.AccessoryType != pb.AccessoryType_AccessoryType_Unknow {
+				return errors.Errorf("非首饰分组不能配置首饰类型: group:%s id:%d %v", group.name, itemID, xruntime.Location())
+			}
 			if entry.Name == nil || strings.TrimSpace(*entry.Name) == "" {
 				return errors.Errorf("道具名称不能为空: id:%d %v", itemID, xruntime.Location())
 			}
@@ -176,8 +190,8 @@ func (p *ItemConfig) load(dir string) error {
 				return errors.Errorf("道具sprite不能为空: id:%d %v", itemID, xruntime.Location())
 			}
 			if *entry.Sprite == 0 {
-				if group.weapon {
-					return errors.Errorf("武器sprite必须大于0: group:%s id:%d %v", group.name, itemID, xruntime.Location())
+				if group.weapon || group.name == "accessory" {
+					return errors.Errorf("装备sprite必须大于0: group:%s id:%d %v", group.name, itemID, xruntime.Location())
 				}
 				if entry.Atlas != nil {
 					return errors.Errorf("sprite为0的道具不能配置atlas: id:%d %v", itemID, xruntime.Location())
@@ -197,7 +211,7 @@ func (p *ItemConfig) load(dir string) error {
 					}
 				}
 			}
-			if err := validateItemUse(itemID, entry, group.weapon); err != nil {
+			if err := validateItemUse(itemID, entry, group.weapon || group.name == "accessory"); err != nil {
 				return err
 			}
 			if err := validateItemAttributes(itemID, entry); err != nil {
@@ -287,8 +301,8 @@ func validateItemAtlas(atlas string) error {
 	return nil
 }
 
-func validateItemUse(itemID uint32, entry *ItemEntry, weapon bool) error {
-	if weapon {
+func validateItemUse(itemID uint32, entry *ItemEntry, equipment bool) error {
+	if equipment {
 		if entry.Use != nil {
 			return errors.Errorf("装备不能配置使用效果: id:%d %v", itemID, xruntime.Location())
 		}

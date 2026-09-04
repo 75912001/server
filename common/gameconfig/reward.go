@@ -3,6 +3,8 @@ package gameconfig
 import (
 	"strings"
 
+	pb "server/proto/pb"
+
 	xmap "github.com/75912001/xlib/map"
 	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
@@ -16,11 +18,23 @@ type RewardEntry struct {
 	ID    *uint32           `yaml:"id"`
 	Name  *string           `yaml:"name"`
 	Items []RewardItemEntry `yaml:"items"`
+	Pets  []RewardPetEntry  `yaml:"pets"`
 }
 
 type RewardItemEntry struct {
 	ItemID   *uint32 `yaml:"itemId"`
 	Quantity *uint64 `yaml:"quantity"`
+}
+
+type RewardPetGrade string
+
+const RewardPetGradeRandom RewardPetGrade = "random"
+
+type RewardPetEntry struct {
+	PetID    *uint32         `yaml:"petId"`
+	Level    *uint32         `yaml:"level"`
+	Grade    *RewardPetGrade `yaml:"grade"`
+	Quantity *uint32         `yaml:"quantity"`
 }
 
 func newRewardConfig() *RewardConfig {
@@ -48,13 +62,13 @@ func (p *RewardConfig) configure(entries []*RewardEntry) error {
 		if reward.Name == nil || strings.TrimSpace(*reward.Name) == "" {
 			return errors.Errorf("奖励包名称不能为空: id:%d %v", *reward.ID, xruntime.Location())
 		}
-		if len(reward.Items) == 0 {
-			return errors.Errorf("奖励包道具不能为空: id:%d %v", *reward.ID, xruntime.Location())
+		if len(reward.Items) == 0 && len(reward.Pets) == 0 {
+			return errors.Errorf("奖励包内容不能为空: id:%d %v", *reward.ID, xruntime.Location())
 		}
 		seenItemIDs := make(map[uint32]struct{}, len(reward.Items))
 		for itemIndex := range reward.Items {
 			item := &reward.Items[itemIndex]
-			if item.ItemID == nil || !isItemID(*item.ItemID) {
+			if item.ItemID == nil || (!isItemID(*item.ItemID) && !isEquipmentID(*item.ItemID)) {
 				return errors.Errorf("奖励包道具ID不能为空: reward:%d index:%d %v", *reward.ID, itemIndex, xruntime.Location())
 			}
 			if item.Quantity == nil || *item.Quantity == 0 {
@@ -64,6 +78,26 @@ func (p *RewardConfig) configure(entries []*RewardEntry) error {
 				return errors.Errorf("奖励包道具ID重复: reward:%d item:%d %v", *reward.ID, *item.ItemID, xruntime.Location())
 			}
 			seenItemIDs[*item.ItemID] = struct{}{}
+		}
+		seenPetIDs := make(map[uint32]struct{}, len(reward.Pets))
+		for petIndex := range reward.Pets {
+			pet := &reward.Pets[petIndex]
+			if pet.PetID == nil || !isPetID(*pet.PetID) {
+				return errors.Errorf("奖励包宠物ID无效: reward:%d index:%d %v", *reward.ID, petIndex, xruntime.Location())
+			}
+			if pet.Level == nil || *pet.Level < uint32(pb.LevelRange_LevelRange_Min) || *pet.Level > uint32(pb.LevelRange_LevelRange_Max) {
+				return errors.Errorf("奖励包宠物等级无效: reward:%d pet:%d %v", *reward.ID, *pet.PetID, xruntime.Location())
+			}
+			if pet.Grade == nil || *pet.Grade != RewardPetGradeRandom {
+				return errors.Errorf("奖励包宠物品质无效: reward:%d pet:%d %v", *reward.ID, *pet.PetID, xruntime.Location())
+			}
+			if pet.Quantity == nil || *pet.Quantity == 0 {
+				return errors.Errorf("奖励包宠物数量必须大于0: reward:%d pet:%d %v", *reward.ID, *pet.PetID, xruntime.Location())
+			}
+			if _, exists := seenPetIDs[*pet.PetID]; exists {
+				return errors.Errorf("奖励包宠物ID重复: reward:%d pet:%d %v", *reward.ID, *pet.PetID, xruntime.Location())
+			}
+			seenPetIDs[*pet.PetID] = struct{}{}
 		}
 		if !p.AddIfNotExist(*reward.ID, reward) {
 			return errors.Errorf("奖励包ID重复: %d %v", *reward.ID, xruntime.Location())
@@ -78,6 +112,12 @@ func (p *RewardConfig) check() error {
 		for _, item := range reward.Items {
 			if GGameConfig.Item == nil || GGameConfig.Item.Get(*item.ItemID) == nil {
 				checkErr = errors.Errorf("奖励包引用了未定义道具: reward:%d item:%d %v", rewardID, *item.ItemID, xruntime.Location())
+				return false
+			}
+		}
+		for _, pet := range reward.Pets {
+			if GGameConfig.Pet == nil || GGameConfig.Pet.Get(*pet.PetID) == nil {
+				checkErr = errors.Errorf("奖励包引用了未定义宠物: reward:%d pet:%d %v", rewardID, *pet.PetID, xruntime.Location())
 				return false
 			}
 		}

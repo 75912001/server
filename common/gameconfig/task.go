@@ -20,10 +20,12 @@ const (
 type TaskConditionKind string
 
 const (
-	TaskConditionKindCharacterLevel TaskConditionKind = "characterLevel"
-	TaskConditionKindItemPossession TaskConditionKind = "itemPossession"
-	TaskConditionKindTaskCompleted  TaskConditionKind = "taskCompleted"
-	TaskConditionKindBattleVictory  TaskConditionKind = "battleVictory"
+	TaskConditionKindCharacterLevel     TaskConditionKind = "characterLevel"
+	TaskConditionKindItemPossession     TaskConditionKind = "itemPossession"
+	TaskConditionKindPetPossession      TaskConditionKind = "petPossession"
+	TaskConditionKindTaskCompleted      TaskConditionKind = "taskCompleted"
+	TaskConditionKindTaskRewardsClaimed TaskConditionKind = "taskRewardsClaimed"
+	TaskConditionKindBattleVictory      TaskConditionKind = "battleVictory"
 )
 
 type TaskConfig struct {
@@ -35,6 +37,7 @@ type TaskEntry struct {
 	Name             *string              `yaml:"name"`
 	Description      *string              `yaml:"description"`
 	IsMain           *bool                `yaml:"isMain"`
+	Repeatable       *bool                `yaml:"repeatable"`
 	Sort             int32                `yaml:"sort"`
 	AcceptConditions []TaskConditionEntry `yaml:"acceptConditions"`
 	Steps            []*TaskStepEntry     `yaml:"steps"`
@@ -49,6 +52,7 @@ type TaskStepEntry struct {
 	CompletionMode       *TaskCompletionMode  `yaml:"completionMode"`
 	Challenge            *TaskChallengeEntry  `yaml:"challenge"`
 	ConsumeItems         []TaskItemEntry      `yaml:"consumeItems"`
+	ConsumePets          []TaskPetEntry       `yaml:"consumePets"`
 	RewardID             *uint32              `yaml:"rewardId"`
 }
 
@@ -62,6 +66,7 @@ type TaskConditionEntry struct {
 	Kind         *TaskConditionKind `yaml:"kind"`
 	Level        *uint32            `yaml:"level"`
 	ItemID       *uint32            `yaml:"itemId"`
+	PetID        *uint32            `yaml:"petId"`
 	Quantity     *uint64            `yaml:"quantity"`
 	TaskID       *uint32            `yaml:"taskId"`
 	EnemyGroupID *uint32            `yaml:"enemyGroupId"`
@@ -70,6 +75,12 @@ type TaskConditionEntry struct {
 type TaskItemEntry struct {
 	ItemID   *uint32 `yaml:"itemId"`
 	Quantity *uint64 `yaml:"quantity"`
+}
+
+type TaskPetEntry struct {
+	PetID    *uint32 `yaml:"petId"`
+	Level    *uint32 `yaml:"level"`
+	Quantity *uint32 `yaml:"quantity"`
 }
 
 func newTaskConfig() *TaskConfig {
@@ -101,6 +112,7 @@ func (p *TaskConfig) configure(entries []*TaskEntry) error {
 			return errors.Errorf("任务说明不能为空: id:%d %v", *task.ID, xruntime.Location())
 		}
 		defaultBool(&task.IsMain, false)
+		defaultBool(&task.Repeatable, false)
 		if len(task.Steps) == 0 {
 			return errors.Errorf("任务步骤不能为空: id:%d %v", *task.ID, xruntime.Location())
 		}
@@ -141,8 +153,8 @@ func configureTaskStep(taskID uint32, expectedStepID uint32, step *TaskStepEntry
 	if step.RewardID == nil {
 		return errors.Errorf("任务步骤缺少rewardId: task:%d step:%d %v", taskID, expectedStepID, xruntime.Location())
 	}
-	if len(step.ConsumeItems) > 0 && *step.CompletionMode != TaskCompletionModeSubmit {
-		return errors.Errorf("配置consumeItems的任务步骤必须主动提交: task:%d step:%d %v", taskID, expectedStepID, xruntime.Location())
+	if (len(step.ConsumeItems) > 0 || len(step.ConsumePets) > 0) && *step.CompletionMode != TaskCompletionModeSubmit {
+		return errors.Errorf("配置扣除内容的任务步骤必须主动提交: task:%d step:%d %v", taskID, expectedStepID, xruntime.Location())
 	}
 	if step.Challenge != nil {
 		if step.Challenge.EnemyGroupID == nil || *step.Challenge.EnemyGroupID == 0 || *step.CompletionMode != TaskCompletionModeAutomatic {
@@ -162,13 +174,26 @@ func configureTaskStep(taskID uint32, expectedStepID uint32, step *TaskStepEntry
 	seenItemIDs := make(map[uint32]struct{}, len(step.ConsumeItems))
 	for itemIndex := range step.ConsumeItems {
 		item := &step.ConsumeItems[itemIndex]
-		if item.ItemID == nil || !isItemID(*item.ItemID) || item.Quantity == nil || *item.Quantity == 0 {
+		if item.ItemID == nil || (!isItemID(*item.ItemID) && !isEquipmentID(*item.ItemID)) || item.Quantity == nil || *item.Quantity == 0 {
 			return errors.Errorf("任务步骤扣除道具无效: task:%d step:%d index:%d %v", taskID, expectedStepID, itemIndex, xruntime.Location())
 		}
 		if _, exists := seenItemIDs[*item.ItemID]; exists {
 			return errors.Errorf("任务步骤扣除道具ID重复: task:%d step:%d item:%d %v", taskID, expectedStepID, *item.ItemID, xruntime.Location())
 		}
 		seenItemIDs[*item.ItemID] = struct{}{}
+	}
+	seenPetIDs := make(map[uint32]struct{}, len(step.ConsumePets))
+	for petIndex := range step.ConsumePets {
+		pet := &step.ConsumePets[petIndex]
+		if pet.PetID == nil || !isPetID(*pet.PetID) || pet.Level == nil ||
+			*pet.Level < uint32(pb.LevelRange_LevelRange_Min) || *pet.Level > uint32(pb.LevelRange_LevelRange_Max) ||
+			pet.Quantity == nil || *pet.Quantity == 0 {
+			return errors.Errorf("任务步骤扣除宠物无效: task:%d step:%d index:%d %v", taskID, expectedStepID, petIndex, xruntime.Location())
+		}
+		if _, exists := seenPetIDs[*pet.PetID]; exists {
+			return errors.Errorf("任务步骤扣除宠物ID重复: task:%d step:%d pet:%d %v", taskID, expectedStepID, *pet.PetID, xruntime.Location())
+		}
+		seenPetIDs[*pet.PetID] = struct{}{}
 	}
 	return nil
 }
@@ -204,6 +229,12 @@ func (p *TaskConfig) check() error {
 					return false
 				}
 			}
+			for _, pet := range step.ConsumePets {
+				if GGameConfig.Pet == nil || GGameConfig.Pet.Get(*pet.PetID) == nil {
+					checkErr = errors.Errorf("任务步骤引用了未定义扣除宠物: task:%d step:%d pet:%d %v", taskID, stepID, *pet.PetID, xruntime.Location())
+					return false
+				}
+			}
 			if *step.RewardID != 0 && (GGameConfig.Reward == nil || GGameConfig.Reward.Get(*step.RewardID) == nil) {
 				checkErr = errors.Errorf("任务步骤引用了未定义奖励包: task:%d step:%d reward:%d %v", taskID, stepID, *step.RewardID, xruntime.Location())
 				return false
@@ -229,9 +260,15 @@ func (p *TaskConfig) checkConditions(taskID uint32, stepID uint32, field string,
 			if condition.ItemID == nil || condition.Quantity == nil || *condition.Quantity == 0 || GGameConfig.Item == nil || GGameConfig.Item.Get(*condition.ItemID) == nil {
 				return errors.Errorf("任务持有道具条件无效: task:%d step:%d field:%s index:%d %v", taskID, stepID, field, index, xruntime.Location())
 			}
-		case TaskConditionKindTaskCompleted:
+		case TaskConditionKindPetPossession:
+			if condition.PetID == nil || condition.Level == nil || condition.Quantity == nil || *condition.Quantity == 0 ||
+				*condition.Level < uint32(pb.LevelRange_LevelRange_Min) || *condition.Level > uint32(pb.LevelRange_LevelRange_Max) ||
+				GGameConfig.Pet == nil || GGameConfig.Pet.Get(*condition.PetID) == nil {
+				return errors.Errorf("任务持有宠物条件无效: task:%d step:%d field:%s index:%d %v", taskID, stepID, field, index, xruntime.Location())
+			}
+		case TaskConditionKindTaskCompleted, TaskConditionKindTaskRewardsClaimed:
 			if condition.TaskID == nil || *condition.TaskID == 0 || *condition.TaskID == taskID || p.Get(*condition.TaskID) == nil {
-				return errors.Errorf("任务完成前置条件无效: task:%d step:%d field:%s index:%d %v", taskID, stepID, field, index, xruntime.Location())
+				return errors.Errorf("任务前置条件无效: task:%d step:%d field:%s index:%d %v", taskID, stepID, field, index, xruntime.Location())
 			}
 		case TaskConditionKindBattleVictory:
 			if !allowBattleVictory || condition.EnemyGroupID == nil || *condition.EnemyGroupID == 0 || GGameConfig.Enemy == nil || GGameConfig.Enemy.Get(*condition.EnemyGroupID) == nil {
@@ -258,7 +295,11 @@ func validateTaskConditionFields(condition *TaskConditionEntry) error {
 	case TaskConditionKindItemPossession:
 		allowed["itemId"] = true
 		allowed["quantity"] = true
-	case TaskConditionKindTaskCompleted:
+	case TaskConditionKindPetPossession:
+		allowed["petId"] = true
+		allowed["level"] = true
+		allowed["quantity"] = true
+	case TaskConditionKindTaskCompleted, TaskConditionKindTaskRewardsClaimed:
 		allowed["taskId"] = true
 	case TaskConditionKindBattleVictory:
 		allowed["enemyGroupId"] = true
@@ -268,6 +309,9 @@ func validateTaskConditionFields(condition *TaskConditionEntry) error {
 	}
 	if condition.ItemID != nil && !allowed["itemId"] {
 		return errors.New("unexpected itemId")
+	}
+	if condition.PetID != nil && !allowed["petId"] {
+		return errors.New("unexpected petId")
 	}
 	if condition.Quantity != nil && !allowed["quantity"] {
 		return errors.New("unexpected quantity")

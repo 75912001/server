@@ -5440,13 +5440,14 @@ sprite:
       walk: [116821,116822,116823,116824,116825,116826]
   # 317 [116827,117058] 232 个文件
   - id: 317
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 10.0
     attackImpactFrameNumberList: [5]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
@@ -5509,13 +5510,14 @@ sprite:
       walk: [117053,117054,117055,117056,117057,117058]
   # 318 [117059,117290] 232 个文件
   - id: 318
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 10.0
     attackImpactFrameNumberList: [5]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
@@ -5578,13 +5580,14 @@ sprite:
       walk: [117285,117286,117287,117288,117289,117290]
   # 319 [117291,117522] 232 个文件
   - id: 319
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 10.0
     attackImpactFrameNumberList: [5]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
@@ -5647,13 +5650,14 @@ sprite:
       walk: [117517,117518,117519,117520,117521,117522]
   # 320 [117523,117754] 232 个文件
   - id: 320
+    testStatus: 1
     framesPerSecondByAction:
       attack: 14
-      faint: 6
-      hurt: 20
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,7,9,11]
     attackImpactSoundIdList: [250,250,250,250]
     attackActionSoundFrameNumberList: []
@@ -5716,13 +5720,14 @@ sprite:
       walk: [117749,117750,117751,117752,117753,117754]
   # 321 [117755,117994] 240 个文件
   - id: 321
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 20
-      faint: 8.75
-      hurt: 20
+      attack: 26.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 7.857143
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [21]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
@@ -5785,13 +5790,14 @@ sprite:
       walk: [117989,117990,117991,117992,117993,117994]
   # 322 [117995,118234] 240 个文件
   - id: 322
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 20
-      faint: 8.75
-      hurt: 20
+      attack: 26.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 7.857143
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [21]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
@@ -5854,13 +5860,14 @@ sprite:
       walk: [118229,118230,118231,118232,118233,118234]
   # 323 [118235,118474] 240 个文件
   - id: 323
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 20
-      faint: 8.75
-      hurt: 20
+      attack: 26.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 7.857143
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [21]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
@@ -5923,13 +5930,14 @@ sprite:
       walk: [118469,118470,118471,118472,118473,118474]
   # 324 [118475,118714] 240 个文件
   - id: 324
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 20
-      faint: 8.75
-      hurt: 20
+      attack: 26.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 7.857143
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [21]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
@@ -5992,13 +6000,14 @@ sprite:
       walk: [118709,118710,118711,118712,118713,118714]
   # 325 [118955,119202] 248 个文件
   - id: 325
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 10
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.714286
-      walk: 6
+      stand: 12.0
+      walk: 10.0
     attackImpactFrameNumberList: [7]
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
@@ -6061,13 +6070,14 @@ sprite:
       walk: [119197,119198,119199,119200,119201,119202]
   # 326 [119203,119450] 248 个文件
   - id: 326
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 10
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.714286
-      walk: 6
+      stand: 12.0
+      walk: 10.0
     attackImpactFrameNumberList: [7]
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
@@ -6130,13 +6140,14 @@ sprite:
       walk: [119445,119446,119447,119448,119449,119450]
   # 327 [119451,119698] 248 个文件
   - id: 327
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 10
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.714286
-      walk: 6
+      stand: 12.0
+      walk: 10.0
     attackImpactFrameNumberList: [7]
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
@@ -6199,13 +6210,14 @@ sprite:
       walk: [119693,119694,119695,119696,119697,119698]
   # 328 [119699,119946] 248 个文件
   - id: 328
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 10
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.714286
-      walk: 6
+      stand: 12.0
+      walk: 10.0
     attackImpactFrameNumberList: [7]
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
@@ -6268,13 +6280,14 @@ sprite:
       walk: [119941,119942,119943,119944,119945,119946]
   # 329 [119947,120178] 232 个文件
   - id: 329
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 18
-      faint: 6
-      hurt: 20
+      attack: 24.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 8.0
     attackImpactFrameNumberList: [15]
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [13]
@@ -6337,13 +6350,14 @@ sprite:
       walk: [120173,120174,120175,120176,120177,120178]
   # 330 [120179,120410] 232 个文件
   - id: 330
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 18
-      faint: 6
-      hurt: 20
+      attack: 24.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 8.0
     attackImpactFrameNumberList: [15]
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [13]
@@ -6406,13 +6420,14 @@ sprite:
       walk: [120405,120406,120407,120408,120409,120410]
   # 331 [120411,120642] 232 个文件
   - id: 331
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 18
-      faint: 6
-      hurt: 20
+      attack: 24.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 8.0
     attackImpactFrameNumberList: [15]
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [13]
@@ -6475,13 +6490,14 @@ sprite:
       walk: [120637,120638,120639,120640,120641,120642]
   # 332 [120643,120874] 232 个文件
   - id: 332
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 15.454545
-      faint: 6
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 8.0
     attackImpactFrameNumberList: [10,16]
     attackImpactSoundIdList: [254,254]
     attackActionSoundFrameNumberList: [8,14]
@@ -6544,13 +6560,14 @@ sprite:
       walk: [120869,120870,120871,120872,120873,120874]
   # 333 [120875,121106] 232 个文件
   - id: 333
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 13.333333
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 5.875
-      walk: 7.5
+      stand: 18.0
+      walk: 12.0
     attackImpactFrameNumberList: [7,9,11,13,15]
     attackImpactSoundIdList: [254,254,254,254,254]
     attackActionSoundFrameNumberList: []
@@ -6613,13 +6630,14 @@ sprite:
       walk: [121101,121102,121103,121104,121105,121106]
   # 334 [121107,121338] 232 个文件
   - id: 334
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 30.666667
-      faint: 7.5
-      hurt: 20
+      attack: 30.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 5.875
-      walk: 10
+      stand: 18.0
+      walk: 12.0
     attackImpactFrameNumberList: [21,23,25,27,29,31,33,35,37,39,41,43,45]
     attackImpactSoundIdList: [254,254,254,254,254,254,254,254,254,254,254,254,254]
     attackActionSoundFrameNumberList: []
@@ -6682,13 +6700,14 @@ sprite:
       walk: [121333,121334,121335,121336,121337,121338]
   # 335 [121339,121570] 232 个文件
   - id: 335
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 13.333333
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 5.875
-      walk: 7.5
+      stand: 18.0
+      walk: 12.0
     attackImpactFrameNumberList: [7,9,11,13,15]
     attackImpactSoundIdList: [254,254,254,254,254]
     attackActionSoundFrameNumberList: []
@@ -6751,13 +6770,14 @@ sprite:
       walk: [121565,121566,121567,121568,121569,121570]
   # 336 [121571,121802] 232 个文件
   - id: 336
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 13.333333
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 5.875
-      walk: 7.5
+      stand: 18.0
+      walk: 12.0
     attackImpactFrameNumberList: [7,9,11,13,15]
     attackImpactSoundIdList: [254,254,254,254,254]
     attackActionSoundFrameNumberList: []
@@ -7100,13 +7120,14 @@ sprite:
       walk: [122741,122742,122743,122744,122745,122746]
   # 341 [122747,122978] 232 个文件
   - id: 341
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 4.285714
-      walk: 7.5
+      stand: 10.0
+      walk: 12.0
     attackImpactFrameNumberList: [4]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
@@ -7169,13 +7190,14 @@ sprite:
       walk: [122973,122974,122975,122976,122977,122978]
   # 342 [122979,123210] 232 个文件
   - id: 342
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 4.285714
-      walk: 7.5
+      stand: 10.0
+      walk: 12.0
     attackImpactFrameNumberList: [4]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
@@ -7238,13 +7260,14 @@ sprite:
       walk: [123205,123206,123207,123208,123209,123210]
   # 343 [123211,123442] 232 个文件
   - id: 343
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 4.285714
-      walk: 7.5
+      stand: 10.0
+      walk: 12.0
     attackImpactFrameNumberList: [4]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
@@ -7307,13 +7330,14 @@ sprite:
       walk: [123437,123438,123439,123440,123441,123442]
   # 344 [123443,123674] 232 个文件
   - id: 344
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 12
-      faint: 6
-      hurt: 20
+      attack: 16.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 4.285714
-      walk: 10
+      stand: 10.0
+      walk: 12.0
     attackImpactFrameNumberList: [6]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
@@ -7376,13 +7400,14 @@ sprite:
       walk: [123669,123670,123671,123672,123673,123674]
   # 345 [123907,124138] 232 个文件
   - id: 345
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 14
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 12.0
+      hurt: 2.0
       defense: 1
-      stand: 5.4
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,10]
     attackImpactSoundIdList: [250,250]
     attackActionSoundFrameNumberList: []
@@ -7445,13 +7470,14 @@ sprite:
       walk: [124133,124134,124135,124136,124137,124138]
   # 346 [124139,124370] 232 个文件
   - id: 346
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 14
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 12.0
+      hurt: 2.0
       defense: 1
-      stand: 5.4
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,10]
     attackImpactSoundIdList: [250,250]
     attackActionSoundFrameNumberList: []
@@ -7514,13 +7540,14 @@ sprite:
       walk: [124365,124366,124367,124368,124369,124370]
   # 347 [124371,124602] 232 个文件
   - id: 347
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 14
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 12.0
+      hurt: 2.0
       defense: 1
-      stand: 5.4
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,10]
     attackImpactSoundIdList: [250,250]
     attackActionSoundFrameNumberList: []
@@ -7583,13 +7610,14 @@ sprite:
       walk: [124597,124598,124599,124600,124601,124602]
   # 348 [124603,124834] 232 个文件
   - id: 348
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 73.333333
-      faint: 7.5
-      hurt: 20
+      attack: 40.0
+      faint: 12.0
+      hurt: 2.0
       defense: 1
-      stand: 5.4
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [14,22,27,32,37,46]
     attackImpactSoundIdList: [250,250,250,250,250,250]
     attackActionSoundFrameNumberList: []
@@ -7652,13 +7680,14 @@ sprite:
       walk: [124829,124830,124831,124832,124833,124834]
   # 349 [124835,125066] 232 个文件
   - id: 349
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 14
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 12.0
+      hurt: 2.0
       defense: 1
-      stand: 5.4
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,10]
     attackImpactSoundIdList: [250,250]
     attackActionSoundFrameNumberList: []
@@ -7721,13 +7750,14 @@ sprite:
       walk: [125061,125062,125063,125064,125065,125066]
   # 350 [125067,125298] 232 个文件
   - id: 350
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 14.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.666667
-      walk: 6
+      stand: 22.0
+      walk: 10.0
     attackImpactFrameNumberList: [3]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [2]
@@ -7790,13 +7820,14 @@ sprite:
       walk: [125293,125294,125295,125296,125297,125298]
   # 351 [125299,125530] 232 个文件
   - id: 351
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 14.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.666667
-      walk: 6
+      stand: 22.0
+      walk: 10.0
     attackImpactFrameNumberList: [3]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [2]
@@ -7859,13 +7890,14 @@ sprite:
       walk: [125525,125526,125527,125528,125529,125530]
   # 352 [125531,125763] 232 个文件
   - id: 352
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 14.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.666667
-      walk: 6
+      stand: 22.0
+      walk: 10.0
     attackImpactFrameNumberList: [3]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [2]
@@ -7928,13 +7960,14 @@ sprite:
       walk: [125758,125759,125760,125761,125762,125763]
   # 353 [125764,125995] 232 个文件
   - id: 353
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 14.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.666667
-      walk: 6
+      stand: 22.0
+      walk: 10.0
     attackImpactFrameNumberList: [3]
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [2]
@@ -7997,6 +8030,7 @@ sprite:
       walk: [125990,125991,125992,125993,125994,125995]
   # 354 [96811,97042] 232 个文件
   - id: 354
+    testStatus: 1
     walkActionSoundFrameNumberList: [1,4]
     walkActionSoundIdList: [76,76]
     framesPerSecondByAction:
@@ -8558,13 +8592,14 @@ sprite:
       walk: [112085,112086,112086,112086,112087,112088,112089,112089,112089,112090]
   # 362 [118715,118954] 240 个文件
   - id: 362
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 20
-      faint: 8.75
-      hurt: 20
+      attack: 26.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 7.857143
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [21]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
@@ -8627,13 +8662,14 @@ sprite:
       walk: [118949,118950,118951,118952,118953,118954]
   # 393 [123675,123906] 232 个文件
   - id: 393
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 12
-      faint: 6
-      hurt: 20
+      attack: 16.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 4.285714
-      walk: 15
+      stand: 10.0
+      walk: 12.0
     attackImpactFrameNumberList: [6]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
@@ -8696,6 +8732,7 @@ sprite:
       walk: [123901,123902,123903,123904,123905,123906]
   # 584 [163049,163280] 232 个文件
   - id: 584
+    testStatus: 1
     walkActionSoundFrameNumberList: [1,4]
     walkActionSoundIdList: [76,76]
     framesPerSecondByAction:
@@ -13398,13 +13435,14 @@ sprite:
       walk: [179219,179220,179221,179222,179223,179224]
   # 651 [179225,179456] 232 个文件
   - id: 651
+    testStatus: 1
     framesPerSecondByAction:
       attack: 14
-      faint: 6
-      hurt: 20
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,7,9,11]
     attackImpactSoundIdList: [250,250,250,250]
     attackActionSoundFrameNumberList: []
@@ -13467,13 +13505,14 @@ sprite:
       walk: [179451,179452,179453,179454,179455,179456]
   # 652 [179457,179688] 232 个文件
   - id: 652
+    testStatus: 1
     framesPerSecondByAction:
       attack: 14
-      faint: 6
-      hurt: 20
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,7,9,11]
     attackImpactSoundIdList: [250,250,250,250]
     attackActionSoundFrameNumberList: []
@@ -13536,13 +13575,14 @@ sprite:
       walk: [179683,179684,179685,179686,179687,179688]
   # 653 [179689,179920] 232 个文件
   - id: 653
+    testStatus: 1
     framesPerSecondByAction:
       attack: 14
-      faint: 6
-      hurt: 20
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,7,9,11]
     attackImpactSoundIdList: [250,250,250,250]
     attackActionSoundFrameNumberList: []
@@ -13605,13 +13645,14 @@ sprite:
       walk: [179915,179916,179917,179918,179919,179920]
   # 654 [179921,180152] 232 个文件
   - id: 654
+    testStatus: 1
     framesPerSecondByAction:
       attack: 14
-      faint: 6
-      hurt: 20
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,7,9,11]
     attackImpactSoundIdList: [250,250,250,250]
     attackActionSoundFrameNumberList: []
@@ -13674,13 +13715,14 @@ sprite:
       walk: [180147,180148,180149,180150,180151,180152]
   # 655 [180153,180392] 240 个文件
   - id: 655
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 20
-      faint: 8.75
-      hurt: 20
+      attack: 26.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 7.857143
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [21]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
@@ -13743,13 +13785,14 @@ sprite:
       walk: [180387,180388,180389,180390,180391,180392]
   # 656 [180393,180632] 240 个文件
   - id: 656
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 20
-      faint: 8.75
-      hurt: 20
+      attack: 26.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 7.857143
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [21]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
@@ -13812,13 +13855,14 @@ sprite:
       walk: [180627,180628,180629,180630,180631,180632]
   # 657 [180633,180872] 240 个文件
   - id: 657
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 20
-      faint: 8.75
-      hurt: 20
+      attack: 26.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 7.857143
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [21]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [20]
@@ -13881,13 +13925,14 @@ sprite:
       walk: [180867,180868,180869,180870,180871,180872]
   # 658 [180873,181120] 248 个文件
   - id: 658
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 10
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.714286
-      walk: 6
+      stand: 12.0
+      walk: 10.0
     attackImpactFrameNumberList: [7]
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
@@ -13950,13 +13995,14 @@ sprite:
       walk: [181115,181116,181117,181118,181119,181120]
   # 659 [181121,181368] 248 个文件
   - id: 659
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 10
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.714286
-      walk: 6
+      stand: 12.0
+      walk: 10.0
     attackImpactFrameNumberList: [7]
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
@@ -14019,13 +14065,14 @@ sprite:
       walk: [181363,181364,181365,181366,181367,181368]
   # 660 [181369,181616] 248 个文件
   - id: 660
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 10
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.714286
-      walk: 6
+      stand: 12.0
+      walk: 10.0
     attackImpactFrameNumberList: [7]
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
@@ -14088,13 +14135,14 @@ sprite:
       walk: [181611,181612,181613,181614,181615,181616]
   # 661 [181617,181864] 248 个文件
   - id: 661
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 10
-      faint: 6
-      hurt: 20
+      attack: 12.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.714286
-      walk: 6
+      stand: 12.0
+      walk: 10.0
     attackImpactFrameNumberList: [7]
     attackImpactSoundIdList: [254]
     attackActionSoundFrameNumberList: [5]
@@ -14157,13 +14205,14 @@ sprite:
       walk: [181859,181860,181861,181862,181863,181864]
   # 662 [181865,182096] 232 个文件
   - id: 662
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 15.454545
-      faint: 6
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 8.0
     attackImpactFrameNumberList: [10,16]
     attackImpactSoundIdList: [254,254]
     attackActionSoundFrameNumberList: [8,14]
@@ -14226,13 +14275,14 @@ sprite:
       walk: [182091,182092,182093,182094,182095,182096]
   # 663 [182097,182328] 232 个文件
   - id: 663
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 15.454545
-      faint: 6
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 8.0
     attackImpactFrameNumberList: [10,16]
     attackImpactSoundIdList: [254,254]
     attackActionSoundFrameNumberList: [8,14]
@@ -14295,13 +14345,14 @@ sprite:
       walk: [182323,182324,182325,182326,182327,182328]
   # 664 [182329,182560] 232 个文件
   - id: 664
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 15.454545
-      faint: 6
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 8.0
     attackImpactFrameNumberList: [10,16]
     attackImpactSoundIdList: [254,254]
     attackActionSoundFrameNumberList: [8,14]
@@ -14364,13 +14415,14 @@ sprite:
       walk: [182555,182556,182557,182558,182559,182560]
   # 665 [182561,182792] 232 个文件
   - id: 665
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 15.454545
-      faint: 6
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 6
-      walk: 6
+      stand: 8.0
+      walk: 8.0
     attackImpactFrameNumberList: [10,16]
     attackImpactSoundIdList: [254,254]
     attackActionSoundFrameNumberList: [8,14]
@@ -14433,13 +14485,14 @@ sprite:
       walk: [182787,182788,182789,182790,182791,182792]
   # 666 [182793,183024] 232 个文件
   - id: 666
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 13.333333
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 5.875
-      walk: 7.5
+      stand: 18.0
+      walk: 12.0
     attackImpactFrameNumberList: [7,9,11,13,15]
     attackImpactSoundIdList: [254,254,254,254,254]
     attackActionSoundFrameNumberList: []
@@ -14502,13 +14555,14 @@ sprite:
       walk: [183019,183020,183021,183022,183023,183024]
   # 667 [183025,183256] 232 个文件
   - id: 667
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 13.333333
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 5.875
-      walk: 7.5
+      stand: 18.0
+      walk: 12.0
     attackImpactFrameNumberList: [7,9,11,13,15]
     attackImpactSoundIdList: [254,254,254,254,254]
     attackActionSoundFrameNumberList: []
@@ -14571,13 +14625,14 @@ sprite:
       walk: [183251,183252,183253,183254,183255,183256]
   # 668 [183257,183488] 232 个文件
   - id: 668
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 13.333333
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 5.875
-      walk: 7.5
+      stand: 18.0
+      walk: 12.0
     attackImpactFrameNumberList: [7,9,11,13,15]
     attackImpactSoundIdList: [254,254,254,254,254]
     attackActionSoundFrameNumberList: []
@@ -14640,13 +14695,14 @@ sprite:
       walk: [183483,183484,183485,183486,183487,183488]
   # 669 [183489,183720] 232 个文件
   - id: 669
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 13.333333
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 8.0
+      hurt: 2.0
       defense: 1
-      stand: 5.875
-      walk: 7.5
+      stand: 18.0
+      walk: 12.0
     attackImpactFrameNumberList: [7,9,11,13,15]
     attackImpactSoundIdList: [254,254,254,254,254]
     attackActionSoundFrameNumberList: []
@@ -14989,13 +15045,14 @@ sprite:
       walk: [184643,184644,184645,184646,184647,184648]
   # 674 [184649,184880] 232 个文件
   - id: 674
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 12
-      faint: 6
-      hurt: 20
+      attack: 16.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 4.285714
-      walk: 15
+      stand: 10.0
+      walk: 12.0
     attackImpactFrameNumberList: [6]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
@@ -15058,13 +15115,14 @@ sprite:
       walk: [184875,184876,184877,184878,184879,184880]
   # 675 [184881,185112] 232 个文件
   - id: 675
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 12
-      faint: 6
-      hurt: 20
+      attack: 16.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 4.285714
-      walk: 15
+      stand: 10.0
+      walk: 12.0
     attackImpactFrameNumberList: [6]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
@@ -15127,13 +15185,14 @@ sprite:
       walk: [185107,185108,185109,185110,185111,185112]
   # 676 [185113,185344] 232 个文件
   - id: 676
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 12
-      faint: 6
-      hurt: 20
+      attack: 16.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 4.285714
-      walk: 15
+      stand: 10.0
+      walk: 12.0
     attackImpactFrameNumberList: [6]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: []
@@ -15196,13 +15255,14 @@ sprite:
       walk: [185339,185340,185341,185342,185343,185344]
   # 677 [185345,185576] 232 个文件
   - id: 677
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 14
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 12.0
+      hurt: 2.0
       defense: 1
-      stand: 5.4
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,10]
     attackImpactSoundIdList: [250,250]
     attackActionSoundFrameNumberList: []
@@ -15265,13 +15325,14 @@ sprite:
       walk: [185571,185572,185573,185574,185575,185576]
   # 678 [185577,185808] 232 个文件
   - id: 678
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 14
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 12.0
+      hurt: 2.0
       defense: 1
-      stand: 5.4
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,10]
     attackImpactSoundIdList: [250,250]
     attackActionSoundFrameNumberList: []
@@ -15334,13 +15395,14 @@ sprite:
       walk: [185803,185804,185805,185806,185807,185808]
   # 679 [185809,186040] 232 个文件
   - id: 679
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 14
-      faint: 7.5
-      hurt: 20
+      attack: 18.0
+      faint: 12.0
+      hurt: 2.0
       defense: 1
-      stand: 5.4
-      walk: 7.5
+      stand: 16.0
+      walk: 10.0
     attackImpactFrameNumberList: [5,10]
     attackImpactSoundIdList: [250,250]
     attackActionSoundFrameNumberList: []
@@ -15403,13 +15465,14 @@ sprite:
       walk: [186035,186036,186037,186038,186039,186040]
   # 680 [186041,186272] 232 个文件
   - id: 680
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 14.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.666667
-      walk: 6
+      stand: 22.0
+      walk: 10.0
     attackImpactFrameNumberList: [3]
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [2]
@@ -15472,13 +15535,14 @@ sprite:
       walk: [186267,186268,186269,186270,186271,186272]
   # 681 [186273,186504] 232 个文件
   - id: 681
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 14.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.666667
-      walk: 6
+      stand: 22.0
+      walk: 10.0
     attackImpactFrameNumberList: [3]
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [2]
@@ -15541,13 +15605,14 @@ sprite:
       walk: [186499,186500,186501,186502,186503,186504]
   # 682 [186505,186736] 232 个文件
   - id: 682
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 14.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.666667
-      walk: 6
+      stand: 22.0
+      walk: 10.0
     attackImpactFrameNumberList: [3]
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [2]
@@ -15610,13 +15675,14 @@ sprite:
       walk: [186731,186732,186733,186734,186735,186736]
   # 683 [186737,186968] 232 个文件
   - id: 683
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 8
-      faint: 6
-      hurt: 20
+      attack: 14.0
+      faint: 10.0
+      hurt: 2.0
       defense: 1
-      stand: 6.666667
-      walk: 6
+      stand: 22.0
+      walk: 10.0
     attackImpactFrameNumberList: [3]
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [2]
@@ -37846,13 +37912,14 @@ sprite:
 
   # 394 [87631,87972] 224 个文件
   - id: 394
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 18.666667
-      faint: 7.333333
-      hurt: 20
+      attack: 36.0
+      faint: 12.0
+      hurt: 2.0
       defense: 1
-      stand: 4
-      walk: 6
+      stand: 6.0
+      walk: 10.0
     attackImpactFrameNumberList: [18]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [2,17]
@@ -37916,13 +37983,14 @@ sprite:
 
   # 402 [89503,89796] 224 个文件
   - id: 402
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 15
-      faint: 7.333333
-      hurt: 20
+      attack: 22.0
+      faint: 12.0
+      hurt: 2.0
       defense: 1
-      stand: 4
-      walk: 6
+      stand: 6.0
+      walk: 10.0
     attackImpactFrameNumberList: [7]
     attackImpactSoundIdList: [252]
     attackActionSoundFrameNumberList: [6]
@@ -37986,13 +38054,14 @@ sprite:
 
   # 399 [89159,89500] 224 个文件
   - id: 399
+    testStatus: 1
     framesPerSecondByAction:
-      attack: 18.666667
-      faint: 7.333333
-      hurt: 20
+      attack: 36.0
+      faint: 12.0
+      hurt: 2.0
       defense: 1
-      stand: 4
-      walk: 6
+      stand: 6.0
+      walk: 10.0
     attackImpactFrameNumberList: [18]
     attackImpactSoundIdList: [250]
     attackActionSoundFrameNumberList: [2,17]
