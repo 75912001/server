@@ -85,25 +85,26 @@ message CharacterLuckState {
 // CharacterEffectiveAttribute 是角色基础属性叠加当前装备后的运行期派生快照, 不写入账号档案.
 message CharacterEffectiveAttribute {
   uint64 character_uuid = 1; // 角色 UUID
-  uint32 max_hp = 2; // 装备修正后的最大生命值
-  uint32 attack = 3; // 装备修正后的攻击力
-  int32 defense = 4; // 装备修正后的防御力, 原版最低为-100
-  int32 agility = 5; // 装备修正后的敏捷, 原版最低为-100
-  uint32 max_mp = 6; // 装备修正后的最大魔法值, 范围0-1000
-  uint32 effective_luck = 10; // 装备修正后的有效运气, 范围1-5
-  uint32 effective_charm = 11; // 装备修正后的有效魅力, 范围0-100
-  int32 effective_avoid = 12; // 装备修正后的有效闪避
-  int32 critical_modifier = 13; // 装备固化暴击修正合计, 保留原版配置值和量纲
-  int32 poison_resistance_modifier = 20; // 毒抗性修正合计, 保留原版配置值和量纲
-  int32 paralysis_resistance_modifier = 21; // 麻痹抗性修正合计, 保留原版配置值和量纲
-  int32 sleep_resistance_modifier = 22; // 睡眠抗性修正合计, 保留原版配置值和量纲
-  int32 stone_resistance_modifier = 23; // 石化抗性修正合计, 保留原版配置值和量纲
-  int32 drunk_resistance_modifier = 24; // 酒醉抗性修正合计, 保留原版配置值和量纲
-  int32 confusion_resistance_modifier = 25; // 混乱抗性修正合计, 保留原版配置值和量纲
-  ElementalPoints elemental = 30; // 装备元素修正后的地水火风点数, 各项限制在0-10
-  int32 other_damage_modifier = 31; // 原版额外伤害修正合计
-  int32 other_defense_modifier = 32; // 原版额外防御修正合计
-  CharacterWeaponType weapon_type = 40; // 当前实际武器类型, 未装备时为空手
+  ElementalPoints elemental = 2; // 面板-元素点数, 各项限制在0-10
+  CharacterWeaponType weapon_type = 3; // 面板武器类型, 未装备时为空手
+  uint32 attack = 100; // 面板-攻击力
+  int32 defense = 101; // 面板-防御力, 最低为-100
+  int32 agility = 102; // 面板-敏捷, 最低为-100
+  uint32 max_hp = 103; // 面板-最大生命值
+  uint32 max_mp = 104; // 面板-最大魔法值, 范围0-1000
+  uint32 effective_luck = 105; // 面板-运气, 范围1-5
+  uint32 effective_charm = 106; // 面板-魅力, 范围0-100
+  int32 effective_avoid = 107; // 面板-闪避
+  int32 critical_modifier = 108; // 面板-暴击
+  // todo menglc 增加 面板-反击
+  int32 damage_bonus_percent = 109; // 面板-伤害加成百分比
+  int32 crit_damage_bonus_percent = 110; // 面板-暴击伤害加成百分比
+
+  int32 paralysis_resistance_modifier = 201; // 面板-麻痹抗性
+  int32 sleep_resistance_modifier = 202; // 面板-睡眠抗性
+  int32 stone_resistance_modifier = 203; // 面板-石化抗性
+  int32 drunk_resistance_modifier = 204; // 面板-酒醉抗性
+  int32 confusion_resistance_modifier = 205; // 面板-混乱抗性
 }
 
 // CharacterBaseRecord 表示不包含道具、扩展记录和宠物集合的角色基础权威快照.

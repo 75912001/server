@@ -6,9 +6,9 @@ option go_package = "server/proto/pb;pb";
 import "record.proto";
 
 // EquipmentType 表示装备穿戴部位.
-// Unknow 仅作为 proto3 默认值和未初始化占位, Max 仅作为枚举边界.
+// Unspecified 仅作为 proto3 默认值和未初始化占位, Max 仅作为枚举边界.
 enum EquipmentType {
-  EquipmentType_Unknow = 0; // 未知装备部位, proto3 默认值
+  EquipmentType_Unspecified = 0; // 未知装备部位, proto3 默认值
   EquipmentType_Accessory1 = 1; // 首饰位1
   EquipmentType_Helmet = 2; // 头盔
   EquipmentType_Accessory2 = 3; // 首饰位2
@@ -21,10 +21,10 @@ enum EquipmentType {
   EquipmentType_Max = 10; // 装备部位枚举边界, 不作为业务值存储
 }
 
-// AccessoryType 表示首饰类别, 数值沿用原版 ITEM_TYPE.
+// AccessoryType 表示首饰类别
 // 六类首饰共用两个首饰位, 同时穿戴时类别必须不同; 0和Max不作为业务值.
 enum AccessoryType {
-  AccessoryType_Unknow = 0; // 未初始化或尚未确认的首饰类型, 不能发布或穿戴
+  AccessoryType_Unspecified = 0; // 未初始化或尚未确认的首饰类型, 不能发布或穿戴
   AccessoryType_Bracelet = 8; // 手环
   AccessoryType_Musical = 9; // 乐器
   AccessoryType_Necklace = 10; // 项链
@@ -44,7 +44,7 @@ message EquipmentRecord {
 
 // EquipmentRecordBase 定义 record_base_map 的基础数值类型.
 enum EquipmentRecordBase {
-  EquipmentRecordBase_Unknow = 0; // 未知基础数值类型, proto3 默认值
+  EquipmentRecordBase_Unspecified = 0; // 未知基础数值类型, proto3 默认值
   EquipmentRecordBase_AttackModifier = 1; // 攻击力修正
   EquipmentRecordBase_DefenceModifier = 2; // 防御力修正
   EquipmentRecordBase_QuickModifier = 3; // 敏捷修正
@@ -53,27 +53,30 @@ enum EquipmentRecordBase {
   EquipmentRecordBase_LuckModifier = 6; // 运气修正
   EquipmentRecordBase_CharmModifier = 7; // 魅力修正
   EquipmentRecordBase_AvoidModifier = 8; // 闪避修正
-  EquipmentRecordBase_PoisonResistanceModifier = 9; // 毒抗性修正
-  EquipmentRecordBase_ParalysisResistanceModifier = 10; // 麻痹抗性修正
-  EquipmentRecordBase_SleepResistanceModifier = 11; // 睡眠抗性修正
-  EquipmentRecordBase_StoneResistanceModifier = 12; // 石化抗性修正
-  EquipmentRecordBase_DrunkResistanceModifier = 13; // 酒醉抗性修正
-  EquipmentRecordBase_ConfusionResistanceModifier = 14; // 混乱抗性修正
   EquipmentRecordBase_CriticalModifier = 15; // 暴击修正
-  EquipmentRecordBase_DamagePercent = 10000; // 伤害百分比
-  EquipmentRecordBase_CritRate = 10001; // 暴击率
-  EquipmentRecordBase_CritDamageBonusRate = 10002; // 暴击伤害加成率
+  // todo menglc 需要增加 EquipmentRecordBase_CounterModifier（反击修正字段）
+
+  EquipmentRecordBase_PoisonResistanceModifier = 100; // 毒抗性修正
+  EquipmentRecordBase_ParalysisResistanceModifier = 101; // 麻痹抗性修正
+  EquipmentRecordBase_SleepResistanceModifier = 102; // 睡眠抗性修正
+  EquipmentRecordBase_StoneResistanceModifier = 103; // 石化抗性修正
+  EquipmentRecordBase_DrunkResistanceModifier = 104; // 酒醉抗性修正
+  EquipmentRecordBase_ConfusionResistanceModifier = 105; // 混乱抗性修正
+  
+  EquipmentRecordBase_DamageBonusPercent = 10000; // 伤害加成百分比 // todo menglc 把这个移到 15 下面
+  EquipmentRecordBase_CritRate = 10001; // 暴击率 // todo menglc 这个字段可以移除了.
+  EquipmentRecordBase_CritDamageBonusRate = 10002; // 暴击伤害加成百分比 // todo menglc 把这个移到 15 下面
 }
 
 // EquipmentRecordPrimary 定义 record_map 的一级扩展记录类型.
 enum EquipmentRecordPrimary {
-  EquipmentRecordPrimary_Unknow = 0; // 未知一级记录类型, proto3 默认值
+  EquipmentRecordPrimary_Unspecified = 0; // 未知一级记录类型, proto3 默认值
   EquipmentRecordPrimary_Slot = 1; // 装备槽位记录
 }
 
 // EquipmentRecordSecondary 定义装备一级记录下的二级扩展记录类型.
 enum EquipmentRecordSecondary {
-  EquipmentRecordSecondary_Unknow = 0; // 未知二级记录类型, proto3 默认值
+  EquipmentRecordSecondary_Unspecified = 0; // 未知二级记录类型, proto3 默认值
   EquipmentRecordSecondary_Slot_Data = 1; // 装备槽位数据记录
 }
 
