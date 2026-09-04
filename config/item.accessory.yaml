@@ -1,0 +1,16 @@
+# 首饰配置, 由 Godot make_armor 导出.
+# 仅包含已发布首饰, accessory_type 使用协议 AccessoryType.
+items:
+  accessory:
+    3630000:
+      name: "火难的戒指"
+      secretname: "火难的戒指"
+      effectstring: "魅力 +2                     会心一击率上升 +5"
+      atlas: "item/装备.首饰"
+      sprite: 6512
+      accessory_type: 11
+      level: 30
+      charm_min: 2
+      charm_max: 2
+      critical_min: 5
+      critical_max: 5
