@@ -8,7 +8,7 @@ import "msg.pet.proto";
 
 // GMItemAddCommand 表示给发起命令的角色自身增加道具.
 message GMItemAddCommand {
-  uint32 item_id = 1; // 道具资源 ID, 必须存在于 item.yaml
+  uint32 item_id = 1; // 道具资源 ID, 必须存在于道具配置中
   uint64 count = 2; // 增加数量, 必须大于 0 且增加后不得发生 uint64 溢出
 }
 
