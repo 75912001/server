@@ -56,8 +56,7 @@ message CharacterMailDeleteRes {
   uint64 mail_uuid = 2; // 已删除的邮件 UUID
 }
 
-//0x005006#gateway->client#新增角色系统邮件-通知
-message CharacterSystemMailNotify {
-  uint64 character_uuid = 1; // 收到新邮件的在线角色 UUID
-  MailRecord mail_record = 2; // Cache 持久化成功的新邮件完整记录
+// 新增角色系统邮件.
+message CharacterSystemMailChanged {
+  MailRecord mail_record = 1; // Cache持久化成功后的新邮件完整记录
 }
