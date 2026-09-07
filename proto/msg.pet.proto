@@ -8,7 +8,7 @@ import "msg.item.proto";
 // 消息范围 [0x002000, 0x002fff]
 
 enum PetAction {
-  PetAction_Unknow = 0;
+  PetAction_Unspecified = 0;
   PetAction_Attack = 1;
   PetAction_Faint = 2;
   PetAction_Hurt = 3;
@@ -21,7 +21,7 @@ enum PetAction {
 // PetRarity 表示宠物稀有度, 主要来自宠物资源配置 pet[].rarity.
 // 业务有效值为 Common 到 Mythic; Unknow 仅作为 proto3 默认值和非法/未初始化占位, Max 仅作为枚举边界占位.
 enum PetRarity {
-  PetRarity_Unknow = 0; // 未知稀有度, proto3 默认值; 正常业务配置和已创建宠物不应使用; 客户端显示色: 灰色 #9AA0A6
+  PetRarity_Unspecified = 0; // 未知稀有度, proto3 默认值; 正常业务配置和已创建宠物不应使用; 客户端显示色: 灰色 #9AA0A6
   PetRarity_Common = 1; // 普通等级, 基础宠物资源分层; 客户端显示色: 白色 #F2F2F2
   PetRarity_Rare = 2; // 稀有等级, 高于普通的宠物资源分层; 客户端显示色: 蓝色 #45A7FF
   PetRarity_Epic = 3; // 史诗等级, 高于稀有的宠物资源分层; 客户端显示色: 紫色 #B56CFF
@@ -33,7 +33,7 @@ enum PetRarity {
 // PetGrade 表示宠物品阶, 用于描述宠物养成或评级体系中的等级分层.
 // 业务有效值为 Common 到 Mythic; Unknow 仅作为 proto3 默认值和非法/未初始化占位, Max 仅作为枚举边界占位.
 enum PetGrade {
-  PetGrade_Unknow = 0; // 未知品阶, proto3 默认值; 正常业务配置和已创建宠物不应使用; 客户端显示色: 灰色 #9AA0A6
+  PetGrade_Unspecified = 0; // 未知品阶, proto3 默认值; 正常业务配置和已创建宠物不应使用; 客户端显示色: 灰色 #9AA0A6
   PetGrade_Common = 1; // 普通品阶, 基础宠物品阶分层; 客户端显示色: 白色 #F2F2F2
   PetGrade_Rare = 2; // 稀有品阶, 高于普通的宠物品阶分层; 客户端显示色: 蓝色 #45A7FF
   PetGrade_Epic = 3; // 史诗品阶, 高于稀有的宠物品阶分层; 客户端显示色: 紫色 #B56CFF
@@ -53,7 +53,7 @@ enum PetSkillLimit {
 }
 
 enum PetCarryStatus {
-  PetCarryStatus_Unknow = 0; // 未指定携带状态, 旧档案或非法默认值
+  PetCarryStatus_Unspecified = 0; // 未指定携带状态, 旧档案或非法默认值
   PetCarryStatus_Rest = 1; // 休息, 不可参与战斗; 仓库内宠物固定为该状态; 客户端状态色: 白色 #FFFFFF
   PetCarryStatus_Battle = 2; // 战斗, 角色战斗首发宠物; 单个角色最多一只; 客户端状态色: 红色 #FF4A4A
   PetCarryStatus_Wait = 3; // 等待, 战斗中可以替换上场; 客户端状态色: 蓝色 #45A7FF
