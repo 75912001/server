@@ -8,6 +8,7 @@ import "record.proto";
 import "equipment.proto";
 import "weapon.proto";
 import "msg.item.proto";
+import "msg.mail.proto";
 import "msg.map.proto";
 import "msg.pet.proto";
 import "msg.task.proto";
@@ -182,10 +183,27 @@ message CharacterOfflineRes {
   uint64 character_uuid = 1; // 已下线的角色 UUID
 }
 
-//0x001008#gateway->client#角色基础数据变化-通知
-message CharacterBaseChangedNotify {
+//0x001011#gateway->client#角色数据变化-通知
+message CharacterNotify {
+  // 角色任一域权威档案持久化成功后的统一变化入口, 替代原分散的域通知:
+  // 服务端一次操作可能连发多条同 CMD 通知(如战斗结算同时改基础/道具/宠物),
+  // 每条只携带一个 oneof 分支; 客户端按到达顺序逐条应用, 后序即权威.
+  // character_uuid 为变化所属角色 UUID, 所有分支共用.
+  uint64 character_uuid = 1; // 变化所属角色 UUID, 所有分支共用
+
+  oneof change {
+    CharacterBaseChanged base_changed = 10;              // 基础档案+完整有效属性快照
+    CharacterItemChanged item_changed = 11;              // 道具/货币数量增量, 0 表示耗尽
+    CharacterContainerChanged container_changed = 12;    // 完整背包容器全量替换
+    CharacterSystemMailChanged system_mail_changed = 13; // 新增系统邮件
+    CharacterPetChanged pet_changed = 14;                // 随身宠物变化(增/改/删)
+  }
+}
+
+// 角色基础档案变化: 基础数据或仅有效属性(换装/装备效果)变化后的权威快照.
+message CharacterBaseChanged {
   CharacterBaseRecord character_base_record = 1; // cache持久化成功后的角色基础权威快照
-  CharacterEffectiveAttribute effective_attribute = 2; // 基础数据变化后的完整有效属性快照
+  CharacterEffectiveAttribute effective_attribute = 2; // 变化后的完整有效属性快照
 }
 
 //0x001009#client->gateway#修改角色设置-请求
