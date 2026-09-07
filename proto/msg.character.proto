@@ -16,7 +16,7 @@ import "msg.task.proto";
 // 消息范围 [0x001000, 0x001fff]
 
 enum CharacterAction {
-  CharacterAction_Unknow = 0;
+  CharacterAction_Unspecified = 0;
   CharacterAction_Attack = 1;
   CharacterAction_Wave = 2;
   CharacterAction_Faint = 3;
@@ -114,17 +114,9 @@ message CharacterBaseRecord {
   string nick = 2; // 角色昵称
   uint64 asset_id = 3; // 角色资源 ID
   uint64 exp = 4; // 经验值
-  // todo menglc   ElementalPoints elemental = 2; // 面板-元素点数, 各项限制在0-10
-  uint32 earth = 5; // 角色地元素点数
-  uint32 water = 6; // 角色水元素点数
-  uint32 fire = 7; // 角色火元素点数
-  uint32 wind = 8; // 角色风元素点数
+  ElementalPoints elemental = 30; // 地水火风元素点数; 此前为平铺 earth/water/fire/wind(5-8), 收缩为嵌套后新用编号 30
   uint32 available_point = 9; // 角色可分配属性点
-  // todo menglc CharacterAttributePoints
-  uint32 vitality = 10; // 角色体力点数
-  uint32 strength = 11; // 角色腕力点数
-  uint32 toughness = 12; // 角色耐力点数
-  uint32 dexterity = 13; // 角色速度点数
+  CharacterAttributePoints attribute = 31; // 体力腕力耐力速度点数; 此前为平铺 vitality/strength/toughness/dexterity(10-13), 收缩为嵌套后新用编号 31
   int64 last_login_timestamp_ms = 14; // 角色最后登录时间戳, 单位毫秒
   int64 last_logout_timestamp_ms = 15; // 角色最后登出时间戳, 单位毫秒
   int64 create_timestamp_ms = 16; // 角色创建时间戳, 单位毫秒
@@ -161,7 +153,7 @@ message CharacterCreateRes
   CharacterRecord character_record = 1; // 新创建的完整角色档案
 }
 
-//0x004002#client->gateway#角色上线-请求
+//0x001002#client->gateway#角色上线-请求
 message CharacterOnlineReq {
   uint64 character_uuid = 1; // 角色 UUID, 必须属于当前账号且尚未上线
 }
@@ -212,20 +204,11 @@ message CharacterSettingSetReq {
 
   // 每次请求只提交一个设置动作, oneof 保证动作互斥.
   oneof action {
-    CharacterSettingTeamEnabled team_enabled = 2; // 是否允许组队
-    CharacterSettingDuelEnabled duel_enabled = 3; // 是否允许决斗
+    bool team_enabled = 2; // 是否允许组队
+    bool duel_enabled = 3; // 是否允许决斗
   }
 }
 
-// 角色设置-是否允许组队
-message CharacterSettingTeamEnabled {
-  bool enabled = 1; // 是否允许组队
-}
-
-// 角色设置-是否允许决斗
-message CharacterSettingDuelEnabled {
-  bool enabled = 1; // 是否允许决斗
-}
 
 //0x00100A#gateway->client#修改角色设置-回复
 message CharacterSettingSetRes {
@@ -233,8 +216,8 @@ message CharacterSettingSetRes {
 
   // 回复本次动作对应的设置项及其权威值, 与请求 action 一一对应.
   oneof action {
-    CharacterSettingTeamEnabled team_enabled = 2; // 是否允许组队
-    CharacterSettingDuelEnabled duel_enabled = 3; // 是否允许决斗
+    bool team_enabled = 2; // 是否允许组队
+    bool duel_enabled = 3; // 是否允许决斗
   }
 }
 
