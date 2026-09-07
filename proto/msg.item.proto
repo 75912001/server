@@ -38,12 +38,6 @@ message ItemUseRes {
   uint64 target_pet_uuid = 3; // 实际作用的宠物 UUID; 角色目标为0
 }
 
-//0x003002#gateway->client#角色道具变化-通知
-message CharacterItemChangedNotify {
-  uint64 character_uuid = 1; // 道具所属角色 UUID
-  map<uint32, uint64> item_count_map = 2; // 变化道具的最终数量, 0 表示已耗尽
-}
-
 //0x003003#client->gateway#将角色背包物品存入账号仓库-请求
 message ItemWarehouseDepositReq {
   uint64 character_uuid = 1; // 物品当前所属角色 UUID
@@ -98,4 +92,15 @@ message ShopPurchaseRes {
   ItemElement affected_item = 7; // 本次支付影响的道具及扣除后的最终持有数量
   uint64 used_uuid = 8; // 购买后账号已分配 UUID 游标
   repeated EquipmentRecord equipment_record_list = 10; // 新增到角色背包的装备实例
+}
+
+// 角色道具与货币数量增量: 普通道具落 item_bag, 货币落 asset_count_map, 0 表示耗尽.
+message CharacterItemChanged {
+  map<uint32, uint64> item_count_map = 1; // 变化项最终数量, 0 表示耗尽
+}
+
+// 角色背包容器全量变化: 装备实例增删或任务结算等结构性变化时整体替换.
+message CharacterContainerChanged {
+  ItemContainerRecord item_bag = 1; // 变化后的完整随身背包权威快照
+  uint64 used_uuid = 2; // 本次容器变化涉及新增装备实例后的账号UUID游标; 0 表示本次无新实例
 }
