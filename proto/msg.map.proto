@@ -46,7 +46,7 @@ message CharacterMapEventNotify {
     CharacterKey team_leave = 12; // 离开队伍并继续留在当前地图的成员身份
     CharacterKey team_disband = 13; // 解散队伍的队长身份
     CharacterMapGroup team_join = 15; // 加入队伍后的完整新队伍; 队长固定第一项, 新成员位于末尾
-    MapCharacterInfo character_update = 14; // 已有角色最新的完整显示快照
+    MapCharacterInfo character_update = 14; // 已有角色最新完整显示快照; 同地图所有观察者(含同队成员)都会收到
   }
 }
 
