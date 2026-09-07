@@ -97,9 +97,9 @@ message CharacterEffectiveAttribute {
   uint32 effective_charm = 106; // 面板-魅力, 范围0-100
   int32 effective_avoid = 107; // 面板-闪避
   int32 critical_modifier = 108; // 面板-暴击
-  // todo menglc 增加 面板-反击
-  int32 damage_bonus_percent = 109; // 面板-伤害加成百分比
-  int32 crit_damage_bonus_percent = 110; // 面板-暴击伤害加成百分比
+  int32 counter_modifier = 109; // 面板-反击
+  int32 damage_bonus_percent = 110; // 面板-伤害加成百分比
+  int32 crit_damage_bonus_percent = 111; // 面板-暴击伤害加成百分比
 
   int32 paralysis_resistance_modifier = 201; // 面板-麻痹抗性
   int32 sleep_resistance_modifier = 202; // 面板-睡眠抗性
