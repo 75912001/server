@@ -376,7 +376,7 @@ func (x *AccountHeartbeatReq) GetLastHeartbeatSession() string {
 	return ""
 }
 
-// 0x0000012#gateway->client#心跳-回复
+// 0x000012#gateway->client#心跳-回复
 type AccountHeartbeatRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -185,7 +185,7 @@ func (x *GMPetAddCommand) GetPetGrade() PetGrade {
 	if x != nil {
 		return x.PetGrade
 	}
-	return PetGrade_PetGrade_Unknow
+	return PetGrade_PetGrade_Unspecified
 }
 
 // GMPetAddResult 表示服务端已持久化的随身宠物增加结果.
@@ -249,7 +249,7 @@ func (x *GMPetAddResult) GetPetGrade() PetGrade {
 	if x != nil {
 		return x.PetGrade
 	}
-	return PetGrade_PetGrade_Unknow
+	return PetGrade_PetGrade_Unspecified
 }
 
 // GMSystemMailAddCommand 表示给发起命令的在线角色自身增加一封系统邮件.
