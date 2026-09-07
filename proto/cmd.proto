@@ -21,7 +21,7 @@ enum MsgID {
   CharacterOnlineRes_CMD = 4099; //0x001003#gateway->client#角色上线-回复
   CharacterOfflineReq_CMD = 4100; //0x001004#client->gateway#角色下线-请求
   CharacterOfflineRes_CMD = 4101; //0x001005#gateway->client#角色下线-回复
-  CharacterBaseChangedNotify_CMD = 4104; //0x001008#gateway->client#角色基础数据变化-通知
+  CharacterNotify_CMD = 4113; //0x001011#gateway->client#角色数据变化-通知
   CharacterSettingSetReq_CMD = 4105; //0x001009#client->gateway#修改角色设置-请求
   CharacterSettingSetRes_CMD = 4106; //0x00100A#gateway->client#修改角色设置-回复
   CharacterAttributeAddReq_CMD = 4107; //0x00100B#client->gateway#增加角色基础属性-请求
@@ -42,7 +42,6 @@ enum MsgID {
   GMCommandRes_CMD = 61441; //0x00f001#gateway->client#执行GM命令-回复
   ItemUseReq_CMD = 12288; //0x003000#client->gateway#使用角色道具-请求
   ItemUseRes_CMD = 12289; //0x003001#gateway->client#使用角色道具-回复
-  CharacterItemChangedNotify_CMD = 12290; //0x003002#gateway->client#角色道具变化-通知
   ItemWarehouseDepositReq_CMD = 12291; //0x003003#client->gateway#将角色背包物品存入账号仓库-请求
   ItemWarehouseDepositRes_CMD = 12292; //0x003004#gateway->client#将角色背包物品存入账号仓库-回复
   ItemWarehouseWithdrawReq_CMD = 12293; //0x003005#client->gateway#将账号仓库物品取入角色背包-请求
@@ -55,7 +54,6 @@ enum MsgID {
   CharacterMailReadRes_CMD = 20483; //0x005003#gateway->client#标记角色邮件已读-回复
   CharacterMailDeleteReq_CMD = 20484; //0x005004#client->gateway#删除角色邮件-请求
   CharacterMailDeleteRes_CMD = 20485; //0x005005#gateway->client#删除角色邮件-回复
-  CharacterSystemMailNotify_CMD = 20486; //0x005006#gateway->client#新增角色系统邮件-通知
   CharacterMapEnterReq_CMD = 4124; //0x00101C#client->gateway#进入地图-请求
   CharacterMapEnterRes_CMD = 4125; //0x00101D#gateway->client#进入地图-回复
   CharacterMapEventNotify_CMD = 4126; //0x00101E#gateway->client#地图角色事件-通知
@@ -63,7 +61,6 @@ enum MsgID {
   NpcInteractionRes_CMD = 24577; //0x006001#gateway->client#执行NPC功能-回复
   PetCarryStatusSetReq_CMD = 8192; //0x002000#client->gateway#修改随身宠物状态-请求
   PetCarryStatusSetRes_CMD = 8193; //0x002001#gateway->client#修改随身宠物状态-回复
-  CharacterPetChangedNotify_CMD = 8194; //0x002002#gateway->client#角色随身宠物变化-通知
   PetWarehouseDepositReq_CMD = 8195; //0x002003#client->gateway#将随身宠物存入仓库-请求
   PetWarehouseDepositRes_CMD = 8196; //0x002004#gateway->client#将随身宠物存入仓库-回复
   PetWarehouseWithdrawReq_CMD = 8197; //0x002005#client->gateway#将仓库宠物取出-请求
@@ -81,7 +78,6 @@ enum MsgID {
   CharacterTaskChangedNotify_CMD = 28678; //0x007006#gateway->client#角色任务记录变化-通知
   TaskBattleChallengeReq_CMD = 28679; //0x007007#client->gateway#挑战任务步骤-请求
   TaskBattleChallengeRes_CMD = 28680; //0x007008#gateway->client#挑战任务步骤-回复
-  CharacterTaskInventoryChangedNotify_CMD = 28681; //0x007009#gateway->client#任务库存变化-通知
   CharacterTeamOperationReq_CMD = 4121; //0x001019#client->gateway#角色队伍操作-请求
   CharacterTeamOperationRes_CMD = 4122; //0x00101A#gateway->client#角色队伍操作-回复
   CharacterTeamChangedNotify_CMD = 4123; //0x00101B#gateway->client#角色队伍变化-通知
