@@ -15,8 +15,7 @@ enum PetAction {
   PetAction_Defense = 4;
   PetAction_Stand = 5;
   PetAction_Walk = 6;
-  PetAction_AttackShort = 7;
-  PetAction_Max = 8;
+  PetAction_Max = 7; // 动作枚举边界, 不作为业务值; 删除 AttackShort 后有效值 0-6
 }
 
 // PetRarity 表示宠物稀有度, 主要来自宠物资源配置 pet[].rarity.
@@ -107,12 +106,6 @@ message PetCarryStatusSetRes {
   repeated PetCarryStatusChange change_list = 2; // 本次原子操作实际修改的状态列表, 包含被替换的战斗或骑乘宠物
 }
 
-//0x002002#gateway->client#角色随身宠物变化-通知
-message CharacterPetChangedNotify {
-  uint64 character_uuid = 1; // 宠物所属角色 UUID
-  repeated PetRecord pet_record_list = 2; // 每项为变化后的完整随身宠物记录
-}
-
 //0x002003#client->gateway#将随身宠物存入仓库-请求
 message PetWarehouseDepositReq {
   uint64 character_uuid = 1; // 宠物当前所属角色 UUID
@@ -167,4 +160,11 @@ message PetSkillSetRes {
   uint32 skill_id = 4; // 已写入的最终技能 ID; 0表示该槽已清空
   uint64 cost = 5; // 本次实际扣除的石币; 遗忘为0
   ItemElement affected_item = 6; // 石币的最终权威数量
+}
+
+// 角色随身宠物变化: pet_record_list 为新增/变化的完整随身宠物记录(按uuid合并),
+// removed_pet_uuid_list 为本次被移出随身列表的宠物 UUID(消耗/离队等), 客户端须删除.
+message CharacterPetChanged {
+  repeated PetRecord pet_record_list = 1; // 新增或变化的完整随身宠物记录
+  repeated uint64 removed_pet_uuid_list = 2; // 本次移除的随身宠物 UUID
 }
