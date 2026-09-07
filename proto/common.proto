@@ -9,12 +9,6 @@ message CharacterKey {
   uint64 character_uuid = 2; // 角色 UUID; 玩家单位为所属角色 UUID
 }
 
-enum LevelRange {
-  LevelRange_Unspecified = 0;
-  LevelRange_Min = 1;
-  LevelRange_Max = 140;
-}
-
 // CharacterRebirthNameColor 表示角色昵称按转生次数使用的客户端显示色.
 // 枚举值与转生次数一致; 业务有效值为 White 到 Purple, Max 仅作为枚举边界占位.
 enum CharacterRebirthNameColor {
@@ -29,6 +23,8 @@ enum CharacterRebirthNameColor {
 
 enum Constants {
   Constants_Unspecified = 0;
+  Constants_Level_Min = 1; // 角色和宠物等级下限
+  Constants_Level_Max = 140; // 角色和宠物等级上限
   Constants_Elemental_Max_Active_Type_Count = 2; // 最多允许同时分配的元素种类数量
   Constants_Elemental_Total_Point = 10; // 地水火风元素总点数
   Constants_Character_Name_Max_Length = 12; // 角色名称最大长度
