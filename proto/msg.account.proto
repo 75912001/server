@@ -55,7 +55,7 @@ message AccountHeartbeatReq {
   string last_heartbeat_session = 1;   // 上次 Gateway 下发的 heartbeatSession
 }
 
-//0x0000012#gateway->client#心跳-回复
+//0x000012#gateway->client#心跳-回复
 message AccountHeartbeatRes {
   int64 server_timestamp_ms  = 1;   // 服务器时间毫秒
   string next_heartbeat_session = 2;   // 客户端下次心跳必须使用的 heartbeatSession
