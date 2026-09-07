@@ -11,7 +11,7 @@ import "asset.proto";
 
 // CombatEnemyGroupEnemyCountRange 定义普通敌人组单次生成敌人数量的闭区间边界.
 enum CombatEnemyGroupEnemyCountRange {
-  CombatEnemyGroupEnemyCountRange_Unknow = 0; // 未配置或非法的敌人数量
+  CombatEnemyGroupEnemyCountRange_Unspecified = 0; // 未配置或非法的敌人数量
   CombatEnemyGroupEnemyCountRange_Min = 1; // 单次生成敌人的最小数量
   CombatEnemyGroupEnemyCountRange_Max = 10; // 单次生成敌人的最大数量, 同时受单阵营站位数量限制
 }
@@ -30,13 +30,13 @@ enum CombatCamp {
 
 // CombatCampPosition 定义单个阵营的站位编号范围和槽位总数.
 enum CombatCampPosition {
-  CombatCampPosition_Unknow = 0; // 站位编号起始值, 当前实现中 0 是合法站位
+  CombatCampPosition_Unspecified = 0; // 站位编号起始值, 当前实现中 0 是合法站位
   CombatCampPosition_Count = 10; // 单阵营站位总数, 合法站位编号为 0-9
 }
 
 // CombatHitOutcome 标识一次攻击是否实际命中目标; 暴击和防御由伤害详情中的独立字段表达.
 enum CombatHitOutcome {
-  CombatHitOutcome_Unknown = 0; // 未指定命中结果
+  CombatHitOutcome_Unspecified = 0; // 未指定命中结果
   CombatHitOutcome_Hit = 1; // 已命中并完成本次伤害结算
   CombatHitOutcome_Miss = 2; // 命中判定失败
   CombatHitOutcome_Dodge = 3; // 目标主动闪避
@@ -44,7 +44,7 @@ enum CombatHitOutcome {
 
 // CombatKnockbackType 对应 8.5 的两类 Ultimate 击飞来源.
 enum CombatKnockbackType {
-  CombatKnockbackType_Unknown = 0; // 未发生击飞
+  CombatKnockbackType_Unspecified = 0; // 未发生击飞
   CombatKnockbackType_AccumulatedOverkill = 1; // 累计过量伤害达到 maxHP*1.2+20
   CombatKnockbackType_SingleHitOverkill = 2; // 单次伤害达到 maxHP*1.2+20
 }
@@ -92,7 +92,7 @@ message CombatUnit {
 
 // CombatAssetType 标识战斗期间可发生增减的单位运行期数值.
 enum CombatAssetType {
-  CombatAssetType_Unknown = 0; // 未指定或无法识别的数值类型
+  CombatAssetType_Unspecified = 0; // 未指定或无法识别的数值类型
   CombatAssetType_HP = 1; // 生命值
   CombatAssetType_MP = 2; // 魔法值
   CombatAssetType_Rage = 3; // 怒气值
@@ -100,7 +100,7 @@ enum CombatAssetType {
 
 // CombatAttributeType 标识持续修正作用的战斗属性.
 enum CombatAttributeType {
-  CombatAttributeType_Unknown = 0; // 未指定或无法识别的战斗属性
+  CombatAttributeType_Unspecified = 0; // 未指定或无法识别的战斗属性
   CombatAttributeType_Attack = 1; // 攻击力
   CombatAttributeType_Defense = 2; // 防御力
   CombatAttributeType_Agility = 3; // 敏捷
@@ -115,7 +115,7 @@ message CombatAssetDelta {
 
 // CombatStatusDeltaType 标识状态相对上一份客户端状态的变化方式.
 enum CombatStatusDeltaType {
-  CombatStatusDeltaType_Unknown = 0; // 未指定或无法识别的状态变化
+  CombatStatusDeltaType_Unspecified = 0; // 未指定或无法识别的状态变化
   CombatStatusDeltaType_Add = 1; // 新增状态
   CombatStatusDeltaType_Remove = 2; // 移除状态
   CombatStatusDeltaType_Update = 3; // 更新状态的剩余时长
@@ -123,7 +123,7 @@ enum CombatStatusDeltaType {
 
 // CombatStatusType 标识客户端需要表现和维护的战斗状态.
 enum CombatStatusType {
-  CombatStatusType_Unknown = 0; // 未指定或无法识别的状态
+  CombatStatusType_Unspecified = 0; // 未指定或无法识别的状态
   CombatStatusType_Poison = 1; // 毒
   CombatStatusType_Paralysis = 2; // 麻痹
   CombatStatusType_Sleep = 3; // 睡眠
@@ -141,7 +141,7 @@ enum CombatStatusType {
 
 // CombatDurationUnit 标识状态或场地效果剩余时长的递减单位.
 enum CombatDurationUnit {
-  CombatDurationUnit_Unknown = 0; // 未指定时长单位
+  CombatDurationUnit_Unspecified = 0; // 未指定时长单位
   CombatDurationUnit_Action = 1; // 按相关单位行动次数结算, 具体递减时点由状态规则决定
   CombatDurationUnit_Round = 2; // 每个战斗回合后递减
   CombatDurationUnit_Hit = 3; // 每次触发或承受命中后递减
@@ -249,7 +249,7 @@ message CombatUnitStateDelta {
 
 // CombatReactionType 标识伤害链中由技能或状态触发的特殊反应.
 enum CombatReactionType {
-  CombatReactionType_Unknown = 0; // 未指定反应
+  CombatReactionType_Unspecified = 0; // 未指定反应
   CombatReactionType_Vanish = 1; // 伤害无效化
   CombatReactionType_Absorb = 2; // 伤害转化为治疗
   CombatReactionType_Reflect = 3; // 反射伤害
@@ -260,14 +260,14 @@ enum CombatReactionType {
 
 // CombatReactionPhase 标识特殊反应是被施加还是在伤害链中实际触发.
 enum CombatReactionPhase {
-  CombatReactionPhase_Unknown = 0; // 未指定阶段
+  CombatReactionPhase_Unspecified = 0; // 未指定阶段
   CombatReactionPhase_Armed = 1; // 已施加并等待后续攻击触发
   CombatReactionPhase_Triggered = 2; // 本次伤害链已经触发
 }
 
 // CombatUnitLeaveReason 标识单位离开当前战场的原因.
 enum CombatUnitLeaveReason {
-  CombatUnitLeaveReason_Unknown = 0; // 未指定离场原因
+  CombatUnitLeaveReason_Unspecified = 0; // 未指定离场原因
   CombatUnitLeaveReason_Escape = 1; // 逃跑离场
   CombatUnitLeaveReason_Switch = 2; // 换宠离场
   CombatUnitLeaveReason_Captured = 3; // 被捕获离场
@@ -278,7 +278,7 @@ enum CombatUnitLeaveReason {
 
 // CombatCaptureResult 标识捕获动作的结算结果.
 enum CombatCaptureResult {
-  CombatCaptureResult_Unknown = 0; // 未指定捕获结果
+  CombatCaptureResult_Unspecified = 0; // 未指定捕获结果
   CombatCaptureResult_Success = 1; // 捕获成功
   CombatCaptureResult_Failed = 2; // 捕获失败
 }
@@ -322,7 +322,7 @@ message CombatDodgeBoostDetail {
 
 // CombatTransformationType 标识单位在战斗中的具体变身形态.
 enum CombatTransformationType {
-  CombatTransformationType_Unknown = 0; // 未指定或无法识别的变身
+  CombatTransformationType_Unspecified = 0; // 未指定或无法识别的变身
   CombatTransformationType_Fox = 1; // 媚惑术产生的狐狸形态
   CombatTransformationType_Wolf = 2; // Vary产生的狼形态
 }
@@ -417,7 +417,7 @@ message CombatEffect {
 
 // CombatActionCause 标识动作步骤由何种战斗机制产生.
 enum CombatActionCause {
-  CombatActionCause_Unknown = 0; // 未指定或无法识别的动作来源
+  CombatActionCause_Unspecified = 0; // 未指定或无法识别的动作来源
   CombatActionCause_Active = 1; // 玩家、宠物或 AI 主动选择的动作
   CombatActionCause_Counter = 2; // 由前序伤害触发的反击
   CombatActionCause_Status = 3; // 由毒等状态触发的结算动作
@@ -442,7 +442,7 @@ message CombatEvent {
 
 // CombatBattleResult 标识战斗最终胜负.
 enum CombatBattleResult {
-  CombatBattleResult_Unknown = 0; // 默认值; 正式结算中非法
+  CombatBattleResult_Unspecified = 0; // 默认值; 正式结算中非法
   CombatBattleResult_InitiatorWin = 1; // 发起方获胜
   CombatBattleResult_DefenderWin = 2; // 防守方获胜
 }
@@ -496,7 +496,7 @@ message CombatFlowCompleteReq {
 }
 
 // CombatFlowCompleteRes 确认服务端已接受客户端战斗流程完成状态并执行后续处理.
-//0x1000010#gateway->client#战斗流程完成-回复
+//0x10000A#gateway->client#战斗流程完成-回复
 message CombatFlowCompleteRes {
   uint64 character_uuid = 1; // 服务端已确认流程完成的玩家角色 UUID
 }
