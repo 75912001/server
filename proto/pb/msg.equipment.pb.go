@@ -74,7 +74,7 @@ func (x *CharacterEquipmentReplaceReq) GetEquipmentType() EquipmentType {
 	if x != nil {
 		return x.EquipmentType
 	}
-	return EquipmentType_EquipmentType_Unknow
+	return EquipmentType_EquipmentType_Unspecified
 }
 
 func (x *CharacterEquipmentReplaceReq) GetEquipmentUuid() uint64 {
@@ -140,7 +140,7 @@ func (x *CharacterEquipmentReplaceRes) GetEquipmentType() EquipmentType {
 	if x != nil {
 		return x.EquipmentType
 	}
-	return EquipmentType_EquipmentType_Unknow
+	return EquipmentType_EquipmentType_Unspecified
 }
 
 func (x *CharacterEquipmentReplaceRes) GetItemBag() *ItemContainerRecord {

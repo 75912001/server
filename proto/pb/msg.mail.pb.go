@@ -492,18 +492,17 @@ func (x *CharacterMailDeleteRes) GetMailUuid() uint64 {
 	return 0
 }
 
-// 0x005006#gateway->client#新增角色系统邮件-通知
-type CharacterSystemMailNotify struct {
+// 新增角色系统邮件.
+type CharacterSystemMailChanged struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CharacterUuid uint64      `protobuf:"varint,1,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"` // 收到新邮件的在线角色 UUID
-	MailRecord    *MailRecord `protobuf:"bytes,2,opt,name=mail_record,json=mailRecord,proto3" json:"mail_record,omitempty"`           // Cache 持久化成功的新邮件完整记录
+	MailRecord *MailRecord `protobuf:"bytes,1,opt,name=mail_record,json=mailRecord,proto3" json:"mail_record,omitempty"` // Cache持久化成功后的新邮件完整记录
 }
 
-func (x *CharacterSystemMailNotify) Reset() {
-	*x = CharacterSystemMailNotify{}
+func (x *CharacterSystemMailChanged) Reset() {
+	*x = CharacterSystemMailChanged{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_msg_mail_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -511,13 +510,13 @@ func (x *CharacterSystemMailNotify) Reset() {
 	}
 }
 
-func (x *CharacterSystemMailNotify) String() string {
+func (x *CharacterSystemMailChanged) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CharacterSystemMailNotify) ProtoMessage() {}
+func (*CharacterSystemMailChanged) ProtoMessage() {}
 
-func (x *CharacterSystemMailNotify) ProtoReflect() protoreflect.Message {
+func (x *CharacterSystemMailChanged) ProtoReflect() protoreflect.Message {
 	mi := &file_msg_mail_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -529,19 +528,12 @@ func (x *CharacterSystemMailNotify) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CharacterSystemMailNotify.ProtoReflect.Descriptor instead.
-func (*CharacterSystemMailNotify) Descriptor() ([]byte, []int) {
+// Deprecated: Use CharacterSystemMailChanged.ProtoReflect.Descriptor instead.
+func (*CharacterSystemMailChanged) Descriptor() ([]byte, []int) {
 	return file_msg_mail_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *CharacterSystemMailNotify) GetCharacterUuid() uint64 {
-	if x != nil {
-		return x.CharacterUuid
-	}
-	return 0
-}
-
-func (x *CharacterSystemMailNotify) GetMailRecord() *MailRecord {
+func (x *CharacterSystemMailChanged) GetMailRecord() *MailRecord {
 	if x != nil {
 		return x.MailRecord
 	}
@@ -614,16 +606,14 @@ var file_msg_mail_proto_rawDesc = []byte{
 	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0d, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74,
 	0x65, 0x72, 0x55, 0x75, 0x69, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x6d, 0x61, 0x69, 0x6c, 0x5f, 0x75,
 	0x75, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x08, 0x6d, 0x61, 0x69, 0x6c, 0x55,
-	0x75, 0x69, 0x64, 0x22, 0x78, 0x0a, 0x19, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72,
-	0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x4d, 0x61, 0x69, 0x6c, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79,
-	0x12, 0x25, 0x0a, 0x0e, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x75, 0x75,
-	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0d, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63,
-	0x74, 0x65, 0x72, 0x55, 0x75, 0x69, 0x64, 0x12, 0x34, 0x0a, 0x0b, 0x6d, 0x61, 0x69, 0x6c, 0x5f,
-	0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x61,
-	0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x2e, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x63, 0x6f, 0x72,
-	0x64, 0x52, 0x0a, 0x6d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x42, 0x14, 0x5a,
-	0x12, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62,
-	0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x75, 0x69, 0x64, 0x22, 0x52, 0x0a, 0x1a, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72,
+	0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x4d, 0x61, 0x69, 0x6c, 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65,
+	0x64, 0x12, 0x34, 0x0a, 0x0b, 0x6d, 0x61, 0x69, 0x6c, 0x5f, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74,
+	0x2e, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x0a, 0x6d, 0x61, 0x69,
+	0x6c, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72, 0x76, 0x65,
+	0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -640,21 +630,21 @@ func file_msg_mail_proto_rawDescGZIP() []byte {
 
 var file_msg_mail_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_msg_mail_proto_goTypes = []any{
-	(*MailRecord)(nil),                // 0: account.MailRecord
-	(*MailboxRecord)(nil),             // 1: account.MailboxRecord
-	(*CharacterMailboxGetReq)(nil),    // 2: account.CharacterMailboxGetReq
-	(*CharacterMailboxGetRes)(nil),    // 3: account.CharacterMailboxGetRes
-	(*CharacterMailReadReq)(nil),      // 4: account.CharacterMailReadReq
-	(*CharacterMailReadRes)(nil),      // 5: account.CharacterMailReadRes
-	(*CharacterMailDeleteReq)(nil),    // 6: account.CharacterMailDeleteReq
-	(*CharacterMailDeleteRes)(nil),    // 7: account.CharacterMailDeleteRes
-	(*CharacterSystemMailNotify)(nil), // 8: account.CharacterSystemMailNotify
-	nil,                               // 9: account.MailboxRecord.MailRecordMapEntry
+	(*MailRecord)(nil),                 // 0: account.MailRecord
+	(*MailboxRecord)(nil),              // 1: account.MailboxRecord
+	(*CharacterMailboxGetReq)(nil),     // 2: account.CharacterMailboxGetReq
+	(*CharacterMailboxGetRes)(nil),     // 3: account.CharacterMailboxGetRes
+	(*CharacterMailReadReq)(nil),       // 4: account.CharacterMailReadReq
+	(*CharacterMailReadRes)(nil),       // 5: account.CharacterMailReadRes
+	(*CharacterMailDeleteReq)(nil),     // 6: account.CharacterMailDeleteReq
+	(*CharacterMailDeleteRes)(nil),     // 7: account.CharacterMailDeleteRes
+	(*CharacterSystemMailChanged)(nil), // 8: account.CharacterSystemMailChanged
+	nil,                                // 9: account.MailboxRecord.MailRecordMapEntry
 }
 var file_msg_mail_proto_depIdxs = []int32{
 	9, // 0: account.MailboxRecord.mail_record_map:type_name -> account.MailboxRecord.MailRecordMapEntry
 	1, // 1: account.CharacterMailboxGetRes.mailbox_record:type_name -> account.MailboxRecord
-	0, // 2: account.CharacterSystemMailNotify.mail_record:type_name -> account.MailRecord
+	0, // 2: account.CharacterSystemMailChanged.mail_record:type_name -> account.MailRecord
 	0, // 3: account.MailboxRecord.MailRecordMapEntry.value:type_name -> account.MailRecord
 	4, // [4:4] is the sub-list for method output_type
 	4, // [4:4] is the sub-list for method input_type
@@ -766,7 +756,7 @@ func file_msg_mail_proto_init() {
 			}
 		}
 		file_msg_mail_proto_msgTypes[8].Exporter = func(v any, i int) any {
-			switch v := v.(*CharacterSystemMailNotify); i {
+			switch v := v.(*CharacterSystemMailChanged); i {
 			case 0:
 				return &v.state
 			case 1:

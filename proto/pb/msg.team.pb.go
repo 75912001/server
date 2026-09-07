@@ -578,54 +578,6 @@ func (*CharacterTeamOperationRes_Disband) isCharacterTeamOperationRes_Operation(
 
 func (*CharacterTeamOperationRes_Kick) isCharacterTeamOperationRes_Operation() {}
 
-// 0x00101B#gateway->client#角色队伍变化-通知
-type CharacterTeamChangedNotify struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	TargetCharacterUuid uint64 `protobuf:"varint,1,opt,name=target_character_uuid,json=targetCharacterUuid,proto3" json:"target_character_uuid,omitempty"` // 本通知对应的本地角色 UUID
-}
-
-func (x *CharacterTeamChangedNotify) Reset() {
-	*x = CharacterTeamChangedNotify{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_team_proto_msgTypes[10]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *CharacterTeamChangedNotify) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CharacterTeamChangedNotify) ProtoMessage() {}
-
-func (x *CharacterTeamChangedNotify) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_team_proto_msgTypes[10]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CharacterTeamChangedNotify.ProtoReflect.Descriptor instead.
-func (*CharacterTeamChangedNotify) Descriptor() ([]byte, []int) {
-	return file_msg_team_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *CharacterTeamChangedNotify) GetTargetCharacterUuid() uint64 {
-	if x != nil {
-		return x.TargetCharacterUuid
-	}
-	return 0
-}
-
 var File_msg_team_proto protoreflect.FileDescriptor
 
 var file_msg_team_proto_rawDesc = []byte{
@@ -688,14 +640,8 @@ var file_msg_team_proto_rawDesc = []byte{
 	0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x2e, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65,
 	0x72, 0x54, 0x65, 0x61, 0x6d, 0x4b, 0x69, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x48, 0x00, 0x52, 0x04,
 	0x6b, 0x69, 0x63, 0x6b, 0x42, 0x0b, 0x0a, 0x09, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x22, 0x50, 0x0a, 0x1a, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x54, 0x65,
-	0x61, 0x6d, 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x64, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x12,
-	0x32, 0x0a, 0x15, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x5f, 0x63, 0x68, 0x61, 0x72, 0x61, 0x63,
-	0x74, 0x65, 0x72, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x13,
-	0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x55,
-	0x75, 0x69, 0x64, 0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x6e, 0x42, 0x14, 0x5a, 0x12, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2f, 0x70, 0x62, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -710,24 +656,23 @@ func file_msg_team_proto_rawDescGZIP() []byte {
 	return file_msg_team_proto_rawDescData
 }
 
-var file_msg_team_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_msg_team_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_msg_team_proto_goTypes = []any{
-	(*CharacterTeamJoinReq)(nil),       // 0: account.CharacterTeamJoinReq
-	(*CharacterTeamJoinRes)(nil),       // 1: account.CharacterTeamJoinRes
-	(*CharacterTeamLeaveReq)(nil),      // 2: account.CharacterTeamLeaveReq
-	(*CharacterTeamLeaveRes)(nil),      // 3: account.CharacterTeamLeaveRes
-	(*CharacterTeamDisbandReq)(nil),    // 4: account.CharacterTeamDisbandReq
-	(*CharacterTeamDisbandRes)(nil),    // 5: account.CharacterTeamDisbandRes
-	(*CharacterTeamKickReq)(nil),       // 6: account.CharacterTeamKickReq
-	(*CharacterTeamKickRes)(nil),       // 7: account.CharacterTeamKickRes
-	(*CharacterTeamOperationReq)(nil),  // 8: account.CharacterTeamOperationReq
-	(*CharacterTeamOperationRes)(nil),  // 9: account.CharacterTeamOperationRes
-	(*CharacterTeamChangedNotify)(nil), // 10: account.CharacterTeamChangedNotify
-	(*CharacterKey)(nil),               // 11: account.CharacterKey
+	(*CharacterTeamJoinReq)(nil),      // 0: account.CharacterTeamJoinReq
+	(*CharacterTeamJoinRes)(nil),      // 1: account.CharacterTeamJoinRes
+	(*CharacterTeamLeaveReq)(nil),     // 2: account.CharacterTeamLeaveReq
+	(*CharacterTeamLeaveRes)(nil),     // 3: account.CharacterTeamLeaveRes
+	(*CharacterTeamDisbandReq)(nil),   // 4: account.CharacterTeamDisbandReq
+	(*CharacterTeamDisbandRes)(nil),   // 5: account.CharacterTeamDisbandRes
+	(*CharacterTeamKickReq)(nil),      // 6: account.CharacterTeamKickReq
+	(*CharacterTeamKickRes)(nil),      // 7: account.CharacterTeamKickRes
+	(*CharacterTeamOperationReq)(nil), // 8: account.CharacterTeamOperationReq
+	(*CharacterTeamOperationRes)(nil), // 9: account.CharacterTeamOperationRes
+	(*CharacterKey)(nil),              // 10: account.CharacterKey
 }
 var file_msg_team_proto_depIdxs = []int32{
-	11, // 0: account.CharacterTeamJoinReq.target:type_name -> account.CharacterKey
-	11, // 1: account.CharacterTeamKickReq.target:type_name -> account.CharacterKey
+	10, // 0: account.CharacterTeamJoinReq.target:type_name -> account.CharacterKey
+	10, // 1: account.CharacterTeamKickReq.target:type_name -> account.CharacterKey
 	0,  // 2: account.CharacterTeamOperationReq.join:type_name -> account.CharacterTeamJoinReq
 	2,  // 3: account.CharacterTeamOperationReq.leave:type_name -> account.CharacterTeamLeaveReq
 	4,  // 4: account.CharacterTeamOperationReq.disband:type_name -> account.CharacterTeamDisbandReq
@@ -870,18 +815,6 @@ func file_msg_team_proto_init() {
 				return nil
 			}
 		}
-		file_msg_team_proto_msgTypes[10].Exporter = func(v any, i int) any {
-			switch v := v.(*CharacterTeamChangedNotify); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
 	}
 	file_msg_team_proto_msgTypes[8].OneofWrappers = []any{
 		(*CharacterTeamOperationReq_Join)(nil),
@@ -901,7 +834,7 @@ func file_msg_team_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_msg_team_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -2106,7 +2106,7 @@ func (x *CombatRoundActionReq) GetArgEquipmentType() EquipmentType {
 	if x != nil {
 		return x.ArgEquipmentType
 	}
-	return EquipmentType_EquipmentType_Unknow
+	return EquipmentType_EquipmentType_Unspecified
 }
 
 func (x *CombatRoundActionReq) GetArgEquipmentUuid() uint64 {
@@ -2897,7 +2897,7 @@ func (x *CombatFieldAttributeDetail) GetElement() AssetElemental {
 	if x != nil {
 		return x.Element
 	}
-	return AssetElemental_AssetElemental_Unknow
+	return AssetElemental_AssetElemental_Unspecified
 }
 
 func (x *CombatFieldAttributeDetail) GetPower() uint32 {
@@ -2966,7 +2966,7 @@ func (x *CombatAttackElementDetail) GetElement() AssetElemental {
 	if x != nil {
 		return x.Element
 	}
-	return AssetElemental_AssetElemental_Unknow
+	return AssetElemental_AssetElemental_Unspecified
 }
 
 func (x *CombatAttackElementDetail) GetPower() uint32 {

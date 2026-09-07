@@ -26,7 +26,7 @@ type GMItemAddCommand struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ItemId uint32 `protobuf:"varint,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"` // 道具资源 ID, 必须存在于 item.yaml
+	ItemId uint32 `protobuf:"varint,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"` // 道具资源 ID, 必须存在于道具配置中
 	Count  uint64 `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`                 // 增加数量, 必须大于 0 且增加后不得发生 uint64 溢出
 }
 
