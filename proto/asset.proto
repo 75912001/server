@@ -35,6 +35,24 @@ enum AssetID {
     AssetIDRange_Item_Currency_End = 3499999;
     // 道具-装备
     AssetIDRange_Item_Equipment_Start = 3500000;
+      // 道具-装备-头盔
+      AssetIDRange_Item_Equipment_Helmet_Start = 3500000;
+      AssetIDRange_Item_Equipment_Helmet_End = 3509999;
+      // 道具-装备-胸甲
+      AssetIDRange_Item_Equipment_Chest_Start = 3510000;
+      AssetIDRange_Item_Equipment_Chest_End = 3519999;
+      // 道具-装备-盾牌
+      AssetIDRange_Item_Equipment_Shield_Start = 3520000;
+      AssetIDRange_Item_Equipment_Shield_End = 3529999;
+      // 道具-装备-手套
+      AssetIDRange_Item_Equipment_Gloves_Start = 3530000;
+      AssetIDRange_Item_Equipment_Gloves_End = 3539999;
+      // 道具-装备-腰带
+      AssetIDRange_Item_Equipment_Belt_Start = 3540000;
+      AssetIDRange_Item_Equipment_Belt_End = 3549999;
+      // 道具-装备-靴子
+      AssetIDRange_Item_Equipment_Boots_Start = 3550000;
+      AssetIDRange_Item_Equipment_Boots_End = 3559999;
       // 道具-装备-首饰
       AssetIDRange_Item_Equipment_Accessory_Start = 3600000; // 首饰-开始
         // 道具-装备-首饰-耳环
