@@ -149,7 +149,7 @@ message PetSkillSetReq {
   uint64 character_uuid = 1; // 宠物所属角色 UUID, 必须属于当前账号且在线
   uint64 pet_uuid = 2; // 需要修改技能槽的随身宠物 UUID
   uint32 slot_index = 3; // 技能槽下标, 合法范围为0-6
-  uint32 skill_id = 4; // 目标技能 ID; 0表示免费遗忘, 非0表示按skill.yaml.cost学习或替换
+  uint32 skill_id = 4; // 技能商品 ID, 直接对应技能 ID; 0表示免费遗忘
 }
 
 //0x00200A#gateway->client#学习替换或遗忘随身宠物技能-回复
@@ -158,8 +158,7 @@ message PetSkillSetRes {
   uint64 pet_uuid = 2; // 已修改技能槽的随身宠物 UUID
   uint32 slot_index = 3; // 已修改的技能槽下标
   uint32 skill_id = 4; // 已写入的最终技能 ID; 0表示该槽已清空
-  uint64 cost = 5; // 本次实际扣除的石币; 遗忘为0
-  ItemElement affected_item = 6; // 石币的最终权威数量
+  repeated ItemCostResult cost_result_list = 5; // 各资源的实际消耗和最终余额
 }
 
 // 角色随身宠物变化: pet_record_list 为新增/变化的完整随身宠物记录(按uuid合并),
