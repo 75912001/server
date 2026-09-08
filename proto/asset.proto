@@ -27,11 +27,18 @@ enum AssetID {
 
   // 道具
   AssetIDRange_Item_Start = 3000000; // 道具
+    // 道具-合成素材
+    AssetIDRange_Item_Material_Start = 3100000;
+      // 基础素材ID采用310GGLL: GG为素材系, LL为等级或系内序号.
+      // 01石, 02木, 03骨, 04牙, 05皮, 06爪, 07贝壳, 08壳, 09线, 10花, 11黏土, 12鳞, 13叶, 14水晶.
+      AssetIDRange_Item_Material_Basic_Start = 3100000;
+      AssetIDRange_Item_Material_Basic_End = 3109999;
+    AssetIDRange_Item_Material_End = 3199999;
     // 道具-货币
-    AssetIDRange_Item_Currency_Start = 3000000; // 货币
-        AssetID_Currency_Stone = 3490000; // 石币
-        AssetID_Currency_Silver = 3490001; // 银币
-        AssetID_Currency_Gold = 3490002; // 金币
+    AssetIDRange_Item_Currency_Start = 3490000; // 货币
+      AssetID_Currency_Stone = 3490000; // 石币
+      AssetID_Currency_Silver = 3490001; // 银币
+      AssetID_Currency_Gold = 3490002; // 金币
     AssetIDRange_Item_Currency_End = 3499999;
     // 道具-装备
     AssetIDRange_Item_Equipment_Start = 3500000;
