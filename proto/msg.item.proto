@@ -12,6 +12,13 @@ message ItemElement {
   uint64 count = 2; // 道具数量
 }
 
+// ItemCostResult 表示交易中一种资源的实际消耗及扣除后的权威余额.
+message ItemCostResult {
+  uint32 item_id = 1; // 消耗资源 ID
+  uint64 consumed_count = 2; // 本次实际消耗数量
+  uint64 remaining_count = 3; // 扣除后的权威持有数量
+}
+
 // ItemContainerRecord 保存不关心位置的道具和装备集合.
 message ItemContainerRecord {
   map<uint32, uint64> item_count_map = 1; // 可堆叠道具总数, key 为道具资源 ID, value 为持有数量
@@ -77,21 +84,19 @@ message ItemWarehouseWithdrawRes {
 //0x003007#client->gateway#购买商店商品-请求
 message ShopPurchaseReq {
   uint64 character_uuid = 1; // 执行购买并接收商品的角色 UUID
-  uint32 store_item_id = 2; // 商店商品唯一 ID(store.yaml 商品 id, 服务端据此查商品与价格)
+  uint32 item_id = 2; // 商品道具 ID, 直接对应 store.yaml 商品 id
   uint32 quantity = 3; // 购买份数, 范围为 1-30
 }
 
 //0x003008#gateway->client#购买商店商品-回复
 message ShopPurchaseRes {
   uint64 character_uuid = 1; // 执行购买并接收商品的角色 UUID
-  uint32 store_item_id = 2; // 已购买的商店商品唯一 ID
-  uint32 item_id = 3; // 实际交付的道具资源 ID(商店商品的 item_id)
-  uint32 item_count = 4; // 每份交付数量; 装备实例总数 = item_count × quantity
-  uint32 quantity = 5; // 实际购买份数
-  uint64 total_cost = 6; // 本次购买总价
-  ItemElement affected_item = 7; // 本次支付影响的道具及扣除后的最终持有数量
-  uint64 used_uuid = 8; // 购买后账号已分配 UUID 游标
-  repeated EquipmentRecord equipment_record_list = 10; // 新增到角色背包的装备实例
+  uint32 item_id = 2; // 实际购买的道具 ID
+  uint32 item_count = 3; // 每份交付数量; 装备实例总数 = item_count × quantity
+  uint32 quantity = 4; // 实际购买份数
+  uint64 used_uuid = 5; // 购买后账号已分配 UUID 游标
+  repeated ItemCostResult cost_result_list = 6; // 各资源的实际消耗和最终余额
+  repeated EquipmentRecord equipment_record_list = 7; // 新增到角色背包的装备实例
 }
 
 // 角色道具与货币数量增量: 普通道具落 item_bag, 货币落 asset_count_map, 0 表示耗尽.
