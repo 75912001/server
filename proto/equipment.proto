@@ -38,7 +38,7 @@ enum AccessoryType {
 message EquipmentRecord {
   uint64 uuid = 1; // 装备 UUID, 在所属 AccountRecord.aid 作用域内唯一
   uint32 asset_id = 2; // 装备资产 ID, 对应装备配置 ID
-  map<int32, int64> record_base_map = 10; // 装备基础数值表, key 使用 EquipmentRecordBase; 15项随机属性即使固化为0也必须完整保存
+  map<int32, int64> record_base_map = 10; // 装备基础数值表, key 使用 EquipmentRecordBase; 仅保存非0值, 缺失的已知key按0处理
   map<int32, RecordPrimary> record_map = 1000; // 装备扩展记录表, key 使用 EquipmentRecordPrimary
 }
 
@@ -57,6 +57,8 @@ enum EquipmentRecordBase {
   EquipmentRecordBase_CounterModifier = 16; // 反击修正
   EquipmentRecordBase_DamageBonusPercent = 17; // 伤害加成百分比
   EquipmentRecordBase_CritDamageBonusPercent = 18; // 暴击伤害加成百分比
+  EquipmentRecordBase_AttachedElement = 19; // 附带元素, 值使用 AssetElemental
+  EquipmentRecordBase_AttachedElementValue = 20; // 附带元素数值
 
   EquipmentRecordBase_PoisonResistanceModifier = 100; // 毒抗性修正
   EquipmentRecordBase_ParalysisResistanceModifier = 101; // 麻痹抗性修正
