@@ -25,7 +25,7 @@ type PetEntry struct {
 	CreationMode PetCreationMode `yaml:"creationMode,omitempty"`
 	// Rarity 来自 pet.<family>[].rarity, 使用协议 PetRarity 的整数值, 当前范围为普通到神话.
 	Rarity *uint32 `yaml:"rarity"`
-	// Elemental 来自 pet.<family>[].elemental, key 转为协议元素类型, 值范围[0,10], 总和必须为10.
+	// Elemental 来自pet.<family>[].elemental, key转为协议元素类型, 值范围[0,100], 总和必须为100.
 	Elemental PetElementalEntry `yaml:"elemental"`
 	// Attribute 来自 pet.<family>[].attribute, 保存宠物抗性和战斗附加属性, 字段必须为非负值.
 	Attribute *PetAttributeEntry `yaml:"attribute"`
@@ -146,7 +146,7 @@ func validatePetSignedRawRange(pet *PetEntry) error {
 	}
 
 	rankMin, rankMax := PetRankGrowthRange(pet.Growth.Rank)
-	upgradeCount := int64(pb.LevelRange_LevelRange_Max - pb.LevelRange_LevelRange_Min)
+	upgradeCount := int64(pb.Constants_Constants_Level_Max - pb.Constants_Constants_Level_Min)
 	attributes := []struct {
 		name  string
 		value uint32
@@ -175,7 +175,7 @@ func validatePetSignedRawRange(pet *PetEntry) error {
 		maximumRaw := maximumRandomBase*initNum + maximumUpgrade*upgradeCount
 		if minimumRaw < math.MinInt32 || maximumRaw > math.MaxInt32 {
 			return errors.Errorf("宠物 growth.%s 在1至%d级随机范围内超出int32: ID:%d min:%d max:%d %v",
-				attribute.name, pb.LevelRange_LevelRange_Max, *pet.ID, minimumRaw, maximumRaw, xruntime.Location())
+				attribute.name, pb.Constants_Constants_Level_Max, *pet.ID, minimumRaw, maximumRaw, xruntime.Location())
 		}
 	}
 	return nil
@@ -256,26 +256,26 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 		if pet.Elemental == nil {
 			return errors.Errorf("宠物缺少 elemental: pet:%d %v", *pet.ID, xruntime.Location())
 		}
-		for elementalType := pb.AssetElemental_AssetElemental_Unknow + 1; elementalType < pb.AssetElemental_AssetElemental_Max; elementalType++ {
+		for elementalType := pb.AssetElemental_AssetElemental_Unspecified + 1; elementalType < pb.AssetElemental_AssetElemental_Max; elementalType++ {
 			if pet.Elemental[elementalType] == nil {
 				pet.Elemental[elementalType] = valuePtr(uint32(0))
 			}
 		}
 		sum := uint32(0)
 		activeIndexes := []int{}
-		for elementalType := pb.AssetElemental_AssetElemental_Unknow + 1; elementalType < pb.AssetElemental_AssetElemental_Max; elementalType++ {
+		for elementalType := pb.AssetElemental_AssetElemental_Unspecified + 1; elementalType < pb.AssetElemental_AssetElemental_Max; elementalType++ {
 			value := *pet.Elemental[elementalType]
 			if value > uint32(pb.Constants_Constants_Elemental_Total_Point) {
-				return errors.Errorf("宠物 elemental 值必须在[0,10]: ID:%d value:%d %v", *pet.ID, value, xruntime.Location())
+				return errors.Errorf("宠物 elemental 值必须在[0,100]: ID:%d value:%d %v", *pet.ID, value, xruntime.Location())
 			}
 			sum += value
 			if value > 0 {
-				index := int(elementalType - pb.AssetElemental_AssetElemental_Unknow - 1)
+				index := int(elementalType - pb.AssetElemental_AssetElemental_Unspecified - 1)
 				activeIndexes = append(activeIndexes, index)
 			}
 		}
 		if sum != uint32(pb.Constants_Constants_Elemental_Total_Point) {
-			return errors.Errorf("宠物元素分配总和须为10: ID:%d sum:%d %v", *pet.ID, sum, xruntime.Location())
+			return errors.Errorf("宠物元素分配总和须为100: ID:%d sum:%d %v", *pet.ID, sum, xruntime.Location())
 		}
 		if len(activeIndexes) != 1 && len(activeIndexes) != 2 {
 			return errors.Errorf("宠物 elemental 只能是单元素或两个相邻元素: ID:%d %v", *pet.ID, xruntime.Location())
@@ -285,7 +285,7 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 			if distance < 0 {
 				distance = -distance
 			}
-			wrapDistance := int(pb.AssetElemental_AssetElemental_Max - pb.AssetElemental_AssetElemental_Unknow - 2)
+			wrapDistance := int(pb.AssetElemental_AssetElemental_Max - pb.AssetElemental_AssetElemental_Unspecified - 2)
 			if distance != 1 && distance != wrapDistance {
 				return errors.Errorf("宠物 elemental 两个元素必须相邻: ID:%d %v", *pet.ID, xruntime.Location())
 			}
@@ -410,8 +410,13 @@ func (p *PetConfig) check() error {
 			if skillID == 0 {
 				continue
 			}
-			if !GGameConfig.Skill.IsExist(skillID) {
+			skill := GGameConfig.Skill.Get(skillID)
+			if skill == nil {
 				err = errors.Errorf("宠物引用了未定义技能: pet:%d skill:%d %v", petID, skillID, xruntime.Location())
+				return false
+			}
+			if !skill.CanBeUsedBy("pet") {
+				err = errors.Errorf("宠物引用了不可由宠物使用的技能: pet:%d skill:%d %v", petID, skillID, xruntime.Location())
 				return false
 			}
 		}

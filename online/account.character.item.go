@@ -108,13 +108,19 @@ func (p *characterItemManager) Consume(itemID uint32, count uint64) error {
 }
 
 func isCharacterAssetItemID(itemID uint32) bool {
-	return itemID >= uint32(pb.AssetIDRange_AssetIDRange_CharacterAsset_Start) &&
-		itemID <= uint32(pb.AssetIDRange_AssetIDRange_CharacterAsset_End)
+	switch itemID {
+	case uint32(pb.AssetID_AssetID_Currency_Stone),
+		uint32(pb.AssetID_AssetID_Currency_Silver),
+		uint32(pb.AssetID_AssetID_Currency_Gold):
+		return true
+	default:
+		return false
+	}
 }
 
 func configuredItem(itemID uint32) (*gameconfig.ItemEntry, error) {
-	if itemID < uint32(pb.AssetIDRange_AssetIDRange_Item_Item_Start) ||
-		itemID > uint32(pb.AssetIDRange_AssetIDRange_Item_Item_End) ||
+	if itemID < uint32(pb.AssetID_AssetIDRange_Item_Start) ||
+		itemID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Start) ||
 		gameconfig.GGameConfig == nil ||
 		gameconfig.GGameConfig.Item == nil {
 		return nil, fmt.Errorf("%w: item config is not loaded or item id is empty", errItemUseInvalidArgument)

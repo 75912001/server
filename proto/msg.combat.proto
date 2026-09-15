@@ -71,7 +71,7 @@ message CombatUnitAttribute {
   int32 defense = 4; // 防御力, 玩家装备修正后最低可为-100
   int32 agility = 5; // 敏捷, 玩家装备修正后最低可为-100
   uint32 loyalty = 6; // 忠诚度, 非宠物单位为 0
-  ElementalPoints elemental = 7; // 地水火风元素点数, 当前共享配置总和为 10
+  ElementalPoints elemental = 7; // 地水火风元素百分比, 基础配置总和为100
   uint32 level = 8; // 服务端根据经验或敌人配置得到的实际等级
   uint32 max_mp = 10; // 战斗魔法值上限; 玩家角色包含装备修正
   CombatLuckSnapshot luck = 15; // 玩家角色开战运气快照; 宠物和敌方单位为空
@@ -245,6 +245,8 @@ message CombatUnitStateDelta {
   bool alive = 31; // alive_changed=true 时表示变化后的存活状态
   bool escaped_changed = 32; // 是否包含逃跑离场状态变化
   bool escaped = 33; // escaped_changed=true 时表示单位是否已经逃离战斗
+  bool hidden_changed = 34; // 是否包含战斗隐藏状态变化
+  bool hidden = 35; // hidden_changed=true 时表示单位是否暂时不可见且不可成为敌对目标
 }
 
 // CombatReactionType 标识伤害链中由技能或状态触发的特殊反应.
@@ -274,6 +276,7 @@ enum CombatUnitLeaveReason {
   CombatUnitLeaveReason_Defeated = 4; // 战败离场
   CombatUnitLeaveReason_Intimidated = 5; // 被恐吓技能送回主人身边
   CombatUnitLeaveReason_Detached = 6; // 角色下线或运行态清理导致的外部脱离战场
+  CombatUnitLeaveReason_Abducted = 7; // 被旅程伙伴带离当前战场
 }
 
 // CombatCaptureResult 标识捕获动作的结算结果.
@@ -341,6 +344,11 @@ message CombatEscapeDetail {
   bool success = 1; // 是否成功逃离战斗
 }
 
+// CombatAbductDetail保存旅程伙伴的服务端概率结果; 实际离场单位读取后续UnitLeave效果.
+message CombatAbductDetail {
+  bool success = 1; // 是否成功带走目标; 无论成败施法者都会离场
+}
+
 message CombatEquipmentChangedDetail {
   CharacterEquipmentRecord equipment = 1; // 目标单位变化后的完整装备状态
 }
@@ -387,6 +395,11 @@ message CombatItemUsedDetail {
   uint32 count = 3; // 本次消耗数量
 }
 
+// CombatVisibilityDetail标记单位隐藏或现身; 客户端必须先应用同一效果的状态增量再播放后续效果.
+message CombatVisibilityDetail {
+  bool hidden = 1; // 本次变化后的隐藏状态
+}
+
 // CombatEffect 表示一个动作步骤产生的单项效果; 来源、目标和状态增量只在此处记录一次.
 message CombatEffect {
   CombatUnitKey effect_source_unit_key = 1; // 直接产生本项效果的单位
@@ -412,6 +425,8 @@ message CombatEffect {
     CombatAttributeModifierDetail attribute_modifier = 29; // 攻、防、敏百分比修正
     CombatDodgeBoostDetail dodge_boost = 30; // 独立闪避提升状态
     CombatTransformationDetail transformation = 31; // 狐狸或狼变身状态
+    CombatAbductDetail abduct = 32; // 旅程伙伴结果; 后续UnitLeave明确实际离场单位
+    CombatVisibilityDetail visibility = 33; // 隐藏或现身; 同一动作内的效果顺序具有权威性
   }
 }
 

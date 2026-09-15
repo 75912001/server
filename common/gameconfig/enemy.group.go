@@ -15,6 +15,11 @@ type EnemyGroupConfig struct {
 	*xmap.MapMgr[uint32, *EnemyGroupEntry]
 }
 
+const (
+	enemyNormalDropMaxCount       = 10
+	enemyNormalDropProbabilityMax = 10000
+)
+
 type EnemyGroupEntry struct {
 	// ID 来自 enemyGroups[].id, 必须为正数, 并且在 enemy.group.yaml 内唯一.
 	ID *uint32 `yaml:"id"`
@@ -49,6 +54,15 @@ type EnemyEntry struct {
 	BattleAIID *uint32 `yaml:"battleAI"`
 	// BattleAI 在assemble阶段挂载已校验的只读AI配置, 供建房时复制为独立快照.
 	BattleAI *BattleAIEntry `yaml:"-"`
+	// NormalDrops 来自 enemies[].normalDrops, 每项按万分比在敌人实例创建时独立判定一次.
+	NormalDrops []EnemyNormalDropEntry `yaml:"normalDrops"`
+}
+
+// EnemyNormalDropEntry定义普通PVE敌人的一个原版掉落槽.
+// 相同ItemID可以重复出现, 表示多个按配置顺序独立判定的槽位.
+type EnemyNormalDropEntry struct {
+	ItemID      *uint32 `yaml:"itemId"`
+	Probability *uint32 `yaml:"probability"`
 }
 
 // UnmarshalYAML拒绝旧的技能覆盖字段, 敌人技能必须由所引用的AI统一定义.
@@ -157,8 +171,8 @@ func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 			}
 			if group.LevelRange != nil {
 				if group.LevelRange.Min == nil || group.LevelRange.Max == nil ||
-					*group.LevelRange.Min < int(pb.LevelRange_LevelRange_Min) ||
-					*group.LevelRange.Max > int(pb.LevelRange_LevelRange_Max) {
+					*group.LevelRange.Min < int(pb.Constants_Constants_Level_Min) ||
+					*group.LevelRange.Max > int(pb.Constants_Constants_Level_Max) {
 					return errors.Errorf("普通敌人组 levelRange 超出范围: group:%d %v", *group.ID, xruntime.Location())
 				}
 			}
@@ -200,18 +214,33 @@ func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 					*group.ID, enemyID, xruntime.Location())
 			}
 			if enemy.Level != nil &&
-				(*enemy.Level < uint32(pb.LevelRange_LevelRange_Min) ||
-					uint32(pb.LevelRange_LevelRange_Max) < *enemy.Level) {
+				(*enemy.Level < uint32(pb.Constants_Constants_Level_Min) ||
+					uint32(pb.Constants_Constants_Level_Max) < *enemy.Level) {
 				return errors.Errorf("敌人组 enemy level 超出范围: group:%d enemy:%d level:%d %v",
 					*group.ID, enemyID, *enemy.Level, xruntime.Location())
 			}
 			if enemy.LevelRange != nil &&
 				(enemy.LevelRange.Min == nil || enemy.LevelRange.Max == nil ||
-					*enemy.LevelRange.Min < int(pb.LevelRange_LevelRange_Min) ||
-					*enemy.LevelRange.Max > int(pb.LevelRange_LevelRange_Max) ||
+					*enemy.LevelRange.Min < int(pb.Constants_Constants_Level_Min) ||
+					*enemy.LevelRange.Max > int(pb.Constants_Constants_Level_Max) ||
 					*enemy.LevelRange.Min > *enemy.LevelRange.Max) {
 				return errors.Errorf("敌人组 enemy levelRange 无效: group:%d enemy:%d %v",
 					*group.ID, enemyID, xruntime.Location())
+			}
+			if len(enemy.NormalDrops) > enemyNormalDropMaxCount {
+				return errors.Errorf("敌人组 enemy normalDrops 超过最大槽位数量: group:%d enemy:%d size:%d %v",
+					*group.ID, enemyID, len(enemy.NormalDrops), xruntime.Location())
+			}
+			for dropIndex := range enemy.NormalDrops {
+				drop := &enemy.NormalDrops[dropIndex]
+				if drop.ItemID == nil || (!isItemID(*drop.ItemID) && !isEquipmentID(*drop.ItemID)) {
+					return errors.Errorf("敌人组 enemy normalDrops 道具ID无效: group:%d enemy:%d index:%d %v",
+						*group.ID, enemyID, dropIndex, xruntime.Location())
+				}
+				if drop.Probability == nil || *drop.Probability == 0 || *drop.Probability > enemyNormalDropProbabilityMax {
+					return errors.Errorf("敌人组 enemy normalDrops 万分比无效: group:%d enemy:%d item:%d index:%d %v",
+						*group.ID, enemyID, *drop.ItemID, dropIndex, xruntime.Location())
+				}
 			}
 			if *group.IsBoss {
 				if enemy.Weight != nil {
@@ -279,6 +308,13 @@ func (p *EnemyGroupConfig) check() error {
 				checkErr = errors.Errorf("敌人组引用了未定义AI: group:%d pet:%d ai:%d %v",
 					*group.ID, petID, *enemy.BattleAIID, xruntime.Location())
 				return false
+			}
+			for _, drop := range enemy.NormalDrops {
+				if GGameConfig.Item == nil || GGameConfig.Item.Get(*drop.ItemID) == nil {
+					checkErr = errors.Errorf("敌人组普通掉落引用了未定义道具: group:%d pet:%d item:%d %v",
+						*group.ID, petID, *drop.ItemID, xruntime.Location())
+					return false
+				}
 			}
 		}
 		return true

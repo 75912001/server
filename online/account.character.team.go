@@ -131,21 +131,6 @@ func (p *Account) removeFailedCombatAdmissionMember(leaderKey sceneCharacterKey,
 
 func (p *Account) applyCharacterTeamMutation(mutation characterTeamMutation) {
 	p.applyCharacterMapTeamEvent(mutation.mapEvent)
-	for _, member := range mutation.notifications {
-		target := sceneCharacterPresence{key: member.key, gatewayKey: member.gatewayKey}
-		presence, ok := GScenePresenceMgr.find(member.key)
-		if ok {
-			target = presence
-		}
-		p.sendScenePresencePacket(
-			target,
-			uint32(pb.MsgID_CharacterTeamChangedNotify_CMD),
-			xerror.Success.Code(),
-			&pb.CharacterTeamChangedNotify{
-				TargetCharacterUuid: member.key.characterUUID,
-			},
-		)
-	}
 }
 
 // combatResultDischargesCharacterTeam 只识别原版会解除队伍的成功逃跑和 Ultimate 击飞.
@@ -188,7 +173,7 @@ func combatResultContainsCharacterUnitLeave(
 	key sceneCharacterKey,
 	reason pb.CombatUnitLeaveReason,
 ) bool {
-	if result == nil || key.aid == 0 || key.characterUUID == 0 || reason == pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Unknown {
+	if result == nil || key.aid == 0 || key.characterUUID == 0 || reason == pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Unspecified {
 		return false
 	}
 	for _, event := range result.GetEventList() {

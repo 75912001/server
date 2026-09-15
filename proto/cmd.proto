@@ -48,6 +48,12 @@ enum MsgID {
   ItemWarehouseWithdrawRes_CMD = 12294; //0x003006#gateway->client#将账号仓库物品取入角色背包-回复
   ShopPurchaseReq_CMD = 12295; //0x003007#client->gateway#购买商店商品-请求
   ShopPurchaseRes_CMD = 12296; //0x003008#gateway->client#购买商店商品-回复
+  ItemSynthesisReq_CMD = 12297; //0x003009#client->gateway#宠物使用加工技能-请求
+  ItemSynthesisRes_CMD = 12298; //0x00300A#gateway->client#宠物使用加工技能-回复
+  EquipmentSkillAttachReq_CMD = 12299; //0x00300B#client->gateway#宠物给背包装备附加技能-请求
+  EquipmentSkillAttachRes_CMD = 12300; //0x00300C#gateway->client#宠物给背包装备附加技能-回复
+  EquipmentElementAttachReq_CMD = 12301; //0x00300D#client->gateway#宠物给背包装备附加元素-请求
+  EquipmentElementAttachRes_CMD = 12302; //0x00300E#gateway->client#宠物给背包装备附加元素-回复
   CharacterMailboxGetReq_CMD = 20480; //0x005000#client->gateway#获取角色邮箱-请求
   CharacterMailboxGetRes_CMD = 20481; //0x005001#gateway->client#获取角色邮箱-回复
   CharacterMailReadReq_CMD = 20482; //0x005002#client->gateway#标记角色邮件已读-请求

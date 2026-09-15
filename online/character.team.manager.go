@@ -40,8 +40,7 @@ type characterTeamMapEvent struct {
 }
 
 type characterTeamMutation struct {
-	notifications []characterTeamMember
-	mapEvent      *characterTeamMapEvent
+	mapEvent *characterTeamMapEvent
 }
 
 type characterTeamManager struct {
@@ -110,8 +109,7 @@ func (m *characterTeamManager) join(sceneID uint32, sourceKey sceneCharacterKey,
 		m.byMember[targetKey] = targetTeam
 		m.byMember[sourceKey] = targetTeam
 		return characterTeamMutation{
-			notifications: characterTeamNotifications(targetTeam),
-			mapEvent:      newCharacterTeamJoinMapEvent(targetTeam),
+			mapEvent: newCharacterTeamJoinMapEvent(targetTeam),
 		}, nil
 	}
 	if len(targetTeam.members) >= characterTeamMemberLimit {
@@ -120,8 +118,7 @@ func (m *characterTeamManager) join(sceneID uint32, sourceKey sceneCharacterKey,
 	targetTeam.members = append(targetTeam.members, sourceMember)
 	m.byMember[sourceKey] = targetTeam
 	return characterTeamMutation{
-		notifications: characterTeamNotifications(targetTeam),
-		mapEvent:      newCharacterTeamJoinMapEvent(targetTeam),
+		mapEvent: newCharacterTeamJoinMapEvent(targetTeam),
 	}, nil
 }
 
@@ -247,7 +244,6 @@ func (m *characterTeamManager) removeMemberLocked(team *characterTeam, memberInd
 		delete(m.byMember, leader.key)
 		team.members = nil
 		return characterTeamMutation{
-			notifications: []characterTeamMember{leader, removed},
 			mapEvent: &characterTeamMapEvent{
 				eventType: characterTeamMapEventLeave,
 				key:       removed.key,
@@ -255,10 +251,7 @@ func (m *characterTeamManager) removeMemberLocked(team *characterTeam, memberInd
 			},
 		}
 	}
-	notifications := characterTeamNotifications(team)
-	notifications = append(notifications, removed)
 	return characterTeamMutation{
-		notifications: notifications,
 		mapEvent: &characterTeamMapEvent{
 			eventType: characterTeamMapEventLeave,
 			key:       removed.key,
@@ -272,7 +265,6 @@ func (m *characterTeamManager) disbandLocked(team *characterTeam) characterTeamM
 		return characterTeamMutation{}
 	}
 	leaderKey := team.members[0].key
-	notifications := characterTeamNotifications(team)
 	orderKeys := make([]sceneCharacterKey, 0, len(team.members))
 	for _, member := range team.members {
 		orderKeys = append(orderKeys, member.key)
@@ -280,7 +272,6 @@ func (m *characterTeamManager) disbandLocked(team *characterTeam) characterTeamM
 	}
 	team.members = nil
 	return characterTeamMutation{
-		notifications: notifications,
 		mapEvent: &characterTeamMapEvent{
 			eventType: characterTeamMapEventDisband,
 			key:       leaderKey,
@@ -323,13 +314,4 @@ func characterTeamMemberIndex(team *characterTeam, key sceneCharacterKey) int {
 		}
 	}
 	return -1
-}
-
-func characterTeamNotifications(team *characterTeam) []characterTeamMember {
-	if team == nil || len(team.members) == 0 {
-		return nil
-	}
-	notifications := make([]characterTeamMember, len(team.members))
-	copy(notifications, team.members)
-	return notifications
 }

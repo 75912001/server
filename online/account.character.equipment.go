@@ -22,28 +22,53 @@ var (
 	errCharacterEquipmentRecordInvalid      = errors.New("character equipment record is invalid")
 )
 
-var equipmentFixedModifierKeys = [...]pb.EquipmentRecordBase{
-	pb.EquipmentRecordBase_EquipmentRecordBase_AttackModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_DefenceModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_QuickModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_MaxHPModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_MaxMPModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_LuckModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_CharmModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_AvoidModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_PoisonResistanceModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_ParalysisResistanceModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_SleepResistanceModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_StoneResistanceModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_DrunkResistanceModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_ConfusionResistanceModifier,
-	pb.EquipmentRecordBase_EquipmentRecordBase_CriticalModifier,
+var equipmentBaseAttributeKeys = [...]pb.EquipmentRecordAttribute{
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Attack,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Defence,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Quick,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_MaxHP,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_MaxMP,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Luck,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Charm,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Avoid,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_PoisonResistance,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_ParalysisResistance,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_SleepResistance,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_StoneResistance,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_DrunkResistance,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_ConfusionResistance,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Critical,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Counter,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_DamageBonusPercent,
+	pb.EquipmentRecordAttribute_EquipmentRecordAttribute_CritDamageBonusPercent,
 }
 
 var supportedCharacterEquipmentTypes = [...]pb.EquipmentType{
 	pb.EquipmentType_EquipmentType_Weapon,
 	pb.EquipmentType_EquipmentType_Accessory1,
 	pb.EquipmentType_EquipmentType_Accessory2,
+}
+
+// isArmorEquipmentAssetID只接受当前协议已分配的六类普通防具区间.
+// 防具可以作为装备实例进入背包, 是否开放对应穿戴槽由换装链路独立判断.
+func isArmorEquipmentAssetID(assetID uint32) bool {
+	switch {
+	case assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Helmet_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Helmet_End):
+	case assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Chest_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Chest_End):
+	case assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Shield_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Shield_End):
+	case assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Gloves_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Gloves_End):
+	case assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Belt_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Belt_End):
+	case assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Boots_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Boots_End):
+	default:
+		return false
+	}
+	return true
 }
 
 func configuredEquipmentEntry(assetID uint32) (*gameconfig.ItemEntry, error) {
@@ -54,17 +79,26 @@ func configuredEquipmentEntry(assetID uint32) (*gameconfig.ItemEntry, error) {
 	if entry == nil || entry.ID == nil || *entry.ID != assetID {
 		return nil, fmt.Errorf("equipment config %d is missing or mismatched", assetID)
 	}
-	if assetID >= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Start) &&
-		assetID <= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_End) {
-		if entry.WeaponType <= pb.CharacterWeaponType_CharacterWeaponType_Unknow ||
-			entry.WeaponType >= pb.CharacterWeaponType_CharacterWeaponType_Max || entry.AccessoryType != pb.AccessoryType_AccessoryType_Unknow {
+	switch {
+	case assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_End):
+		if entry.WeaponType <= pb.CharacterWeaponType_CharacterWeaponType_Unspecified ||
+			entry.WeaponType >= pb.CharacterWeaponType_CharacterWeaponType_Max || entry.AccessoryType != pb.AccessoryType_AccessoryType_Unspecified {
 			return nil, fmt.Errorf("weapon config %d type is invalid", assetID)
 		}
-	} else {
+	case assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Accessory_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Accessory_End):
 		minimum, maximum := gameconfig.AccessoryIDRange(entry.AccessoryType)
-		if minimum == 0 || assetID < minimum || assetID > maximum || entry.WeaponType != pb.CharacterWeaponType_CharacterWeaponType_Unknow {
+		if minimum == 0 || assetID < minimum || assetID > maximum || entry.WeaponType != pb.CharacterWeaponType_CharacterWeaponType_Unspecified {
 			return nil, fmt.Errorf("accessory config %d type %d does not match its id range", assetID, entry.AccessoryType)
 		}
+	case isArmorEquipmentAssetID(assetID):
+		if entry.WeaponType != pb.CharacterWeaponType_CharacterWeaponType_Unspecified ||
+			entry.AccessoryType != pb.AccessoryType_AccessoryType_Unspecified {
+			return nil, fmt.Errorf("armor config %d type is invalid", assetID)
+		}
+	default:
+		return nil, fmt.Errorf("equipment config %d id range is unsupported", assetID)
 	}
 	return entry, nil
 }
@@ -74,7 +108,7 @@ func configuredWeaponEntry(assetID uint32) (*gameconfig.ItemEntry, error) {
 	if err != nil {
 		return nil, err
 	}
-	if entry.WeaponType == pb.CharacterWeaponType_CharacterWeaponType_Unknow {
+	if entry.WeaponType == pb.CharacterWeaponType_CharacterWeaponType_Unspecified {
 		return nil, fmt.Errorf("equipment %d is not a weapon", assetID)
 	}
 	return entry, nil
@@ -97,47 +131,53 @@ func characterEquipmentSlot(equipment *pb.CharacterEquipmentRecord, equipmentTyp
 	}
 }
 
-func equipmentModifierRange(entry *gameconfig.ItemEntry, key pb.EquipmentRecordBase) (int32, int32, bool) {
+func equipmentBaseAttributeRange(entry *gameconfig.ItemEntry, key pb.EquipmentRecordAttribute) (int32, int32, bool) {
 	if entry == nil {
 		return 0, 0, false
 	}
 	switch key {
-	case pb.EquipmentRecordBase_EquipmentRecordBase_AttackModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Attack:
 		return entry.AttackMin, entry.AttackMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_DefenceModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Defence:
 		return entry.DefenceMin, entry.DefenceMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_QuickModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Quick:
 		return entry.QuickMin, entry.QuickMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_MaxHPModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_MaxHP:
 		return entry.HPMin, entry.HPMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_MaxMPModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_MaxMP:
 		return entry.MPMin, entry.MPMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_LuckModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Luck:
 		return entry.LuckMin, entry.LuckMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_CharmModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Charm:
 		return entry.CharmMin, entry.CharmMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_AvoidModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Avoid:
 		return entry.AvoidMin, entry.AvoidMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_PoisonResistanceModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_PoisonResistance:
 		return entry.PoisonMin, entry.PoisonMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_ParalysisResistanceModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_ParalysisResistance:
 		return entry.ParalysisMin, entry.ParalysisMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_SleepResistanceModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_SleepResistance:
 		return entry.SleepMin, entry.SleepMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_StoneResistanceModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_StoneResistance:
 		return entry.StoneMin, entry.StoneMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_DrunkResistanceModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_DrunkResistance:
 		return entry.DrunkMin, entry.DrunkMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_ConfusionResistanceModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_ConfusionResistance:
 		return entry.ConfusionMin, entry.ConfusionMax, true
-	case pb.EquipmentRecordBase_EquipmentRecordBase_CriticalModifier:
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Critical:
 		return entry.CriticalMin, entry.CriticalMax, true
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Counter:
+		return entry.CounterModifierMin, entry.CounterModifierMax, true
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_DamageBonusPercent:
+		return entry.DamageBonusPercentMin, entry.DamageBonusPercentMax, true
+	case pb.EquipmentRecordAttribute_EquipmentRecordAttribute_CritDamageBonusPercent:
+		return entry.CritDamageBonusPercentMin, entry.CritDamageBonusPercentMax, true
 	default:
 		return 0, 0, false
 	}
 }
 
-// newEquipmentRecord 按原版创建时机把15项[min,max]独立随机一次并完整固化到实例.
+// newEquipmentRecord 在装备创建时独立随机各项配置范围, 并仅保存非0基础属性和有效元素属性.
 func newEquipmentRecord(equipmentUUID uint64, assetID uint32) (*pb.EquipmentRecord, error) {
 	if equipmentUUID == 0 {
 		return nil, fmt.Errorf("equipment uuid is empty")
@@ -146,24 +186,38 @@ func newEquipmentRecord(equipmentUUID uint64, assetID uint32) (*pb.EquipmentReco
 	if err != nil {
 		return nil, err
 	}
-	recordBaseMap := make(map[int32]int64, len(equipmentFixedModifierKeys))
-	for _, key := range equipmentFixedModifierKeys {
-		minimum, maximum, ok := equipmentModifierRange(entry, key)
+	recordBaseMap := make(map[int32]int64, len(equipmentBaseAttributeKeys))
+	for _, key := range equipmentBaseAttributeKeys {
+		minimum, maximum, ok := equipmentBaseAttributeRange(entry, key)
 		if !ok || minimum > maximum {
-			return nil, fmt.Errorf("equipment %d modifier %s range is invalid", assetID, key)
+			return nil, fmt.Errorf("equipment %d base attribute %s range is invalid", assetID, key)
 		}
 		width := uint64(int64(maximum) - int64(minimum))
 		value := int64(minimum) + int64(xutil.RandomU64(0, width))
-		recordBaseMap[int32(key)] = value
+		if value != 0 {
+			recordBaseMap[int32(key)] = value
+		}
 	}
-	return &pb.EquipmentRecord{
+	if entry.AttributeValue != 0 {
+		if entry.Attribute < uint32(pb.AssetElemental_AssetElemental_Earth) || entry.Attribute >= uint32(pb.AssetElemental_AssetElemental_Max) || entry.AttributeValue > uint32(pb.Constants_Constants_Elemental_Total_Point) {
+			return nil, fmt.Errorf("equipment %d attached element %d value %d is invalid", assetID, entry.Attribute, entry.AttributeValue)
+		}
+	}
+	record := &pb.EquipmentRecord{
 		Uuid:          equipmentUUID,
 		AssetId:       assetID,
 		RecordBaseMap: recordBaseMap,
-	}, nil
+	}
+	if entry.AttributeValue != 0 {
+		record.ElementAttribute = &pb.EquipmentElementAttribute{
+			Element: pb.AssetElemental(entry.Attribute),
+			Value:   entry.AttributeValue,
+		}
+	}
+	return record, nil
 }
 
-// validateEquipmentRecord 不迁移旧实例: 15项必须齐全且无额外key, 固化值必须仍在当前配置范围内.
+// validateEquipmentRecord 校验装备实例的基础属性、附加修正、实例技能和元素属性.
 func validateEquipmentRecord(record *pb.EquipmentRecord, expectedUUID uint64) error {
 	if record == nil || expectedUUID == 0 || record.GetUuid() != expectedUUID {
 		return fmt.Errorf("equipment key %d does not match record uuid %d", expectedUUID, record.GetUuid())
@@ -172,17 +226,63 @@ func validateEquipmentRecord(record *pb.EquipmentRecord, expectedUUID uint64) er
 	if err != nil {
 		return err
 	}
-	if len(record.GetRecordBaseMap()) != len(equipmentFixedModifierKeys) {
-		return fmt.Errorf("equipment %d fixed modifier count %d is not %d", expectedUUID, len(record.GetRecordBaseMap()), len(equipmentFixedModifierKeys))
-	}
-	for _, key := range equipmentFixedModifierKeys {
-		value, exists := record.GetRecordBaseMap()[int32(key)]
-		if !exists {
-			return fmt.Errorf("equipment %d fixed modifier %s is missing", expectedUUID, key)
+	recordBaseMap := record.GetRecordBaseMap()
+	for rawKey, value := range recordBaseMap {
+		if value == 0 {
+			return fmt.Errorf("equipment %d record base %d explicitly stores zero", expectedUUID, rawKey)
 		}
-		minimum, maximum, ok := equipmentModifierRange(entry, key)
+		key := pb.EquipmentRecordAttribute(rawKey)
+		if _, _, ok := equipmentBaseAttributeRange(entry, key); !ok {
+			return fmt.Errorf("equipment %d record base key %d is unsupported", expectedUUID, rawKey)
+		}
+	}
+	for _, key := range equipmentBaseAttributeKeys {
+		value := recordBaseMap[int32(key)]
+		minimum, maximum, ok := equipmentBaseAttributeRange(entry, key)
 		if !ok || value < int64(minimum) || value > int64(maximum) {
-			return fmt.Errorf("equipment %d fixed modifier %s value %d is outside [%d,%d]", expectedUUID, key, value, minimum, maximum)
+			return fmt.Errorf("equipment %d base attribute %s value %d is outside [%d,%d]", expectedUUID, key, value, minimum, maximum)
+		}
+	}
+	for rawKey, value := range record.GetRecordModifierMap() {
+		if value == 0 {
+			return fmt.Errorf("equipment %d record modifier %d explicitly stores zero", expectedUUID, rawKey)
+		}
+		if _, _, ok := equipmentBaseAttributeRange(entry, pb.EquipmentRecordAttribute(rawKey)); !ok {
+			return fmt.Errorf("equipment %d record modifier key %d is unsupported", expectedUUID, rawKey)
+		}
+		if value < math.MinInt32 || value > math.MaxInt32 {
+			return fmt.Errorf("equipment %d record modifier %d value %d is outside int32", expectedUUID, rawKey, value)
+		}
+	}
+	seenSkillID := make(map[uint32]struct{}, len(record.GetAdditionalSkillIdList()))
+	seenStatusSpirit := make(map[pb.EquipmentRecordAttribute]uint32, len(equipmentStatusSpiritResistanceAttributes))
+	for _, skillID := range record.GetAdditionalSkillIdList() {
+		if skillID == 0 || skillID == entry.GrantedSkillID {
+			return fmt.Errorf("equipment %d additional skill %d is invalid or configured by asset", expectedUUID, skillID)
+		}
+		if _, exists := seenSkillID[skillID]; exists {
+			return fmt.Errorf("equipment %d additional skill %d is duplicated", expectedUUID, skillID)
+		}
+		if gameconfig.GGameConfig.Skill == nil {
+			return fmt.Errorf("equipment %d additional skill config is not loaded", expectedUUID)
+		}
+		if gameconfig.GGameConfig.Skill.Get(skillID) == nil {
+			return fmt.Errorf("equipment %d additional skill %d is missing", expectedUUID, skillID)
+		}
+		if attribute, statusSpirit := equipmentStatusSpiritResistanceAttribute(skillID); statusSpirit {
+			if existingSkillID := seenStatusSpirit[attribute]; existingSkillID != 0 {
+				return fmt.Errorf("equipment %d additional status spirit skills %d and %d have the same category", expectedUUID, existingSkillID, skillID)
+			}
+			seenStatusSpirit[attribute] = skillID
+		}
+		seenSkillID[skillID] = struct{}{}
+	}
+	if element := record.GetElementAttribute(); element != nil {
+		if element.GetElement() < pb.AssetElemental_AssetElemental_Earth || element.GetElement() >= pb.AssetElemental_AssetElemental_Max {
+			return fmt.Errorf("equipment %d element %d is invalid", expectedUUID, element.GetElement())
+		}
+		if element.GetValue() == 0 || element.GetValue() > uint32(pb.Constants_Constants_Elemental_Total_Point) {
+			return fmt.Errorf("equipment %d element value %d is invalid", expectedUUID, element.GetValue())
 		}
 	}
 	return nil
@@ -244,7 +344,7 @@ func validateCharacterEquipmentSlots(equipment *pb.CharacterEquipmentRecord) err
 			return fmt.Errorf("unsupported equipped slot %s is populated", slot.name)
 		}
 	}
-	accessoryType := pb.AccessoryType_AccessoryType_Unknow
+	accessoryType := pb.AccessoryType_AccessoryType_Unspecified
 	for _, equipmentType := range supportedCharacterEquipmentTypes {
 		equipped := *characterEquipmentSlot(equipment, equipmentType)
 		if equipped == nil {
@@ -255,11 +355,11 @@ func validateCharacterEquipmentSlots(equipment *pb.CharacterEquipmentRecord) err
 		}
 		entry := gameconfig.GGameConfig.Item.Get(equipped.GetAssetId())
 		if equipmentType == pb.EquipmentType_EquipmentType_Weapon {
-			if entry.WeaponType == pb.CharacterWeaponType_CharacterWeaponType_Unknow {
+			if entry.WeaponType == pb.CharacterWeaponType_CharacterWeaponType_Unspecified {
 				return fmt.Errorf("weapon slot contains accessory %d", equipped.GetAssetId())
 			}
 		} else {
-			if entry.AccessoryType == pb.AccessoryType_AccessoryType_Unknow {
+			if entry.AccessoryType == pb.AccessoryType_AccessoryType_Unspecified {
 				return fmt.Errorf("accessory slot contains weapon %d", equipped.GetAssetId())
 			}
 			if entry.AccessoryType == accessoryType {
@@ -281,14 +381,15 @@ func clampEquipmentValue(value int64, minimum int64, maximum int64) int64 {
 	return value
 }
 
-func equipmentModifier(record *pb.EquipmentRecord, key pb.EquipmentRecordBase) int64 {
+// equipmentAttribute 合并装备基础属性、普通附加修正和由实例附加技能实时派生的抗性修正.
+func equipmentAttribute(record *pb.EquipmentRecord, key pb.EquipmentRecordAttribute) int64 {
 	if record == nil {
 		return 0
 	}
-	return record.GetRecordBaseMap()[int32(key)]
+	return record.GetRecordBaseMap()[int32(key)] + record.GetRecordModifierMap()[int32(key)] + equipmentSkillResistanceModifier(record, key)
 }
 
-// characterEffectiveAttribute 保留当前项目裸装公式, 再按原版ITEM_equipEffect顺序叠加实例固化值.
+// characterEffectiveAttribute 保留当前项目裸装公式, 再按原版ITEM_equipEffect顺序叠加装备实例属性.
 func characterEffectiveAttribute(record *pb.CharacterRecord) (*pb.CharacterEffectiveAttribute, error) {
 	if record == nil || record.GetBase() == nil || record.GetBase().GetUuid() == 0 || record.GetEquipment() == nil {
 		return nil, fmt.Errorf("character record is incomplete")
@@ -297,10 +398,12 @@ func characterEffectiveAttribute(record *pb.CharacterRecord) (*pb.CharacterEffec
 		return nil, err
 	}
 	base := record.GetBase()
-	vitality := int64(base.GetVitality())
-	strength := int64(base.GetStrength())
-	toughness := int64(base.GetToughness())
-	dexterity := int64(base.GetDexterity())
+	attribute := base.GetAttribute()
+	elementalPoints := base.GetElemental()
+	vitality := int64(attribute.GetVitality())
+	strength := int64(attribute.GetStrength())
+	toughness := int64(attribute.GetToughness())
+	dexterity := int64(attribute.GetDexterity())
 	maxHP := vitality*4 + strength + toughness + dexterity
 	attack := strength + toughness/10 + vitality/10 + dexterity/20
 	defense := toughness + strength/10 + vitality/10 + dexterity/20
@@ -320,15 +423,21 @@ func characterEffectiveAttribute(record *pb.CharacterRecord) (*pb.CharacterEffec
 	charm := int64(base.GetCharm())
 	avoid := int64(0)
 	critical := int64(0)
-	poison := int64(0)
+	critDamageBonusPercent := int64(0)
 	paralysis := int64(0)
 	sleep := int64(0)
 	stone := int64(0)
 	drunk := int64(0)
 	confusion := int64(0)
-	otherDamage := int64(0)
-	otherDefense := int64(0)
-	elemental := [4]int64{int64(base.GetEarth()), int64(base.GetWater()), int64(base.GetFire()), int64(base.GetWind())}
+	damageBonusPercent := int64(0)
+	// 角色基础值和装备attribvalue统一使用原版0至100百分比单位.
+	// 按ITEM_equipEffect直接叠加装备值, 无需在协议边界换算.
+	elemental := [4]int64{
+		int64(elementalPoints.GetEarth()),
+		int64(elementalPoints.GetWater()),
+		int64(elementalPoints.GetFire()),
+		int64(elementalPoints.GetWind()),
+	}
 	weaponType := pb.CharacterWeaponType_CharacterWeaponType_Unarmed
 
 	for _, equipmentType := range supportedCharacterEquipmentTypes {
@@ -340,37 +449,37 @@ func characterEffectiveAttribute(record *pb.CharacterRecord) (*pb.CharacterEffec
 		if equipmentType == pb.EquipmentType_EquipmentType_Weapon {
 			weaponType = entry.WeaponType
 		}
-		maxHP += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_MaxHPModifier)
-		attack += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_AttackModifier)
-		defense += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_DefenceModifier)
-		agility += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_QuickModifier)
-		maxMP += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_MaxMPModifier)
-		luck += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_LuckModifier)
-		charm += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_CharmModifier)
-		avoid += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_AvoidModifier)
-		poison += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_PoisonResistanceModifier)
-		paralysis += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_ParalysisResistanceModifier)
-		sleep += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_SleepResistanceModifier)
-		stone += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_StoneResistanceModifier)
-		drunk += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_DrunkResistanceModifier)
-		confusion += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_ConfusionResistanceModifier)
-		critical += equipmentModifier(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_CriticalModifier)
-		otherDamage += int64(entry.OtherDamage)
-		otherDefense += int64(entry.OtherDefence)
-		if entry.Attribute >= 1 && entry.Attribute <= 4 {
-			selected := int(entry.Attribute - 1)
+		maxHP += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_MaxHP)
+		attack += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Attack)
+		defense += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Defence)
+		agility += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Quick)
+		maxMP += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_MaxMP)
+		luck += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Luck)
+		charm += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Charm)
+		avoid += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Avoid)
+		paralysis += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_ParalysisResistance)
+		sleep += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_SleepResistance)
+		stone += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_StoneResistance)
+		drunk += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_DrunkResistance)
+		confusion += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_ConfusionResistance)
+		critical += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Critical)
+		critDamageBonusPercent += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_CritDamageBonusPercent)
+		damageBonusPercent += equipmentAttribute(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_DamageBonusPercent) + int64(entry.OtherDamage)
+		if elementAttribute := equipped.GetElementAttribute(); elementAttribute != nil {
+			selected := int(elementAttribute.GetElement() - 1)
+			value := int64(elementAttribute.GetValue())
 			for index := range elemental {
 				if index == selected {
-					elemental[index] += int64(entry.AttributeValue)
+					elemental[index] += value
 				} else {
-					elemental[index] -= int64(entry.AttributeValue)
+					elemental[index] -= value
 				}
 			}
 		}
 	}
 
 	for index := range elemental {
-		elemental[index] = clampEquipmentValue(elemental[index], 0, 10)
+		elemental[index] = clampEquipmentValue(elemental[index], 0, int64(pb.Constants_Constants_Elemental_Total_Point))
 	}
 	return &pb.CharacterEffectiveAttribute{
 		CharacterUuid:               base.GetUuid(),
@@ -383,15 +492,14 @@ func characterEffectiveAttribute(record *pb.CharacterRecord) (*pb.CharacterEffec
 		EffectiveCharm:              uint32(clampEquipmentValue(charm, 0, 100)),
 		EffectiveAvoid:              int32(clampEquipmentValue(avoid, 0, 10_000_000)),
 		CriticalModifier:            int32(clampEquipmentValue(critical, math.MinInt32, math.MaxInt32)),
-		PoisonResistanceModifier:    int32(clampEquipmentValue(poison, math.MinInt32, math.MaxInt32)),
+		CritDamageBonusPercent:      int32(clampEquipmentValue(critDamageBonusPercent, math.MinInt32, math.MaxInt32)),
 		ParalysisResistanceModifier: int32(clampEquipmentValue(paralysis, math.MinInt32, math.MaxInt32)),
 		SleepResistanceModifier:     int32(clampEquipmentValue(sleep, math.MinInt32, math.MaxInt32)),
 		StoneResistanceModifier:     int32(clampEquipmentValue(stone, math.MinInt32, math.MaxInt32)),
 		DrunkResistanceModifier:     int32(clampEquipmentValue(drunk, math.MinInt32, math.MaxInt32)),
 		ConfusionResistanceModifier: int32(clampEquipmentValue(confusion, math.MinInt32, math.MaxInt32)),
 		Elemental:                   &pb.ElementalPoints{Earth: uint32(elemental[0]), Water: uint32(elemental[1]), Fire: uint32(elemental[2]), Wind: uint32(elemental[3])},
-		OtherDamageModifier:         int32(clampEquipmentValue(otherDamage, math.MinInt32, math.MaxInt32)),
-		OtherDefenseModifier:        int32(clampEquipmentValue(otherDefense, math.MinInt32, math.MaxInt32)),
+		DamageBonusPercent:          int32(clampEquipmentValue(damageBonusPercent, math.MinInt32, math.MaxInt32)),
 		WeaponType:                  weaponType,
 	}, nil
 }
@@ -474,11 +582,11 @@ func prepareCharacterEquipmentReplacePlan(accountRecord *pb.AccountRecord, chara
 			return nil, fmt.Errorf("%w: %v", errCharacterEquipmentTargetNotFound, err)
 		}
 		if equipmentType == pb.EquipmentType_EquipmentType_Weapon {
-			if entry.WeaponType == pb.CharacterWeaponType_CharacterWeaponType_Unknow {
+			if entry.WeaponType == pb.CharacterWeaponType_CharacterWeaponType_Unspecified {
 				return nil, fmt.Errorf("%w: accessory cannot enter weapon slot", errCharacterEquipmentFailedPrecondition)
 			}
 		} else {
-			if entry.AccessoryType == pb.AccessoryType_AccessoryType_Unknow {
+			if entry.AccessoryType == pb.AccessoryType_AccessoryType_Unspecified {
 				return nil, fmt.Errorf("%w: weapon cannot enter accessory slot", errCharacterEquipmentFailedPrecondition)
 			}
 			otherAccessory := nextCharacter.Equipment.GetAccessory1()
@@ -607,8 +715,8 @@ func characterEquipmentResultID(err error) uint32 {
 	}
 }
 
-func equipmentFixedModifierValueInt32(record *pb.EquipmentRecord, key pb.EquipmentRecordBase) int32 {
-	value := equipmentModifier(record, key)
+func equipmentAttributeValueInt32(record *pb.EquipmentRecord, key pb.EquipmentRecordAttribute) int32 {
+	value := equipmentAttribute(record, key)
 	if value < math.MinInt32 {
 		return math.MinInt32
 	}

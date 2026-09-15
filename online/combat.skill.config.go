@@ -91,7 +91,14 @@ func enemyCombatSkillSupported(skillID uint32, skill *gameconfig.SkillEntry) boo
 		return (skill.ContinuationAttack != nil && skill.ContinuationAttack.SegmentCount != nil) ||
 			(skill.MightyAttack != nil && skill.MightyAttack.DamageMultiplier != nil && skill.MightyAttack.TargetDodgeBonus != nil) ||
 			(skill.PoisonAttack != nil && skill.PoisonAttack.DurationActions != nil && skill.PoisonAttack.AttackPercentModifier != nil) ||
+			(skill.StoneAttack != nil && skill.StoneAttack.DurationActions != nil && skill.StoneAttack.AttackPercentModifier != nil) ||
+			(skill.ConfusionAttack != nil && skill.ConfusionAttack.DurationActions != nil && skill.ConfusionAttack.AttackPercentModifier != nil) ||
+			(skill.SleepAttack != nil && skill.SleepAttack.DurationActions != nil && skill.SleepAttack.AttackPercentModifier != nil) ||
 			(skill.ChargeAttack != nil && skill.ChargeAttack.ChargeRounds != nil && skill.ChargeAttack.AttackPercentModifier != nil) ||
-			skill.ShowMercy != nil
+			(skill.EarthRound != nil && skill.EarthRound.DamagePercentModifier != nil) ||
+			(skill.Guardian != nil && skill.Guardian.AttackPercentModifier != nil) ||
+			(skill.NoGuard != nil && skill.NoGuard.DodgePercent != nil && skill.NoGuard.CounterPercent != nil && skill.NoGuard.CriticalPercent != nil) ||
+			(skill.PowerBalance != nil && skill.PowerBalance.AttackPercentModifier != nil && skill.PowerBalance.DefensePercentModifier != nil) ||
+			skill.ShowMercy != nil || skill.Abduct != nil
 	}
 }

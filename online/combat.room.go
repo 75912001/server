@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 
+	"server/common/gameconfig"
 	pb "server/proto/pb"
 
 	xactor "github.com/75912001/xlib/actor"
@@ -104,6 +105,8 @@ type CombatRoom struct {
 	// 的DUELPOINT大于0就锁定为true, 整场改走DP死亡归属和结束结算,
 	// 不再发放普通EXP、战斗石币或掉落. 该模式不会在中途随敌人死亡而切回.
 	pveDuelPointBattle bool
+	// abductDisabled对应原版BattleArray.WinFunc限制. 当前PVE Boss组固定禁止旅程伙伴成功.
+	abductDisabled bool
 }
 
 // GCombatRoomMgr 保存当前 online 进程内仍存活的战斗房间.
@@ -163,6 +166,11 @@ func newCombatRoomWithSeed(
 		random:        newCombatRandom(seed),
 	}
 	room.pveDuelPointBattle = combatRoomIsPVEDuelPointBattle(room.unitStates)
+	if gameconfig.GGameConfig != nil && gameconfig.GGameConfig.Enemy != nil {
+		if group := gameconfig.GGameConfig.Enemy.Get(enemyGroupID); group != nil && group.IsBoss != nil {
+			room.abductDisabled = *group.IsBoss
+		}
+	}
 	if err := room.validatePhysicalState(); err != nil {
 		return nil, err
 	}
@@ -494,7 +502,8 @@ func (r *CombatRoom) removeParticipant(participant *combatRoomParticipant) []*pb
 		state.hp = 0
 		state.alive = false
 		state.guard = false
-		state.charge = nil
+		clearCombatContinuedActionState(state)
+		clearCombatNoGuardState(state)
 		state.battleExperience = 0
 		state.battleDuelPoint = 0
 		state.battleDropAssetIDs = nil
@@ -577,7 +586,7 @@ func (r *CombatRoom) finishCombat(result *pb.CombatRoundResultNotify) {
 		xlog.GLog.Errorf("combat room finish result missing settlement battle:%s", r.battleID)
 		return
 	}
-	if result.GetSettlement().GetBattleResult() == pb.CombatBattleResult_CombatBattleResult_Unknown {
+	if result.GetSettlement().GetBattleResult() == pb.CombatBattleResult_CombatBattleResult_Unspecified {
 		xlog.GLog.Errorf("combat room finish result missing battle result battle:%s", r.battleID)
 		return
 	}

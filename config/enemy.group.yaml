@@ -1,106 +1,88 @@
-# 敌人组配置
-# 任何修改此文件的行为都需要通知客户端和服务端开发人员
-
-# 关于出现的位置
-## 在回合制战斗中,位置规则当前固定:
-### 发起方
-###  1(560,420), 2(480,480), 3(640,360), 4(400,540), 5(720,300), 6(480,360), 7(400,420), 8(560,300), 9(320,480), 10(640,240)
-###  1-5 是角色位, 6-10 是对应角色携带宠物位
-### 接受方
-###  1(240,180), 2(160,240), 3(320,120), 4(80,300), 5(400,60), 6(320,240), 7(240,300), 8(400,180), 9(160,360), 10(480,120)
-###  如果 1-5 是角色位, 6-10 是对应角色携带宠物位; 如果接受方全是宠物, 则从 1,2,3... 顺延放置
-### 先从必须出的怪物(weight=0)开始,按照配置顺序
-### 然后从剩余位置中,按照权重随机选择
-
-# isBoss: true/false 是否是Boss组[默认false]
-## 如果是 boss 组, 那么按照固定顺序,将怪物放置到指定位置.
-## 出现的怪物, 必须全部配置在enemies中, countRange 无效
-## 每个敌人必须且只能配置 enemies[].level 或 enemies[].levelRange; 组级 levelRange/roleLevelOffset 无效
-## captured 无效(不可捕获)
-## babyRate 无效(不可出现宝宝)
-## weight 无效
-
-# countRange: [2, 5]              # 敌人数量范围, [1, 10] 之内
-# levelRange: [最小等级, 最大等级] # 敌人等级范围, [1, 140] 之内
-# roleLevelOffset: [最小偏移, 最大偏移] # 角色等级偏移
-# levelRange 和 roleLevelOffset 必须且只能配置一个
-# captured: true/false 是否允许捕获 [默认:true]
-# babyRate: [0, 100000] 每只敌人成为宠物宝宝(1级)的概率(十万分率) [默认:0]
-# enemies[].id: 引用 pet.yaml 中的宠物ID (作为敌人模板)
-# enemies[].weight: 权重(加权池), 用于随机选择敌人 [默认:0]:0:必定出现
-# enemies[].level: 指定敌人等级 [1, 140] 之内
-# enemies[].levelRange: 本成员随机等级闭区间 [最小等级, 最大等级], 值在 [1, 140] 之内; 与 enemies[].level 互斥
-# enemies[].battleAI: 必填, 引用ai.yaml; 敌人战斗技能、权重和目标策略全部由该AI提供.
-      
+# 本文件由敌人编辑器从config.raw/enemy.group.yaml确定性生成, 不要手工编辑.
+# 敌人组运行配置
 enemyGroups:
-  - id: 1
-    name: 利则诺顿巡逻队
-    countRange: [1, 2]
-    levelRange: [1, 2]
-    captured: true
-    babyRate: 50000
-    enemies:
-      - id: 4000277
-        battleAI: 1
-      - id: 4000277
-        battleAI: 1
-        weight: 100
-
-  - id: 2
-    name: 扬奇洛斯精锐
-    countRange: [10, 10]
-    roleLevelOffset: [-1, 2]
-    captured: true
-    babyRate: 50000
-    enemies:
-      - id: 4000278
-        battleAI: 1
-        weight: 50
-      - id: 4000278
-        battleAI: 1
-        weight: 50
-
-  - id: 3
-    name: 邦浦洛斯守护者
+  - id: 70000
+    name: "[任务][阿布洞窟地下7楼守护者]"
     isBoss: true
     enemies:
-      - id: 4000279
-        battleAI: 1
-        level: 10
-
-  - id: 4
-    name: 邦奇诺长老会
-    isBoss: true
+      - id: 4900294
+        battleAI: 13
+        levelRange:
+          - 39
+          - 41
+        normalDrops:
+          - itemId: 3510568
+            probability: 100
+      - id: 4900295
+        battleAI: 14
+        levelRange:
+          - 38
+          - 40
+        normalDrops:
+          - itemId: 3930606
+            probability: 100
+      - id: 4900296
+        battleAI: 15
+        levelRange:
+          - 37
+          - 39
+        normalDrops:
+          - itemId: 3500574
+            probability: 100
+      - id: 4900297
+        battleAI: 16
+        levelRange:
+          - 35
+          - 38
+      - id: 4900298
+        battleAI: 17
+        levelRange:
+          - 40
+          - 43
+  - id: 70001
+    name: "[任务][卡坦的愿望][1]"
+    countRange:
+      - 3
+      - 5
+    levelRange:
+      - 25
+      - 25
     enemies:
-      - id: 4000280
+      - id: 4000311
         battleAI: 1
-        level: 15
-      - id: 4000280
+        weight: 1
+      - id: 4000312
         battleAI: 1
-        level: 12
-      - id: 4000280
+        weight: 1
+      - id: 4000309
         battleAI: 1
-        level: 12
-
-  - id: 5
-    name: 威威长老会
-    isBoss: true
+        weight: 1
+      - id: 4000310
+        battleAI: 1
+        weight: 1
+  - id: 70002
+    name: "[任务][卡坦的愿望][2]"
+    countRange:
+      - 3
+      - 5
+    levelRange:
+      - 25
+      - 25
     enemies:
-      - id: 4000254
+      - id: 4000333
         battleAI: 1
-        level: 1
-
-  - id: 6
-    name: 布林帖斯长老会
-    isBoss: true
-    enemies:
-      - id: 4000322
+        weight: 1
+      - id: 4000334
         battleAI: 1
-        level: 1
-
-##测试##########################################################
+        weight: 1
+      - id: 4000335
+        battleAI: 1
+        weight: 1
+      - id: 4000336
+        battleAI: 1
+        weight: 1
   - id: 80000
-    name: 测试[人龙系][1]
+    name: "测试[人龙系][1]"
     isBoss: true
     enemies:
       - id: 4000277
@@ -127,9 +109,8 @@ enemyGroups:
       - id: 4000615
         battleAI: 1
         level: 1
-
   - id: 80001
-    name: 测试[人龙系][2]
+    name: "测试[人龙系][2]"
     isBoss: true
     enemies:
       - id: 4001503
@@ -150,9 +131,8 @@ enemyGroups:
       - id: 4001564
         battleAI: 1
         level: 1
-
   - id: 80010
-    name: 测试[老虎系]
+    name: "测试[老虎系]"
     isBoss: true
     enemies:
       - id: 4000301
@@ -179,10 +159,8 @@ enemyGroups:
       - id: 4000638
         battleAI: 1
         level: 1
-
-
   - id: 80020
-    name: 测试[暴龙系]
+    name: "测试[暴龙系]"
     isBoss: true
     enemies:
       - id: 4000337
@@ -208,10 +186,9 @@ enemyGroups:
         level: 1
       - id: 4000673
         battleAI: 1
-        level: 1 
-
+        level: 1
   - id: 80030
-    name: 测试[加美系]
+    name: "测试[加美系]"
     isBoss: true
     enemies:
       - id: 4000249
@@ -237,10 +214,9 @@ enemyGroups:
         level: 1
       - id: 4000593
         battleAI: 1
-        level: 1 
-
+        level: 1
   - id: 80040
-    name: 测试[乌力系]
+    name: "测试[乌力系]"
     isBoss: true
     enemies:
       - id: 4000240
@@ -266,15 +242,12 @@ enemyGroups:
         level: 1
       - id: 4000586
         battleAI: 1
-        level: 1 
+        level: 1
       - id: 4001450
         battleAI: 1
-        level: 1 
-
-
-
+        level: 1
   - id: 80050
-    name: 测试[布伊系]
+    name: "测试[布伊系]"
     isBoss: true
     enemies:
       - id: 4000244
@@ -300,13 +273,12 @@ enemyGroups:
         level: 1
       - id: 4000587
         battleAI: 1
-        level: 1 
+        level: 1
       - id: 4000589
         battleAI: 1
-        level: 1 
-
+        level: 1
   - id: 80060
-    name: 测试[乌宝宝系]
+    name: "测试[乌宝宝系]"
     isBoss: true
     enemies:
       - id: 4000253
@@ -332,10 +304,9 @@ enemyGroups:
         level: 1
       - id: 4000597
         battleAI: 1
-        level: 1 
-        
+        level: 1
   - id: 80070
-    name: 测试[大舌头系]
+    name: "测试[大舌头系]"
     isBoss: true
     enemies:
       - id: 4000257
@@ -361,10 +332,9 @@ enemyGroups:
         level: 1
       - id: 4000601
         battleAI: 1
-        level: 1 
-        
+        level: 1
   - id: 80080
-    name: 测试[乌龟系]
+    name: "测试[乌龟系]"
     isBoss: true
     enemies:
       - id: 4000261
@@ -390,11 +360,9 @@ enemyGroups:
         level: 1
       - id: 4000605
         battleAI: 1
-        level: 1 
-
-
+        level: 1
   - id: 80090
-    name: 测试[特洛昆系]
+    name: "测试[特洛昆系]"
     isBoss: true
     enemies:
       - id: 4000265
@@ -420,10 +388,9 @@ enemyGroups:
         level: 1
       - id: 4000608
         battleAI: 1
-        level: 1 
-
+        level: 1
   - id: 80100
-    name: 测试[呼拔拔系]
+    name: "测试[呼拔拔系]"
     isBoss: true
     enemies:
       - id: 4000269
@@ -449,10 +416,9 @@ enemyGroups:
         level: 1
       - id: 4000612
         battleAI: 1
-        level: 1 
-
+        level: 1
   - id: 80110
-    name: 测试[穿山甲系]
+    name: "测试[穿山甲系]"
     isBoss: true
     enemies:
       - id: 4000273
@@ -478,10 +444,9 @@ enemyGroups:
         level: 1
       - id: 4000358
         battleAI: 1
-        level: 1 
-
+        level: 1
   - id: 80120
-    name: 测试[克克尔系]
+    name: "测试[克克尔系]"
     isBoss: true
     enemies:
       - id: 4000281
@@ -496,9 +461,6 @@ enemyGroups:
       - id: 4000284
         battleAI: 1
         level: 1
-      - id: 4000602
-        battleAI: 1
-        level: 1
       - id: 4000616
         battleAI: 1
         level: 1
@@ -507,10 +469,12 @@ enemyGroups:
         level: 1
       - id: 4000618
         battleAI: 1
-        level: 1 
-
+        level: 1
+      - id: 4000619
+        battleAI: 1
+        level: 1
   - id: 80130
-    name: 测试[凯比系]
+    name: "测试[凯比系]"
     isBoss: true
     enemies:
       - id: 4000285
@@ -536,11 +500,9 @@ enemyGroups:
         level: 1
       - id: 4000623
         battleAI: 1
-        level: 1   
-
-
+        level: 1
   - id: 80140
-    name: 测试[猩猩系]
+    name: "测试[猩猩系]"
     isBoss: true
     enemies:
       - id: 4000289
@@ -566,10 +528,9 @@ enemyGroups:
         level: 1
       - id: 4000627
         battleAI: 1
-        level: 1   
-
+        level: 1
   - id: 80150
-    name: 测试[布克系]
+    name: "测试[布克系]"
     isBoss: true
     enemies:
       - id: 4000293
@@ -595,10 +556,9 @@ enemyGroups:
         level: 1
       - id: 4000630
         battleAI: 1
-        level: 1   
-
+        level: 1
   - id: 80160
-    name: 测试[卡克尔系]
+    name: "测试[卡克尔系]"
     isBoss: true
     enemies:
       - id: 4000297
@@ -624,10 +584,9 @@ enemyGroups:
         level: 1
       - id: 4000634
         battleAI: 1
-        level: 1   
-
+        level: 1
   - id: 80170
-    name: 测试[犀牛系]
+    name: "测试[犀牛系]"
     isBoss: true
     enemies:
       - id: 4000305
@@ -653,10 +612,9 @@ enemyGroups:
         level: 1
       - id: 4000642
         battleAI: 1
-        level: 1   
-
+        level: 1
   - id: 80180
-    name: 测试[鲨鱼系]
+    name: "测试[鲨鱼系]"
     isBoss: true
     enemies:
       - id: 4000309
@@ -682,10 +640,9 @@ enemyGroups:
         level: 1
       - id: 4000646
         battleAI: 1
-        level: 1   
-
+        level: 1
   - id: 80190
-    name: 测试[飞天蛙系]
+    name: "测试[飞天蛙系]"
     isBoss: true
     enemies:
       - id: 4000313
@@ -711,13 +668,15 @@ enemyGroups:
         level: 1
       - id: 4000650
         battleAI: 1
-        level: 1   
-  
-##练级##########################################################  
-  - id: 90001 # 乌力系
-    name: 练级1-10
-    countRange: [1, 2]
-    levelRange: [1, 5]
+        level: 1
+  - id: 90001
+    name: "练级1-10"
+    countRange:
+      - 1
+      - 2
+    levelRange:
+      - 1
+      - 5
     captured: false
     enemies:
       - id: 4000240
@@ -726,10 +685,14 @@ enemyGroups:
       - id: 4000242
         battleAI: 1
         weight: 100
-  - id: 90010 # 乌龟系
-    name: 练级10-20
-    countRange: [2, 5]
-    levelRange: [10, 15]
+  - id: 90010
+    name: "练级10-20"
+    countRange:
+      - 2
+      - 5
+    levelRange:
+      - 10
+      - 15
     captured: false
     enemies:
       - id: 4000261
@@ -741,10 +704,14 @@ enemyGroups:
       - id: 4000264
         battleAI: 1
         weight: 100
-  - id: 90020 # 大舌头系
-    name: 练级20-30
-    countRange: [3, 5]
-    levelRange: [20, 30]
+  - id: 90020
+    name: "练级20-30"
+    countRange:
+      - 3
+      - 5
+    levelRange:
+      - 20
+      - 30
     captured: false
     enemies:
       - id: 4000257
@@ -753,10 +720,14 @@ enemyGroups:
       - id: 4000258
         battleAI: 1
         weight: 100
-  - id: 90030 # 海主人系
-    name: 练级30-40
-    countRange: [4, 5]
-    levelRange: [30, 40]
+  - id: 90030
+    name: "练级30-40"
+    countRange:
+      - 4
+      - 5
+    levelRange:
+      - 30
+      - 40
     captured: false
     enemies:
       - id: 4000318
@@ -765,10 +736,14 @@ enemyGroups:
       - id: 4000319
         battleAI: 1
         weight: 100
-  - id: 90040 # 布伊系
-    name: 练级40-50
-    countRange: [5, 5]
-    levelRange: [40, 50]
+  - id: 90040
+    name: "练级40-50"
+    countRange:
+      - 5
+      - 5
+    levelRange:
+      - 40
+      - 50
     captured: false
     enemies:
       - id: 4000244
@@ -777,10 +752,14 @@ enemyGroups:
       - id: 4000246
         battleAI: 1
         weight: 100
-  - id: 90050 # 大象系
-    name: 练级50-60
-    countRange: [5, 5]
-    levelRange: [50, 60]
+  - id: 90050
+    name: "练级50-60"
+    countRange:
+      - 5
+      - 5
+    levelRange:
+      - 50
+      - 60
     captured: false
     enemies:
       - id: 4000325
@@ -789,10 +768,14 @@ enemyGroups:
       - id: 4000328
         battleAI: 1
         weight: 100
-  - id: 90060 # 穿山甲系
-    name: 练级60-70
-    countRange: [5, 5]
-    levelRange: [60, 70]
+  - id: 90060
+    name: "练级60-70"
+    countRange:
+      - 5
+      - 5
+    levelRange:
+      - 60
+      - 70
     captured: false
     enemies:
       - id: 4000273
@@ -807,28 +790,40 @@ enemyGroups:
       - id: 4000276
         battleAI: 1
         weight: 100
-  - id: 90070 # 乌龟系
-    name: 练级70-80
-    countRange: [5, 8]
-    levelRange: [70, 80]
+  - id: 90070
+    name: "练级70-80"
+    countRange:
+      - 5
+      - 8
+    levelRange:
+      - 70
+      - 80
     captured: false
     enemies:
       - id: 4000264
         battleAI: 1
         weight: 100
-  - id: 90080 # 乌龟系
-    name: 练级80-90
-    countRange: [5, 8]
-    levelRange: [80, 90]
+  - id: 90080
+    name: "练级80-90"
+    countRange:
+      - 5
+      - 8
+    levelRange:
+      - 80
+      - 90
     captured: false
     enemies:
       - id: 4000264
         battleAI: 1
         weight: 100
-  - id: 90090 # 鱼龙系
-    name: 练级90-100
-    countRange: [5, 8]
-    levelRange: [90, 100]
+  - id: 90090
+    name: "练级90-100"
+    countRange:
+      - 5
+      - 8
+    levelRange:
+      - 90
+      - 100
     captured: false
     enemies:
       - id: 4000345
@@ -840,10 +835,14 @@ enemyGroups:
       - id: 4000349
         battleAI: 1
         weight: 100
-  - id: 90100 # 鲨鱼系
-    name: 练级100-110
-    countRange: [5, 10]
-    levelRange: [100, 110]
+  - id: 90100
+    name: "练级100-110"
+    countRange:
+      - 5
+      - 10
+    levelRange:
+      - 100
+      - 110
     captured: false
     enemies:
       - id: 4000309
@@ -858,19 +857,27 @@ enemyGroups:
       - id: 4000312
         battleAI: 1
         weight: 100
-  - id: 90110 # 雷龙系
-    name: 练级110-120
-    countRange: [5, 10]
-    levelRange: [110, 120]
+  - id: 90110
+    name: "练级110-120"
+    countRange:
+      - 5
+      - 10
+    levelRange:
+      - 110
+      - 120
     captured: false
     enemies:
       - id: 4000322
         battleAI: 1
         weight: 100
-  - id: 90120 # 雷龙系
-    name: 练级120-130
-    countRange: [5, 10]
-    levelRange: [120, 130]
+  - id: 90120
+    name: "练级120-130"
+    countRange:
+      - 5
+      - 10
+    levelRange:
+      - 120
+      - 130
     captured: false
     enemies:
       - id: 4000656
@@ -879,93 +886,44 @@ enemyGroups:
       - id: 4000657
         battleAI: 1
         weight: 100
-  - id: 90130 # 雷龙系
-    name: 练级130-140
-    countRange: [5, 10]
-    levelRange: [130, 140]
+  - id: 90130
+    name: "练级130-140"
+    countRange:
+      - 5
+      - 10
+    levelRange:
+      - 130
+      - 140
     captured: false
     enemies:
       - id: 4000655
         battleAI: 1
         weight: 100
-
-##任务##########################################################
-  - id: 1000701
-    name: 任务[阿布洞窟地下7楼守护者] # 任务
+  - id: 80200
+    name: "测试[海主人系]"
+    enemies:
+      - id: 4000317
+        battleAI: 1
+        level: 1
+      - id: 4000318
+        battleAI: 1
+        level: 1
+      - id: 4000319
+        battleAI: 1
+        level: 1
+      - id: 4000320
+        battleAI: 1
+        level: 1
+      - id: 4000651
+        battleAI: 1
+        level: 1
+      - id: 4000652
+        battleAI: 1
+        level: 1
+      - id: 4000653
+        battleAI: 1
+        level: 1
+      - id: 4000654
+        battleAI: 1
+        level: 1
     isBoss: true
-    enemies:
-      - id: 4900294
-        battleAI: 13
-        levelRange: [39, 41]
-      - id: 4900295
-        battleAI: 14
-        levelRange: [38, 40]
-      - id: 4900296
-        battleAI: 15
-        levelRange: [37, 39]
-      - id: 4900297
-        battleAI: 16
-        levelRange: [35, 38]
-      - id: 4900298
-        battleAI: 17
-        levelRange: [40, 43]
-
-  - id: 1000702
-    name: 任务[卡坦的愿望][1] # 任务
-    countRange: [3, 5]
-    levelRange: [25, 25]
-    enemies:
-      - id: 4000309
-        battleAI: 1
-        weight: 100
-      - id: 4000310
-        battleAI: 1
-        weight: 100
-      - id: 4000311
-        battleAI: 1
-        weight: 100
-      - id: 4000312
-        battleAI: 1
-        weight: 100
-      - id: 4000643
-        battleAI: 1
-        weight: 100
-      - id: 4000644
-        battleAI: 1
-        weight: 100
-      - id: 4000645
-        battleAI: 1
-        weight: 100
-      - id: 4000646
-        battleAI: 1
-        weight: 100 
-
-  - id: 1000703
-    name: 任务[卡坦的愿望][2] # 任务
-    countRange: [3, 5]
-    levelRange: [25, 25]
-    enemies:
-      - id: 4000333
-        battleAI: 1
-        weight: 100
-      - id: 4000334
-        battleAI: 1
-        weight: 100
-      - id: 4000335
-        battleAI: 1
-        weight: 100
-      - id: 4000336
-        battleAI: 1
-        weight: 100
-      - id: 4000666
-        battleAI: 1
-        weight: 100
-      - id: 4000667
-        battleAI: 1
-        weight: 100
-      - id: 4000668
-        battleAI: 1
-        weight: 100
-      - id: 4000669
-        battleAI: 1
-        weight: 100 

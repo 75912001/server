@@ -39,10 +39,10 @@ func combatPoisonThreshold(attacker *combatUnitRuntimeState, defender *combatUni
 	return min(int64(80), threshold)
 }
 
-// tryInflictCombatPoison只在主动攻击造成正伤害后调用. 已中毒时不刷新计数,
-// 也不消费额外随机数. 致死伤害仍保留原版概率抽取顺序, 但不向倒下目标挂状态.
+// tryInflictCombatPoison只在主动攻击造成正伤害后调用. 目标已有任一普通异常时不覆盖,
+// 不刷新计数且不消费随机数. 致死伤害仍保留原版概率抽取顺序, 但不向倒下目标挂状态.
 func (r *CombatRoom) tryInflictCombatPoison(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState, durationActions uint32, step *combatStepResult) {
-	if defender.poisonTurns > 0 {
+	if combatStateHasAbnormalStatus(defender) {
 		return
 	}
 	if r.random.rangeInt(1, 100) >= combatPoisonThreshold(attacker, defender) {
@@ -51,7 +51,9 @@ func (r *CombatRoom) tryInflictCombatPoison(attacker *combatUnitRuntimeState, de
 	if !defender.alive || defender.escaped {
 		return
 	}
-	defender.poisonTurns = durationActions
+	// 原版状态攻击把技能turn加1后写入状态表. BATTLE_StatusSeq会在目标
+	// 行动开始先递减, 归零时只解除状态, 因而turn次毒伤后还保留一次解毒行动.
+	defender.poisonTurns = durationActions + 1
 	combatAppendEffect(step, &combatEffectResult{
 		EffectKind:        combatEffectKindStatus,
 		SourceUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(attacker.unit.GetKey())},
@@ -70,30 +72,48 @@ func (r *CombatRoom) tryInflictCombatPoison(attacker *combatUnitRuntimeState, de
 	})
 }
 
-// processCombatPoisonBeforeAction在正常行动前结算毒伤, 最后一次同时移除状态.
-// 每名合击成员只结算一次, 连续攻击各段和反击不调用. 状态步骤先于本人的实际
-// 动作, 通过现有Status cause与HP/status delta下发, 客户端不自行扣血或计数.
+// processCombatPoisonBeforeAction复刻BATTLE_StatusSeq: 正常行动开始先递减状态,
+// 归零时只解除, 仍为正数时才结算毒伤. 每名合击成员只处理一次, 连续攻击各段
+// 和反击不调用. 状态步骤先于本人实际动作, 客户端不自行扣血或计数.
 func (r *CombatRoom) processCombatPoisonBeforeAction(action *combatAction, steps *[]*combatStepResult) {
 	state := r.stateByKey(action.unitKey)
 	if state == nil || !state.alive || state.escaped || state.poisonTurns == 0 {
 		return
 	}
+	state.poisonTurns--
+	if state.poisonTurns == 0 {
+		step := &combatStepResult{
+			EventKind:         combatStepKindStatus,
+			SourceUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(state.unit.GetKey())},
+			TargetUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(state.unit.GetKey())},
+		}
+		combatAppendEffect(step, &combatEffectResult{
+			EffectKind:        combatEffectKindStatus,
+			SourceUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(state.unit.GetKey())},
+			TargetUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(state.unit.GetKey())},
+			UnitDeltaList: []*pb.CombatUnitStateDelta{{
+				UnitKey: cloneCombatUnitKey(state.unit.GetKey()),
+				StatusDeltaList: []*pb.CombatStatusDelta{{
+					StatusType: pb.CombatStatusType_CombatStatusType_Poison,
+					DeltaType:  pb.CombatStatusDeltaType_CombatStatusDeltaType_Remove,
+				}},
+			}},
+		})
+		*steps = append(*steps, step)
+		return
+	}
 	before := state.hp
 	damage := combatPoisonDamage(state)
 	state.hp -= damage
-	state.poisonTurns--
 	statusDelta := &pb.CombatStatusDelta{
 		StatusType: pb.CombatStatusType_CombatStatusType_Poison,
-		DeltaType:  pb.CombatStatusDeltaType_CombatStatusDeltaType_Remove,
-	}
-	if state.poisonTurns > 0 {
-		statusDelta.DeltaType = pb.CombatStatusDeltaType_CombatStatusDeltaType_Update
-		statusDelta.DurationAfter = &pb.CombatDuration{
+		DeltaType:  pb.CombatStatusDeltaType_CombatStatusDeltaType_Update,
+		DurationAfter: &pb.CombatDuration{
 			Unit:      pb.CombatDurationUnit_CombatDurationUnit_Action,
 			Remaining: state.poisonTurns,
-		}
+		},
 	}
-	// HP=1时仍发送0伤害, 并照常消耗一次毒伤结算次数.
+	// HP=1时仍发送0伤害, 并照常消耗这次原版状态计数.
 	unitDelta := &pb.CombatUnitStateDelta{
 		UnitKey: cloneCombatUnitKey(state.unit.GetKey()),
 		AssetDeltaList: []*pb.CombatAssetDelta{{
@@ -124,10 +144,12 @@ func (r *CombatRoom) processCombatPoisonBeforeAction(action *combatAction, steps
 	})
 }
 
-// resetRoundPoisonAttackModifiers对应下一回合BATTLE_TurnParam恢复攻击力.
-// 清理的是施放者本回合的攻击命令修正, 不清理目标跨回合的中毒状态.
-func (r *CombatRoom) resetRoundPoisonAttackModifiers() {
+// resetRoundAttributeModifiers对应下一回合BATTLE_TurnParam恢复攻防.
+// 清理中毒攻击、忠犬和背水之战的本回合修正, 不清理目标跨回合的中毒状态.
+func (r *CombatRoom) resetRoundAttributeModifiers() {
 	for _, state := range r.unitStates {
 		state.roundAttackPercentModifier = 0
+		state.roundDefensePercentModifier = 0
+		state.guardianProtectedUnitKey = nil
 	}
 }

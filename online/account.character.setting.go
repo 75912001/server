@@ -23,19 +23,25 @@ func (p *Account) onCharacterSettingSetReq(gateway *Gateway, pkt *pb.OnlineClien
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSettingSetRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
-	key := sceneCharacterKey{aid: p.aid, characterUUID: character.record.GetBase().GetUuid()}
-	member, leader := GCharacterTeamMgr.membership(key)
-	if member && !leader && req.GetTeamEnabled() != character.teamEnabled {
-		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSettingSetRes_CMD), xerror.FailedPrecondition.Code())
+	res := &pb.CharacterSettingSetRes{CharacterUuid: req.GetCharacterUuid()}
+	switch action := req.GetAction().(type) {
+	case *pb.CharacterSettingSetReq_TeamEnabled:
+		// 非队长的组员不允许修改是否允许组队.
+		key := sceneCharacterKey{aid: p.aid, characterUUID: character.record.GetBase().GetUuid()}
+		member, leader := GCharacterTeamMgr.membership(key)
+		if member && !leader && action.TeamEnabled != character.teamEnabled {
+			p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSettingSetRes_CMD), xerror.FailedPrecondition.Code())
+			return
+		}
+		character.teamEnabled = action.TeamEnabled
+		res.Action = &pb.CharacterSettingSetRes_TeamEnabled{TeamEnabled: character.teamEnabled}
+	case *pb.CharacterSettingSetReq_DuelEnabled:
+		character.duelEnabled = action.DuelEnabled
+		res.Action = &pb.CharacterSettingSetRes_DuelEnabled{DuelEnabled: character.duelEnabled}
+	default:
+		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterSettingSetRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
-
-	character.teamEnabled = req.GetTeamEnabled()
-	character.duelEnabled = req.GetDuelEnabled()
 	p.refreshCharacterPresence(character)
-	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterSettingSetRes_CMD), xerror.Success.Code(), &pb.CharacterSettingSetRes{
-		CharacterUuid: req.GetCharacterUuid(),
-		TeamEnabled:   character.teamEnabled,
-		DuelEnabled:   character.duelEnabled,
-	})
+	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterSettingSetRes_CMD), xerror.Success.Code(), res)
 }

@@ -5,7 +5,7 @@
 ## 组件
 
 ```text
-robot
+client
   -> login
       -> cache
       -> 返回 gatewayAddr + connectTicket
@@ -26,7 +26,6 @@ login / gateway / online / cache
 - `cache`：用户记录、用户 session、token 等缓存数据访问。
 - `Redis Cluster`：cache 后端数据存储。
 - `etcd Cluster`：服务注册发现。
-- `robot`：本地客户端模拟器。
 
 ## 配置入口
 

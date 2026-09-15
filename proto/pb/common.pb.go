@@ -87,10 +87,10 @@ type Constants int32
 
 const (
 	Constants_Constants_Unspecified                     Constants = 0
-	Constants_Constants_Level_Min                       Constants = 1    // 角色和宠物等级下限(原 LevelRange_Min)
-	Constants_Constants_Level_Max                       Constants = 140  // 角色和宠物等级上限(原 LevelRange_Max)
+	Constants_Constants_Level_Min                       Constants = 1    // 角色和宠物等级下限
+	Constants_Constants_Level_Max                       Constants = 140  // 角色和宠物等级上限
 	Constants_Constants_Elemental_Max_Active_Type_Count Constants = 2    // 最多允许同时分配的元素种类数量
-	Constants_Constants_Elemental_Total_Point           Constants = 10   // 地水火风元素总点数
+	Constants_Constants_Elemental_Total_Point           Constants = 100  // 地水火风元素总百分比
 	Constants_Constants_Character_Name_Max_Length       Constants = 12   // 角色名称最大长度
 	Constants_Constants_Mail_Title_Max_Length           Constants = 30   // 系统邮件主题最大 Unicode 字符数
 	Constants_Constants_Mail_Expire_Days                Constants = 365  // 系统邮件固定有效天数
@@ -105,7 +105,7 @@ var (
 		1:    "Constants_Level_Min",
 		140:  "Constants_Level_Max",
 		2:    "Constants_Elemental_Max_Active_Type_Count",
-		10:   "Constants_Elemental_Total_Point",
+		100:  "Constants_Elemental_Total_Point",
 		12:   "Constants_Character_Name_Max_Length",
 		30:   "Constants_Mail_Title_Max_Length",
 		365:  "Constants_Mail_Expire_Days",
@@ -117,7 +117,7 @@ var (
 		"Constants_Level_Min":                       1,
 		"Constants_Level_Max":                       140,
 		"Constants_Elemental_Max_Active_Type_Count": 2,
-		"Constants_Elemental_Total_Point":           10,
+		"Constants_Elemental_Total_Point":           100,
 		"Constants_Character_Name_Max_Length":       12,
 		"Constants_Mail_Title_Max_Length":           30,
 		"Constants_Mail_Expire_Days":                365,
@@ -246,7 +246,7 @@ var file_common_proto_rawDesc = []byte{
 	0x6c, 0x5f, 0x4d, 0x61, 0x78, 0x5f, 0x41, 0x63, 0x74, 0x69, 0x76, 0x65, 0x5f, 0x54, 0x79, 0x70,
 	0x65, 0x5f, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x10, 0x02, 0x12, 0x23, 0x0a, 0x1f, 0x43, 0x6f, 0x6e,
 	0x73, 0x74, 0x61, 0x6e, 0x74, 0x73, 0x5f, 0x45, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x61, 0x6c,
-	0x5f, 0x54, 0x6f, 0x74, 0x61, 0x6c, 0x5f, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x10, 0x0a, 0x12, 0x27,
+	0x5f, 0x54, 0x6f, 0x74, 0x61, 0x6c, 0x5f, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x10, 0x64, 0x12, 0x27,
 	0x0a, 0x23, 0x43, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x74, 0x73, 0x5f, 0x43, 0x68, 0x61, 0x72,
 	0x61, 0x63, 0x74, 0x65, 0x72, 0x5f, 0x4e, 0x61, 0x6d, 0x65, 0x5f, 0x4d, 0x61, 0x78, 0x5f, 0x4c,
 	0x65, 0x6e, 0x67, 0x74, 0x68, 0x10, 0x0c, 0x12, 0x23, 0x0a, 0x1f, 0x43, 0x6f, 0x6e, 0x73, 0x74,

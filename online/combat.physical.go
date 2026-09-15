@@ -31,9 +31,20 @@ const (
 	combatActionKindGuardBreak
 	combatActionKindMightyAttack
 	combatActionKindPoisonAttack
+	combatActionKindStoneAttack
+	combatActionKindConfusionAttack
+	combatActionKindSleepAttack
+	combatActionKindDeepPoisonAttack
 	combatActionKindChargeAttack
+	combatActionKindEarthRound
+	combatActionKindGuardian
+	combatActionKindNoGuard
+	combatActionKindPowerBalance
 	combatActionKindShowMercy
 	combatActionKindCapture
+	combatActionKindAbduct
+	combatActionKindStatusSpirit
+	combatActionKindHealingSpirit
 )
 
 // combatEffectKind只用于服务端结算器内部区分原子结果, 不进入线上协议.
@@ -52,6 +63,10 @@ const (
 	combatEffectKindActionOnly
 	combatEffectKindStatus
 	combatEffectKindCapture
+	combatEffectKindAbduct
+	combatEffectKindHeal
+	combatEffectKindReaction
+	combatEffectKindVisibility
 )
 
 // combatHitResult保留旧结算器可组合的命中标记. 协议出口会归一化为
@@ -110,19 +125,23 @@ func (d *combatDamageDetail) GetHpAfter() uint32 {
 	return d.HpAfter
 }
 
-// combatAction是服务端根据skill.yaml解析出的回合行为, 不进入客户端协议和持久化数据.
+// combatAction是服务端根据技能.yaml解析出的回合行为, 不进入客户端协议和持久化数据.
 type combatAction struct {
 	unitKey     *pb.CombatUnitKey
 	kind        combatActionKind
 	skillID     uint32
 	targetKey   *pb.CombatUnitKey
 	actionValue int64
-	comboMember bool
+	// actionValueFrozen表示跨回合续招沿用首次行动值, 本回合不得重新计算或消耗随机数.
+	actionValueFrozen bool
+	comboMember       bool
+	// beforeActionProcessed防止预组成合击在降级为单人动作后重复结算行动前状态.
+	beforeActionProcessed bool
 
 	// declaredTargetKey保存行动前状态处理尚未改写的声明目标.
 	declaredTargetCaptured bool
 	declaredTargetKey      *pb.CombatUnitKey
-	// segmentCount保存本次动作的计划段数. 连续攻击来自skill.yaml配置,
+	// segmentCount保存本次动作的计划段数. 连续攻击来自技能.yaml配置,
 	// 普通武器攻击按attacknum范围锁定, 空手攻击按等级和BaseLuck锁定.
 	segmentCount uint32
 	// weaponDamageDivision只对原版ITEM_FIST爪武器的普通多段攻击生效.
@@ -130,14 +149,55 @@ type combatAction struct {
 	// 一击必杀参数在动作解析时从配置复制, 不修改单位属性, 反击动作也不继承.
 	mightyDamageMultiplier uint32
 	mightyTargetDodgeBonus uint32
-	// 猛毒攻击参数只来自已经校验的配置, 不接受客户端提交伤害或中毒次数.
+	// 中毒攻击参数只来自已经校验的配置, 不接受客户端提交伤害或中毒次数.
 	poisonDurationActions       uint32
 	poisonAttackPercentModifier int32
+	// 石化攻击参数只来自已经校验的配置, 不接受客户端提交状态类型或持续次数.
+	stoneDurationActions       uint32
+	stoneAttackPercentModifier int32
+	// 混乱攻击参数只来自已经校验的配置, 不接受客户端提交状态类型或持续次数.
+	confusionDurationActions       uint32
+	confusionAttackPercentModifier int32
+	// 催眠攻击参数只来自已经校验的配置, 不接受客户端提交状态类型或持续次数.
+	sleepDurationActions       uint32
+	sleepAttackPercentModifier int32
+	// 剧毒攻击参数只来自已经校验的配置, 到期致死由服务端行动前状态结算负责.
+	deepPoisonDurationActions       uint32
+	deepPoisonAttackPercentModifier int32
+	// confusionRewritten标记本次行动已被运行态混乱改写, 目标可合法落在同阵营.
+	confusionRewritten bool
 	// 突击参数从首次提交的配置复制, 开始执行后转存到单位的跨回合蓄力状态.
 	chargeRounds                uint32
 	chargeAttackPercentModifier int32
+	// 地球一周参数在首次提交时冻结, release只标记当前动作是第二阶段.
+	earthRoundDamagePercentModifier int32
+	earthRoundRelease               bool
+	// 忠犬参数在动作解析时冻结, 本回合预激活后同时用于主动攻击与代受伤害.
+	guardianAttackPercentModifier  int32
+	guardianDefensePercentModifier int32
+	// 不防守战法参数在动作解析时冻结, 不读取客户端目标或运行中热更新配置.
+	noGuardDodgePercent    int32
+	noGuardCounterPercent  uint32
+	noGuardCriticalPercent uint32
+	// 背水之战参数在动作解析时冻结, 排序前写入本回合工作攻防.
+	powerBalanceAttackPercentModifier  int32
+	powerBalanceDefensePercentModifier int32
+	// 旅程伙伴2/3在提交时冻结可选忠诚度阈值, 避免回合执行期间读取热更新配置.
+	abductHasLoyaltyThreshold bool
+	abductLoyaltyThreshold    uint32
+	// 异常精灵参数在提交动作时从技能.yaml复制, 客户端只提交技能ID和目标.
+	statusType                 pb.CombatStatusType
+	statusDurationActions      uint32
+	statusBaseSuccess          uint32
+	statusLevelDifferenceRange uint32
+	statusTargetScope          string
+	statusMPCost               uint32
+	// 治疗精灵参数在提交时冻结, 装备只证明技能归属, 不参与耗蓝和治疗量计算.
+	healPower       uint32
+	healTargetScope string
+	healMPCost      uint32
 	// 连击开始执行后按普通攻击命令参与后续反击资格判断.
-	// 一击必杀和猛毒攻击也在主动出手时提升为相同的反击资格.
+	// 一击必杀和三种普通异常攻击也在主动出手时提升为相同的反击资格.
 	counterCommandPromotedToAttack bool
 }
 
@@ -201,12 +261,56 @@ func (a *combatAction) isPoisonAttack() bool {
 	return a != nil && a.kind == combatActionKindPoisonAttack
 }
 
+func (a *combatAction) isStoneAttack() bool {
+	return a != nil && a.kind == combatActionKindStoneAttack
+}
+
+func (a *combatAction) isConfusionAttack() bool {
+	return a != nil && a.kind == combatActionKindConfusionAttack
+}
+
+func (a *combatAction) isSleepAttack() bool {
+	return a != nil && a.kind == combatActionKindSleepAttack
+}
+
+func (a *combatAction) isDeepPoisonAttack() bool {
+	return a != nil && a.kind == combatActionKindDeepPoisonAttack
+}
+
 func (a *combatAction) isChargeAttack() bool {
 	return a != nil && a.kind == combatActionKindChargeAttack
 }
 
+func (a *combatAction) isEarthRound() bool {
+	return a != nil && a.kind == combatActionKindEarthRound
+}
+
+func (a *combatAction) isGuardian() bool {
+	return a != nil && a.kind == combatActionKindGuardian
+}
+
+func (a *combatAction) isNoGuard() bool {
+	return a != nil && a.kind == combatActionKindNoGuard
+}
+
+func (a *combatAction) isPowerBalance() bool {
+	return a != nil && a.kind == combatActionKindPowerBalance
+}
+
 func (a *combatAction) isShowMercy() bool {
 	return a != nil && a.kind == combatActionKindShowMercy
+}
+
+func (a *combatAction) isAbduct() bool {
+	return a != nil && a.kind == combatActionKindAbduct
+}
+
+func (a *combatAction) isStatusSpirit() bool {
+	return a != nil && a.kind == combatActionKindStatusSpirit
+}
+
+func (a *combatAction) isHealingSpirit() bool {
+	return a != nil && a.kind == combatActionKindHealingSpirit
 }
 
 func (a *combatAction) usesMultiSegmentDamageDivision() bool {
@@ -217,11 +321,11 @@ func (a *combatAction) canCounter() bool {
 	if a == nil {
 		return false
 	}
-	return a.isAttack() || ((a.isContinuationAttack() || a.isMightyAttack() || a.isPoisonAttack()) && a.counterCommandPromotedToAttack)
+	return a.isAttack() || a.isNoGuard() || ((a.isContinuationAttack() || a.isMightyAttack() || a.isPoisonAttack() || a.isStoneAttack() || a.isConfusionAttack() || a.isSleepAttack() || a.isDeepPoisonAttack() || a.isGuardian() || a.isPowerBalance()) && a.counterCommandPromotedToAttack)
 }
 
 func (a *combatAction) promoteSpecialAttackCommand() {
-	if a != nil && (a.isContinuationAttack() || a.isMightyAttack() || a.isPoisonAttack()) {
+	if a != nil && (a.isContinuationAttack() || a.isMightyAttack() || a.isPoisonAttack() || a.isStoneAttack() || a.isConfusionAttack() || a.isSleepAttack() || a.isDeepPoisonAttack() || a.isGuardian() || a.isPowerBalance()) {
 		a.counterCommandPromotedToAttack = true
 	}
 }
@@ -414,6 +518,7 @@ func combatPetElementalPoints(entry *gameconfig.PetEntry) *pb.ElementalPoints {
 		if entry.Elemental[elemental] == nil {
 			return 0
 		}
+		// pet.yaml与战斗快照统一使用原版百分比单位, 无需换算.
 		return *entry.Elemental[elemental]
 	}
 	return &pb.ElementalPoints{
@@ -580,7 +685,7 @@ func combatClampDelta(value uint64) int32 {
 
 // combatActionValue按单位当前敏捷计算本回合行动值.
 //
-// 当前skill.yaml开放动作均使用8.5 BATTLE_DexCalc基础分支. RAND的0.3倍
+// 当前技能.yaml开放动作均使用8.5 BATTLE_DexCalc基础分支. RAND的0.3倍
 // 上限必须保留小数缩放语义, 不能先转换成整数后调用rangeInt.
 func (r *CombatRoom) combatActionValue(action *combatAction) int64 {
 	state := r.stateByKey(action.unitKey)
@@ -637,6 +742,7 @@ func combatDodgeCoreThreshold(attacker *combatUnitRuntimeState, defender *combat
 	percentage := float32(math.Sqrt(float64(work)))
 	percentage *= wari
 	percentage += float32(combatEffectiveLuck(defender))
+	percentage += float32(defender.noGuardDodgePercent)
 	// 原版gBattleDuckModyfy以百分点加到基础闪避, 必须先加值再执行75%封顶.
 	percentage += float32(targetDodgeBonus)
 	percentage *= 100
@@ -655,6 +761,11 @@ func (r *CombatRoom) combatDodge(attacker *combatUnitRuntimeState, defender *com
 		return false
 	}
 	percentage := combatDodgeCoreThreshold(attacker, defender, targetDodgeBonus)
+	// 原版酒醉让攻击者额外增加20至30个百分点的被闪避率, 再执行75%封顶.
+	if attacker.statusTurns[pb.CombatStatusType_CombatStatusType_Drunk] > 0 {
+		percentage += float32(r.random.rangeInt(20, 30) * 100)
+		percentage = min(float32(7500), percentage)
+	}
 	if combatKind(attacker.unit) == combatUnitKindPlayer {
 		minimumHit := int64(float32(attacker.hitModifier) * 0.8)
 		maximumHit := int64(float32(attacker.hitModifier) * 1.2)
@@ -680,7 +791,7 @@ func (r *CombatRoom) combatDodge(attacker *combatUnitRuntimeState, defender *com
 //   - 非玩家单位攻击玩家: 不开平方, 除数改为10;
 //   - 玩家攻击非玩家单位: 敌方敏捷先乘0.6并按C int复合赋值向零截断.
 //
-// attacker.criticalModifier对应8.5的装备暴击输入At_Soubi, 玩家建房时从武器实例固化值冻结.
+// attacker.criticalModifier对应8.5的装备暴击输入At_Soubi, 玩家建房时从武器实例属性冻结.
 // 字段和0.5加成顺序属于原版随机判定链. defender.ultimateKnockbackImmune同时映射源码在公式末尾对真实基础形象
 // 101813/101814执行的`per=0`; 守护已经在调用本函数前把计算目标切换到实际守护宠物.
 // 弓与其他武器共用本阈值和随机判定, 只在后续暴击伤害阶段跳过近战追加伤害.
@@ -764,9 +875,9 @@ const (
 	combatElementCount
 )
 
-// combatElementArray把当前项目的0至10元素点转换成8.5 BATTLE_GetAttr使用的
-// 0至100属性值. 当前角色创建和pet.yaml都要求四项点数总和为10, 所以正常PVE
-// 单位的无属性值为0; nil或全0快照仍按8.5的ATTR_MAX补成100点无属性, 供房间
+// combatElementArray读取已统一为原版0至100百分比单位的战斗快照. 角色创建、
+// pet.yaml、人物有效属性和宠物快照全链路不再进行单位换算.
+// 正常PVE单位的无属性值为0; nil或全0快照仍按8.5的ATTR_MAX补成100点无属性, 供房间
 // 内部边界处理和对照测试使用.
 //
 // 8.5会先把每个负属性钳到0, 再用max(100-sum, 0)计算无属性. 当前PB字段为
@@ -778,10 +889,10 @@ func combatElementArray(points *pb.ElementalPoints) [combatElementCount]int64 {
 	if points == nil {
 		return [combatElementCount]int64{0, 0, 0, 0, 100}
 	}
-	earth := int64(points.GetEarth()) * 10
-	water := int64(points.GetWater()) * 10
-	fire := int64(points.GetFire()) * 10
-	wind := int64(points.GetWind()) * 10
+	earth := int64(points.GetEarth())
+	water := int64(points.GetWater())
+	fire := int64(points.GetFire())
+	wind := int64(points.GetWind())
 	none := int64(100) - earth - water - fire - wind
 	if none < 0 {
 		none = 0
@@ -872,7 +983,7 @@ func (r *CombatRoom) combatElementAdjustedDamage(attacker *combatUnitRuntimeStat
 	return combatElementMatrixDamage(attackerElement, defenderElement, damage)
 }
 
-// combatEffectiveAttackPower把本回合状态攻击修正应用于只读开战攻击力.
+// combatEffectiveAttackPower把本回合技能修正应用于只读开战攻击力.
 func combatEffectiveAttackPower(state *combatUnitRuntimeState) int64 {
 	if state == nil || state.unit == nil || state.unit.GetAttribute() == nil {
 		return 0
@@ -882,18 +993,24 @@ func combatEffectiveAttackPower(state *combatUnitRuntimeState) int64 {
 		return *state.chargeAttackPower
 	}
 	attack := int64(state.unit.GetAttribute().GetAttack())
-	// PETSKILL_StatusChange先计算C float百分比, 再把修正量向零截断后加回;
+	// StatusChange、Guardian和PowerBalance都先计算C float百分比, 再把修正量向零截断后加回;
 	// 不能改成最终伤害乘0.7, 也不能先把修正后的攻击力整体向下取整.
 	modifier := float32(state.roundAttackPercentModifier) / 100
 	return attack + int64(float32(attack)*modifier)
 }
 
-// combatEffectiveDefensePower返回单位开战快照中的防御力.
+// combatEffectiveDefensePower返回应用本回合技能修正后的防御力.
 func combatEffectiveDefensePower(state *combatUnitRuntimeState) int64 {
 	if state == nil || state.unit == nil || state.unit.GetAttribute() == nil {
 		return 0
 	}
-	return int64(state.unit.GetAttribute().GetDefense())
+	defense := int64(state.unit.GetAttribute().GetDefense())
+	modifier := float32(state.roundDefensePercentModifier) / 100
+	defense += int64(float32(defense) * modifier)
+	if state.statusTurns[pb.CombatStatusType_CombatStatusType_Stone] > 0 {
+		defense *= 2
+	}
+	return defense
 }
 
 // combatEffectiveAgilityPower返回单位开战快照中的敏捷.
@@ -901,7 +1018,11 @@ func combatEffectiveAgilityPower(state *combatUnitRuntimeState) int64 {
 	if state == nil || state.unit == nil || state.unit.GetAttribute() == nil {
 		return 0
 	}
-	return int64(state.unit.GetAttribute().GetAgility())
+	agility := int64(state.unit.GetAttribute().GetAgility())
+	if state.statusTurns[pb.CombatStatusType_CombatStatusType_Drunk] > 0 {
+		agility /= 2
+	}
+	return agility
 }
 
 // combatBaseDefensePower复刻_BATTLE_NEWPOWER无骑乘分支的
@@ -1353,6 +1474,12 @@ func combatCounterThreshold(attacker *combatUnitRuntimeState, defender *combatUn
 		return threshold, false
 	}
 	percentage := float32(base)
+	modifier := int64(attacker.noGuardCounterPercent)
+	if modifier > 127 {
+		// 原版把无防守反击参数取自低字节后, 对128..255执行乘-1的历史字节语义.
+		modifier *= -1
+	}
+	percentage += float32(modifier)
 	if percentage > 100 {
 		percentage = 100
 	}
@@ -1417,11 +1544,11 @@ func combatUltimateThreshold(maxHP uint64) float64 {
 // 那两种覆盖本身不会清空CHAR_WORKULTIMATE, 因而不能合并到本函数的清零分支.
 func applyCombatUltimateTail(defender *combatUnitRuntimeState, singleHitBasis uint64, overkillDamage uint64) pb.CombatKnockbackType {
 	if defender == nil {
-		return pb.CombatKnockbackType_CombatKnockbackType_Unknown
+		return pb.CombatKnockbackType_CombatKnockbackType_Unspecified
 	}
 
 	threshold := combatUltimateThreshold(defender.maxHP)
-	knockback := pb.CombatKnockbackType_CombatKnockbackType_Unknown
+	knockback := pb.CombatKnockbackType_CombatKnockbackType_Unspecified
 	if float64(singleHitBasis) >= threshold {
 		knockback = pb.CombatKnockbackType_CombatKnockbackType_SingleHitOverkill
 	} else if overkillDamage > 0 {
@@ -1431,9 +1558,9 @@ func applyCombatUltimateTail(defender *combatUnitRuntimeState, singleHitBasis ui
 		}
 	}
 
-	if knockback == pb.CombatKnockbackType_CombatKnockbackType_Unknown ||
+	if knockback == pb.CombatKnockbackType_CombatKnockbackType_Unspecified ||
 		defender.ultimateKnockbackImmune {
-		return pb.CombatKnockbackType_CombatKnockbackType_Unknown
+		return pb.CombatKnockbackType_CombatKnockbackType_Unspecified
 	}
 	defender.overkillDamage = 0
 	return knockback
@@ -1472,7 +1599,8 @@ func (r *CombatRoom) applyCombatDamageWithSingleHitBasis(attacker *combatUnitRun
 	}
 	if defender.hp == 0 && defender.alive {
 		defender.alive = false
-		defender.charge = nil
+		clearCombatContinuedActionState(defender)
+		clearCombatNoGuardState(defender)
 		application.killed = true
 		if defender.inanimate {
 			// CHAR_BATTLEFLG_ABIO优先于暴击分支, 无论DamageSub原本返回0、1或2,
@@ -1488,7 +1616,7 @@ func (r *CombatRoom) applyCombatDamageWithSingleHitBasis(attacker *combatUnitRun
 		if defender.ultimateKnockbackImmune {
 			// 源码在ABIO/暴击覆盖后再次检查雷尔真实基础形象, 所以排除必须
 			// 位于最后. 随机数已经按上面的条件消费, 累计值也保持原样.
-			application.knockback = pb.CombatKnockbackType_CombatKnockbackType_Unknown
+			application.knockback = pb.CombatKnockbackType_CombatKnockbackType_Unspecified
 		}
 	}
 	return application
@@ -1507,7 +1635,10 @@ type combatEffectResult struct {
 	Knockdown         *pb.CombatKnockdownDetail
 	Knockback         *pb.CombatKnockbackDetail
 	EscapeSucceeded   bool
+	AbductSucceeded   bool
 	Capture           *pb.CombatCaptureDetail
+	Reaction          *pb.CombatReactionDetail
+	Hidden            bool
 	UnitLeaveReason   pb.CombatUnitLeaveReason
 }
 
@@ -1555,11 +1686,21 @@ func combatAppendDamageEffect(event *combatStepResult, attacker *combatUnitRunti
 			unitDelta.Alive = false
 			if defender.poisonTurns > 0 {
 				defender.poisonTurns = 0
-				unitDelta.StatusDeltaList = []*pb.CombatStatusDelta{{
+				unitDelta.StatusDeltaList = append(unitDelta.StatusDeltaList, &pb.CombatStatusDelta{
 					StatusType: pb.CombatStatusType_CombatStatusType_Poison,
 					DeltaType:  pb.CombatStatusDeltaType_CombatStatusDeltaType_Remove,
-				}}
+				})
 			}
+			for statusType, remaining := range defender.statusTurns {
+				if remaining == 0 {
+					continue
+				}
+				unitDelta.StatusDeltaList = append(unitDelta.StatusDeltaList, &pb.CombatStatusDelta{
+					StatusType: statusType,
+					DeltaType:  pb.CombatStatusDeltaType_CombatStatusDeltaType_Remove,
+				})
+			}
+			clear(defender.statusTurns)
 		}
 		deltaList = append(deltaList, unitDelta)
 	}
@@ -1582,7 +1723,7 @@ func combatAppendDefeatEffects(event *combatStepResult, attacker *combatUnitRunt
 	if !application.killed {
 		return
 	}
-	if application.knockback != pb.CombatKnockbackType_CombatKnockbackType_Unknown {
+	if application.knockback != pb.CombatKnockbackType_CombatKnockbackType_Unspecified {
 		combatAppendEffect(event, &combatEffectResult{
 			EffectKind:        combatEffectKindKnockback,
 			SourceUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(attacker.unit.GetKey())},
@@ -1609,7 +1750,7 @@ func combatAppendDefeatEffects(event *combatStepResult, attacker *combatUnitRunt
 func (r *CombatRoom) appendCombatDefeatEffects(event *combatStepResult, attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState, application combatDamageApplication, counter bool) {
 	combatAppendDefeatEffects(event, attacker, defender, application, counter)
 	if r == nil || defender == nil || defender.unit == nil || !application.killed ||
-		application.knockback == pb.CombatKnockbackType_CombatKnockbackType_Unknown ||
+		application.knockback == pb.CombatKnockbackType_CombatKnockbackType_Unspecified ||
 		!combatUnitIsPlayerCharacter(defender.unit) {
 		return
 	}
@@ -1618,7 +1759,8 @@ func (r *CombatRoom) appendCombatDefeatEffects(event *combatStepResult, attacker
 	for _, leavingState := range leavingStates {
 		leavingState.escaped = true
 		leavingState.guard = false
-		leavingState.charge = nil
+		clearCombatContinuedActionState(leavingState)
+		clearCombatNoGuardState(leavingState)
 		leavingUnitKeys = append(leavingUnitKeys, cloneCombatUnitKey(leavingState.unit.GetKey()))
 	}
 	combatAppendEffect(event, &combatEffectResult{
@@ -1647,12 +1789,68 @@ func (r *CombatRoom) combatStateAtPosition(camp pb.CombatCamp, position uint32) 
 	return nil
 }
 
+// combatGuardianBlocked对应原版GuardianCheck中会禁止代受的行动控制状态.
+// 中毒、酒醉等不阻止行动的状态继续允许忠犬拦截.
+func combatGuardianBlocked(state *combatUnitRuntimeState) bool {
+	if state == nil {
+		return true
+	}
+	for _, statusType := range []pb.CombatStatusType{
+		pb.CombatStatusType_CombatStatusType_Paralysis,
+		pb.CombatStatusType_CombatStatusType_Sleep,
+		pb.CombatStatusType_CombatStatusType_Stone,
+		pb.CombatStatusType_CombatStatusType_Confusion,
+		pb.CombatStatusType_CombatStatusType_Barrier,
+		pb.CombatStatusType_CombatStatusType_Dizzy,
+		pb.CombatStatusType_CombatStatusType_Dragnet,
+	} {
+		if state.statusTurns[statusType] > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+// guardianForProtectedUnit按每阵营前后排相同列寻找本回合已声明忠犬的宠物.
+// 这里只读取当前运行态, 因而宠物死亡、离场或进入控制状态后会立即停止代受.
+func (r *CombatRoom) guardianForProtectedUnit(protected *combatUnitRuntimeState) *combatUnitRuntimeState {
+	if r == nil || protected == nil || protected.unit == nil || !protected.alive || protected.escaped ||
+		protected.unit.GetPosition() >= combatCampRowPositionCount {
+		return nil
+	}
+	guardian := r.combatStateAtPosition(
+		protected.unit.GetCamp(),
+		protected.unit.GetPosition()+combatCampRowPositionCount,
+	)
+	if guardian == nil || guardian.unit == nil || !guardian.alive || guardian.escaped ||
+		combatKind(guardian.unit) == combatUnitKindPlayer || combatGuardianBlocked(guardian) ||
+		!combatUnitKeyEqual(guardian.guardianProtectedUnitKey, protected.unit.GetKey()) {
+		return nil
+	}
+	return guardian
+}
+
+func combatAppendGuardianReaction(event *combatStepResult, guardian, protected *combatUnitRuntimeState) {
+	if event == nil || guardian == nil || protected == nil {
+		return
+	}
+	combatAppendEffect(event, &combatEffectResult{
+		EffectKind:        combatEffectKindReaction,
+		SourceUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(guardian.unit.GetKey())},
+		TargetUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(protected.unit.GetKey())},
+		Reaction: &pb.CombatReactionDetail{
+			ReactionType: pb.CombatReactionType_CombatReactionType_Guardian,
+			Phase:        pb.CombatReactionPhase_CombatReactionPhase_Triggered,
+		},
+	})
+}
+
 type combatAttackOutcome struct {
 	continueCounter bool
 	defender        *combatUnitRuntimeState
 }
 
-// executeSingleAttack结算一个普通物理, 破除防御, 一击必杀, 猛毒, 突击或连续攻击段.
+// executeSingleAttack结算一个普通物理, 破除防御, 一击必杀, 中毒/石化状态攻击, 突击或连续攻击段.
 // 手下留情也复用此入口, 只在实际扣血前限制本次主动伤害, 保留普通命中类型.
 func (r *CombatRoom) executeSingleAttack(action *combatAction, counter bool, events *[]*combatStepResult) combatAttackOutcome {
 	return r.executeSingleAttackWithBoomerangModifier(action, counter, events, false)
@@ -1668,8 +1866,8 @@ func (r *CombatRoom) executeSingleAttackWithBoomerangModifier(action *combatActi
 	if attacker == nil || !attacker.alive || attacker.escaped {
 		return combatAttackOutcome{}
 	}
-	defender := r.resolveCombatTarget(action)
-	if defender == nil {
+	declaredDefender := r.resolveCombatTarget(action)
+	if declaredDefender == nil {
 		return combatAttackOutcome{}
 	}
 
@@ -1677,25 +1875,62 @@ func (r *CombatRoom) executeSingleAttackWithBoomerangModifier(action *combatActi
 		EventKind:         combatStepKindAction,
 		SkillId:           action.skillID,
 		SourceUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(attacker.unit.GetKey())},
-		TargetUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(defender.unit.GetKey())},
+		TargetUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(declaredDefender.unit.GetKey())},
 	}
 	if counter {
 		event.EventKind = combatStepKindCounter
 	}
+	if action.isEarthRound() && action.earthRoundRelease {
+		// 现身必须是本动作第一项权威效果, 客户端据此先恢复可见性再播放攻击.
+		combatAppendVisibilityEffect(event, attacker, false)
+	}
 
 	mightyAttack := action.isMightyAttack() && !counter
 	poisonAttack := action.isPoisonAttack() && !counter
+	stoneAttack := action.isStoneAttack() && !counter
+	confusionAttack := action.isConfusionAttack() && !counter
+	sleepAttack := action.isSleepAttack() && !counter
+	deepPoisonAttack := action.isDeepPoisonAttack() && !counter
+	// 完整回合会在行动前预激活STATUSCHANGE修正, 这里再次按未改写的专用命令赋值,
+	// 同时保证独立动作执行入口和现有测试夹具仍获得相同工作攻击力.
 	if poisonAttack {
 		attacker.roundAttackPercentModifier = action.poisonAttackPercentModifier
+	} else if stoneAttack {
+		attacker.roundAttackPercentModifier = action.stoneAttackPercentModifier
+	} else if confusionAttack {
+		attacker.roundAttackPercentModifier = action.confusionAttackPercentModifier
+	} else if sleepAttack {
+		attacker.roundAttackPercentModifier = action.sleepAttackPercentModifier
+	} else if deepPoisonAttack {
+		attacker.roundAttackPercentModifier = action.deepPoisonAttackPercentModifier
 	}
 	targetDodgeBonus := uint32(0)
 	if mightyAttack {
 		targetDodgeBonus = action.mightyTargetDodgeBonus
 	}
+	defender := declaredDefender
+	guardianRedirected := false
+	// 原版先让声明目标完成闪避判定, 只有未闪避的直接主动物理攻击才检查忠犬.
+	// 合击、反击和破除防御使用各自专用分支, 不触发代受.
+	if !counter && !action.comboMember && !action.isGuardBreak() {
+		if guardian := r.guardianForProtectedUnit(declaredDefender); guardian != nil {
+			if r.combatDodge(attacker, declaredDefender, targetDodgeBonus) {
+				combatAppendEffect(event, &combatEffectResult{
+					EffectKind:        combatEffectKindDodge,
+					SourceUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(attacker.unit.GetKey())},
+					TargetUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(declaredDefender.unit.GetKey())},
+				})
+				*events = append(*events, event)
+				return combatAttackOutcome{continueCounter: true, defender: declaredDefender}
+			}
+			defender = guardian
+			guardianRedirected = true
+		}
+	}
 	roll := r.combatAttackRoll(
 		attacker,
 		defender,
-		false,
+		guardianRedirected,
 		counter,
 		action.isGuardBreak(),
 		targetDodgeBonus,
@@ -1726,6 +1961,13 @@ func (r *CombatRoom) executeSingleAttackWithBoomerangModifier(action *combatActi
 		// 不能提前放大Attack属性, 也不能强制暴击或把0伤害补成正数.
 		roll.damage = uint64(int64(float32(roll.damage) * float32(action.mightyDamageMultiplier)))
 	}
+	if action.isEarthRound() && action.earthRoundRelease {
+		// 原版gBattleDamageModyfy在命中、暴击、Guard和最低伤害之后执行C float复合乘法并向零截断.
+		roll.damage = combatEarthRoundAdjustedDamage(roll.damage, action.earthRoundDamagePercentModifier)
+	}
+	if guardianRedirected {
+		combatAppendGuardianReaction(event, defender, declaredDefender)
+	}
 
 	// 原版DamageSub在普通命中, 暴击, Guard和最低伤害之后限伤, 先于扣血和击飞判定.
 	// resolveCombatTarget已保证目标存活; HP为1时允许0伤害且保留已确定的Normal/Critical.
@@ -1741,13 +1983,30 @@ func (r *CombatRoom) executeSingleAttackWithBoomerangModifier(action *combatActi
 	}
 	application := r.applyCombatDamage(attacker, defender, roll.damage, roll.critical)
 	combatAppendDamageEffect(event, attacker, defender, roll, application)
+	// 原版正物理伤害会唤醒Sleep. PoisonAttack主动段是既定例外;
+	// MISS和最终0伤害不会进入这里. 状态攻击随后可按Damage -> Remove -> Add重施.
+	if roll.damage > 0 && !poisonAttack {
+		r.wakeCombatSleepAfterPhysicalDamage(attacker, defender, event)
+	}
 	if poisonAttack && roll.damage > 0 {
 		r.tryInflictCombatPoison(attacker, defender, action.poisonDurationActions, event)
+	}
+	if stoneAttack && roll.damage > 0 {
+		r.tryInflictCombatStone(attacker, defender, action.stoneDurationActions, event)
+	}
+	if confusionAttack && roll.damage > 0 {
+		r.tryInflictCombatConfusion(attacker, defender, action.confusionDurationActions, event)
+	}
+	if sleepAttack && roll.damage > 0 {
+		r.tryInflictCombatSleep(attacker, defender, action.sleepDurationActions, event)
+	}
+	if deepPoisonAttack && roll.damage > 0 {
+		r.tryInflictCombatDeepPoison(attacker, defender, action.deepPoisonDurationActions, event)
 	}
 	r.appendCombatDefeatEffects(event, attacker, defender, application, counter)
 	*events = append(*events, event)
 
-	continueCounter := !action.isGuardBreak() && !roll.critical && !combatGuardReductionActive(defender) && !application.killed
+	continueCounter := !guardianRedirected && !action.isGuardBreak() && !roll.critical && !combatGuardReductionActive(defender) && !application.killed
 	if counter && roll.damage == 0 {
 		continueCounter = false
 	}
@@ -1981,8 +2240,8 @@ func (r *CombatRoom) enemyAIActions() []*combatAction {
 		if state == nil {
 			continue
 		}
-		// 原版AI对S_CHARGE直接续招, 蓄力和释放回合都不重新抽技能或目标.
-		if action := continuedCombatChargeAction(state); action != nil {
+		// 原版跨回合指令直接续招, 不重新抽技能或目标.
+		if action := continuedCombatAction(state); action != nil {
 			actions = append(actions, action)
 			continue
 		}
@@ -2108,7 +2367,7 @@ func (r *CombatRoom) enemyAITargetCandidates(source *pb.CombatUnit, scope gameco
 	if scope == gameconfig.BattleAITargetScopePartyLeader {
 		for position := uint32(0); position < 10; position++ {
 			candidate := r.combatStateAtPosition(targetCamp, position)
-			if candidate != nil && candidate.unit != nil && r.isAlive(candidate.unit.GetKey()) &&
+			if candidate != nil && candidate.unit != nil && r.isAlive(candidate.unit.GetKey()) && !candidate.hidden &&
 				combatUnitIsPlayerCharacter(candidate.unit) {
 				partyLeader = candidate
 				break
@@ -2119,7 +2378,7 @@ func (r *CombatRoom) enemyAITargetCandidates(source *pb.CombatUnit, scope gameco
 	candidates := make([]*combatUnitRuntimeState, 0, 10)
 	for position := uint32(0); position < 10; position++ {
 		candidate := r.combatStateAtPosition(targetCamp, position)
-		if candidate == nil || candidate.unit == nil || !r.isAlive(candidate.unit.GetKey()) {
+		if candidate == nil || candidate.unit == nil || !r.isAlive(candidate.unit.GetKey()) || candidate.hidden {
 			continue
 		}
 		include := false
@@ -2238,6 +2497,13 @@ func (r *CombatRoom) resolveCombatTarget(action *combatAction) *combatUnitRuntim
 	if action == nil {
 		return nil
 	}
+	if action.confusionRewritten && action.targetKey != nil && !combatUnitKeyEmpty(action.targetKey) {
+		target := r.stateByKey(action.targetKey)
+		if target != nil && target.unit != nil && target.alive && !target.escaped && !target.hidden &&
+			!combatUnitKeyEqual(target.unit.GetKey(), action.unitKey) {
+			return target
+		}
+	}
 	if action.targetKey != nil && !combatUnitKeyEmpty(action.targetKey) {
 		if target, err := r.validOpponentTarget(action.targetKey, action.unitKey); err == nil {
 			return r.stateByKey(target)
@@ -2248,6 +2514,106 @@ func (r *CombatRoom) resolveCombatTarget(action *combatAction) *combatUnitRuntim
 		return nil
 	}
 	return r.stateByKey(candidates[r.random.rangeInt(0, int64(len(candidates)-1))])
+}
+
+// resolveAbductTarget沿用普通动作的执行期目标调整, 但候选始终排除玩家角色.
+// 旅程伙伴没有合法非角色目标时不生成事件, 也不消费概率随机数.
+func (r *CombatRoom) resolveAbductTarget(action *combatAction) *combatUnitRuntimeState {
+	if action == nil {
+		return nil
+	}
+	if action.targetKey != nil && !combatUnitKeyEmpty(action.targetKey) {
+		if target, err := r.validAbductTarget(action.targetKey, action.unitKey); err == nil {
+			return r.stateByKey(target)
+		}
+	}
+	candidates := r.aliveAbductOpponentKeys(action.unitKey)
+	if len(candidates) == 0 {
+		return nil
+	}
+	return r.stateByKey(candidates[r.random.rangeInt(0, int64(len(candidates)-1))])
+}
+
+// combatAbductChance复刻8.5 BATTLE_Abduct的成功阈值, 本函数不消耗随机数.
+// 带阈值技能只对玩家战宠目标读取忠诚度; 敌方NPC宠物继续使用等级差公式.
+func combatAbductChance(action *combatAction, source *combatUnitRuntimeState, target *combatUnitRuntimeState) int64 {
+	if action == nil || source == nil || source.unit == nil || target == nil || target.unit == nil {
+		return 0
+	}
+	if action.abductHasLoyaltyThreshold && combatKind(target.unit) == combatUnitKindPet {
+		if target.unit.GetAttribute().GetLoyalty() < action.abductLoyaltyThreshold {
+			return 200
+		}
+		return 0
+	}
+	levelDifference := int64(target.unit.GetAttribute().GetLevel()) - int64(source.unit.GetAttribute().GetLevel())
+	chance := int64(float64(levelDifference)*0.6 + 30)
+	if chance < 50 {
+		return 50
+	}
+	return chance
+}
+
+func markCombatStateAbducted(state *combatUnitRuntimeState) {
+	if state == nil {
+		return
+	}
+	state.escaped = true
+	state.guard = false
+	clearCombatContinuedActionState(state)
+	clearCombatNoGuardState(state)
+}
+
+// executeAbduct执行原版旅程伙伴动作.
+// 有效目标固定消费一次RAND(1,100); Boss只把阈值清零, 不跳过该抽取.
+// 成功按目标、施法者顺序离场, 失败仅施法者离场. 两种结果都不修改HP或持久宠物档案.
+func (r *CombatRoom) executeAbduct(action *combatAction, events *[]*combatStepResult) bool {
+	if r == nil || action == nil || events == nil {
+		return false
+	}
+	source := r.stateByKey(action.unitKey)
+	if source == nil || source.unit == nil || !source.alive || source.escaped {
+		return false
+	}
+	target := r.resolveAbductTarget(action)
+	if target == nil || target.unit == nil {
+		return false
+	}
+
+	chance := combatAbductChance(action, source, target)
+	if r.abductDisabled {
+		chance = 0
+	}
+	succeeded := r.random.rangeInt(1, 100) < chance
+	leavingStates := []*combatUnitRuntimeState{source}
+	if succeeded {
+		leavingStates = []*combatUnitRuntimeState{target, source}
+	}
+	leavingUnitKeys := make([]*pb.CombatUnitKey, 0, len(leavingStates))
+	for _, leavingState := range leavingStates {
+		markCombatStateAbducted(leavingState)
+		leavingUnitKeys = append(leavingUnitKeys, cloneCombatUnitKey(leavingState.unit.GetKey()))
+	}
+
+	event := &combatStepResult{
+		EventKind:         combatStepKindAction,
+		SkillId:           action.skillID,
+		SourceUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(source.unit.GetKey())},
+		TargetUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(target.unit.GetKey())},
+	}
+	combatAppendEffect(event, &combatEffectResult{
+		EffectKind:        combatEffectKindAbduct,
+		SourceUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(source.unit.GetKey())},
+		TargetUnitKeyList: []*pb.CombatUnitKey{cloneCombatUnitKey(target.unit.GetKey())},
+		AbductSucceeded:   succeeded,
+	})
+	combatAppendEffect(event, &combatEffectResult{
+		EffectKind:        combatEffectKindUnitLeave,
+		TargetUnitKeyList: leavingUnitKeys,
+		UnitLeaveReason:   pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Abducted,
+	})
+	*events = append(*events, event)
+	return succeeded
 }
 
 // combatEscapeChance 按8.5 BATTLE_EscapeCheck计算本次PVE逃跑阈值, 但不消耗随机数也不修改运行态.
@@ -2376,7 +2742,8 @@ func (r *CombatRoom) executeEscape(action *combatAction, events *[]*combatStepRe
 		for _, leavingState := range leavingStates {
 			leavingState.escaped = true
 			leavingState.guard = false
-			leavingState.charge = nil
+			clearCombatContinuedActionState(leavingState)
+			clearCombatNoGuardState(leavingState)
 		}
 	}
 	event := &combatStepResult{
@@ -2517,7 +2884,7 @@ func combatProtocolActionCause(stepKind combatStepKind) pb.CombatActionCause {
 	case combatStepKindStatus:
 		return pb.CombatActionCause_CombatActionCause_Status
 	default:
-		return pb.CombatActionCause_CombatActionCause_Unknown
+		return pb.CombatActionCause_CombatActionCause_Unspecified
 	}
 }
 
@@ -2567,6 +2934,8 @@ func buildCombatProtocolEffect(effect *combatEffectResult) *pb.CombatEffect {
 		result.Detail = &pb.CombatEffect_Guard{Guard: &pb.CombatGuardDetail{}}
 	case combatEffectKindStatus:
 		result.Detail = &pb.CombatEffect_Status{Status: &pb.CombatStatusDetail{}}
+	case combatEffectKindHeal:
+		result.Detail = &pb.CombatEffect_Heal{Heal: &pb.CombatHealDetail{}}
 	case combatEffectKindDodge:
 		result.Detail = &pb.CombatEffect_Damage{Damage: &pb.CombatDamageDetail{
 			Outcome: pb.CombatHitOutcome_CombatHitOutcome_Dodge,
@@ -2579,8 +2948,14 @@ func buildCombatProtocolEffect(effect *combatEffectResult) *pb.CombatEffect {
 		result.Detail = &pb.CombatEffect_Escape{Escape: &pb.CombatEscapeDetail{Success: effect.EscapeSucceeded}}
 	case combatEffectKindCapture:
 		result.Detail = &pb.CombatEffect_Capture{Capture: effect.Capture}
+	case combatEffectKindAbduct:
+		result.Detail = &pb.CombatEffect_Abduct{Abduct: &pb.CombatAbductDetail{Success: effect.AbductSucceeded}}
+	case combatEffectKindReaction:
+		result.Detail = &pb.CombatEffect_Reaction{Reaction: effect.Reaction}
 	case combatEffectKindUnitLeave:
 		result.Detail = &pb.CombatEffect_UnitLeave{UnitLeave: &pb.CombatUnitLeaveDetail{Reason: effect.UnitLeaveReason}}
+	case combatEffectKindVisibility:
+		result.Detail = &pb.CombatEffect_Visibility{Visibility: &pb.CombatVisibilityDetail{Hidden: effect.Hidden}}
 	default:
 		return nil
 	}
@@ -2716,20 +3091,19 @@ func combatComboActionMatches(room *CombatRoom, first *combatAction, next *comba
 }
 
 func (r *CombatRoom) executeCombo(group combatActionGroup, actionByUnit map[string]*combatAction, events *[]*combatStepResult) {
-	activeActions := make([]*combatAction, 0, len(group.actions))
+	candidates := make([]*combatAction, 0, len(group.actions))
 	for _, action := range group.actions {
 		if action == nil || !r.isAlive(action.unitKey) {
 			continue
 		}
 		captureCombatActionDeclaredTarget(action)
-		action.comboMember = true
-		activeActions = append(activeActions, action)
+		candidates = append(candidates, action)
 	}
-	if len(activeActions) == 0 {
+	if len(candidates) == 0 {
 		return
 	}
-	if len(activeActions) == 1 {
-		action := activeActions[0]
+	if len(candidates) == 1 {
+		action := candidates[0]
 		action.comboMember = false
 		stepStart := len(*events)
 		r.executeStandaloneAction(action, actionByUnit, events)
@@ -2742,13 +3116,47 @@ func (r *CombatRoom) executeCombo(group combatActionGroup, actionByUnit map[stri
 		return
 	}
 
+	// 合击分组发生在回合执行前. 成员可能在轮到本组之前刚被控制. 原版先处理
+	// 首名实际行动者: 若其被混乱改写, 立即脱离本组合击独立攻击, 后续成员再继续组队.
+	stepStart := len(*events)
+	activeActions := make([]*combatAction, 0, len(candidates))
+	for index, action := range candidates {
+		r.processCombatPoisonBeforeAction(action, events)
+		blocked := r.processCombatDeepPoisonBeforeAction(action, events)
+		blocked = r.processCombatControlBeforeAction(action, events) || blocked
+		action.beforeActionProcessed = true
+		if blocked || !r.isAlive(action.unitKey) {
+			continue
+		}
+		if len(activeActions) == 0 && action.confusionRewritten {
+			action.comboMember = false
+			actionStepStart := len(*events)
+			r.executeStandaloneAction(action, actionByUnit, events)
+			steps := (*events)[actionStepStart:]
+			markCombatTopLevelEvent(steps, combatActionTopLevelSources(action), combatActionTopLevelTargets(action, steps))
+			if index+1 < len(candidates) {
+				r.executeCombo(combatActionGroup{actions: candidates[index+1:], combo: true}, actionByUnit, events)
+			}
+			return
+		}
+		action.comboMember = true
+		activeActions = append(activeActions, action)
+	}
+	if len(activeActions) == 0 {
+		return
+	}
+	if len(activeActions) == 1 {
+		action := activeActions[0]
+		action.comboMember = false
+		r.executeStandaloneAction(action, actionByUnit, events)
+		steps := (*events)[stepStart:]
+		markCombatTopLevelEvent(steps, combatActionTopLevelSources(action), combatActionTopLevelTargets(action, steps))
+		return
+	}
+
 	// 8.5只在合击组第一名实际执行者进入主循环时锁定一次武器attacknum.
 	// 随后成员由BATTLE_COM_COMBO分支直接结算并跳过各自的主循环, 所以不额外抽取.
 	// 合击始终是成员单段累计伤害, 这次预抽只保留随机顺序, 不开启爪多段或分摊.
-	stepStart := len(*events)
-	for _, action := range activeActions {
-		r.processCombatPoisonBeforeAction(action, events)
-	}
 	r.combatConsumeEquippedWeaponAttackSegmentPlan(activeActions[0])
 	defender := r.resolveCombatTarget(activeActions[0])
 	if defender == nil {
@@ -2831,6 +3239,9 @@ func (r *CombatRoom) executeComboMembers(activeActions []*combatAction, defender
 		finalRoll.damage = totalDamage
 		application := r.applyCombatDamage(member.attacker, defender, totalDamage, finalRoll.critical)
 		combatAppendDamageEffect(event, member.attacker, defender, finalRoll, application)
+		if totalDamage > 0 {
+			r.wakeCombatSleepAfterPhysicalDamage(member.attacker, defender, event)
+		}
 		r.appendCombatDefeatEffects(event, member.attacker, defender, application, false)
 		*events = append(*events, event)
 	}
@@ -2856,7 +3267,29 @@ func (r *CombatRoom) executeStandaloneAction(action *combatAction, actionByUnit 
 		return nil
 	}
 	captureCombatActionDeclaredTarget(action)
-	r.processCombatPoisonBeforeAction(action, events)
+	wasGuardian := action.isGuardian()
+	blocked := false
+	if action.beforeActionProcessed {
+		action.beforeActionProcessed = false
+	} else {
+		r.processCombatPoisonBeforeAction(action, events)
+		blocked = r.processCombatDeepPoisonBeforeAction(action, events)
+		blocked = r.processCombatControlBeforeAction(action, events) || blocked
+	}
+	if blocked {
+		if wasGuardian {
+			if state := r.stateByKey(action.unitKey); state != nil {
+				state.guardianProtectedUnitKey = nil
+			}
+		}
+		return nil
+	}
+	// 混乱可能把原忠犬命令改写为普通攻击, 此时本回合不再保护主人.
+	if wasGuardian && !action.isGuardian() {
+		if state := r.stateByKey(action.unitKey); state != nil {
+			state.guardianProtectedUnitKey = nil
+		}
+	}
 	r.combatConsumeUnusedPlayerAttackSegmentPlan(action)
 	defer r.addPVEEnemyDefeatProfit([]*pb.CombatUnitKey{action.unitKey})
 
@@ -2864,6 +3297,8 @@ func (r *CombatRoom) executeStandaloneAction(action *combatAction, actionByUnit 
 	case action.isGuard():
 		r.appendGuardEvent(action, events)
 	case action.isStandby():
+		appendCombatActionOnlyStep(action, events)
+	case action.isNoGuard():
 		appendCombatActionOnlyStep(action, events)
 	case action.isContinuationAttack():
 		firstEventIndex := len(*events)
@@ -2879,7 +3314,35 @@ func (r *CombatRoom) executeStandaloneAction(action *combatAction, actionByUnit 
 			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
 		}
 	case action.isPoisonAttack():
-		// 原版STATUSCHANGE进入攻击循环时转为ATTACK; 反击只继承本回合攻击力.
+		// 原版STATUSCHANGE进入攻击循环时转为ATTACK; 反击只继承本回合攻击力且不附加状态.
+		action.promoteSpecialAttackCommand()
+		outcome := r.executeSingleAttack(action, false, events)
+		if outcome.continueCounter {
+			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
+		}
+	case action.isStoneAttack():
+		// 原版STATUSCHANGE进入攻击循环时转为ATTACK; 反击只继承本回合攻击力且不附加状态.
+		action.promoteSpecialAttackCommand()
+		outcome := r.executeSingleAttack(action, false, events)
+		if outcome.continueCounter {
+			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
+		}
+	case action.isConfusionAttack():
+		// 原版STATUSCHANGE进入攻击循环时转为ATTACK; 反击只继承本回合攻击力且不附加状态.
+		action.promoteSpecialAttackCommand()
+		outcome := r.executeSingleAttack(action, false, events)
+		if outcome.continueCounter {
+			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
+		}
+	case action.isSleepAttack():
+		// 原版STATUSCHANGE进入攻击循环时转为ATTACK; 反击只继承本回合攻击力且不附加状态.
+		action.promoteSpecialAttackCommand()
+		outcome := r.executeSingleAttack(action, false, events)
+		if outcome.continueCounter {
+			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
+		}
+	case action.isDeepPoisonAttack():
+		// 剧毒状态攻击转为普通攻击后可触发反击, 反击段只继承工作攻击力.
 		action.promoteSpecialAttackCommand()
 		outcome := r.executeSingleAttack(action, false, events)
 		if outcome.continueCounter {
@@ -2887,6 +3350,25 @@ func (r *CombatRoom) executeStandaloneAction(action *combatAction, actionByUnit 
 		}
 	case action.isChargeAttack():
 		outcome := r.executeChargeAttack(action, events)
+		if outcome.continueCounter {
+			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
+		}
+	case action.isEarthRound():
+		outcome := r.executeEarthRound(action, events)
+		if outcome.continueCounter {
+			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
+		}
+	case action.isGuardian():
+		// 忠犬在回合开始已经激活攻防修正和保护关系; 主动出手复用普通物理.
+		action.promoteSpecialAttackCommand()
+		outcome := r.executeSingleAttack(action, false, events)
+		if outcome.continueCounter {
+			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
+		}
+	case action.isPowerBalance():
+		// 原版POWERBALANCE在进入通用攻击循环时转为ATTACK, 出手后才取得反击资格.
+		action.promoteSpecialAttackCommand()
+		outcome := r.executeSingleAttack(action, false, events)
 		if outcome.continueCounter {
 			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
 		}
@@ -2900,6 +3382,12 @@ func (r *CombatRoom) executeStandaloneAction(action *combatAction, actionByUnit 
 		r.executeEscape(action, events)
 	case action.kind == combatActionKindCapture:
 		r.executeCapture(action, events)
+	case action.isAbduct():
+		r.executeAbduct(action, events)
+	case action.isStatusSpirit():
+		r.executeStatusSpirit(action, events)
+	case action.isHealingSpirit():
+		r.executeHealingSpirit(action, events)
 	case action.isAttack():
 		action.segmentCount = r.combatPlayerAttackSegmentCount(action)
 		firstEventIndex := len(*events)
@@ -2940,9 +3428,122 @@ func (r *CombatRoom) activateRoundGuards(actions []*combatAction) {
 	}
 }
 
-// completeCombatRound结算skill.yaml当前开放的基础战斗动作.
+// activateRoundGuardians在排序前冻结忠犬本回合的攻防修正并绑定同列前排主人.
+// 敌方NPC与玩家宠物使用相同的0..4前排、5..9后排位置约定.
+func (r *CombatRoom) activateRoundGuardians(actions []*combatAction) {
+	if r == nil {
+		return
+	}
+	for _, action := range actions {
+		if action == nil || !action.isGuardian() {
+			continue
+		}
+		guardian := r.stateByKey(action.unitKey)
+		if guardian == nil || guardian.unit == nil || !guardian.alive || guardian.escaped {
+			continue
+		}
+		guardian.roundAttackPercentModifier = action.guardianAttackPercentModifier
+		guardian.roundDefensePercentModifier = action.guardianDefensePercentModifier
+		position := guardian.unit.GetPosition()
+		if position < combatCampRowPositionCount || position >= combatCampRowPositionCount*2 {
+			continue
+		}
+		protected := r.combatStateAtPosition(guardian.unit.GetCamp(), position-combatCampRowPositionCount)
+		if protected != nil && protected.unit != nil && protected.alive && !protected.escaped {
+			guardian.guardianProtectedUnitKey = cloneCombatUnitKey(protected.unit.GetKey())
+		}
+	}
+}
+
+// activateRoundPowerBalances在行动值排序前应用本回合攻防工作值.
+// 动作仍保留专用命令, 因而出手前不具备反击资格, 也不会加入普通攻击合击组.
+func (r *CombatRoom) activateRoundPowerBalances(actions []*combatAction) {
+	if r == nil {
+		return
+	}
+	for _, action := range actions {
+		if action == nil || !action.isPowerBalance() {
+			continue
+		}
+		state := r.stateByKey(action.unitKey)
+		if state == nil || !state.alive || state.escaped {
+			continue
+		}
+		state.roundAttackPercentModifier = action.powerBalanceAttackPercentModifier
+		state.roundDefensePercentModifier = action.powerBalanceDefensePercentModifier
+	}
+}
+
+// activateRoundStatusAttacks在行动值排序前应用STATUSCHANGE的本回合攻击修正.
+// 即使施放者随后被混乱改写为普通攻击, 当回合主动段与反击仍沿用这份工作攻击力;
+// 只有保留下来的专用主动命令才会尝试附加对应异常.
+func (r *CombatRoom) activateRoundStatusAttacks(actions []*combatAction) {
+	if r == nil {
+		return
+	}
+	for _, action := range actions {
+		if action == nil {
+			continue
+		}
+		state := r.stateByKey(action.unitKey)
+		if state == nil || !state.alive || state.escaped {
+			continue
+		}
+		switch {
+		case action.isPoisonAttack():
+			state.roundAttackPercentModifier = action.poisonAttackPercentModifier
+		case action.isStoneAttack():
+			state.roundAttackPercentModifier = action.stoneAttackPercentModifier
+		case action.isConfusionAttack():
+			state.roundAttackPercentModifier = action.confusionAttackPercentModifier
+		case action.isSleepAttack():
+			state.roundAttackPercentModifier = action.sleepAttackPercentModifier
+		case action.isDeepPoisonAttack():
+			state.roundAttackPercentModifier = action.deepPoisonAttackPercentModifier
+		}
+	}
+}
+
+func clearCombatNoGuardState(state *combatUnitRuntimeState) {
+	if state == nil {
+		return
+	}
+	state.noGuardDodgePercent = 0
+	state.noGuardCounterPercent = 0
+	state.noGuardCriticalPercent = 0
+}
+
+func (r *CombatRoom) resetRoundNoGuards() {
+	if r == nil {
+		return
+	}
+	for _, state := range r.unitStates {
+		clearCombatNoGuardState(state)
+	}
+}
+
+// activateRoundNoGuards在行动值排序前激活姿态, 因而低速宠物在自身行动前受击时也能闪避和反击.
+func (r *CombatRoom) activateRoundNoGuards(actions []*combatAction) {
+	if r == nil {
+		return
+	}
+	for _, action := range actions {
+		if action == nil || !action.isNoGuard() {
+			continue
+		}
+		state := r.stateByKey(action.unitKey)
+		if state == nil || !state.alive || state.escaped || combatNoGuardBlocked(state) {
+			continue
+		}
+		state.noGuardDodgePercent = action.noGuardDodgePercent
+		state.noGuardCounterPercent = action.noGuardCounterPercent
+		state.noGuardCriticalPercent = action.noGuardCriticalPercent
+	}
+}
+
+// completeCombatRound结算技能.yaml当前开放的基础战斗动作.
 //
-// 当前处理攻击, 防御, 逃跑, 捕获, 待机, 破除防御, 连续攻击, 一击必杀, 猛毒攻击, 突击和手下留情. 其他已配置技能
+// 当前处理攻击, 防御, 逃跑, 捕获, 待机, 破除防御, 连续攻击, 一击必杀, 中毒攻击, 石化攻击, 混乱攻击, 突击, 地球一周, 忠犬, 不防守战法, 背水之战, 手下留情和旅程伙伴. 其他已配置技能
 // 在动作解析阶段直接返回不支持错误, 不会进入本结算器.
 func (r *CombatRoom) completeCombatRound(playerActions []*combatAction) {
 	if r == nil || r.roundTimer == nil || r.random == nil {
@@ -2952,10 +3553,15 @@ func (r *CombatRoom) completeCombatRound(playerActions []*combatAction) {
 	actions = append(actions, r.enemyAIActions()...)
 
 	r.resetRoundGuards()
-	r.resetRoundPoisonAttackModifiers()
+	r.resetRoundNoGuards()
+	r.resetRoundAttributeModifiers()
+	r.activateRoundStatusAttacks(actions)
 	r.activateRoundGuards(actions)
+	r.activateRoundGuardians(actions)
+	r.activateRoundNoGuards(actions)
+	r.activateRoundPowerBalances(actions)
 	for _, action := range actions {
-		if action != nil {
+		if action != nil && !action.actionValueFrozen {
 			action.actionValue = r.combatActionValue(action)
 		}
 	}
@@ -3010,7 +3616,7 @@ func (r *CombatRoom) completeCombatRound(playerActions []*combatAction) {
 		r.finishCombat(result)
 		return
 	}
-	result.NextRoundAutoActionUnitKeyList = r.pendingChargePlayerUnitKeys()
+	result.NextRoundAutoActionUnitKeyList = r.pendingContinuedPlayerUnitKeys()
 	r.sendRoundResultAndFinalizeParticipantLeaves(result)
 	if len(r.participants) == 0 {
 		r.closeCombatRoom()

@@ -85,7 +85,7 @@ func (p *RewardConfig) configure(entries []*RewardEntry) error {
 			if pet.PetID == nil || !isPetID(*pet.PetID) {
 				return errors.Errorf("奖励包宠物ID无效: reward:%d index:%d %v", *reward.ID, petIndex, xruntime.Location())
 			}
-			if pet.Level == nil || *pet.Level < uint32(pb.LevelRange_LevelRange_Min) || *pet.Level > uint32(pb.LevelRange_LevelRange_Max) {
+			if pet.Level == nil || *pet.Level < uint32(pb.Constants_Constants_Level_Min) || *pet.Level > uint32(pb.Constants_Constants_Level_Max) {
 				return errors.Errorf("奖励包宠物等级无效: reward:%d pet:%d %v", *reward.ID, *pet.PetID, xruntime.Location())
 			}
 			if pet.Grade == nil || *pet.Grade != RewardPetGradeRandom {

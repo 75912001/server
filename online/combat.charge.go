@@ -25,12 +25,13 @@ func continuedCombatChargeAction(state *combatUnitRuntimeState) *combatAction {
 	}
 }
 
-// pendingChargePlayerUnitKeys随本回合战报告知下一回合无需重新选招的玩家单位.
-// 使用稳定的参与者顺序, 并排除死亡和离场单位; 释放前的零计数仍必须锁定.
-func (r *CombatRoom) pendingChargePlayerUnitKeys() []*pb.CombatUnitKey {
+// pendingContinuedPlayerUnitKeys随本回合战报告知下一回合无需重新选招的玩家单位.
+// 使用稳定的参与者顺序, 同时收集待释放的突击和地球一周.
+func (r *CombatRoom) pendingContinuedPlayerUnitKeys() []*pb.CombatUnitKey {
 	var keys []*pb.CombatUnitKey
 	for _, key := range r.requiredPlayerUnitKeys() {
-		if r.stateByKey(key).charge != nil {
+		state := r.stateByKey(key)
+		if state.charge != nil || state.earthRound != nil {
 			keys = append(keys, key)
 		}
 	}

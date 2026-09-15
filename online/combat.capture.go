@@ -61,7 +61,8 @@ func (r *CombatRoom) executeCapture(action *combatAction, events *[]*combatStepR
 				// escaped 是现有服务端统一离场标记; 协议用 Captured 区分捕获与逃跑, 不下发逃跑状态.
 				target.escaped = true
 				target.guard = false
-				target.charge = nil
+				clearCombatContinuedActionState(target)
+				clearCombatNoGuardState(target)
 			}
 		}
 	}

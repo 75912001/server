@@ -8,6 +8,7 @@ import (
 	xmap "github.com/75912001/xlib/map"
 	xruntime "github.com/75912001/xlib/runtime"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 )
 
 type ItemUseTarget string
@@ -28,12 +29,12 @@ type ItemEntry struct {
 	EffectString  string                 `yaml:"effectstring"`
 	Atlas         *string                `yaml:"atlas"`
 	Sprite        *uint32                `yaml:"sprite"`
-	Cost          uint64                 `yaml:"cost"`
+	IDTier        uint32                 `yaml:"idTier"`
 	Level         uint32                 `yaml:"level"`
 	Profession    pb.CharacterProfession `yaml:"neprof"`
 	OtherDamage   int32                  `yaml:"otdmags"`
 	OtherDefence  int32                  `yaml:"otdefcs"`
-	SuitCode      uint32                 `yaml:"nsuit"`
+	SetID         uint32                 `yaml:"setId"`
 	WeaponType    pb.CharacterWeaponType `yaml:"-"`
 	AccessoryType pb.AccessoryType       `yaml:"accessory_type"`
 
@@ -56,26 +57,152 @@ type ItemEntry struct {
 	AvoidMin        int32  `yaml:"avoid_min"`
 	AvoidMax        int32  `yaml:"avoid_max"`
 
-	Attribute      uint32 `yaml:"attrib"`
-	AttributeValue uint32 `yaml:"attribvalue"`
-	PoisonMin      int32  `yaml:"poison_min"`
-	PoisonMax      int32  `yaml:"poison_max"`
-	ParalysisMin   int32  `yaml:"paralysis_min"`
-	ParalysisMax   int32  `yaml:"paralysis_max"`
-	SleepMin       int32  `yaml:"sleep_min"`
-	SleepMax       int32  `yaml:"sleep_max"`
-	StoneMin       int32  `yaml:"stone_min"`
-	StoneMax       int32  `yaml:"stone_max"`
-	DrunkMin       int32  `yaml:"drunk_min"`
-	DrunkMax       int32  `yaml:"drunk_max"`
-	ConfusionMin   int32  `yaml:"confusion_min"`
-	ConfusionMax   int32  `yaml:"confusion_max"`
-	CriticalMin    int32  `yaml:"critical_min"`
-	CriticalMax    int32  `yaml:"critical_max"`
-	MagicID        uint32 `yaml:"magicid"`
-	MagicUseMP     uint32 `yaml:"magicusemp"`
+	Attribute                 uint32 `yaml:"attrib"`
+	AttributeValue            uint32 `yaml:"attribvalue"`
+	PoisonMin                 int32  `yaml:"poison_min"`
+	PoisonMax                 int32  `yaml:"poison_max"`
+	ParalysisMin              int32  `yaml:"paralysis_min"`
+	ParalysisMax              int32  `yaml:"paralysis_max"`
+	SleepMin                  int32  `yaml:"sleep_min"`
+	SleepMax                  int32  `yaml:"sleep_max"`
+	StoneMin                  int32  `yaml:"stone_min"`
+	StoneMax                  int32  `yaml:"stone_max"`
+	DrunkMin                  int32  `yaml:"drunk_min"`
+	DrunkMax                  int32  `yaml:"drunk_max"`
+	ConfusionMin              int32  `yaml:"confusion_min"`
+	ConfusionMax              int32  `yaml:"confusion_max"`
+	CriticalMin               int32  `yaml:"critical_min"`
+	CriticalMax               int32  `yaml:"critical_max"`
+	CounterModifierMin        int32  `yaml:"counter_modifier_min"`
+	CounterModifierMax        int32  `yaml:"counter_modifier_max"`
+	DamageBonusPercentMin     int32  `yaml:"damage_bonus_percent_min"`
+	DamageBonusPercentMax     int32  `yaml:"damage_bonus_percent_max"`
+	CritDamageBonusPercentMin int32  `yaml:"crit_damage_bonus_percent_min"`
+	CritDamageBonusPercentMax int32  `yaml:"crit_damage_bonus_percent_max"`
+	// GrantedSkillID只表示装备授予的现代技能ID, 耗蓝由技能.yaml中的技能独立配置.
+	GrantedSkillID uint32 `yaml:"magicid"`
 
 	Use *ItemUseEntry `yaml:"use"`
+
+	legacyRangeFields bool `yaml:"-"`
+}
+
+type itemEntryYAML ItemEntry
+
+type itemRangeYAML struct {
+	AttackNumber           []uint32 `yaml:"attacknum"`
+	Attack                 []int32  `yaml:"attack"`
+	Defence                []int32  `yaml:"defence"`
+	Quick                  []int32  `yaml:"quick"`
+	HP                     []int32  `yaml:"hp"`
+	MP                     []int32  `yaml:"mp"`
+	Luck                   []int32  `yaml:"luck"`
+	Charm                  []int32  `yaml:"charm"`
+	Avoid                  []int32  `yaml:"avoid"`
+	Poison                 []int32  `yaml:"poison"`
+	Paralysis              []int32  `yaml:"paralysis"`
+	Sleep                  []int32  `yaml:"sleep"`
+	Stone                  []int32  `yaml:"stone"`
+	Drunk                  []int32  `yaml:"drunk"`
+	Confusion              []int32  `yaml:"confusion"`
+	Critical               []int32  `yaml:"critical"`
+	CounterModifier        []int32  `yaml:"counter_modifier"`
+	DamageBonusPercent     []int32  `yaml:"damage_bonus_percent"`
+	CritDamageBonusPercent []int32  `yaml:"crit_damage_bonus_percent"`
+}
+
+// UnmarshalYAML 读取武器的二元素范围数组, 并继续兼容七类装备尚未迁移的 Min/Max 字段.
+func (p *ItemEntry) UnmarshalYAML(node *yaml.Node) error {
+	var legacy itemEntryYAML
+	if err := node.Decode(&legacy); err != nil {
+		return err
+	}
+	var ranges itemRangeYAML
+	if err := node.Decode(&ranges); err != nil {
+		return err
+	}
+	*p = ItemEntry(legacy)
+	p.legacyRangeFields = hasLegacyItemRangeFields(node)
+	if err := assignUint32Range("attacknum", ranges.AttackNumber, &p.AttackNumberMin, &p.AttackNumberMax); err != nil {
+		return err
+	}
+	for _, definition := range []struct {
+		name   string
+		values []int32
+		min    *int32
+		max    *int32
+	}{
+		{name: "attack", values: ranges.Attack, min: &p.AttackMin, max: &p.AttackMax},
+		{name: "defence", values: ranges.Defence, min: &p.DefenceMin, max: &p.DefenceMax},
+		{name: "quick", values: ranges.Quick, min: &p.QuickMin, max: &p.QuickMax},
+		{name: "hp", values: ranges.HP, min: &p.HPMin, max: &p.HPMax},
+		{name: "mp", values: ranges.MP, min: &p.MPMin, max: &p.MPMax},
+		{name: "luck", values: ranges.Luck, min: &p.LuckMin, max: &p.LuckMax},
+		{name: "charm", values: ranges.Charm, min: &p.CharmMin, max: &p.CharmMax},
+		{name: "avoid", values: ranges.Avoid, min: &p.AvoidMin, max: &p.AvoidMax},
+		{name: "poison", values: ranges.Poison, min: &p.PoisonMin, max: &p.PoisonMax},
+		{name: "paralysis", values: ranges.Paralysis, min: &p.ParalysisMin, max: &p.ParalysisMax},
+		{name: "sleep", values: ranges.Sleep, min: &p.SleepMin, max: &p.SleepMax},
+		{name: "stone", values: ranges.Stone, min: &p.StoneMin, max: &p.StoneMax},
+		{name: "drunk", values: ranges.Drunk, min: &p.DrunkMin, max: &p.DrunkMax},
+		{name: "confusion", values: ranges.Confusion, min: &p.ConfusionMin, max: &p.ConfusionMax},
+		{name: "critical", values: ranges.Critical, min: &p.CriticalMin, max: &p.CriticalMax},
+		{name: "counter_modifier", values: ranges.CounterModifier, min: &p.CounterModifierMin, max: &p.CounterModifierMax},
+		{name: "damage_bonus_percent", values: ranges.DamageBonusPercent, min: &p.DamageBonusPercentMin, max: &p.DamageBonusPercentMax},
+		{name: "crit_damage_bonus_percent", values: ranges.CritDamageBonusPercent, min: &p.CritDamageBonusPercentMin, max: &p.CritDamageBonusPercentMax},
+	} {
+		if err := assignInt32Range(definition.name, definition.values, definition.min, definition.max); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func hasLegacyItemRangeFields(node *yaml.Node) bool {
+	legacyFields := map[string]struct{}{
+		"attacknum_min": {}, "attacknum_max": {}, "attack_min": {}, "attack_max": {},
+		"defence_min": {}, "defence_max": {}, "quick_min": {}, "quick_max": {},
+		"hp_min": {}, "hp_max": {}, "mp_min": {}, "mp_max": {},
+		"luck_min": {}, "luck_max": {}, "charm_min": {}, "charm_max": {},
+		"avoid_min": {}, "avoid_max": {}, "poison_min": {}, "poison_max": {},
+		"paralysis_min": {}, "paralysis_max": {}, "sleep_min": {}, "sleep_max": {},
+		"stone_min": {}, "stone_max": {}, "drunk_min": {}, "drunk_max": {},
+		"confusion_min": {}, "confusion_max": {}, "critical_min": {}, "critical_max": {},
+		"counter_modifier_min": {}, "counter_modifier_max": {},
+		"damage_bonus_percent_min": {}, "damage_bonus_percent_max": {},
+		"crit_damage_bonus_percent_min": {}, "crit_damage_bonus_percent_max": {},
+	}
+	if node.Kind != yaml.MappingNode {
+		return false
+	}
+	for index := 0; index < len(node.Content); index += 2 {
+		if _, ok := legacyFields[node.Content[index].Value]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+func assignUint32Range(name string, values []uint32, minimum, maximum *uint32) error {
+	if values == nil {
+		return nil
+	}
+	if len(values) != 2 {
+		return errors.Errorf("%s必须是包含最小值和最大值的二元素数组", name)
+	}
+	*minimum, *maximum = values[0], values[1]
+	return nil
+}
+
+func assignInt32Range(name string, values []int32, minimum, maximum *int32) error {
+	if values == nil {
+		return nil
+	}
+	if len(values) != 2 {
+		return errors.Errorf("%s必须是包含最小值和最大值的二元素数组", name)
+	}
+	*minimum, *maximum = values[0], values[1]
+	return nil
 }
 
 type ItemUseEntry struct {
@@ -90,20 +217,30 @@ type itemGroupDefinition struct {
 	start      uint32
 	end        uint32
 	weapon     bool
+	equipment  bool
+	allowEmpty bool
 	weaponType pb.CharacterWeaponType
 }
 
 var itemGroupDefinitions = []itemGroupDefinition{
-	{name: "item", fileName: FileItem, start: uint32(pb.AssetIDRange_AssetIDRange_Item_Item_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Item_End)},
-	{name: "accessory", fileName: FileItemAccessory, start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Accessory_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Accessory_End)},
-	{name: "weaponClaw", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Claw_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Claw_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Claw},
-	{name: "weaponAxe", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Axe_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Axe_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Axe},
-	{name: "weaponStaff", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Staff_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Staff_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Stick},
-	{name: "weaponSpear", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Spear_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Spear_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Spear},
-	{name: "weaponBow", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Bow_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Bow_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Bow},
-	{name: "weaponBoomerang", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Boomerang_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Boomerang_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Boomerang},
-	{name: "weaponThrowingAxe", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_ThrowingAxe},
-	{name: "weaponThrowingStone", start: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingStone_Start), end: uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_ThrowingStone_End), weapon: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_ThrowingStone},
+	{name: "item", fileName: FileItem, start: uint32(pb.AssetID_AssetIDRange_Item_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Material_Start) - 1},
+	{name: "material", fileName: FileItemMaterial, start: uint32(pb.AssetID_AssetIDRange_Item_Material_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Material_End)},
+	{name: "currency", fileName: FileItemCurrency, start: uint32(pb.AssetID_AssetIDRange_Item_Currency_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Currency_End)},
+	{name: "equipmentChest", fileName: FileItemEquipmentChest, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Chest_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Chest_End), equipment: true, allowEmpty: true},
+	{name: "equipmentHelmet", fileName: FileItemEquipmentHelmet, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Helmet_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Helmet_End), equipment: true, allowEmpty: true},
+	{name: "equipmentShield", fileName: FileItemEquipmentShield, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Shield_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Shield_End), equipment: true, allowEmpty: true},
+	{name: "equipmentGloves", fileName: FileItemEquipmentGloves, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Gloves_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Gloves_End), equipment: true, allowEmpty: true},
+	{name: "equipmentBelt", fileName: FileItemEquipmentBelt, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Belt_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Belt_End), equipment: true, allowEmpty: true},
+	{name: "equipmentBoots", fileName: FileItemEquipmentBoots, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Boots_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Boots_End), equipment: true, allowEmpty: true},
+	{name: "equipmentAccessory", fileName: FileItemEquipmentAccessory, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Accessory_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Accessory_End), equipment: true, allowEmpty: true},
+	{name: "weaponClaw", fileName: FileItemWeaponClaw, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Claw_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Claw_End), weapon: true, equipment: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Claw},
+	{name: "weaponAxe", fileName: FileItemWeaponAxe, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Axe_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Axe_End), weapon: true, equipment: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Axe},
+	{name: "weaponStaff", fileName: FileItemWeaponStaff, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Staff_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Staff_End), weapon: true, equipment: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Stick},
+	{name: "weaponSpear", fileName: FileItemWeaponSpear, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Spear_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Spear_End), weapon: true, equipment: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Spear},
+	{name: "weaponBow", fileName: FileItemWeaponBow, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Bow_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Bow_End), weapon: true, equipment: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Bow},
+	{name: "weaponBoomerang", fileName: FileItemWeaponBoomerang, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Boomerang_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_Boomerang_End), weapon: true, equipment: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_Boomerang},
+	{name: "weaponThrowingAxe", fileName: FileItemWeaponThrowingAxe, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_ThrowingAxe_End), weapon: true, equipment: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_ThrowingAxe},
+	{name: "weaponThrowingStone", fileName: FileItemWeaponThrowingStone, start: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_ThrowingStone_Start), end: uint32(pb.AssetID_AssetIDRange_Item_Equipment_Weapon_ThrowingStone_End), weapon: true, equipment: true, weaponType: pb.CharacterWeaponType_CharacterWeaponType_ThrowingStone},
 }
 
 func newItemConfig() *ItemConfig {
@@ -125,14 +262,10 @@ func loadItemGroups(dir string, fileName string) (map[string]map[uint32]*ItemEnt
 		if !ok {
 			return nil, errors.Errorf("道具分组无效: file:%s group:%s %v", fileName, groupName, xruntime.Location())
 		}
-		expectedFile := group.fileName
-		if group.weapon {
-			expectedFile = FileItemWeapon
-		}
-		if expectedFile != fileName {
+		if group.fileName != fileName {
 			return nil, errors.Errorf("道具分组所属文件错误: file:%s group:%s %v", fileName, groupName, xruntime.Location())
 		}
-		if entries == nil || (len(entries) == 0 && group.name != "accessory") {
+		if entries == nil || (len(entries) == 0 && !group.allowEmpty) {
 			return nil, errors.Errorf("道具分组不能为空: file:%s group:%s %v", fileName, groupName, xruntime.Location())
 		}
 	}
@@ -141,7 +274,9 @@ func loadItemGroups(dir string, fileName string) (map[string]map[uint32]*ItemEnt
 
 func (p *ItemConfig) load(dir string) error {
 	itemGroups := make(map[string]map[uint32]*ItemEntry)
-	for _, fileName := range []string{FileItem, FileItemWeapon, FileItemAccessory} {
+	fileNames := append([]string{FileItem, FileItemMaterial, FileItemCurrency}, FileItemWeapons...)
+	fileNames = append(fileNames, FileItemEquipments...)
+	for _, fileName := range fileNames {
 		groups, err := loadItemGroups(dir, fileName)
 		if err != nil {
 			return err
@@ -160,7 +295,6 @@ func (p *ItemConfig) load(dir string) error {
 		if !ok {
 			continue
 		}
-		groupAtlas := ""
 		for itemID, entry := range entries {
 			if itemID < group.start || itemID > group.end {
 				return errors.Errorf("道具ID不属于配置分组: group:%s id:%d range:[%d,%d] %v", group.name, itemID, group.start, group.end, xruntime.Location())
@@ -172,46 +306,53 @@ func (p *ItemConfig) load(dir string) error {
 			if entry == nil {
 				return errors.Errorf("道具配置不能为空: group:%s id:%d %v", group.name, itemID, xruntime.Location())
 			}
+			if group.weapon && entry.legacyRangeFields {
+				return errors.Errorf("武器范围必须使用二元素数组, 不再接受_min/_max字段: group:%s id:%d %v", group.name, itemID, xruntime.Location())
+			}
 			itemIDValue := itemID
 			entry.ID = &itemIDValue
 			entry.WeaponType = group.weaponType
-			if group.name == "accessory" {
+			if group.name == "equipmentAccessory" {
 				minimum, maximum := AccessoryIDRange(entry.AccessoryType)
 				if minimum == 0 || itemID < minimum || itemID > maximum {
 					return errors.Errorf("首饰类型与ID区间不匹配: id:%d accessory_type:%d range:[%d,%d] %v", itemID, entry.AccessoryType, minimum, maximum, xruntime.Location())
 				}
-			} else if entry.AccessoryType != pb.AccessoryType_AccessoryType_Unknow {
+			} else if entry.AccessoryType != pb.AccessoryType_AccessoryType_Unspecified {
 				return errors.Errorf("非首饰分组不能配置首饰类型: group:%s id:%d %v", group.name, itemID, xruntime.Location())
 			}
-			if entry.Name == nil || strings.TrimSpace(*entry.Name) == "" {
+			if !group.weapon && !group.equipment && (entry.Name == nil || strings.TrimSpace(*entry.Name) == "") {
 				return errors.Errorf("道具名称不能为空: id:%d %v", itemID, xruntime.Location())
 			}
-			if entry.Sprite == nil {
-				return errors.Errorf("道具sprite不能为空: id:%d %v", itemID, xruntime.Location())
-			}
-			if *entry.Sprite == 0 {
-				if group.weapon || group.name == "accessory" {
-					return errors.Errorf("装备sprite必须大于0: group:%s id:%d %v", group.name, itemID, xruntime.Location())
-				}
-				if entry.Atlas != nil {
-					return errors.Errorf("sprite为0的道具不能配置atlas: id:%d %v", itemID, xruntime.Location())
-				}
-			} else {
-				if entry.Atlas == nil {
-					return errors.Errorf("sprite大于0的道具必须配置atlas: id:%d %v", itemID, xruntime.Location())
-				}
-				if err := validateItemAtlas(*entry.Atlas); err != nil {
-					return errors.Errorf("道具atlas无效: id:%d atlas:%q err:%v %v", itemID, *entry.Atlas, err, xruntime.Location())
-				}
-				if group.weapon {
-					if groupAtlas == "" {
-						groupAtlas = *entry.Atlas
-					} else if groupAtlas != *entry.Atlas {
-						return errors.Errorf("武器分组不能混用atlas: group:%s atlas:%q duplicateAtlas:%q %v", group.name, groupAtlas, *entry.Atlas, xruntime.Location())
+			// 非装备道具必须显式提供并配套 sprite/atlas; 七类装备允许按 C/S 字段归属独立省略展示字段.
+			if !group.weapon {
+				if group.equipment {
+					if entry.Sprite != nil && *entry.Sprite == 0 {
+						return errors.Errorf("装备sprite必须大于0: group:%s id:%d %v", group.name, itemID, xruntime.Location())
+					}
+					if entry.Atlas != nil {
+						if err := validateItemAtlas(*entry.Atlas); err != nil {
+							return errors.Errorf("道具atlas无效: id:%d atlas:%q err:%v %v", itemID, *entry.Atlas, err, xruntime.Location())
+						}
+					}
+				} else {
+					if entry.Sprite == nil {
+						return errors.Errorf("道具sprite不能为空: id:%d %v", itemID, xruntime.Location())
+					}
+					if *entry.Sprite == 0 {
+						if entry.Atlas != nil {
+							return errors.Errorf("sprite为0的道具不能配置atlas: id:%d %v", itemID, xruntime.Location())
+						}
+					} else {
+						if entry.Atlas == nil {
+							return errors.Errorf("sprite大于0的道具必须配置atlas: id:%d %v", itemID, xruntime.Location())
+						}
+						if err := validateItemAtlas(*entry.Atlas); err != nil {
+							return errors.Errorf("道具atlas无效: id:%d atlas:%q err:%v %v", itemID, *entry.Atlas, err, xruntime.Location())
+						}
 					}
 				}
 			}
-			if err := validateItemUse(itemID, entry, group.weapon || group.name == "accessory"); err != nil {
+			if err := validateItemUse(itemID, entry, group.equipment); err != nil {
 				return err
 			}
 			if err := validateItemAttributes(itemID, entry); err != nil {
@@ -221,7 +362,7 @@ func (p *ItemConfig) load(dir string) error {
 		}
 	}
 	if len(seenItemIDs) == 0 {
-		return errors.Errorf("道具配置没有可用条目: %s,%s %v", FileItem, FileItemWeapon, xruntime.Location())
+		return errors.Errorf("道具配置没有可用条目: 普通道具、素材、货币、8个武器文件、7个装备文件 %v", xruntime.Location())
 	}
 	return nil
 }
@@ -250,6 +391,9 @@ func validateItemAttributes(itemID uint32, entry *ItemEntry) error {
 		{name: "drunk", min: entry.DrunkMin, max: entry.DrunkMax},
 		{name: "confusion", min: entry.ConfusionMin, max: entry.ConfusionMax},
 		{name: "critical", min: entry.CriticalMin, max: entry.CriticalMax},
+		{name: "counter_modifier", min: entry.CounterModifierMin, max: entry.CounterModifierMax},
+		{name: "damage_bonus_percent", min: entry.DamageBonusPercentMin, max: entry.DamageBonusPercentMax},
+		{name: "crit_damage_bonus_percent", min: entry.CritDamageBonusPercentMin, max: entry.CritDamageBonusPercentMax},
 	}
 	for _, itemRange := range ranges {
 		if itemRange.min > itemRange.max {
@@ -262,7 +406,7 @@ func validateItemAttributes(itemID uint32, entry *ItemEntry) error {
 	if entry.Attribute > 4 {
 		return errors.Errorf("道具元素类型无效: id:%d attrib:%d %v", itemID, entry.Attribute, xruntime.Location())
 	}
-	if entry.AttributeValue > 10 {
+	if entry.AttributeValue > uint32(pb.Constants_Constants_Elemental_Total_Point) {
 		return errors.Errorf("道具元素值无效: id:%d attribvalue:%d %v", itemID, entry.AttributeValue, xruntime.Location())
 	}
 	if entry.Attribute == 0 && entry.AttributeValue != 0 {
@@ -342,7 +486,27 @@ func validateItemUse(itemID uint32, entry *ItemEntry, equipment bool) error {
 }
 
 func (p *ItemConfig) check() error {
-	return nil
+	var checkErr error
+	p.Foreach(func(itemID uint32, entry *ItemEntry) bool {
+		if entry == nil || entry.GrantedSkillID == 0 {
+			return true
+		}
+		if GGameConfig == nil || GGameConfig.Skill == nil {
+			checkErr = errors.Errorf("装备技能配置尚未加载: item:%d skill:%d %v", itemID, entry.GrantedSkillID, xruntime.Location())
+			return false
+		}
+		skill := GGameConfig.Skill.Get(entry.GrantedSkillID)
+		if skill == nil {
+			checkErr = errors.Errorf("装备引用不存在的现代技能: item:%d skill:%d %v", itemID, entry.GrantedSkillID, xruntime.Location())
+			return false
+		}
+		if !skill.CanBeUsedBy("character") {
+			checkErr = errors.Errorf("装备技能不允许角色使用: item:%d skill:%d %v", itemID, entry.GrantedSkillID, xruntime.Location())
+			return false
+		}
+		return true
+	})
+	return checkErr
 }
 
 func (p *ItemConfig) assemble() error {

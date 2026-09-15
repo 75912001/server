@@ -9,7 +9,7 @@
 # creationMode 创建模式: 省略表示普通宠物; fusionEgg 表示原版融合蛋, 保留模板成长且禁止使用普通宠物创建入口
 # testStatus 编辑器测试状态: 0=未测试(省略), 1=通过, 2=未通过; 编辑宠物字段后自动恢复为0, 客户端和服务端运行时均忽略
 # bestiary 图鉴: 声明后进入宠物图鉴; 普通宠物无独立图鉴资源时使用默认帧 300859, 战斗专用模板可省略
-# elemental 元素属性: earth-土, water-水, fire-火, wind-风 [默认:0] (整数, 范围[0,10], 总和必须等于10) (要么是单元素, 要么是两个元素相邻, 可以首尾相邻)
+# elemental 元素属性: earth-土, water-水, fire-火, wind-风 [默认:0] (整数百分比, 范围[0,100], 总和必须等于100) (要么是单元素, 要么是两个元素相邻, 可以首尾相邻)
 # attribute 属性: 允许负数
   ## poisonResist - 毒抗性
   ## paralysisResist - 麻痹抗性
@@ -143,7 +143,7 @@ pet:
       rarity: 2
       bestiary: 7285
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -178,8 +178,8 @@ pet:
       rarity: 2
       bestiary: 7286
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -214,8 +214,8 @@ pet:
       rarity: 2
       bestiary: 7287
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -250,7 +250,7 @@ pet:
       rarity: 2
       bestiary: 7288
       elemental:
-        fire: 10
+        fire: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -285,8 +285,8 @@ pet:
       rarity: 2
       bestiary: 7289
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -321,8 +321,8 @@ pet:
       rarity: 2
       bestiary: 126302
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -357,8 +357,8 @@ pet:
       rarity: 2
       bestiary: 126303
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -393,8 +393,8 @@ pet:
       rarity: 2
       bestiary: 126304
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -429,8 +429,8 @@ pet:
       rarity: 4
       bestiary: 343595
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 8
         paralysisResist: 8
@@ -465,7 +465,7 @@ pet:
       rarity: 3
       bestiary: 343596
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -500,8 +500,8 @@ pet:
       rarity: 3
       bestiary: 343597
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -536,7 +536,7 @@ pet:
       rarity: 3
       bestiary: 343598
       elemental:
-        fire: 10
+        fire: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -571,8 +571,8 @@ pet:
       rarity: 3
       bestiary: 343599
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -607,8 +607,8 @@ pet:
       rarity: 3
       bestiary: 349333
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -647,8 +647,8 @@ pet:
       rarity: 2
       bestiary: 7311
       elemental:
-        earth: 6
-        water: 4
+        earth: 60
+        water: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -683,8 +683,8 @@ pet:
       rarity: 2
       bestiary: 7312
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -719,8 +719,8 @@ pet:
       rarity: 2
       bestiary: 7313
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -755,8 +755,8 @@ pet:
       rarity: 3
       bestiary: 7314
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -791,8 +791,8 @@ pet:
       rarity: 2
       bestiary: 126324
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -827,7 +827,7 @@ pet:
       rarity: 5
       bestiary: 126325
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 1
         paralysisResist: 1
@@ -862,8 +862,8 @@ pet:
       rarity: 2
       bestiary: 126326
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -898,8 +898,8 @@ pet:
       rarity: 2
       bestiary: 126327
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -938,8 +938,8 @@ pet:
       rarity: 2
       bestiary: 7348
       elemental:
-        earth: 6
-        water: 4
+        earth: 60
+        water: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -974,8 +974,8 @@ pet:
       rarity: 3
       bestiary: 7349
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1010,8 +1010,8 @@ pet:
       rarity: 3
       bestiary: 7350
       elemental:
-        water: 2
-        fire: 8
+        water: 20
+        fire: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1046,8 +1046,8 @@ pet:
       rarity: 4
       bestiary: 7351
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 5
         paralysisResist: 5
@@ -1082,8 +1082,8 @@ pet:
       rarity: 3
       bestiary: 126359
       elemental:
-        fire: 4
-        wind: 6
+        fire: 40
+        wind: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1118,8 +1118,8 @@ pet:
       rarity: 4
       bestiary: 126360
       elemental:
-        fire: 1
-        wind: 9
+        fire: 10
+        wind: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1154,8 +1154,8 @@ pet:
       rarity: 3
       bestiary: 126361
       elemental:
-        earth: 4
-        wind: 6
+        earth: 40
+        wind: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1190,7 +1190,7 @@ pet:
       rarity: 3
       bestiary: 126362
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1229,8 +1229,8 @@ pet:
       rarity: 1
       bestiary: 7256
       elemental:
-        fire: 6
-        wind: 4
+        fire: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1265,8 +1265,8 @@ pet:
       rarity: 1
       bestiary: 7257
       elemental:
-        earth: 5
-        wind: 5
+        earth: 50
+        wind: 50
       attribute:
         poisonResist: 20
         paralysisResist: 0
@@ -1301,7 +1301,7 @@ pet:
       rarity: 1
       bestiary: 7258
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1336,8 +1336,8 @@ pet:
       rarity: 1
       bestiary: 7259
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1372,8 +1372,8 @@ pet:
       rarity: 1
       bestiary: 126279
       elemental:
-        earth: 6
-        water: 4
+        earth: 60
+        water: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1408,8 +1408,8 @@ pet:
       rarity: 1
       bestiary: 126280
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1444,8 +1444,8 @@ pet:
       rarity: 1
       bestiary: 126281
       elemental:
-        water: 6
-        fire: 4
+        water: 60
+        fire: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1480,8 +1480,8 @@ pet:
       rarity: 1
       bestiary: 126282
       elemental:
-        earth: 4
-        water: 6
+        earth: 40
+        water: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1520,8 +1520,8 @@ pet:
       rarity: 1
       bestiary: 7246
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1556,7 +1556,7 @@ pet:
       rarity: 1
       bestiary: 7248
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1591,8 +1591,8 @@ pet:
       rarity: 1
       bestiary: 7247
       elemental:
-        water: 4
-        fire: 6
+        water: 40
+        fire: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1627,8 +1627,8 @@ pet:
       rarity: 1
       bestiary: 7249
       elemental:
-        fire: 7
-        wind: 3
+        fire: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1663,8 +1663,8 @@ pet:
       rarity: 1
       bestiary: 7250
       elemental:
-        earth: 5
-        wind: 5
+        earth: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1699,7 +1699,7 @@ pet:
       rarity: 1
       bestiary: 126273
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1734,8 +1734,8 @@ pet:
       rarity: 1
       bestiary: 126274
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1770,8 +1770,8 @@ pet:
       rarity: 1
       bestiary: 126275
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1806,8 +1806,8 @@ pet:
       rarity: 1
       bestiary: 334407
       elemental:
-        earth: 1
-        water: 9
+        earth: 10
+        water: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1846,8 +1846,8 @@ pet:
       rarity: 1
       bestiary: 7251
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1882,8 +1882,8 @@ pet:
       rarity: 1
       bestiary: 7253
       elemental:
-        earth: 6
-        water: 4
+        earth: 60
+        water: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1918,8 +1918,8 @@ pet:
       rarity: 1
       bestiary: 7254
       elemental:
-        water: 4
-        fire: 6
+        water: 40
+        fire: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1954,7 +1954,7 @@ pet:
       rarity: 1
       bestiary: 7255
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -1989,8 +1989,8 @@ pet:
       rarity: 1
       bestiary: 126277
       elemental:
-        water: 7
-        fire: 3
+        water: 70
+        fire: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2025,8 +2025,8 @@ pet:
       rarity: 1
       bestiary: 350186
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2061,8 +2061,8 @@ pet:
       rarity: 1
       bestiary: 7252
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2097,8 +2097,8 @@ pet:
       rarity: 1
       bestiary: 126276
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2133,8 +2133,8 @@ pet:
       rarity: 1
       bestiary: 126278
       elemental:
-        fire: 6
-        wind: 4
+        fire: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2173,8 +2173,8 @@ pet:
       rarity: 1
       bestiary: 7260
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2209,8 +2209,8 @@ pet:
       rarity: 1
       bestiary: 7261
       elemental:
-        fire: 6
-        wind: 4
+        fire: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2245,8 +2245,8 @@ pet:
       rarity: 1
       bestiary: 7262
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2281,8 +2281,8 @@ pet:
       rarity: 1
       bestiary: 7263
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2317,8 +2317,8 @@ pet:
       rarity: 1
       bestiary: 126283
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2353,8 +2353,8 @@ pet:
       rarity: 1
       bestiary: 126284
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2389,8 +2389,8 @@ pet:
       rarity: 1
       bestiary: 126285
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2425,8 +2425,8 @@ pet:
       rarity: 1
       bestiary: 126286
       elemental:
-        earth: 9
-        wind: 1
+        earth: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2465,7 +2465,7 @@ pet:
       rarity: 1
       bestiary: 7264
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2500,8 +2500,8 @@ pet:
       rarity: 1
       bestiary: 7265
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 60
         paralysisResist: 0
@@ -2536,8 +2536,8 @@ pet:
       rarity: 1
       bestiary: 7266
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2572,8 +2572,8 @@ pet:
       rarity: 1
       bestiary: 7267
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2608,8 +2608,8 @@ pet:
       rarity: 1
       bestiary: 126287
       elemental:
-        fire: 4
-        wind: 6
+        fire: 40
+        wind: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2644,8 +2644,8 @@ pet:
       rarity: 1
       bestiary: 126288
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2680,8 +2680,8 @@ pet:
       rarity: 1
       bestiary: 126289
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2716,8 +2716,8 @@ pet:
       rarity: 1
       bestiary: 126290
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2756,8 +2756,8 @@ pet:
       rarity: 1
       bestiary: 7268
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2792,8 +2792,8 @@ pet:
       rarity: 1
       bestiary: 7269
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2828,8 +2828,8 @@ pet:
       rarity: 1
       bestiary: 7270
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2864,8 +2864,8 @@ pet:
       rarity: 1
       bestiary: 7271
       elemental:
-        earth: 9
-        wind: 1
+        earth: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2900,7 +2900,7 @@ pet:
       rarity: 1
       bestiary: 126291
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2935,8 +2935,8 @@ pet:
       rarity: 1
       bestiary: 126292
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -2971,8 +2971,8 @@ pet:
       rarity: 1
       bestiary: 126293
       elemental:
-        fire: 4
-        wind: 6
+        fire: 40
+        wind: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3007,8 +3007,8 @@ pet:
       rarity: 1
       bestiary: 126294
       elemental:
-        earth: 4
-        water: 6
+        earth: 40
+        water: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3047,8 +3047,8 @@ pet:
       rarity: 1
       bestiary: 7273
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3083,8 +3083,8 @@ pet:
       rarity: 1
       bestiary: 7272
       elemental:
-        earth: 4
-        water: 6
+        earth: 40
+        water: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3119,8 +3119,8 @@ pet:
       rarity: 1
       bestiary: 7274
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3155,8 +3155,8 @@ pet:
       rarity: 1
       bestiary: 7275
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3191,8 +3191,8 @@ pet:
       rarity: 1
       bestiary: 7276
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3227,8 +3227,8 @@ pet:
       rarity: 1
       bestiary: 126295
       elemental:
-        earth: 4
-        wind: 6
+        earth: 40
+        wind: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3263,8 +3263,8 @@ pet:
       rarity: 1
       bestiary: 126296
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3299,8 +3299,8 @@ pet:
       rarity: 1
       bestiary: 126297
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3339,7 +3339,7 @@ pet:
       rarity: 1
       bestiary: 7277
       elemental:
-        fire: 10
+        fire: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3374,8 +3374,8 @@ pet:
       rarity: 1
       bestiary: 7278
       elemental:
-        fire: 6
-        wind: 4
+        fire: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3410,8 +3410,8 @@ pet:
       rarity: 1
       bestiary: 7279
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3446,7 +3446,7 @@ pet:
       rarity: 1
       bestiary: 7280
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3481,8 +3481,8 @@ pet:
       rarity: 1
       bestiary: 126298
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3517,8 +3517,8 @@ pet:
       rarity: 1
       bestiary: 126299
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3553,8 +3553,8 @@ pet:
       rarity: 1
       bestiary: 126300
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3589,8 +3589,8 @@ pet:
       rarity: 1
       bestiary: 126301
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3629,7 +3629,7 @@ pet:
       rarity: 1
       bestiary: 7281
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3664,8 +3664,8 @@ pet:
       rarity: 1
       bestiary: 7282
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3700,8 +3700,8 @@ pet:
       rarity: 1
       bestiary: 7283
       elemental:
-        water: 4
-        fire: 6
+        water: 40
+        fire: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3736,8 +3736,8 @@ pet:
       rarity: 1
       bestiary: 7284
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3772,8 +3772,8 @@ pet:
       rarity: 1
       bestiary: 126222
       elemental:
-        earth: 5
-        wind: 5
+        earth: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3808,8 +3808,8 @@ pet:
       rarity: 1
       bestiary: 126067
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3844,8 +3844,8 @@ pet:
       rarity: 1
       bestiary: 126224
       elemental:
-        water: 6
-        fire: 4
+        water: 60
+        fire: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3880,8 +3880,8 @@ pet:
       rarity: 1
       bestiary: 126225
       elemental:
-        earth: 2
-        wind: 8
+        earth: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3920,8 +3920,8 @@ pet:
       rarity: 1
       bestiary: 7290
       elemental:
-        earth: 6
-        water: 4
+        earth: 60
+        water: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3956,8 +3956,8 @@ pet:
       rarity: 1
       bestiary: 7291
       elemental:
-        water: 7
-        fire: 3
+        water: 70
+        fire: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -3992,8 +3992,8 @@ pet:
       rarity: 1
       bestiary: 7292
       elemental:
-        water: 4
-        fire: 6
+        water: 40
+        fire: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4028,8 +4028,8 @@ pet:
       rarity: 1
       bestiary: 7293
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4064,8 +4064,8 @@ pet:
       rarity: 1
       bestiary: 126305
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4100,8 +4100,8 @@ pet:
       rarity: 1
       bestiary: 126306
       elemental:
-        fire: 6
-        wind: 4
+        fire: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4136,7 +4136,7 @@ pet:
       rarity: 1
       bestiary: 126307
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4171,8 +4171,8 @@ pet:
       rarity: 1
       bestiary: 126308
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4211,8 +4211,8 @@ pet:
       rarity: 1
       bestiary: 7294
       elemental:
-        fire: 7
-        wind: 3
+        fire: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4247,8 +4247,8 @@ pet:
       rarity: 1
       bestiary: 7295
       elemental:
-        earth: 2
-        wind: 8
+        earth: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4283,8 +4283,8 @@ pet:
       rarity: 1
       bestiary: 7296
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4319,7 +4319,7 @@ pet:
       rarity: 1
       bestiary: 7297
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4354,8 +4354,8 @@ pet:
       rarity: 1
       bestiary: 126309
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4390,8 +4390,8 @@ pet:
       rarity: 1
       bestiary: 126310
       elemental:
-        earth: 6
-        water: 4
+        earth: 60
+        water: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4426,8 +4426,8 @@ pet:
       rarity: 1
       bestiary: 126311
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4462,8 +4462,8 @@ pet:
       rarity: 1
       bestiary: 126312
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4502,7 +4502,7 @@ pet:
       rarity: 1
       bestiary: 7298
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4537,8 +4537,8 @@ pet:
       rarity: 1
       bestiary: 7299
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4573,8 +4573,8 @@ pet:
       rarity: 1
       bestiary: 7300
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4609,8 +4609,8 @@ pet:
       rarity: 1
       bestiary: 7301
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4645,8 +4645,8 @@ pet:
       rarity: 1
       bestiary: 126313
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4681,8 +4681,8 @@ pet:
       rarity: 1
       bestiary: 126314
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4717,7 +4717,7 @@ pet:
       rarity: 1
       bestiary: 126315
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4752,8 +4752,8 @@ pet:
       rarity: 1
       bestiary: 126316
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4792,8 +4792,8 @@ pet:
       rarity: 1
       bestiary: 7302
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4828,8 +4828,8 @@ pet:
       rarity: 1
       bestiary: 7303
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4864,8 +4864,8 @@ pet:
       rarity: 1
       bestiary: 7304
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4900,8 +4900,8 @@ pet:
       rarity: 1
       bestiary: 7305
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4936,8 +4936,8 @@ pet:
       rarity: 1
       bestiary: 7306
       elemental:
-        fire: 4
-        wind: 6
+        fire: 40
+        wind: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -4972,7 +4972,7 @@ pet:
       rarity: 1
       bestiary: 126317
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5007,7 +5007,7 @@ pet:
       rarity: 1
       bestiary: 126318
       elemental:
-        fire: 10
+        fire: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5042,8 +5042,8 @@ pet:
       rarity: 1
       bestiary: 126319
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5082,8 +5082,8 @@ pet:
       rarity: 1
       bestiary: 7307
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5118,8 +5118,8 @@ pet:
       rarity: 1
       bestiary: 7308
       elemental:
-        fire: 4
-        wind: 6
+        fire: 40
+        wind: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5154,8 +5154,8 @@ pet:
       rarity: 1
       bestiary: 7309
       elemental:
-        earth: 2
-        wind: 8
+        earth: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5190,8 +5190,8 @@ pet:
       rarity: 1
       bestiary: 7310
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5226,8 +5226,8 @@ pet:
       rarity: 1
       bestiary: 126320
       elemental:
-        fire: 6
-        wind: 4
+        fire: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5262,8 +5262,8 @@ pet:
       rarity: 1
       bestiary: 126321
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5298,7 +5298,7 @@ pet:
       rarity: 1
       bestiary: 126322
       elemental:
-        fire: 10
+        fire: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5333,8 +5333,8 @@ pet:
       rarity: 1
       bestiary: 126323
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5373,8 +5373,8 @@ pet:
       rarity: 1
       bestiary: 7315
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5409,8 +5409,8 @@ pet:
       rarity: 1
       bestiary: 7316
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5445,8 +5445,8 @@ pet:
       rarity: 1
       bestiary: 7317
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5481,7 +5481,7 @@ pet:
       rarity: 1
       bestiary: 7318
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5516,8 +5516,8 @@ pet:
       rarity: 1
       bestiary: 126328
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5552,7 +5552,7 @@ pet:
       rarity: 1
       bestiary: 126329
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5587,7 +5587,7 @@ pet:
       rarity: 1
       bestiary: 126330
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5622,8 +5622,8 @@ pet:
       rarity: 1
       bestiary: 126331
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5662,8 +5662,8 @@ pet:
       rarity: 1
       bestiary: 7319
       elemental:
-        earth: 4
-        water: 6
+        earth: 40
+        water: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5698,8 +5698,8 @@ pet:
       rarity: 1
       bestiary: 7320
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5734,7 +5734,7 @@ pet:
       rarity: 1
       bestiary: 7321
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5769,8 +5769,8 @@ pet:
       rarity: 1
       bestiary: 7322
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5805,8 +5805,8 @@ pet:
       rarity: 1
       bestiary: 126332
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5841,8 +5841,8 @@ pet:
       rarity: 1
       bestiary: 126333
       elemental:
-        water: 2
-        fire: 8
+        water: 20
+        fire: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5877,8 +5877,8 @@ pet:
       rarity: 1
       bestiary: 126334
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5913,8 +5913,8 @@ pet:
       rarity: 1
       bestiary: 126335
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5953,8 +5953,8 @@ pet:
       rarity: 1
       bestiary: 7323
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -5989,8 +5989,8 @@ pet:
       rarity: 1
       bestiary: 7324
       elemental:
-        earth: 4
-        water: 6
+        earth: 40
+        water: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6025,8 +6025,8 @@ pet:
       rarity: 1
       bestiary: 7325
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 20
         paralysisResist: 0
@@ -6061,8 +6061,8 @@ pet:
       rarity: 1
       bestiary: 7326
       elemental:
-        water: 2
-        fire: 8
+        water: 20
+        fire: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6097,8 +6097,8 @@ pet:
       rarity: 1
       bestiary: 126336
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6133,8 +6133,8 @@ pet:
       rarity: 1
       bestiary: 126337
       elemental:
-        earth: 5
-        wind: 5
+        earth: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6169,8 +6169,8 @@ pet:
       rarity: 1
       bestiary: 126338
       elemental:
-        earth: 2
-        wind: 8
+        earth: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6205,7 +6205,7 @@ pet:
       rarity: 1
       bestiary: 126339
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6244,8 +6244,8 @@ pet:
       rarity: 1
       bestiary: 7327
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6280,7 +6280,7 @@ pet:
       rarity: 1
       bestiary: 7328
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6315,8 +6315,8 @@ pet:
       rarity: 1
       bestiary: 7329
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6351,8 +6351,8 @@ pet:
       rarity: 1
       bestiary: 7330
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6387,8 +6387,8 @@ pet:
       rarity: 1
       bestiary: 126340
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6423,8 +6423,8 @@ pet:
       rarity: 1
       bestiary: 126341
       elemental:
-        water: 7
-        fire: 3
+        water: 70
+        fire: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6459,8 +6459,8 @@ pet:
       rarity: 1
       bestiary: 126342
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6495,8 +6495,8 @@ pet:
       rarity: 1
       bestiary: 126343
       elemental:
-        fire: 6
-        wind: 4
+        fire: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6535,8 +6535,8 @@ pet:
       rarity: 1
       bestiary: 7331
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6571,8 +6571,8 @@ pet:
       rarity: 1
       bestiary: 7332
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6607,8 +6607,8 @@ pet:
       rarity: 1
       bestiary: 7333
       elemental:
-        water: 2
-        fire: 8
+        water: 20
+        fire: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6643,8 +6643,8 @@ pet:
       rarity: 1
       bestiary: 7334
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6679,8 +6679,8 @@ pet:
       rarity: 1
       bestiary: 7335
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6715,8 +6715,8 @@ pet:
       rarity: 1
       bestiary: 126344
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6751,8 +6751,8 @@ pet:
       rarity: 1
       bestiary: 126345
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6787,8 +6787,8 @@ pet:
       rarity: 1
       bestiary: 126346
       elemental:
-        earth: 5
-        wind: 5
+        earth: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6827,8 +6827,8 @@ pet:
       rarity: 1
       bestiary: 7336
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6863,8 +6863,8 @@ pet:
       rarity: 1
       bestiary: 7337
       elemental:
-        water: 2
-        fire: 8
+        water: 20
+        fire: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6899,8 +6899,8 @@ pet:
       rarity: 1
       bestiary: 7338
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6935,8 +6935,8 @@ pet:
       rarity: 1
       bestiary: 7339
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -6971,8 +6971,8 @@ pet:
       rarity: 1
       bestiary: 126347
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7007,8 +7007,8 @@ pet:
       rarity: 1
       bestiary: 126348
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7043,7 +7043,7 @@ pet:
       rarity: 1
       bestiary: 126349
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7078,8 +7078,8 @@ pet:
       rarity: 1
       bestiary: 126350
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7118,8 +7118,8 @@ pet:
       rarity: 1
       bestiary: 7340
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7154,8 +7154,8 @@ pet:
       rarity: 1
       bestiary: 7341
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7190,8 +7190,8 @@ pet:
       rarity: 1
       bestiary: 7342
       elemental:
-        earth: 5
-        wind: 5
+        earth: 50
+        wind: 50
       attribute:
         poisonResist: 20
         paralysisResist: 0
@@ -7226,7 +7226,7 @@ pet:
       rarity: 1
       bestiary: 7343
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7261,8 +7261,8 @@ pet:
       rarity: 1
       bestiary: 126351
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7297,8 +7297,8 @@ pet:
       rarity: 1
       bestiary: 126352
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7333,8 +7333,8 @@ pet:
       rarity: 1
       bestiary: 126353
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7369,8 +7369,8 @@ pet:
       rarity: 1
       bestiary: 126354
       elemental:
-        earth: 1
-        water: 9
+        earth: 10
+        water: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7409,8 +7409,8 @@ pet:
       rarity: 1
       bestiary: 7344
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7445,7 +7445,7 @@ pet:
       rarity: 1
       bestiary: 7345
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7480,8 +7480,8 @@ pet:
       rarity: 1
       bestiary: 7346
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7516,8 +7516,8 @@ pet:
       rarity: 1
       bestiary: 7347
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7552,8 +7552,8 @@ pet:
       rarity: 1
       bestiary: 126355
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7588,8 +7588,8 @@ pet:
       rarity: 1
       bestiary: 126356
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7624,8 +7624,8 @@ pet:
       rarity: 1
       bestiary: 126357
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7660,8 +7660,8 @@ pet:
       rarity: 1
       bestiary: 126358
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7700,8 +7700,8 @@ pet:
       rarity: 1
       bestiary: 7352
       elemental:
-        earth: 2
-        wind: 8
+        earth: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7736,7 +7736,7 @@ pet:
       rarity: 1
       bestiary: 7353
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7771,8 +7771,8 @@ pet:
       rarity: 1
       bestiary: 7354
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7807,8 +7807,8 @@ pet:
       rarity: 1
       bestiary: 7355
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 5
         paralysisResist: 5
@@ -7843,8 +7843,8 @@ pet:
       rarity: 1
       bestiary: 7356
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 5
         paralysisResist: 5
@@ -7879,8 +7879,8 @@ pet:
       rarity: 1
       bestiary: 126363
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7915,8 +7915,8 @@ pet:
       rarity: 1
       bestiary: 126364
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7951,8 +7951,8 @@ pet:
       rarity: 1
       bestiary: 126365
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -7991,8 +7991,8 @@ pet:
       rarity: 1
       bestiary: 7357
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8027,7 +8027,7 @@ pet:
       rarity: 1
       bestiary: 7358
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8062,8 +8062,8 @@ pet:
       rarity: 1
       bestiary: 7359
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8098,8 +8098,8 @@ pet:
       rarity: 1
       bestiary: 7360
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8134,8 +8134,8 @@ pet:
       rarity: 1
       bestiary: 7361
       elemental:
-        water: 7
-        fire: 3
+        water: 70
+        fire: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8170,8 +8170,8 @@ pet:
       rarity: 1
       bestiary: 126366
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8206,8 +8206,8 @@ pet:
       rarity: 1
       bestiary: 126367
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8242,8 +8242,8 @@ pet:
       rarity: 1
       bestiary: 126368
       elemental:
-        earth: 1
-        water: 9
+        earth: 10
+        water: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8282,8 +8282,8 @@ pet:
       rarity: 1
       bestiary: 7362
       elemental:
-        earth: 4
-        water: 6
+        earth: 40
+        water: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8318,8 +8318,8 @@ pet:
       rarity: 1
       bestiary: 7363
       elemental:
-        water: 7
-        fire: 3
+        water: 70
+        fire: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8354,8 +8354,8 @@ pet:
       rarity: 1
       bestiary: 7364
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8390,8 +8390,8 @@ pet:
       rarity: 1
       bestiary: 7365
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8426,8 +8426,8 @@ pet:
       rarity: 1
       bestiary: 126369
       elemental:
-        earth: 5
-        wind: 5
+        earth: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8462,8 +8462,8 @@ pet:
       rarity: 1
       bestiary: 126370
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8498,8 +8498,8 @@ pet:
       rarity: 1
       bestiary: 126371
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8534,8 +8534,8 @@ pet:
       rarity: 1
       bestiary: 126372
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8600,6 +8600,122 @@ pet:
 
   # 未知系
   未知系:
+    - id: 4001681
+      name: 莫里卡奇
+      sprite: 1681
+      enemyId: 2635
+      rarity: 2
+      bestiary: 300859
+      elemental:
+        fire: 80
+        wind: 20
+      attribute:
+        poisonResist: 25
+        paralysisResist: 25
+        sleepResist: 25
+        stoneResist: 25
+        drunkResist: 25
+        confusionResist: 25
+        critical: 3
+        counter: 3
+        rate: 1
+        get: 3
+      growth:
+        initNum: 33
+        lvupPointSource: 4.5
+        baseVital: 38
+        baseStr: 60
+        baseTough: 10
+        baseDex: 40
+      panelReference:
+        level1CommonAverage:
+          hp: 87
+          attack: 22
+          defense: 7
+          agility: 13
+        level1MythicAverage:
+          hp: 96
+          attack: 23
+          defense: 9
+          agility: 14
+        level140CommonAverage:
+          hp: 1833
+          attack: 466
+          defense: 154
+          agility: 280
+        level140MythicAverage:
+          hp: 2027
+          attack: 501
+          defense: 188
+          agility: 307
+        growthRateMin: 6.173
+        growthRateMax: 6.835
+      skill:
+      - 8000001
+      - 8000002
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+    - id: 4001680
+      name: 司卡奇
+      sprite: 1680
+      enemyId: 2634
+      rarity: 2
+      bestiary: 300859
+      elemental:
+        earth: 10
+        water: 90
+      attribute:
+        poisonResist: 35
+        paralysisResist: 35
+        sleepResist: 35
+        stoneResist: 35
+        drunkResist: 35
+        confusionResist: 35
+        critical: 3
+        counter: 3
+        rate: 1
+        get: 3
+      growth:
+        initNum: 32
+        lvupPointSource: 4.5
+        baseVital: 40
+        baseStr: 55
+        baseTough: 11
+        baseDex: 44
+      panelReference:
+        level1CommonAverage:
+          hp: 87
+          attack: 20
+          defense: 7
+          agility: 14
+        level1MythicAverage:
+          hp: 96
+          attack: 21
+          defense: 9
+          agility: 15
+        level140CommonAverage:
+          hp: 1888
+          attack: 434
+          defense: 160
+          agility: 307
+        level140MythicAverage:
+          hp: 2082
+          attack: 469
+          defense: 195
+          agility: 335
+        growthRateMin: 6.187
+        growthRateMax: 6.863
+      skill:
+      - 8000001
+      - 8000002
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
     - id: 4000963
       name: 讦谯龙
       sprite: 963
@@ -8607,8 +8723,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 20
         paralysisResist: 0
@@ -8659,8 +8775,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8710,8 +8826,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -8754,219 +8870,17 @@ pet:
         growthRateMin: 3.345
         growthRateMax: 4.065
       skill: [8000001,8000002,0,0,0,0,0]
-    - id: 4000968
-      name: 卡恩格登
-      sprite: 968
-      enemyId: 1900
-      rarity: 2
-      bestiary: 300859
-      elemental:
-        earth: 7
-        water: 3
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 1
-        counter: 1
-        rate: 1
-        get: 11
-      growth:
-        initNum: 26
-        lvupPointSource: 4.5
-        baseVital: 27
-        baseStr: 32
-        baseTough: 32
-        baseDex: 20
-      panelReference:
-        level1CommonAverage:
-          hp: 50
-          attack: 10
-          defense: 10
-          agility: 5
-        level1MythicAverage:
-          hp: 58
-          attack: 11
-          defense: 11
-          agility: 6
-        level140CommonAverage:
-          hp: 1336
-          attack: 270
-          defense: 270
-          agility: 140
-        level140MythicAverage:
-          hp: 1528
-          attack: 304
-          defense: 304
-          agility: 167
-        growthRateMin: 4.712
-        growthRateMax: 5.374
-      skill: [8000001,8000002,0,0,0,0,0]
-    - id: 4000969
-      name: 卡恩米兹
-      sprite: 969
-      enemyId: 1901
-      rarity: 2
-      bestiary: 300859
-      elemental:
-        water: 7
-        fire: 3
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 1
-        counter: 1
-        rate: 1
-        get: 11
-      growth:
-        initNum: 26
-        lvupPointSource: 4.5
-        baseVital: 30
-        baseStr: 31
-        baseTough: 25
-        baseDex: 23
-      panelReference:
-        level1CommonAverage:
-          hp: 52
-          attack: 9
-          defense: 8
-          agility: 6
-        level1MythicAverage:
-          hp: 59
-          attack: 11
-          defense: 9
-          agility: 7
-        level140CommonAverage:
-          hp: 1381
-          attack: 261
-          defense: 223
-          agility: 160
-        level140MythicAverage:
-          hp: 1573
-          attack: 295
-          defense: 258
-          agility: 187
-        growthRateMin: 4.468
-        growthRateMax: 5.129
-      skill: [8000001,8000002,0,0,0,0,0]
-    - id: 4000970
-      name: 卡恩法尔
-      sprite: 970
-      enemyId: 1902
-      rarity: 2
-      bestiary: 300859
-      elemental:
-        fire: 7
-        wind: 3
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 1
-        counter: 1
-        rate: 1
-        get: 11
-      growth:
-        initNum: 26
-        lvupPointSource: 4.5
-        baseVital: 25
-        baseStr: 37
-        baseTough: 24
-        baseDex: 23
-      panelReference:
-        level1CommonAverage:
-          hp: 48
-          attack: 11
-          defense: 8
-          agility: 6
-        level1MythicAverage:
-          hp: 56
-          attack: 12
-          defense: 9
-          agility: 7
-        level140CommonAverage:
-          hp: 1277
-          attack: 297
-          defense: 218
-          agility: 160
-        level140MythicAverage:
-          hp: 1469
-          attack: 332
-          defense: 252
-          agility: 187
-        growthRateMin: 4.676
-        growthRateMax: 5.345
-      skill: [8000001,8000002,0,0,0,0,0]
-    - id: 4000971
-      name: 卡恩修比
-      sprite: 971
-      enemyId: 1903
-      rarity: 2
-      bestiary: 300859
-      elemental:
-        earth: 3
-        wind: 7
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 1
-        counter: 1
-        rate: 1
-        get: 11
-      growth:
-        initNum: 26
-        lvupPointSource: 4.5
-        baseVital: 25
-        baseStr: 33
-        baseTough: 23
-        baseDex: 29
-      panelReference:
-        level1CommonAverage:
-          hp: 49
-          attack: 10
-          defense: 8
-          agility: 7
-        level1MythicAverage:
-          hp: 56
-          attack: 11
-          defense: 9
-          agility: 8
-        level140CommonAverage:
-          hp: 1283
-          attack: 271
-          defense: 210
-          agility: 200
-        level140MythicAverage:
-          hp: 1475
-          attack: 306
-          defense: 244
-          agility: 228
-        growthRateMin: 4.719
-        growthRateMax: 5.396
-      skill: [8000001,8000002,0,0,0,0,0]
+
     - id: 4001096
+      testStatus: 1
       name: 蒙奇
       sprite: 1096
       enemyId: 1947
       rarity: 3
-      bestiary: 300859
+      bestiary: 284529
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9009,56 +8923,7 @@ pet:
         growthRateMin: 4.468
         growthRateMax: 5.137
       skill: [8000001,8000002,0,0,0,0,0]
-    - id: 4001126
-      name: 洛奇斯德
-      sprite: 1126
-      enemyId: 2057
-      rarity: 1
-      bestiary: 300859
-      elemental:
-        water: 10
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 5
-        counter: 0
-        rate: 0
-        get: 0
-      growth:
-        initNum: 39
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 41
-        baseTough: 24
-        baseDex: 24
-      panelReference:
-        level1CommonAverage:
-          hp: 79
-          attack: 18
-          defense: 12
-          agility: 9
-        level1MythicAverage:
-          hp: 90
-          attack: 20
-          defense: 14
-          agility: 11
-        level140CommonAverage:
-          hp: 1425
-          attack: 334
-          defense: 228
-          agility: 170
-        level140MythicAverage:
-          hp: 1621
-          attack: 369
-          defense: 263
-          agility: 198
-        growthRateMin: 4.986
-        growthRateMax: 5.647
-      skill: [8000001,8000002,0,0,0,0,0]
+
     - id: 4001177
       name: 帖尼布
       sprite: 1177
@@ -9066,8 +8931,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9119,8 +8984,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 7
-        wind: 3
+        fire: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9177,8 +9042,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9235,8 +9100,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9293,7 +9158,7 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9350,7 +9215,7 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 10
+        fire: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9407,8 +9272,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9465,8 +9330,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 2
-        wind: 8
+        earth: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9523,8 +9388,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9581,8 +9446,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9639,8 +9504,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9697,7 +9562,7 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9754,8 +9619,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9812,8 +9677,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9863,63 +9728,7 @@ pet:
       - 0
       - 0
       - 0
-    - id: 4001121
-      name: 翟贝里恩
-      sprite: 1121
-      enemyId: 1980
-      rarity: 1
-      bestiary: 300859
-      elemental:
-        fire: 10
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 5
-        counter: 0
-        rate: 0
-        get: 0
-      growth:
-        initNum: 39
-        lvupPointSource: 4.5
-        baseVital: 24
-        baseStr: 44
-        baseTough: 24
-        baseDex: 26
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 19
-          defense: 12
-          agility: 10
-        level1MythicAverage:
-          hp: 86
-          attack: 21
-          defense: 14
-          agility: 11
-        level140CommonAverage:
-          hp: 1348
-          attack: 354
-          defense: 228
-          agility: 184
-        level140MythicAverage:
-          hp: 1544
-          attack: 388
-          defense: 263
-          agility: 212
-        growthRateMin: 5.216
-        growthRateMax: 5.878
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
+
     - id: 4001179
       name: 帖尼恩
       sprite: 1179
@@ -9927,8 +9736,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -9985,8 +9794,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10043,7 +9852,7 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10100,8 +9909,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10158,8 +9967,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 9
-        wind: 1
+        earth: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10216,8 +10025,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 1
-        water: 9
+        earth: 10
+        water: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10274,8 +10083,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10332,8 +10141,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10390,8 +10199,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10448,8 +10257,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10506,8 +10315,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10564,7 +10373,7 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10621,8 +10430,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10679,8 +10488,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 9
-        wind: 1
+        earth: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10737,8 +10546,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10795,8 +10604,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10853,8 +10662,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10911,8 +10720,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 1
-        water: 9
+        earth: 10
+        water: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -10969,8 +10778,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 2
-        fire: 8
+        water: 20
+        fire: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11027,8 +10836,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 7
-        fire: 3
+        water: 70
+        fire: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11085,8 +10894,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 6
-        water: 4
+        earth: 60
+        water: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11143,8 +10952,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 2
-        fire: 8
+        water: 20
+        fire: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11201,8 +11010,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11259,8 +11068,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11317,8 +11126,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11375,8 +11184,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11433,8 +11242,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11491,8 +11300,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11549,7 +11358,7 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11606,8 +11415,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11664,7 +11473,7 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 30
         paralysisResist: 30
@@ -11721,8 +11530,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11779,8 +11588,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11837,8 +11646,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11895,8 +11704,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 2
-        fire: 8
+        water: 20
+        fire: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -11953,8 +11762,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12011,8 +11820,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12069,8 +11878,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12127,8 +11936,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12185,8 +11994,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12243,8 +12052,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12301,8 +12110,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12359,7 +12168,7 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 99
         paralysisResist: 99
@@ -12409,63 +12218,6 @@ pet:
       - 0
       - 0
       - 0
-    - id: 4001710
-      name: 艾巴登
-      sprite: 1710
-      enemyId: 21210
-      rarity: 3
-      bestiary: 300859
-      elemental:
-        wind: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 2
-        get: -1
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 27
-        baseStr: 46
-        baseTough: 19
-        baseDex: 48
-      panelReference:
-        level1CommonAverage:
-          hp: 80
-          attack: 19
-          defense: 10
-          agility: 17
-        level1MythicAverage:
-          hp: 90
-          attack: 21
-          defense: 12
-          agility: 18
-        level140CommonAverage:
-          hp: 1557
-          attack: 371
-          defense: 203
-          agility: 337
-        level140MythicAverage:
-          hp: 1751
-          attack: 406
-          defense: 237
-          agility: 365
-        growthRateMin: 6.223
-        growthRateMax: 6.885
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
     - id: 4001228
       name: 华可洛
       sprite: 1228
@@ -12473,8 +12225,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12531,8 +12283,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12589,8 +12341,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12647,8 +12399,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12705,8 +12457,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12763,8 +12515,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12821,8 +12573,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12879,7 +12631,7 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12936,8 +12688,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -12994,8 +12746,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13052,8 +12804,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13110,8 +12862,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13168,8 +12920,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13226,8 +12978,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13284,8 +13036,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13342,8 +13094,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 1
-        wind: 9
+        earth: 10
+        wind: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13400,8 +13152,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 6
-        wind: 4
+        fire: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13458,8 +13210,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 4
-        wind: 6
+        earth: 40
+        wind: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13516,8 +13268,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13574,8 +13326,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13632,8 +13384,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 7
-        wind: 3
+        fire: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13690,8 +13442,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 5
-        wind: 5
+        earth: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13748,8 +13500,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13806,8 +13558,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 7
-        fire: 3
+        water: 70
+        fire: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -13857,352 +13609,6 @@ pet:
       - 0
       - 0
       - 0
-    - id: 4001749
-      name: 奥卡帕斯
-      sprite: 1749
-      enemyId: 21008
-      rarity: 1
-      bestiary: 300859
-      elemental:
-        earth: 8
-        water: 2
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 5
-        counter: 5
-        rate: 0
-        get: 1
-      growth:
-        initNum: 26
-        lvupPointSource: 6.0
-        baseVital: 28
-        baseStr: 37
-        baseTough: 32
-        baseDex: 25
-      panelReference:
-        level1CommonAverage:
-          hp: 54
-          attack: 11
-          defense: 10
-          agility: 6
-        level1MythicAverage:
-          hp: 61
-          attack: 12
-          defense: 11
-          agility: 7
-        level140CommonAverage:
-          hp: 1431
-          attack: 306
-          defense: 276
-          agility: 173
-        level140MythicAverage:
-          hp: 1624
-          attack: 340
-          defense: 310
-          agility: 200
-        growthRateMin: 5.237
-        growthRateMax: 5.899
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001750
-      name: 朵巴奈
-      sprite: 1750
-      enemyId: 21011
-      rarity: 1
-      bestiary: 300859
-      elemental:
-        fire: 2
-        wind: 8
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 5
-        counter: 5
-        rate: 0
-        get: 1
-      growth:
-        initNum: 26
-        lvupPointSource: 4.5
-        baseVital: 33
-        baseStr: 37
-        baseTough: 30
-        baseDex: 22
-      panelReference:
-        level1CommonAverage:
-          hp: 58
-          attack: 11
-          defense: 10
-          agility: 5
-        level1MythicAverage:
-          hp: 65
-          attack: 13
-          defense: 11
-          agility: 6
-        level140CommonAverage:
-          hp: 1530
-          attack: 307
-          defense: 264
-          agility: 153
-        level140MythicAverage:
-          hp: 1722
-          attack: 341
-          defense: 298
-          agility: 180
-        growthRateMin: 5.022
-        growthRateMax: 5.676
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001752
-      name: VIP斑尼左迪斯
-      sprite: 1752
-      enemyId: 21009
-      rarity: 3
-      bestiary: 300859
-      elemental:
-        water: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 6
-        counter: 5
-        rate: 2
-        get: -1
-      growth:
-        initNum: 36
-        lvupPointSource: 6.0
-        baseVital: 36
-        baseStr: 44
-        baseTough: 30
-        baseDex: 40
-      panelReference:
-        level1CommonAverage:
-          hp: 94
-          attack: 19
-          defense: 14
-          agility: 14
-        level1MythicAverage:
-          hp: 104
-          attack: 20
-          defense: 16
-          agility: 16
-        level140CommonAverage:
-          hp: 1816
-          attack: 369
-          defense: 281
-          agility: 281
-        level140MythicAverage:
-          hp: 2011
-          attack: 404
-          defense: 316
-          agility: 309
-        growthRateMin: 6.36
-        growthRateMax: 7.029
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001769
-      name: VIP萨格普鲁
-      sprite: 1769
-      enemyId: 21004
-      rarity: 3
-      bestiary: 300859
-      elemental:
-        earth: 10
-      attribute:
-        poisonResist: 40
-        paralysisResist: 40
-        sleepResist: 40
-        stoneResist: 40
-        drunkResist: 40
-        confusionResist: 40
-        critical: 3
-        counter: 7
-        rate: 2
-        get: -1
-      growth:
-        initNum: 42
-        lvupPointSource: 6.0
-        baseVital: 32
-        baseStr: 36
-        baseTough: 18
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 101
-          attack: 18
-          defense: 11
-          agility: 23
-        level1MythicAverage:
-          hp: 112
-          attack: 20
-          defense: 13
-          agility: 24
-        level140CommonAverage:
-          hp: 1684
-          attack: 310
-          defense: 196
-          agility: 388
-        level140MythicAverage:
-          hp: 1880
-          attack: 345
-          defense: 231
-          agility: 416
-        growthRateMin: 6.058
-        growthRateMax: 6.727
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001786
-      name: HF机暴(专属)
-      sprite: 1786
-      enemyId: 21047
-      rarity: 3
-      bestiary: 300859
-      elemental:
-        fire: 1
-        wind: 9
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 6
-        counter: 1
-        rate: 2
-        get: -1
-      growth:
-        initNum: 35
-        lvupPointSource: 4.5
-        baseVital: 43
-        baseStr: 40
-        baseTough: 31
-        baseDex: 54
-      panelReference:
-        level1CommonAverage:
-          hp: 105
-          attack: 17
-          defense: 14
-          agility: 19
-        level1MythicAverage:
-          hp: 114
-          attack: 19
-          defense: 16
-          agility: 20
-        level140CommonAverage:
-          hp: 2083
-          attack: 351
-          defense: 295
-          agility: 377
-        level140MythicAverage:
-          hp: 2277
-          attack: 386
-          defense: 330
-          agility: 405
-        growthRateMin: 7.0
-        growthRateMax: 7.669
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001787
-      name: VIP萨乌鲁斯
-      sprite: 1787
-      enemyId: 21038
-      rarity: 3
-      bestiary: 300859
-      elemental:
-        fire: 5
-        wind: 5
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 6
-        counter: 1
-        rate: 2
-        get: -1
-      growth:
-        initNum: 42
-        lvupPointSource: 6.0
-        baseVital: 32
-        baseStr: 36
-        baseTough: 18
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 101
-          attack: 18
-          defense: 11
-          agility: 23
-        level1MythicAverage:
-          hp: 112
-          attack: 20
-          defense: 13
-          agility: 24
-        level140CommonAverage:
-          hp: 1684
-          attack: 310
-          defense: 196
-          agility: 388
-        level140MythicAverage:
-          hp: 1880
-          attack: 345
-          defense: 231
-          agility: 416
-        growthRateMin: 6.058
-        growthRateMax: 6.727
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
     - id: 4001410
       name: 斯达克
       sprite: 1410
@@ -14210,8 +13616,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -14268,8 +13674,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -14326,8 +13732,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 8
         paralysisResist: 8
@@ -14384,8 +13790,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 6
-        water: 4
+        earth: 60
+        water: 40
       attribute:
         poisonResist: 8
         paralysisResist: 8
@@ -14442,8 +13848,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 8
         paralysisResist: 8
@@ -14500,8 +13906,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -14558,8 +13964,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -14616,8 +14022,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -14674,8 +14080,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -14732,8 +14138,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -14790,8 +14196,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 7
-        fire: 3
+        water: 70
+        fire: 30
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -14848,7 +14254,7 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -14905,7 +14311,7 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 10
+        fire: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -14962,8 +14368,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 3
         paralysisResist: 3
@@ -15020,8 +14426,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 3
         paralysisResist: 3
@@ -15078,8 +14484,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 3
         paralysisResist: 3
@@ -15136,8 +14542,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 3
         paralysisResist: 3
@@ -15194,7 +14600,7 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -15251,8 +14657,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -15309,8 +14715,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -15367,8 +14773,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 5
         paralysisResist: 5
@@ -15425,8 +14831,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 5
         paralysisResist: 5
@@ -15483,8 +14889,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 2
         paralysisResist: 2
@@ -15542,7 +14948,7 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 9
         paralysisResist: 9
@@ -15599,8 +15005,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 6
-        water: 4
+        earth: 60
+        water: 40
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -15650,63 +15056,6 @@ pet:
       - 0
       - 0
       - 0
-    - id: 4001770
-      name: VIP佩露普夏
-      sprite: 1770
-      enemyId: 21003
-      rarity: 3
-      bestiary: 300859
-      elemental:
-        water: 10
-      attribute:
-        poisonResist: 40
-        paralysisResist: 40
-        sleepResist: 40
-        stoneResist: 40
-        drunkResist: 40
-        confusionResist: 40
-        critical: 3
-        counter: 7
-        rate: 2
-        get: -1
-      growth:
-        initNum: 42
-        lvupPointSource: 6.0
-        baseVital: 32
-        baseStr: 36
-        baseTough: 18
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 101
-          attack: 18
-          defense: 11
-          agility: 23
-        level1MythicAverage:
-          hp: 112
-          attack: 20
-          defense: 13
-          agility: 24
-        level140CommonAverage:
-          hp: 1684
-          attack: 310
-          defense: 196
-          agility: 388
-        level140MythicAverage:
-          hp: 1880
-          attack: 345
-          defense: 231
-          agility: 416
-        growthRateMin: 6.058
-        growthRateMax: 6.727
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
     - id: 4001405
       name: 黄泉大鬼
       sprite: 1405
@@ -15714,8 +15063,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 7
-        wind: 3
+        fire: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -15765,63 +15114,6 @@ pet:
       - 0
       - 0
       - 0
-    - id: 4001953
-      name: 精灵弓箭手(男)
-      sprite: 1953
-      enemyId: 21211
-      rarity: 3
-      bestiary: 300859
-      elemental:
-        wind: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 2
-        get: -1
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 27
-        baseStr: 46
-        baseTough: 19
-        baseDex: 48
-      panelReference:
-        level1CommonAverage:
-          hp: 80
-          attack: 19
-          defense: 10
-          agility: 17
-        level1MythicAverage:
-          hp: 90
-          attack: 21
-          defense: 12
-          agility: 18
-        level140CommonAverage:
-          hp: 1557
-          attack: 371
-          defense: 203
-          agility: 337
-        level140MythicAverage:
-          hp: 1751
-          attack: 406
-          defense: 237
-          agility: 365
-        growthRateMin: 6.223
-        growthRateMax: 6.885
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
     - id: 4001499
       name: 雷尔
       sprite: 1499
@@ -15829,7 +15121,7 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 10
+        fire: 100
       attribute:
         poisonResist: 35
         paralysisResist: 35
@@ -15886,8 +15178,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -15937,63 +15229,6 @@ pet:
       - 0
       - 0
       - 0
-    - id: 4001956
-      name: 溶火卡帝亚蒙
-      sprite: 1956
-      enemyId: 21209
-      rarity: 3
-      bestiary: 300859
-      elemental:
-        wind: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 2
-        get: -1
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 27
-        baseStr: 46
-        baseTough: 19
-        baseDex: 48
-      panelReference:
-        level1CommonAverage:
-          hp: 80
-          attack: 19
-          defense: 10
-          agility: 17
-        level1MythicAverage:
-          hp: 90
-          attack: 21
-          defense: 12
-          agility: 18
-        level140CommonAverage:
-          hp: 1557
-          attack: 371
-          defense: 203
-          agility: 337
-        level140MythicAverage:
-          hp: 1751
-          attack: 406
-          defense: 237
-          agility: 365
-        growthRateMin: 6.223
-        growthRateMax: 6.885
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
     - id: 4001409
       name: 三墀蛇王
       sprite: 1409
@@ -16001,8 +15236,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -16059,8 +15294,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -16117,7 +15352,7 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 1
         paralysisResist: 1
@@ -16174,7 +15409,7 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -16224,63 +15459,6 @@ pet:
       - 0
       - 0
       - 0
-    - id: 4001751
-      name: 左迪卡尔
-      sprite: 1751
-      enemyId: 21005
-      rarity: 3
-      bestiary: 300859
-      elemental:
-        water: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 6
-        counter: 1
-        rate: 2
-        get: -1
-      growth:
-        initNum: 38
-        lvupPointSource: 6.0
-        baseVital: 30
-        baseStr: 42
-        baseTough: 18
-        baseDex: 52
-      panelReference:
-        level1CommonAverage:
-          hp: 89
-          attack: 19
-          defense: 10
-          agility: 19
-        level1MythicAverage:
-          hp: 100
-          attack: 20
-          defense: 12
-          agility: 21
-        level140CommonAverage:
-          hp: 1636
-          attack: 347
-          defense: 196
-          agility: 366
-        level140MythicAverage:
-          hp: 1832
-          attack: 382
-          defense: 231
-          agility: 393
-        growthRateMin: 6.194
-        growthRateMax: 6.856
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
     - id: 4001098
       name: 伊蕾丝
       sprite: 1098
@@ -16288,7 +15466,7 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -16345,8 +15523,8 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -16403,8 +15581,8 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -16461,8 +15639,8 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 50
         paralysisResist: 0
@@ -16519,8 +15697,8 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 50
         paralysisResist: 50
@@ -16577,8 +15755,8 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -16635,8 +15813,8 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -16693,8 +15871,8 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -16744,1097 +15922,6 @@ pet:
       - 0
       - 0
       - 0
-    - id: 4001702
-      name: 多奇
-      sprite: 1702
-      enemyId: 5521
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        water: 10
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001801
-      name: 金钱豹
-      sprite: 1801
-      enemyId: 21108
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        earth: 2
-        wind: 8
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 47
-        baseTough: 20
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 19
-          defense: 11
-          agility: 17
-        level1MythicAverage:
-          hp: 93
-          attack: 21
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1606
-          attack: 381
-          defense: 212
-          agility: 343
-        level140MythicAverage:
-          hp: 1801
-          attack: 415
-          defense: 246
-          agility: 370
-        growthRateMin: 6.396
-        growthRateMax: 7.043
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001803
-      name: 红虎人
-      sprite: 1803
-      enemyId: 21109
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        water: 1
-        fire: 9
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 47
-        baseTough: 20
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 19
-          defense: 11
-          agility: 17
-        level1MythicAverage:
-          hp: 93
-          attack: 21
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1606
-          attack: 381
-          defense: 212
-          agility: 343
-        level140MythicAverage:
-          hp: 1801
-          attack: 415
-          defense: 246
-          agility: 370
-        growthRateMin: 6.396
-        growthRateMax: 7.043
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001805
-      name: 米奇洛炎
-      sprite: 1805
-      enemyId: 21090
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        fire: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 34
-        lvupPointSource: 4.5
-        baseVital: 27
-        baseStr: 55
-        baseTough: 17
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 79
-          attack: 21
-          defense: 9
-          agility: 16
-        level1MythicAverage:
-          hp: 88
-          attack: 22
-          defense: 11
-          agility: 18
-        level140CommonAverage:
-          hp: 1606
-          attack: 432
-          defense: 194
-          agility: 342
-        level140MythicAverage:
-          hp: 1801
-          attack: 467
-          defense: 229
-          agility: 369
-        growthRateMin: 6.633
-        growthRateMax: 7.295
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001806
-      name: 米奇苍绿
-      sprite: 1806
-      enemyId: 21088
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        earth: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 35
-        lvupPointSource: 4.5
-        baseVital: 30
-        baseStr: 44
-        baseTough: 25
-        baseDex: 47
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 18
-          defense: 12
-          agility: 16
-        level1MythicAverage:
-          hp: 93
-          attack: 20
-          defense: 14
-          agility: 18
-        level140CommonAverage:
-          hp: 1657
-          attack: 363
-          defense: 244
-          agility: 329
-        level140MythicAverage:
-          hp: 1851
-          attack: 398
-          defense: 278
-          agility: 357
-        growthRateMin: 6.403
-        growthRateMax: 7.058
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001807
-      name: 米奇湛蓝
-      sprite: 1807
-      enemyId: 21091
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        water: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 27
-        baseStr: 51
-        baseTough: 18
-        baseDex: 50
-      panelReference:
-        level1CommonAverage:
-          hp: 82
-          attack: 21
-          defense: 10
-          agility: 18
-        level1MythicAverage:
-          hp: 93
-          attack: 22
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1598
-          attack: 407
-          defense: 199
-          agility: 350
-        level140MythicAverage:
-          hp: 1793
-          attack: 441
-          defense: 234
-          agility: 378
-        growthRateMin: 6.525
-        growthRateMax: 7.194
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001808
-      name: 米奇岚风
-      sprite: 1808
-      enemyId: 21089
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        wind: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 34
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 45
-        baseTough: 19
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 79
-          attack: 18
-          defense: 10
-          agility: 18
-        level1MythicAverage:
-          hp: 89
-          attack: 19
-          defense: 11
-          agility: 20
-        level140CommonAverage:
-          hp: 1622
-          attack: 366
-          defense: 204
-          agility: 384
-        level140MythicAverage:
-          hp: 1817
-          attack: 401
-          defense: 239
-          agility: 412
-        growthRateMin: 6.532
-        growthRateMax: 7.209
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001846
-      name: 水雪人
-      sprite: 1846
-      enemyId: 21110
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        water: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 47
-        baseTough: 20
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 19
-          defense: 11
-          agility: 17
-        level1MythicAverage:
-          hp: 93
-          attack: 21
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1606
-          attack: 381
-          defense: 212
-          agility: 343
-        level140MythicAverage:
-          hp: 1801
-          attack: 415
-          defense: 246
-          agility: 370
-        growthRateMin: 6.396
-        growthRateMax: 7.043
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001847
-      name: 火雪人
-      sprite: 1847
-      enemyId: 21111
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        fire: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 47
-        baseTough: 20
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 19
-          defense: 11
-          agility: 17
-        level1MythicAverage:
-          hp: 93
-          attack: 21
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1606
-          attack: 381
-          defense: 212
-          agility: 343
-        level140MythicAverage:
-          hp: 1801
-          attack: 415
-          defense: 246
-          agility: 370
-        growthRateMin: 6.396
-        growthRateMax: 7.043
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001722
-      name: 菲尼迪克
-      sprite: 1722
-      enemyId: 5545
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        earth: 3
-        wind: 7
-      attribute:
-        poisonResist: 5
-        paralysisResist: 5
-        sleepResist: 5
-        stoneResist: 5
-        drunkResist: 5
-        confusionResist: 5
-        critical: 4
-        counter: 1
-        rate: 6
-        get: 300
-      growth:
-        initNum: 30
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 42
-        baseTough: 24
-        baseDex: 36
-      panelReference:
-        level1CommonAverage:
-          hp: 65
-          attack: 14
-          defense: 10
-          agility: 10
-        level1MythicAverage:
-          hp: 73
-          attack: 16
-          defense: 11
-          agility: 12
-        level140CommonAverage:
-          hp: 1496
-          attack: 341
-          defense: 229
-          agility: 251
-        level140MythicAverage:
-          hp: 1690
-          attack: 375
-          defense: 264
-          agility: 279
-        growthRateMin: 5.662
-        growthRateMax: 6.324
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001860
-      name: 粉红虎
-      sprite: 1860
-      enemyId: 21165
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        fire: 2
-        wind: 8
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 47
-        baseTough: 20
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 19
-          defense: 11
-          agility: 17
-        level1MythicAverage:
-          hp: 93
-          attack: 21
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1606
-          attack: 381
-          defense: 212
-          agility: 343
-        level140MythicAverage:
-          hp: 1801
-          attack: 415
-          defense: 246
-          agility: 370
-        growthRateMin: 6.396
-        growthRateMax: 7.043
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001772
-      name: 黑海豚
-      sprite: 1772
-      enemyId: 21062
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        earth: 9
-        wind: 1
-      attribute:
-        poisonResist: 10
-        paralysisResist: 10
-        sleepResist: 10
-        stoneResist: 10
-        drunkResist: 10
-        confusionResist: 10
-        critical: 4
-        counter: 1
-        rate: 7
-        get: 270
-      growth:
-        initNum: 33
-        lvupPointSource: 4.5
-        baseVital: 33
-        baseStr: 44
-        baseTough: 32
-        baseDex: 47
-      panelReference:
-        level1CommonAverage:
-          hp: 85
-          attack: 17
-          defense: 14
-          agility: 15
-        level1MythicAverage:
-          hp: 94
-          attack: 19
-          defense: 15
-          agility: 16
-        level140CommonAverage:
-          hp: 1783
-          attack: 369
-          defense: 295
-          agility: 328
-        level140MythicAverage:
-          hp: 1977
-          attack: 404
-          defense: 329
-          agility: 356
-        growthRateMin: 6.806
-        growthRateMax: 7.475
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001954
-      name: 精灵弓箭手(女)
-      sprite: 1954
-      enemyId: 21122
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        fire: 6
-        wind: 4
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 47
-        baseTough: 20
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 19
-          defense: 11
-          agility: 17
-        level1MythicAverage:
-          hp: 93
-          attack: 21
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1606
-          attack: 381
-          defense: 212
-          agility: 343
-        level140MythicAverage:
-          hp: 1801
-          attack: 415
-          defense: 246
-          agility: 370
-        growthRateMin: 6.396
-        growthRateMax: 7.043
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001961
-      name: 森林守护地精灵
-      sprite: 1961
-      enemyId: 21132
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        earth: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 47
-        baseTough: 20
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 19
-          defense: 11
-          agility: 17
-        level1MythicAverage:
-          hp: 93
-          attack: 21
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1606
-          attack: 381
-          defense: 212
-          agility: 343
-        level140MythicAverage:
-          hp: 1801
-          attack: 415
-          defense: 246
-          agility: 370
-        growthRateMin: 6.396
-        growthRateMax: 7.043
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001962
-      name: 森林守护水精灵
-      sprite: 1962
-      enemyId: 21133
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        water: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 47
-        baseTough: 20
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 19
-          defense: 11
-          agility: 17
-        level1MythicAverage:
-          hp: 93
-          attack: 21
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1606
-          attack: 381
-          defense: 212
-          agility: 343
-        level140MythicAverage:
-          hp: 1801
-          attack: 415
-          defense: 246
-          agility: 370
-        growthRateMin: 6.396
-        growthRateMax: 7.043
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001963
-      name: 森林守护火精灵
-      sprite: 1963
-      enemyId: 21134
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        fire: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 47
-        baseTough: 20
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 19
-          defense: 11
-          agility: 17
-        level1MythicAverage:
-          hp: 93
-          attack: 21
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1606
-          attack: 381
-          defense: 212
-          agility: 343
-        level140MythicAverage:
-          hp: 1801
-          attack: 415
-          defense: 246
-          agility: 370
-        growthRateMin: 6.396
-        growthRateMax: 7.043
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001964
-      name: 森林守护风精灵
-      sprite: 1964
-      enemyId: 21135
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        wind: 10
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 47
-        baseTough: 20
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 19
-          defense: 11
-          agility: 17
-        level1MythicAverage:
-          hp: 93
-          attack: 21
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1606
-          attack: 381
-          defense: 212
-          agility: 343
-        level140MythicAverage:
-          hp: 1801
-          attack: 415
-          defense: 246
-          agility: 370
-        growthRateMin: 6.396
-        growthRateMax: 7.043
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001971
-      name: 螳螂
-      sprite: 1971
-      enemyId: 21142
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        earth: 5
-        wind: 5
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 42
-        lvupPointSource: 4.5
-        baseVital: 32
-        baseStr: 42
-        baseTough: 20
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 104
-          attack: 21
-          defense: 12
-          agility: 23
-        level1MythicAverage:
-          hp: 116
-          attack: 23
-          defense: 15
-          agility: 24
-        level140CommonAverage:
-          hp: 1740
-          attack: 353
-          defense: 215
-          agility: 388
-        level140MythicAverage:
-          hp: 1937
-          attack: 388
-          defense: 250
-          agility: 416
-        growthRateMin: 6.475
-        growthRateMax: 7.137
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001940
-      name: 绿斑虎
-      sprite: 1940
-      enemyId: 21174
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        earth: 5
-        water: 5
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 47
-        baseTough: 20
-        baseDex: 49
-      panelReference:
-        level1CommonAverage:
-          hp: 83
-          attack: 19
-          defense: 11
-          agility: 17
-        level1MythicAverage:
-          hp: 93
-          attack: 21
-          defense: 12
-          agility: 19
-        level140CommonAverage:
-          hp: 1606
-          attack: 381
-          defense: 212
-          agility: 343
-        level140MythicAverage:
-          hp: 1801
-          attack: 415
-          defense: 246
-          agility: 370
-        growthRateMin: 6.396
-        growthRateMax: 7.043
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
     - id: 4000966
       name: 史凯勒顿
       sprite: 966
@@ -17842,8 +15929,8 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -17900,8 +15987,8 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        earth: 2
-        wind: 8
+        earth: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -17958,7 +16045,7 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 30
         paralysisResist: 30
@@ -18015,8 +16102,8 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 30
         paralysisResist: 30
@@ -18066,642 +16153,6 @@ pet:
       - 0
       - 0
       - 0
-    - id: 4001693
-      name: '68'
-      sprite: 1693
-      enemyId: 2654
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        water: 9
-        fire: 1
-      attribute:
-        poisonResist: 10
-        paralysisResist: 10
-        sleepResist: 10
-        stoneResist: 10
-        drunkResist: 10
-        confusionResist: 10
-        critical: 5
-        counter: 5
-        rate: 7
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001704
-      name: 魔界之门守卫
-      sprite: 1704
-      enemyId: 5536
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        water: 10
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001705
-      name: 魔界之门守卫
-      sprite: 1705
-      enemyId: 5537
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        water: 10
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001706
-      name: 霍塔诺恩
-      sprite: 1706
-      enemyId: 5529
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        water: 8
-        fire: 2
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001955
-      name: 溶岩卡帝亚蒙
-      sprite: 1955
-      enemyId: 21127
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        fire: 5
-        wind: 5
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 42
-        lvupPointSource: 4.5
-        baseVital: 32
-        baseStr: 42
-        baseTough: 20
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 104
-          attack: 21
-          defense: 12
-          agility: 23
-        level1MythicAverage:
-          hp: 116
-          attack: 23
-          defense: 15
-          agility: 24
-        level140CommonAverage:
-          hp: 1740
-          attack: 353
-          defense: 215
-          agility: 388
-        level140MythicAverage:
-          hp: 1937
-          attack: 388
-          defense: 250
-          agility: 416
-        growthRateMin: 6.475
-        growthRateMax: 7.137
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001957
-      name: 牛魔王
-      sprite: 1957
-      enemyId: 21129
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        water: 5
-        fire: 5
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 42
-        lvupPointSource: 4.5
-        baseVital: 32
-        baseStr: 42
-        baseTough: 20
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 104
-          attack: 21
-          defense: 12
-          agility: 23
-        level1MythicAverage:
-          hp: 116
-          attack: 23
-          defense: 15
-          agility: 24
-        level140CommonAverage:
-          hp: 1740
-          attack: 353
-          defense: 215
-          agility: 388
-        level140MythicAverage:
-          hp: 1937
-          attack: 388
-          defense: 250
-          agility: 416
-        growthRateMin: 6.475
-        growthRateMax: 7.137
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001960
-      name: 恶霸
-      sprite: 1960
-      enemyId: 21126
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        water: 5
-        fire: 5
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 42
-        lvupPointSource: 4.5
-        baseVital: 32
-        baseStr: 42
-        baseTough: 20
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 104
-          attack: 21
-          defense: 12
-          agility: 23
-        level1MythicAverage:
-          hp: 116
-          attack: 23
-          defense: 15
-          agility: 24
-        level140CommonAverage:
-          hp: 1740
-          attack: 353
-          defense: 215
-          agility: 388
-        level140MythicAverage:
-          hp: 1937
-          attack: 388
-          defense: 250
-          agility: 416
-        growthRateMin: 6.475
-        growthRateMax: 7.137
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001967
-      name: 失落の魂
-      sprite: 1967
-      enemyId: 21141
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        fire: 1
-        wind: 9
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 42
-        lvupPointSource: 4.5
-        baseVital: 32
-        baseStr: 42
-        baseTough: 20
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 104
-          attack: 21
-          defense: 12
-          agility: 23
-        level1MythicAverage:
-          hp: 116
-          attack: 23
-          defense: 15
-          agility: 24
-        level140CommonAverage:
-          hp: 1740
-          attack: 353
-          defense: 215
-          agility: 388
-        level140MythicAverage:
-          hp: 1937
-          attack: 388
-          defense: 250
-          agility: 416
-        growthRateMin: 6.475
-        growthRateMax: 7.137
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001968
-      name: 绝望の魂
-      sprite: 1968
-      enemyId: 21138
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        earth: 9
-        water: 1
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 42
-        lvupPointSource: 4.5
-        baseVital: 32
-        baseStr: 42
-        baseTough: 20
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 104
-          attack: 21
-          defense: 12
-          agility: 23
-        level1MythicAverage:
-          hp: 116
-          attack: 23
-          defense: 15
-          agility: 24
-        level140CommonAverage:
-          hp: 1740
-          attack: 353
-          defense: 215
-          agility: 388
-        level140MythicAverage:
-          hp: 1937
-          attack: 388
-          defense: 250
-          agility: 416
-        growthRateMin: 6.475
-        growthRateMax: 7.137
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001969
-      name: 悲伤の魂
-      sprite: 1969
-      enemyId: 21140
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        fire: 9
-        wind: 1
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 42
-        lvupPointSource: 4.5
-        baseVital: 30
-        baseStr: 44
-        baseTough: 20
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 101
-          attack: 21
-          defense: 12
-          agility: 23
-        level1MythicAverage:
-          hp: 113
-          attack: 24
-          defense: 15
-          agility: 24
-        level140CommonAverage:
-          hp: 1696
-          attack: 367
-          defense: 215
-          agility: 388
-        level140MythicAverage:
-          hp: 1892
-          attack: 402
-          defense: 250
-          agility: 416
-        growthRateMin: 6.576
-        growthRateMax: 7.23
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001970
-      name: 孤寂の魂
-      sprite: 1970
-      enemyId: 21139
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        water: 9
-        fire: 1
-      attribute:
-        poisonResist: 30
-        paralysisResist: 30
-        sleepResist: 30
-        stoneResist: 30
-        drunkResist: 30
-        confusionResist: 30
-        critical: 7
-        counter: 3
-        rate: 7
-        get: 270
-      growth:
-        initNum: 42
-        lvupPointSource: 4.5
-        baseVital: 32
-        baseStr: 42
-        baseTough: 20
-        baseDex: 55
-      panelReference:
-        level1CommonAverage:
-          hp: 104
-          attack: 21
-          defense: 12
-          agility: 23
-        level1MythicAverage:
-          hp: 116
-          attack: 23
-          defense: 15
-          agility: 24
-        level140CommonAverage:
-          hp: 1740
-          attack: 353
-          defense: 215
-          agility: 388
-        level140MythicAverage:
-          hp: 1937
-          attack: 388
-          defense: 250
-          agility: 416
-        growthRateMin: 6.475
-        growthRateMax: 7.137
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
     - id: 4001691
       name: 皮朋
       sprite: 1691
@@ -18709,7 +16160,7 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 15
         paralysisResist: 15
@@ -18766,8 +16217,8 @@ pet:
       rarity: 5
       bestiary: 300859
       elemental:
-        earth: 1
-        water: 9
+        earth: 10
+        water: 90
       attribute:
         poisonResist: 15
         paralysisResist: 15
@@ -18817,760 +16268,6 @@ pet:
       - 0
       - 0
       - 0
-    - id: 4001695
-      name: 希库玛
-      sprite: 1695
-      enemyId: 5507
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        earth: 8
-        wind: 2
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001696
-      name: 希库玛
-      sprite: 1696
-      enemyId: 5509
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        water: 8
-        fire: 2
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001697
-      name: 布鲁多基
-      sprite: 1697
-      enemyId: 5510
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        earth: 9
-        wind: 1
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001698
-      name: 哈斯多基
-      sprite: 1698
-      enemyId: 5511
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        earth: 1
-        water: 9
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001699
-      name: 毕格多基
-      sprite: 1699
-      enemyId: 5512
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        water: 1
-        fire: 9
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001700
-      name: 普德多基
-      sprite: 1700
-      enemyId: 5513
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        fire: 1
-        wind: 9
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001707
-      name: 赛洛洛班
-      sprite: 1707
-      enemyId: 5528
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        water: 8
-        fire: 2
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001711
-      name: 风猪年
-      sprite: 1711
-      enemyId: 5522
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        fire: 8
-        wind: 2
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 30
-        baseStr: 50
-        baseTough: 26
-        baseDex: 30
-      panelReference:
-        level1CommonAverage:
-          hp: 82
-          attack: 20
-          defense: 13
-          agility: 10
-        level1MythicAverage:
-          hp: 92
-          attack: 22
-          defense: 14
-          agility: 12
-        level140CommonAverage:
-          hp: 1589
-          attack: 400
-          defense: 250
-          agility: 211
-        level140MythicAverage:
-          hp: 1784
-          attack: 435
-          defense: 284
-          agility: 238
-        growthRateMin: 5.885
-        growthRateMax: 6.54
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001712
-      name: 火猪年
-      sprite: 1712
-      enemyId: 5523
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        earth: 2
-        water: 8
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 32
-        baseStr: 48
-        baseTough: 28
-        baseDex: 31
-      panelReference:
-        level1CommonAverage:
-          hp: 85
-          attack: 20
-          defense: 13
-          agility: 11
-        level1MythicAverage:
-          hp: 95
-          attack: 22
-          defense: 15
-          agility: 12
-        level140CommonAverage:
-          hp: 1656
-          attack: 390
-          defense: 265
-          agility: 218
-        level140MythicAverage:
-          hp: 1851
-          attack: 425
-          defense: 299
-          agility: 246
-        growthRateMin: 5.964
-        growthRateMax: 6.626
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001713
-      name: 水猪年
-      sprite: 1713
-      enemyId: 5524
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        earth: 5
-        wind: 5
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 34
-        baseStr: 48
-        baseTough: 32
-        baseDex: 25
-      panelReference:
-        level1CommonAverage:
-          hp: 88
-          attack: 20
-          defense: 15
-          agility: 9
-        level1MythicAverage:
-          hp: 98
-          attack: 22
-          defense: 16
-          agility: 10
-        level140CommonAverage:
-          hp: 1694
-          attack: 392
-          defense: 292
-          agility: 175
-        level140MythicAverage:
-          hp: 1889
-          attack: 427
-          defense: 326
-          agility: 203
-        growthRateMin: 5.863
-        growthRateMax: 6.532
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001714
-      name: 地猪年
-      sprite: 1714
-      enemyId: 5525
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        earth: 2
-        wind: 8
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 28
-        baseStr: 45
-        baseTough: 24
-        baseDex: 36
-      panelReference:
-        level1CommonAverage:
-          hp: 79
-          attack: 18
-          defense: 12
-          agility: 13
-        level1MythicAverage:
-          hp: 89
-          attack: 20
-          defense: 13
-          agility: 14
-        level140CommonAverage:
-          hp: 1530
-          attack: 364
-          defense: 234
-          agility: 253
-        level140MythicAverage:
-          hp: 1725
-          attack: 399
-          defense: 268
-          agility: 281
-        growthRateMin: 5.813
-        growthRateMax: 6.482
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001723
-      name: 帖拉伊贝卡
-      sprite: 1723
-      enemyId: 5546
-      rarity: 5
-      bestiary: 300859
-      elemental:
-        water: 4
-        fire: 6
-      attribute:
-        poisonResist: 5
-        paralysisResist: 5
-        sleepResist: 5
-        stoneResist: 5
-        drunkResist: 5
-        confusionResist: 5
-        critical: 4
-        counter: 3
-        rate: 4
-        get: 300
-      growth:
-        initNum: 36
-        lvupPointSource: 4.5
-        baseVital: 30
-        baseStr: 40
-        baseTough: 20
-        baseDex: 40
-      panelReference:
-        level1CommonAverage:
-          hp: 80
-          attack: 17
-          defense: 10
-          agility: 14
-        level1MythicAverage:
-          hp: 90
-          attack: 18
-          defense: 12
-          agility: 16
-        level140CommonAverage:
-          hp: 1549
-          attack: 330
-          defense: 205
-          agility: 281
-        level140MythicAverage:
-          hp: 1744
-          attack: 365
-          defense: 240
-          agility: 309
-        growthRateMin: 5.576
-        growthRateMax: 6.245
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001724
-      name: 洞穴首领
-      sprite: 1724
-      enemyId: 5547
-      rarity: 4
-      bestiary: 300859
-      elemental:
-        earth: 2
-        wind: 8
-      attribute:
-        poisonResist: 0
-        paralysisResist: 0
-        sleepResist: 0
-        stoneResist: 0
-        drunkResist: 0
-        confusionResist: 0
-        critical: 3
-        counter: 3
-        rate: 3
-        get: 300
-      growth:
-        initNum: 25
-        lvupPointSource: 5.0
-        baseVital: 38
-        baseStr: 60
-        baseTough: 26
-        baseDex: 60
-      panelReference:
-        level1CommonAverage:
-          hp: 75
-          attack: 17
-          defense: 9
-          agility: 15
-        level1MythicAverage:
-          hp: 82
-          attack: 18
-          defense: 11
-          agility: 16
-        level140CommonAverage:
-          hp: 2058
-          attack: 479
-          defense: 268
-          agility: 414
-        level140MythicAverage:
-          hp: 2250
-          attack: 513
-          defense: 302
-          agility: 441
-        growthRateMin: 8.058
-        growthRateMax: 8.712
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
     - id: 4001109
       name: 法亚巴肯
       sprite: 1109
@@ -19578,8 +16275,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: -10
         paralysisResist: -10
@@ -19638,8 +16335,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -19696,8 +16393,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 1
-        water: 9
+        earth: 10
+        water: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -19754,8 +16451,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -19812,8 +16509,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: -10
         paralysisResist: -10
@@ -19870,8 +16567,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 1
-        wind: 9
+        earth: 10
+        wind: 90
       attribute:
         poisonResist: -10
         paralysisResist: -10
@@ -19928,8 +16625,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: -10
         paralysisResist: -10
@@ -19981,13 +16678,14 @@ pet:
       - 0
   魔兽系:
     - id: 4001122
+      testStatus: 1
       name: 赫拉克勒斯
       sprite: 1122
       enemyId: 1979
       rarity: 1
-      bestiary: 300859
+      bestiary: 284928
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20037,14 +16735,124 @@ pet:
       - 0
       - 0
       - 0
+    - id: 4001126
+      testStatus: 1
+      name: 洛奇斯德
+      sprite: 1126
+      enemyId: 2057
+      rarity: 1
+      bestiary: 288393
+      elemental:
+        water: 100
+      attribute:
+        poisonResist: 0
+        paralysisResist: 0
+        sleepResist: 0
+        stoneResist: 0
+        drunkResist: 0
+        confusionResist: 0
+        critical: 5
+        counter: 0
+        rate: 0
+        get: 0
+      growth:
+        initNum: 39
+        lvupPointSource: 4.5
+        baseVital: 28
+        baseStr: 41
+        baseTough: 24
+        baseDex: 24
+      panelReference:
+        level1CommonAverage:
+          hp: 79
+          attack: 18
+          defense: 12
+          agility: 9
+        level1MythicAverage:
+          hp: 90
+          attack: 20
+          defense: 14
+          agility: 11
+        level140CommonAverage:
+          hp: 1425
+          attack: 334
+          defense: 228
+          agility: 170
+        level140MythicAverage:
+          hp: 1621
+          attack: 369
+          defense: 263
+          agility: 198
+        growthRateMin: 4.986
+        growthRateMax: 5.647
+      skill: [8000001,8000002,0,0,0,0,0]
+    - id: 4001121
+      testStatus: 1
+      name: 翟贝里恩
+      sprite: 1121
+      enemyId: 1980
+      rarity: 1
+      bestiary: 284927
+      elemental:
+        fire: 100
+      attribute:
+        poisonResist: 0
+        paralysisResist: 0
+        sleepResist: 0
+        stoneResist: 0
+        drunkResist: 0
+        confusionResist: 0
+        critical: 5
+        counter: 0
+        rate: 0
+        get: 0
+      growth:
+        initNum: 39
+        lvupPointSource: 4.5
+        baseVital: 24
+        baseStr: 44
+        baseTough: 24
+        baseDex: 26
+      panelReference:
+        level1CommonAverage:
+          hp: 75
+          attack: 19
+          defense: 12
+          agility: 10
+        level1MythicAverage:
+          hp: 86
+          attack: 21
+          defense: 14
+          agility: 11
+        level140CommonAverage:
+          hp: 1348
+          attack: 354
+          defense: 228
+          agility: 184
+        level140MythicAverage:
+          hp: 1544
+          attack: 388
+          defense: 263
+          agility: 212
+        growthRateMin: 5.216
+        growthRateMax: 5.878
+      skill:
+      - 8000001
+      - 8000002
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
     - id: 4001127
+      testStatus: 1
       name: 缪那
       sprite: 1127
       enemyId: 2058
       rarity: 1
-      bestiary: 300859
+      bestiary: 288394
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20104,8 +16912,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20162,8 +16970,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20222,8 +17030,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20280,8 +17088,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 1
-        wind: 9
+        earth: 10
+        wind: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20338,8 +17146,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20396,8 +17204,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20454,8 +17262,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20512,8 +17320,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20570,7 +17378,7 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20627,8 +17435,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20685,8 +17493,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20743,7 +17551,7 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20800,8 +17608,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20858,8 +17666,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20916,8 +17724,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -20974,8 +17782,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21032,8 +17840,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21090,8 +17898,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21148,8 +17956,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 9
-        wind: 1
+        earth: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21206,8 +18014,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21264,7 +18072,7 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21321,8 +18129,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 2
-        fire: 8
+        water: 20
+        fire: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21379,8 +18187,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 9
-        wind: 1
+        earth: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21437,8 +18245,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 6
-        wind: 4
+        earth: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21495,8 +18303,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 4
-        water: 6
+        earth: 40
+        water: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21553,8 +18361,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 4
-        fire: 6
+        water: 40
+        fire: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21611,8 +18419,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 4
-        wind: 6
+        fire: 40
+        wind: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21669,8 +18477,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21727,8 +18535,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 1
-        water: 9
+        earth: 10
+        water: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21785,8 +18593,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 6
-        wind: 4
+        fire: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21843,7 +18651,7 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        wind: 10
+        wind: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21900,8 +18708,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 2
-        water: 8
+        earth: 20
+        water: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -21958,8 +18766,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22016,7 +18824,7 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22073,8 +18881,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 2
-        fire: 8
+        water: 20
+        fire: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22131,8 +18939,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22189,8 +18997,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22247,8 +19055,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 7
-        fire: 3
+        water: 70
+        fire: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22305,8 +19113,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22363,8 +19171,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 5
-        wind: 5
+        fire: 50
+        wind: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22422,8 +19230,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 7
-        wind: 3
+        earth: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22480,8 +19288,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22538,8 +19346,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        water: 3
-        fire: 7
+        water: 30
+        fire: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22596,8 +19404,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22657,8 +19465,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22715,8 +19523,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22773,8 +19581,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 6
-        fire: 4
+        water: 60
+        fire: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22833,8 +19641,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22891,8 +19699,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -22949,8 +19757,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 5
-        fire: 5
+        water: 50
+        fire: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23007,8 +19815,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 6
-        wind: 4
+        fire: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23065,8 +19873,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23123,7 +19931,7 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 10
+        water: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23180,8 +19988,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23238,8 +20046,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23297,8 +20105,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23355,8 +20163,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23413,8 +20221,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 1
-        wind: 9
+        fire: 10
+        wind: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23473,8 +20281,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23532,8 +20340,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23590,8 +20398,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23651,8 +20459,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 6
-        wind: 4
+        fire: 60
+        wind: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23709,8 +20517,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 6
-        water: 4
+        earth: 60
+        water: 40
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23767,8 +20575,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 7
-        wind: 3
+        fire: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23825,8 +20633,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23880,14 +20688,15 @@ pet:
   # 蝎子系
   蝎子系:
     - id: 4001296
+      testStatus: 1
       name: 史卡皮诺
       sprite: 1296
       enemyId: 2245
       rarity: 3
-      bestiary: 300859
+      bestiary: 319835
       elemental:
-        earth: 9
-        water: 1
+        earth: 90
+        water: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23938,14 +20747,15 @@ pet:
       - 0
       - 0
     - id: 4001297
+      testStatus: 2
       name: 史卡皮克
       sprite: 1297
       enemyId: 2246
       rarity: 3
-      bestiary: 300859
+      bestiary: 319836
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -23996,14 +20806,15 @@ pet:
       - 0
       - 0
     - id: 4001298
+      testStatus: 1
       name: 史卡皮奥
       sprite: 1298
       enemyId: 2247
       rarity: 3
-      bestiary: 300859
+      bestiary: 319837
       elemental:
-        fire: 9
-        wind: 1
+        fire: 90
+        wind: 10
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24054,14 +20865,15 @@ pet:
       - 0
       - 0
     - id: 4001299
+      testStatus: 1
       name: 史卡皮顿
       sprite: 1299
       enemyId: 2248
       rarity: 3
-      bestiary: 300859
+      bestiary: 319838
       elemental:
-        fire: 1
-        wind: 9
+        fire: 10
+        wind: 90
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24121,8 +20933,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 2
-        wind: 8
+        fire: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24182,8 +20994,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24240,8 +21052,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24298,8 +21110,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24356,8 +21168,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24414,8 +21226,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24472,8 +21284,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 2
-        wind: 8
+        earth: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24533,8 +21345,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 4
-        fire: 6
+        water: 40
+        fire: 60
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24591,8 +21403,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 8
-        wind: 2
+        earth: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24649,8 +21461,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 5
-        water: 5
+        earth: 50
+        water: 50
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24707,8 +21519,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 3
-        water: 7
+        earth: 30
+        water: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24765,8 +21577,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 2
-        wind: 8
+        earth: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24825,8 +21637,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24883,8 +21695,8 @@ pet:
       rarity: 2
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -24941,7 +21753,7 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 10
+        earth: 100
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -24998,8 +21810,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 1
-        fire: 9
+        water: 10
+        fire: 90
       attribute:
         poisonResist: 10
         paralysisResist: 10
@@ -25057,8 +21869,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25115,8 +21927,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25175,8 +21987,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 7
-        wind: 3
+        fire: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25233,8 +22045,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25291,8 +22103,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 3
-        wind: 7
+        fire: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25349,8 +22161,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25408,8 +22220,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25466,8 +22278,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25524,8 +22336,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25582,8 +22394,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 2
-        wind: 8
+        earth: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 40
@@ -25640,8 +22452,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        water: 8
-        fire: 2
+        water: 80
+        fire: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25698,8 +22510,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25756,8 +22568,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 2
-        wind: 8
+        earth: 20
+        wind: 80
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25814,8 +22626,8 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -25875,8 +22687,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 9
-        fire: 1
+        water: 90
+        fire: 10
       attribute:
         poisonResist: 20
         paralysisResist: 20
@@ -25933,8 +22745,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 1
-        wind: 9
+        earth: 10
+        wind: 90
       attribute:
         poisonResist: 20
         paralysisResist: 20
@@ -25991,8 +22803,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 8
-        water: 2
+        earth: 80
+        water: 20
       attribute:
         poisonResist: 20
         paralysisResist: 20
@@ -26049,8 +22861,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 8
-        wind: 2
+        fire: 80
+        wind: 20
       attribute:
         poisonResist: 20
         paralysisResist: 20
@@ -26103,122 +22915,215 @@ pet:
 
   # 端午兽系
   端午兽系:
-    - id: 4001681
-      name: 莫里卡奇
-      sprite: 1681
-      enemyId: 2635
+    - id: 4000968
+      testStatus: 1
+      name: 卡恩格登
+      sprite: 968
+      enemyId: 1900
       rarity: 2
-      bestiary: 300859
+      bestiary: 243879
       elemental:
-        fire: 8
-        wind: 2
+        earth: 70
+        water: 30
       attribute:
-        poisonResist: 25
-        paralysisResist: 25
-        sleepResist: 25
-        stoneResist: 25
-        drunkResist: 25
-        confusionResist: 25
-        critical: 3
-        counter: 3
+        poisonResist: 0
+        paralysisResist: 0
+        sleepResist: 0
+        stoneResist: 0
+        drunkResist: 0
+        confusionResist: 0
+        critical: 1
+        counter: 1
         rate: 1
-        get: 3
+        get: 11
       growth:
-        initNum: 33
+        initNum: 26
         lvupPointSource: 4.5
-        baseVital: 38
-        baseStr: 60
-        baseTough: 10
-        baseDex: 40
+        baseVital: 27
+        baseStr: 32
+        baseTough: 32
+        baseDex: 20
       panelReference:
         level1CommonAverage:
-          hp: 87
-          attack: 22
-          defense: 7
-          agility: 13
+          hp: 50
+          attack: 10
+          defense: 10
+          agility: 5
         level1MythicAverage:
-          hp: 96
-          attack: 23
-          defense: 9
-          agility: 14
+          hp: 58
+          attack: 11
+          defense: 11
+          agility: 6
         level140CommonAverage:
-          hp: 1833
-          attack: 466
-          defense: 154
-          agility: 280
+          hp: 1336
+          attack: 270
+          defense: 270
+          agility: 140
         level140MythicAverage:
-          hp: 2027
-          attack: 501
-          defense: 188
-          agility: 307
-        growthRateMin: 6.173
-        growthRateMax: 6.835
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    - id: 4001680
-      name: 司卡奇
-      sprite: 1680
-      enemyId: 2634
+          hp: 1528
+          attack: 304
+          defense: 304
+          agility: 167
+        growthRateMin: 4.712
+        growthRateMax: 5.374
+      skill: [8000001,8000002,0,0,0,0,0]
+    - id: 4000969
+      testStatus: 1
+      name: 卡恩米兹
+      sprite: 969
+      enemyId: 1901
       rarity: 2
-      bestiary: 300859
+      bestiary: 243877
       elemental:
-        earth: 1
-        water: 9
+        water: 70
+        fire: 30
       attribute:
-        poisonResist: 35
-        paralysisResist: 35
-        sleepResist: 35
-        stoneResist: 35
-        drunkResist: 35
-        confusionResist: 35
-        critical: 3
-        counter: 3
+        poisonResist: 0
+        paralysisResist: 0
+        sleepResist: 0
+        stoneResist: 0
+        drunkResist: 0
+        confusionResist: 0
+        critical: 1
+        counter: 1
         rate: 1
-        get: 3
+        get: 11
       growth:
-        initNum: 32
+        initNum: 26
         lvupPointSource: 4.5
-        baseVital: 40
-        baseStr: 55
-        baseTough: 11
-        baseDex: 44
+        baseVital: 30
+        baseStr: 31
+        baseTough: 25
+        baseDex: 23
       panelReference:
         level1CommonAverage:
-          hp: 87
-          attack: 20
-          defense: 7
-          agility: 14
+          hp: 52
+          attack: 9
+          defense: 8
+          agility: 6
         level1MythicAverage:
-          hp: 96
-          attack: 21
+          hp: 59
+          attack: 11
           defense: 9
-          agility: 15
+          agility: 7
         level140CommonAverage:
-          hp: 1888
-          attack: 434
-          defense: 160
-          agility: 307
+          hp: 1381
+          attack: 261
+          defense: 223
+          agility: 160
         level140MythicAverage:
-          hp: 2082
-          attack: 469
-          defense: 195
-          agility: 335
-        growthRateMin: 6.187
-        growthRateMax: 6.863
-      skill:
-      - 8000001
-      - 8000002
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
+          hp: 1573
+          attack: 295
+          defense: 258
+          agility: 187
+        growthRateMin: 4.468
+        growthRateMax: 5.129
+      skill: [8000001,8000002,0,0,0,0,0]
+    - id: 4000970
+      testStatus: 1
+      name: 卡恩法尔
+      sprite: 970
+      enemyId: 1902
+      rarity: 2
+      bestiary: 243878
+      elemental:
+        fire: 70
+        wind: 30
+      attribute:
+        poisonResist: 0
+        paralysisResist: 0
+        sleepResist: 0
+        stoneResist: 0
+        drunkResist: 0
+        confusionResist: 0
+        critical: 1
+        counter: 1
+        rate: 1
+        get: 11
+      growth:
+        initNum: 26
+        lvupPointSource: 4.5
+        baseVital: 25
+        baseStr: 37
+        baseTough: 24
+        baseDex: 23
+      panelReference:
+        level1CommonAverage:
+          hp: 48
+          attack: 11
+          defense: 8
+          agility: 6
+        level1MythicAverage:
+          hp: 56
+          attack: 12
+          defense: 9
+          agility: 7
+        level140CommonAverage:
+          hp: 1277
+          attack: 297
+          defense: 218
+          agility: 160
+        level140MythicAverage:
+          hp: 1469
+          attack: 332
+          defense: 252
+          agility: 187
+        growthRateMin: 4.676
+        growthRateMax: 5.345
+      skill: [8000001,8000002,0,0,0,0,0]
+    - id: 4000971
+      testStatus: 1
+      name: 卡恩修比
+      sprite: 971
+      enemyId: 1903
+      rarity: 2
+      bestiary: 243880
+      elemental:
+        earth: 30
+        wind: 70
+      attribute:
+        poisonResist: 0
+        paralysisResist: 0
+        sleepResist: 0
+        stoneResist: 0
+        drunkResist: 0
+        confusionResist: 0
+        critical: 1
+        counter: 1
+        rate: 1
+        get: 11
+      growth:
+        initNum: 26
+        lvupPointSource: 4.5
+        baseVital: 25
+        baseStr: 33
+        baseTough: 23
+        baseDex: 29
+      panelReference:
+        level1CommonAverage:
+          hp: 49
+          attack: 10
+          defense: 8
+          agility: 7
+        level1MythicAverage:
+          hp: 56
+          attack: 11
+          defense: 9
+          agility: 8
+        level140CommonAverage:
+          hp: 1283
+          attack: 271
+          defense: 210
+          agility: 200
+        level140MythicAverage:
+          hp: 1475
+          attack: 306
+          defense: 244
+          agility: 228
+        growthRateMin: 4.719
+        growthRateMax: 5.396
+      skill: [8000001,8000002,0,0,0,0,0]
+
 
   # 圣兽系
   圣兽系:
@@ -26229,7 +23134,7 @@ pet:
       rarity: 3
       bestiary: 300859
       elemental:
-        fire: 10
+        fire: 100
       attribute:
         poisonResist: 1
         paralysisResist: 1
@@ -26286,7 +23191,7 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 10
+        fire: 100
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -26347,8 +23252,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -26383,8 +23288,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        water: 7
-        fire: 3
+        water: 70
+        fire: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -26419,8 +23324,8 @@ pet:
       rarity: 1
       bestiary: 300859
       elemental:
-        fire: 7
-        wind: 3
+        fire: 70
+        wind: 30
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -26455,8 +23360,8 @@ pet:
       rarity: 1
       bestiary: 7268
       elemental:
-        earth: 3
-        wind: 7
+        earth: 30
+        wind: 70
       attribute:
         poisonResist: 0
         paralysisResist: 0
@@ -26491,8 +23396,8 @@ pet:
       rarity: 1
       bestiary: 7265
       elemental:
-        earth: 7
-        water: 3
+        earth: 70
+        water: 30
       attribute:
         poisonResist: 30
         paralysisResist: 0

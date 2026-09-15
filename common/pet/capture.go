@@ -25,7 +25,7 @@ func NewCaptureSnapshot(entry *gameconfig.PetEntry, level uint32, savedBase, raw
 	if entry == nil || entry.ID == nil || *entry.ID == 0 || !entry.SupportsOrdinaryCreation() {
 		return nil, fmt.Errorf("capture pet template is invalid")
 	}
-	if level < uint32(pb.LevelRange_LevelRange_Min) || level > uint32(pb.LevelRange_LevelRange_Max) {
+	if level < uint32(pb.Constants_Constants_Level_Min) || level > uint32(pb.Constants_Constants_Level_Max) {
 		return nil, fmt.Errorf("capture pet level is out of range: %d", level)
 	}
 	growth := entry.Growth

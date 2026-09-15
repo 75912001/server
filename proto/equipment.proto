@@ -4,6 +4,7 @@ package account;
 option go_package = "server/proto/pb;pb";
 
 import "record.proto";
+import "asset.proto";
 
 // EquipmentType 表示装备穿戴部位.
 // Unspecified 仅作为 proto3 默认值和未初始化占位, Max 仅作为枚举边界.
@@ -38,34 +39,41 @@ enum AccessoryType {
 message EquipmentRecord {
   uint64 uuid = 1; // 装备 UUID, 在所属 AccountRecord.aid 作用域内唯一
   uint32 asset_id = 2; // 装备资产 ID, 对应装备配置 ID
-  map<int32, int64> record_base_map = 10; // 装备基础数值表, key 使用 EquipmentRecordBase; 仅保存非0值, 缺失的已知key按0处理
+  map<int32, int64> record_base_map = 10; // 装备基础属性表, key 使用 EquipmentRecordAttribute; 仅保存非0值, 缺失的已知key按0处理
+  map<int32, int64> record_modifier_map = 11; // 装备附加属性修正表, key 使用 EquipmentRecordAttribute; 仅保存非0值, 缺失的已知key按0处理
+  repeated uint32 additional_skill_id_list = 20; // 配置表之外后期添加的技能 ID, 不包含装备配置自带技能
+  EquipmentElementAttribute element_attribute = 21; // 装备元素属性, 未设置表示没有元素属性
   map<int32, RecordPrimary> record_map = 1000; // 装备扩展记录表, key 使用 EquipmentRecordPrimary
 }
 
-// EquipmentRecordBase 定义 record_base_map 的基础数值类型.
-enum EquipmentRecordBase {
-  EquipmentRecordBase_Unspecified = 0; // 未知基础数值类型, proto3 默认值
-  EquipmentRecordBase_AttackModifier = 1; // 攻击力修正
-  EquipmentRecordBase_DefenceModifier = 2; // 防御力修正
-  EquipmentRecordBase_QuickModifier = 3; // 敏捷修正
-  EquipmentRecordBase_MaxHPModifier = 4; // 最大生命值修正
-  EquipmentRecordBase_MaxMPModifier = 5; // 最大魔法值修正
-  EquipmentRecordBase_LuckModifier = 6; // 运气修正
-  EquipmentRecordBase_CharmModifier = 7; // 魅力修正
-  EquipmentRecordBase_AvoidModifier = 8; // 闪避修正
-  EquipmentRecordBase_CriticalModifier = 15; // 暴击修正
-  EquipmentRecordBase_CounterModifier = 16; // 反击修正
-  EquipmentRecordBase_DamageBonusPercent = 17; // 伤害加成百分比
-  EquipmentRecordBase_CritDamageBonusPercent = 18; // 暴击伤害加成百分比
-  EquipmentRecordBase_AttachedElement = 19; // 附带元素, 值使用 AssetElemental
-  EquipmentRecordBase_AttachedElementValue = 20; // 附带元素数值
+// EquipmentElementAttribute 保存装备实例的一条元素属性.
+message EquipmentElementAttribute {
+  AssetElemental element = 1; // 元素类型, 仅允许地、水、火、风
+  uint32 value = 2; // 元素百分比值, 原版范围1-100
+}
 
-  EquipmentRecordBase_PoisonResistanceModifier = 100; // 毒抗性修正
-  EquipmentRecordBase_ParalysisResistanceModifier = 101; // 麻痹抗性修正
-  EquipmentRecordBase_SleepResistanceModifier = 102; // 睡眠抗性修正
-  EquipmentRecordBase_StoneResistanceModifier = 103; // 石化抗性修正
-  EquipmentRecordBase_DrunkResistanceModifier = 104; // 酒醉抗性修正
-  EquipmentRecordBase_ConfusionResistanceModifier = 105; // 混乱抗性修正
+// EquipmentRecordAttribute 定义装备实例的数值属性类型.
+enum EquipmentRecordAttribute {
+  EquipmentRecordAttribute_Unspecified = 0; // 未知属性类型, proto3 默认值
+  EquipmentRecordAttribute_Attack = 1; // 攻击力属性
+  EquipmentRecordAttribute_Defence = 2; // 防御力属性
+  EquipmentRecordAttribute_Quick = 3; // 敏捷属性
+  EquipmentRecordAttribute_MaxHP = 4; // 最大生命值属性
+  EquipmentRecordAttribute_MaxMP = 5; // 最大魔法值属性
+  EquipmentRecordAttribute_Luck = 6; // 运气属性
+  EquipmentRecordAttribute_Charm = 7; // 魅力属性
+  EquipmentRecordAttribute_Avoid = 8; // 闪避属性
+  EquipmentRecordAttribute_Critical = 15; // 暴击属性
+  EquipmentRecordAttribute_Counter = 16; // 反击属性
+  EquipmentRecordAttribute_DamageBonusPercent = 17; // 伤害加成百分比属性
+  EquipmentRecordAttribute_CritDamageBonusPercent = 18; // 暴击伤害加成百分比属性
+
+  EquipmentRecordAttribute_PoisonResistance = 100; // 毒抗性属性
+  EquipmentRecordAttribute_ParalysisResistance = 101; // 麻痹抗性属性
+  EquipmentRecordAttribute_SleepResistance = 102; // 睡眠抗性属性
+  EquipmentRecordAttribute_StoneResistance = 103; // 石化抗性属性
+  EquipmentRecordAttribute_DrunkResistance = 104; // 酒醉抗性属性
+  EquipmentRecordAttribute_ConfusionResistance = 105; // 混乱抗性属性
 }
 
 // EquipmentRecordPrimary 定义 record_map 的一级扩展记录类型.

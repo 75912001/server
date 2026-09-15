@@ -27,6 +27,9 @@ enum AssetID {
 
   // 道具
   AssetIDRange_Item_Start = 3000000; // 道具
+    // 道具-合成相关道具. 这类道具可参与合成, 但不属于基础素材.
+    AssetIDRange_Item_Synthesis_Start = 3090000;
+    AssetIDRange_Item_Synthesis_End = 3099999;
     // 道具-合成素材
     AssetIDRange_Item_Material_Start = 3100000;
       // 基础素材ID采用310GGLL: GG为素材系, LL为等级或系内序号.

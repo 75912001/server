@@ -11,8 +11,10 @@ func Load(dir string) (err error) {
 		Scene:     newSceneConfig(),
 		Exp:       newExpConfig(),
 		Item:      newItemConfig(),
+		Tiangong:  newTiangongConfig(),
 		Reward:    newRewardConfig(),
 		Task:      newTaskConfig(),
+		Store:     newStoreConfig(),
 	}
 	if err := GGameConfig.Skill.load(dir); err != nil {
 		return err
@@ -39,6 +41,12 @@ func Load(dir string) (err error) {
 		return err
 	}
 	if err := GGameConfig.Item.load(dir); err != nil {
+		return err
+	}
+	if err := GGameConfig.Tiangong.load(dir); err != nil {
+		return err
+	}
+	if err := GGameConfig.Store.load(dir); err != nil {
 		return err
 	}
 	if err := GGameConfig.Reward.load(dir); err != nil {
@@ -75,6 +83,12 @@ func Load(dir string) (err error) {
 	if err := GGameConfig.Item.check(); err != nil {
 		return err
 	}
+	if err := GGameConfig.Tiangong.check(); err != nil {
+		return err
+	}
+	if err := GGameConfig.Store.check(); err != nil {
+		return err
+	}
 	if err := GGameConfig.Reward.check(); err != nil {
 		return err
 	}
@@ -107,6 +121,12 @@ func Load(dir string) (err error) {
 		return err
 	}
 	if err := GGameConfig.Item.assemble(); err != nil {
+		return err
+	}
+	if err := GGameConfig.Tiangong.assemble(); err != nil {
+		return err
+	}
+	if err := GGameConfig.Store.assemble(); err != nil {
 		return err
 	}
 	if err := GGameConfig.Reward.assemble(); err != nil {

@@ -35,8 +35,10 @@ const (
 	// GETITEM_MAX是每个玩家Entry在BATTLE_AddExpItem阶段最多暂存的战利品数.
 	// 该上限属于战斗内临时槽, 与角色背包30条目的持久化上限不是同一个概念.
 	combatPVEGetItemMax = 3
+	// 新版敌群配置使用万分比, 随机范围固定为[0,9999].
+	combatPVENormalDropProbabilityMax = 10000
 
-	// 战斗技能ID只来自skill.yaml. 8000005至8000007虽然是有效配置,
+	// 战斗技能ID只来自技能.yaml. 8000005至8000007虽然是有效配置,
 	// 但当前online没有对应处理器, 请求会返回不支持技能错误.
 	combatSkillAttack     = gameconfig.BattleSkillIDAttack
 	combatSkillDefense    = gameconfig.BattleSkillIDDefense
@@ -104,6 +106,14 @@ type combatUnitRuntimeState struct {
 	alive   bool
 	escaped bool
 	guard   bool
+	// noGuard三项参数在回合排序前激活. critical仅保留原版命令快照,
+	// 8.5结算代码没有读取该字节, 当前也不把它接入暴击公式.
+	noGuardDodgePercent    int32
+	noGuardCounterPercent  uint32
+	noGuardCriticalPercent uint32
+	// guardianProtectedUnitKey只保存本回合忠犬要保护的同列前排单位.
+	// 是否仍能拦截在每次攻击命中后动态检查, 死亡、离场和控制状态不会沿用旧结果.
+	guardianProtectedUnitKey *pb.CombatUnitKey
 
 	// 基础四维供敌方AI和中毒结算使用. 角色沿用档案点数, 宠物为100倍固定点;
 	// 毒伤先按单位类型还原点数, 不使用合成后的生命、攻击、防御和敏捷反推.
@@ -111,14 +121,21 @@ type combatUnitRuntimeState struct {
 	rawStrength  int64
 	rawToughness int64
 	rawDexterity int64
-	// poisonTurns表示剩余毒伤次数: 行动前扣血并减1, 最后一次同时解除状态.
+	// poisonTurns表示原版状态计数: 行动前先减1, 归零只解除, 仍为正数才扣血.
 	poisonTurns uint32
-	// 毒抗来自开战时的宠物模板或角色装备有效值, 不在战斗中重读配置.
+	// 五类异常抗性来自开战时的宠物模板或角色装备有效值,
+	// 不在战斗中重读配置. poisonResistance同时供旧的中毒链路使用.
 	poisonResistance int64
-	// 状态攻击的减攻保留至本回合结束, 反击继续使用该攻击力但不附毒.
-	roundAttackPercentModifier int32
+	statusTurns      map[pb.CombatStatusType]uint32
+	statusResistance map[pb.CombatStatusType]int64
+	// 状态攻击、忠犬和背水之战的攻防修正保留至本回合结束.
+	roundAttackPercentModifier  int32
+	roundDefensePercentModifier int32
 	// charge独立于异常状态, 保存尚未完成的蓄力指令; 剩余0仍表示下一次行动需要释放.
 	charge *combatChargeState
+	// earthRound保存已隐藏且等待下一回合自动释放的地球一周动作.
+	earthRound *combatEarthRoundState
+	hidden     bool
 	// chargeAttackPower仅在突击释放的一击内覆盖攻击力, 不修改开战快照或后续反击属性.
 	chargeAttackPower *int64
 
@@ -153,8 +170,24 @@ func applyPetBattleTraits(state *combatUnitRuntimeState, pet *gameconfig.PetEntr
 	}
 	state.ultimateKnockbackImmune = pet.Attribute.UltimateKnockbackImmune
 	state.inanimate = pet.Attribute.Inanimate
+	if state.statusResistance == nil {
+		state.statusResistance = make(map[pb.CombatStatusType]int64)
+	}
 	if pet.Attribute.PoisonResist != nil {
 		state.poisonResistance = int64(*pet.Attribute.PoisonResist)
+		state.statusResistance[pb.CombatStatusType_CombatStatusType_Poison] = state.poisonResistance
+	}
+	if pet.Attribute.SleepResist != nil {
+		state.statusResistance[pb.CombatStatusType_CombatStatusType_Sleep] = int64(*pet.Attribute.SleepResist)
+	}
+	if pet.Attribute.StoneResist != nil {
+		state.statusResistance[pb.CombatStatusType_CombatStatusType_Stone] = int64(*pet.Attribute.StoneResist)
+	}
+	if pet.Attribute.DrunkResist != nil {
+		state.statusResistance[pb.CombatStatusType_CombatStatusType_Drunk] = int64(*pet.Attribute.DrunkResist)
+	}
+	if pet.Attribute.ConfusionResist != nil {
+		state.statusResistance[pb.CombatStatusType_CombatStatusType_Confusion] = int64(*pet.Attribute.ConfusionResist)
 	}
 }
 
@@ -293,25 +326,34 @@ func (r *CombatRoom) onCombatRoundActionReq(key combatRoomParticipantKey, gatewa
 		p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundActionRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
-	// 每个可控单位每回合只能提交一次. 动作写入后即锁定, 后续重复请求不会覆盖已确认的意图.
+	// 每个可控单位每回合只能提交一次. 角色逃跑是成对指令: 服务端同时把仍在场的战宠
+	// 锁定为防御, 即使异常客户端曾抢先提交宠物动作, 也以角色逃跑的联动语义为准.
 	actionKey := combatUnitKeyMapKey(action.unitKey)
 	if _, ok := r.playerActions[actionKey]; ok {
 		p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundActionRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
 	r.playerActions[actionKey] = action
+	acceptedActions := []*combatAction{action}
+	if action.kind == combatActionKindEscape && participant.playerPet != nil && r.isAlive(participant.playerPet.GetKey()) {
+		petDefense := defaultCombatAction(participant.playerPet)
+		r.playerActions[combatUnitKeyMapKey(petDefense.unitKey)] = petDefense
+		acceptedActions = append(acceptedActions, petDefense)
+	}
 
 	// 合法动作确认广播给房间内全部玩家, 客户端据此维护当前回合已提交单位集合.
-	for _, participantKey := range r.participantOrder {
-		targetParticipant := r.participant(participantKey)
-		if targetParticipant == nil {
-			continue
+	for _, acceptedAction := range acceptedActions {
+		for _, participantKey := range r.participantOrder {
+			targetParticipant := r.participant(participantKey)
+			if targetParticipant == nil {
+				continue
+			}
+			targetParticipant.account.sendClientRes(targetParticipant.gateway, uint32(pb.MsgID_CombatRoundActionRes_CMD), xerror.Success.Code(), &pb.CombatRoundActionRes{
+				BattleId: r.battleID,
+				Round:    r.round,
+				UnitKey:  cloneCombatUnitKey(acceptedAction.unitKey),
+			})
 		}
-		targetParticipant.account.sendClientRes(targetParticipant.gateway, uint32(pb.MsgID_CombatRoundActionRes_CMD), xerror.Success.Code(), &pb.CombatRoundActionRes{
-			BattleId: r.battleID,
-			Round:    r.round,
-			UnitKey:  cloneCombatUnitKey(action.unitKey),
-		})
 	}
 	// 全部存活的玩家单位均已提交后立即结算, 无需继续等待回合定时器.
 	if r.playerActionsReady() {
@@ -366,6 +408,7 @@ func (r *CombatRoom) characterCombatSkillAction(unit *pb.CombatUnit, input *comb
 	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Skill == nil || !gameconfig.GGameConfig.Skill.IsExist(skillID) {
 		return nil, fmt.Errorf("combat skill is not configured: %d", skillID)
 	}
+	skill := gameconfig.GGameConfig.Skill.Get(skillID)
 	action := &combatAction{unitKey: cloneCombatUnitKey(unit.GetKey()), skillID: skillID}
 	switch skillID {
 	case combatSkillAttack:
@@ -391,9 +434,91 @@ func (r *CombatRoom) characterCombatSkillAction(unit *pb.CombatUnit, input *comb
 		action.kind = combatActionKindCapture
 		action.targetKey = target
 	default:
-		return nil, fmt.Errorf("unsupported character combat skill: %d", skillID)
+		if !skill.CanBeUsedBy("character") || skill.MPCost == nil {
+			return nil, fmt.Errorf("unsupported character combat skill: %d", skillID)
+		}
+		if !r.characterUnitOwnsEquippedSkill(unit, skillID) {
+			return nil, fmt.Errorf("character does not own equipped skill: %d", skillID)
+		}
+		state := r.stateByKey(unit.GetKey())
+		if state == nil || state.mp < uint64(*skill.MPCost) {
+			return nil, fmt.Errorf("character mp is insufficient for skill: %d", skillID)
+		}
+		if parameters, ok := skill.StatusSpirit(); ok {
+			action.kind = combatActionKindStatusSpirit
+			action.statusType = pb.CombatStatusType(parameters.StatusID)
+			action.statusDurationActions = parameters.DurationActions
+			action.statusBaseSuccess = parameters.BaseSuccess
+			action.statusLevelDifferenceRange = parameters.LevelDifferenceRange
+			action.statusTargetScope = skill.TargetScope
+			action.statusMPCost = *skill.MPCost
+			if skill.TargetScope == "singleOpponent" {
+				target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+				if err != nil {
+					return nil, err
+				}
+				action.targetKey = target
+			}
+		} else if parameters, ok := skill.HealingSpiritParameters(); ok {
+			action.kind = combatActionKindHealingSpirit
+			action.healPower = parameters.HealPower
+			action.healTargetScope = skill.TargetScope
+			action.healMPCost = *skill.MPCost
+			switch skill.TargetScope {
+			case "self":
+				if input.GetArgTargetUnit() != nil && !combatUnitKeyEmpty(input.GetArgTargetUnit()) {
+					return nil, fmt.Errorf("self healing skill does not accept a target")
+				}
+				action.targetKey = cloneCombatUnitKey(unit.GetKey())
+			case "singleAlly":
+				target, err := r.validAllyTarget(input.GetArgTargetUnit(), unit.GetKey())
+				if err != nil {
+					return nil, err
+				}
+				action.targetKey = target
+			case "allyCamp":
+				if input.GetArgTargetUnit() != nil && !combatUnitKeyEmpty(input.GetArgTargetUnit()) {
+					return nil, fmt.Errorf("ally camp healing skill does not accept a target")
+				}
+			default:
+				return nil, fmt.Errorf("unsupported healing target scope: %s", skill.TargetScope)
+			}
+		} else {
+			return nil, fmt.Errorf("unsupported character combat skill: %d", skillID)
+		}
 	}
 	return action, nil
+}
+
+// characterUnitOwnsEquippedSkill只读取开战时下发的全部装备快照, 不接受背包或客户端声明技能.
+// 这里独立扫描九个协议槽位, 不受当前穿脱功能分阶段开放的部位列表限制.
+func (r *CombatRoom) characterUnitOwnsEquippedSkill(unit *pb.CombatUnit, skillID uint32) bool {
+	if r == nil || unit == nil || unit.GetEquipment() == nil || gameconfig.GGameConfig == nil {
+		return false
+	}
+	equipment := unit.GetEquipment()
+	for _, record := range []*pb.EquipmentRecord{
+		equipment.GetAccessory1(), equipment.GetHelmet(), equipment.GetAccessory2(),
+		equipment.GetWeapon(), equipment.GetChest(), equipment.GetShield(),
+		equipment.GetGloves(), equipment.GetBelt(), equipment.GetBoots(),
+	} {
+		if record == nil {
+			continue
+		}
+		var entry *gameconfig.ItemEntry
+		if gameconfig.GGameConfig.Item != nil {
+			entry = gameconfig.GGameConfig.Item.Get(record.GetAssetId())
+		}
+		if entry != nil && entry.GrantedSkillID == skillID {
+			return true
+		}
+		for _, additionalSkillID := range record.GetAdditionalSkillIdList() {
+			if additionalSkillID == skillID {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // enemyPetCombatSkillAction将敌方AI选中的技能ID交给统一的宠物技能解析器.
@@ -433,7 +558,12 @@ func (r *CombatRoom) petCombatSkillAction(unit *pb.CombatUnit, input *combatSkil
 	if skill == nil {
 		return nil, fmt.Errorf("combat skill is not configured: %d", skillID)
 	}
-	if !r.petUnitOwnsConfiguredSkill(unit, skillID) {
+	if !skill.CanBeUsedBy("pet") || !petCombatSkillIsSupported(skillID, skill) {
+		return nil, fmt.Errorf("unsupported pet combat skill: %d", skillID)
+	}
+	// 防御是玩家宠物的内置兜底动作. 允许空技能栏或未学习防御的宠物提交,
+	// 敌方AI仍必须从服务端AI技能表取得防御, 不能绕过配置授权.
+	if !(skillID == combatSkillDefense && combatKind(unit) == combatUnitKindPet) && !r.petUnitOwnsConfiguredSkill(unit, skillID) {
 		return nil, fmt.Errorf("pet does not own combat skill: pet:%d skill:%d", unit.GetPetId(), skillID)
 	}
 
@@ -493,6 +623,54 @@ func (r *CombatRoom) petCombatSkillAction(unit *pb.CombatUnit, input *combatSkil
 		action.targetKey = target
 		action.poisonDurationActions = *skill.PoisonAttack.DurationActions
 		action.poisonAttackPercentModifier = *skill.PoisonAttack.AttackPercentModifier
+	case skill.StoneAttack != nil:
+		if skill.StoneAttack.DurationActions == nil || skill.StoneAttack.AttackPercentModifier == nil {
+			return nil, fmt.Errorf("stone attack skill config is incomplete: %d", skillID)
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindStoneAttack
+		action.targetKey = target
+		action.stoneDurationActions = *skill.StoneAttack.DurationActions
+		action.stoneAttackPercentModifier = *skill.StoneAttack.AttackPercentModifier
+	case skill.ConfusionAttack != nil:
+		if skill.ConfusionAttack.DurationActions == nil || skill.ConfusionAttack.AttackPercentModifier == nil {
+			return nil, fmt.Errorf("confusion attack skill config is incomplete: %d", skillID)
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindConfusionAttack
+		action.targetKey = target
+		action.confusionDurationActions = *skill.ConfusionAttack.DurationActions
+		action.confusionAttackPercentModifier = *skill.ConfusionAttack.AttackPercentModifier
+	case skill.SleepAttack != nil:
+		if skill.SleepAttack.DurationActions == nil || skill.SleepAttack.AttackPercentModifier == nil {
+			return nil, fmt.Errorf("sleep attack skill config is incomplete: %d", skillID)
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindSleepAttack
+		action.targetKey = target
+		action.sleepDurationActions = *skill.SleepAttack.DurationActions
+		action.sleepAttackPercentModifier = *skill.SleepAttack.AttackPercentModifier
+	case skill.DeepPoisonAttack != nil:
+		if skill.DeepPoisonAttack.DurationActions == nil || skill.DeepPoisonAttack.AttackPercentModifier == nil {
+			return nil, fmt.Errorf("deep poison attack skill config is incomplete: %d", skillID)
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindDeepPoisonAttack
+		action.targetKey = target
+		action.deepPoisonDurationActions = *skill.DeepPoisonAttack.DurationActions
+		action.deepPoisonAttackPercentModifier = *skill.DeepPoisonAttack.AttackPercentModifier
 	case skill.ChargeAttack != nil:
 		if skill.ChargeAttack.ChargeRounds == nil || skill.ChargeAttack.AttackPercentModifier == nil {
 			return nil, fmt.Errorf("charge attack skill config is incomplete: %d", skillID)
@@ -505,6 +683,51 @@ func (r *CombatRoom) petCombatSkillAction(unit *pb.CombatUnit, input *combatSkil
 		action.targetKey = target
 		action.chargeRounds = *skill.ChargeAttack.ChargeRounds
 		action.chargeAttackPercentModifier = *skill.ChargeAttack.AttackPercentModifier
+	case skill.EarthRound != nil:
+		if skill.EarthRound.DamagePercentModifier == nil {
+			return nil, fmt.Errorf("earth round skill config is incomplete: %d", skillID)
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindEarthRound
+		action.targetKey = target
+		action.earthRoundDamagePercentModifier = *skill.EarthRound.DamagePercentModifier
+	case skill.Guardian != nil:
+		if skill.Guardian.AttackPercentModifier == nil {
+			return nil, fmt.Errorf("guardian skill config is incomplete: %d", skillID)
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindGuardian
+		action.targetKey = target
+		action.guardianAttackPercentModifier = *skill.Guardian.AttackPercentModifier
+		if skill.Guardian.DefensePercentModifier != nil {
+			action.guardianDefensePercentModifier = *skill.Guardian.DefensePercentModifier
+		}
+	case skill.NoGuard != nil:
+		if skill.NoGuard.DodgePercent == nil || skill.NoGuard.CounterPercent == nil || skill.NoGuard.CriticalPercent == nil {
+			return nil, fmt.Errorf("no guard skill config is incomplete: %d", skillID)
+		}
+		action.kind = combatActionKindNoGuard
+		action.noGuardDodgePercent = *skill.NoGuard.DodgePercent
+		action.noGuardCounterPercent = *skill.NoGuard.CounterPercent
+		action.noGuardCriticalPercent = *skill.NoGuard.CriticalPercent
+	case skill.PowerBalance != nil:
+		if skill.PowerBalance.AttackPercentModifier == nil || skill.PowerBalance.DefensePercentModifier == nil {
+			return nil, fmt.Errorf("power balance skill config is incomplete: %d", skillID)
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindPowerBalance
+		action.targetKey = target
+		action.powerBalanceAttackPercentModifier = *skill.PowerBalance.AttackPercentModifier
+		action.powerBalanceDefensePercentModifier = *skill.PowerBalance.DefensePercentModifier
 	case skill.ShowMercy != nil:
 		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
 		if err != nil {
@@ -512,10 +735,34 @@ func (r *CombatRoom) petCombatSkillAction(unit *pb.CombatUnit, input *combatSkil
 		}
 		action.kind = combatActionKindShowMercy
 		action.targetKey = target
+	case skill.Abduct != nil:
+		target, err := r.validAbductTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindAbduct
+		action.targetKey = target
+		if skill.Abduct.LoyaltyThreshold != nil {
+			action.abductHasLoyaltyThreshold = true
+			action.abductLoyaltyThreshold = *skill.Abduct.LoyaltyThreshold
+		}
 	default:
 		return nil, fmt.Errorf("unsupported pet combat skill: %d", skillID)
 	}
 	return action, nil
+}
+
+// petCombatSkillIsSupported只承认当前结算器已经实现的宠物战斗技能.
+// 生活技能即使存在于统一技能配置和宠物实例槽位中, 也不能进入战斗动作解析.
+func petCombatSkillIsSupported(skillID uint32, skill *gameconfig.SkillEntry) bool {
+	if skill == nil {
+		return false
+	}
+	if skillID == combatSkillStandby || skillID == combatSkillAttack || skillID == combatSkillDefense || skillID == combatSkillGuardBreak {
+		return true
+	}
+	return skill.ContinuationAttack != nil || skill.MightyAttack != nil || skill.PoisonAttack != nil || skill.StoneAttack != nil || skill.ConfusionAttack != nil || skill.SleepAttack != nil || skill.DeepPoisonAttack != nil ||
+		skill.ChargeAttack != nil || skill.EarthRound != nil || skill.Guardian != nil || skill.NoGuard != nil || skill.PowerBalance != nil || skill.ShowMercy != nil || skill.Abduct != nil
 }
 
 // petUnitOwnsConfiguredSkill对玩家宠物校验实例七槽, 对敌人校验独立AI技能列表.
@@ -739,8 +986,8 @@ func combatPVEEnemyLevel(
 	if random == nil {
 		return 0, fmt.Errorf("combat PVE random source is nil")
 	}
-	levelMin := int(pb.LevelRange_LevelRange_Min)
-	levelMax := int(pb.LevelRange_LevelRange_Max)
+	levelMin := int(pb.Constants_Constants_Level_Min)
+	levelMax := int(pb.Constants_Constants_Level_Max)
 	if enemy.LevelRange != nil && enemy.LevelRange.Min != nil && enemy.LevelRange.Max != nil {
 		levelMin = *enemy.LevelRange.Min
 		levelMax = *enemy.LevelRange.Max
@@ -754,17 +1001,17 @@ func combatPVEEnemyLevel(
 	} else {
 		return 0, fmt.Errorf("enemy level range is invalid: group:%d enemy:%d", *group.ID, *enemy.ID)
 	}
-	if levelMin < int(pb.LevelRange_LevelRange_Min) {
-		levelMin = int(pb.LevelRange_LevelRange_Min)
+	if levelMin < int(pb.Constants_Constants_Level_Min) {
+		levelMin = int(pb.Constants_Constants_Level_Min)
 	}
-	if levelMin > int(pb.LevelRange_LevelRange_Max) {
-		levelMin = int(pb.LevelRange_LevelRange_Max)
+	if levelMin > int(pb.Constants_Constants_Level_Max) {
+		levelMin = int(pb.Constants_Constants_Level_Max)
 	}
-	if levelMax < int(pb.LevelRange_LevelRange_Min) {
-		levelMax = int(pb.LevelRange_LevelRange_Min)
+	if levelMax < int(pb.Constants_Constants_Level_Min) {
+		levelMax = int(pb.Constants_Constants_Level_Min)
 	}
-	if levelMax > int(pb.LevelRange_LevelRange_Max) {
-		levelMax = int(pb.LevelRange_LevelRange_Max)
+	if levelMax > int(pb.Constants_Constants_Level_Max) {
+		levelMax = int(pb.Constants_Constants_Level_Max)
 	}
 	if levelMax < levelMin {
 		levelMax = levelMin
@@ -814,7 +1061,7 @@ func createCombatPVEEnemyAttributes(
 	if enemyPet == nil || enemyPet.ID == nil || enemyPet.Growth == nil {
 		return attributes, fmt.Errorf("enemy pet or growth is nil")
 	}
-	if level < uint32(pb.LevelRange_LevelRange_Min) || level > uint32(pb.LevelRange_LevelRange_Max) {
+	if level < uint32(pb.Constants_Constants_Level_Min) || level > uint32(pb.Constants_Constants_Level_Max) {
 		return attributes, fmt.Errorf("enemy level is out of range: pet:%d level:%d", *enemyPet.ID, level)
 	}
 	if random == nil {
@@ -969,6 +1216,34 @@ func combatPVEEnemyExperience(petID uint32, level uint32) (uint32, error) {
 	return experience, nil
 }
 
+// rollCombatPVEEnemyDropAssetIDs在敌人实例创建阶段按配置顺序抽取普通掉落.
+// probability使用新版万分比, 每个已配置槽位都恰好执行一次RAND(0,9999).
+func rollCombatPVEEnemyDropAssetIDs(
+	enemy gameconfig.EnemyEntry,
+	random combatPVERandomRange,
+) ([]uint32, error) {
+	if len(enemy.NormalDrops) == 0 {
+		return nil, nil
+	}
+	if random == nil {
+		return nil, fmt.Errorf("combat PVE normal drop random source is nil")
+	}
+	enemyID := uint32(0)
+	if enemy.ID != nil {
+		enemyID = *enemy.ID
+	}
+	dropAssetIDs := make([]uint32, 0, len(enemy.NormalDrops))
+	for index, drop := range enemy.NormalDrops {
+		if drop.ItemID == nil || drop.Probability == nil || *drop.Probability == 0 || *drop.Probability > combatPVENormalDropProbabilityMax {
+			return nil, fmt.Errorf("combat PVE normal drop config is invalid: enemy:%d index:%d", enemyID, index)
+		}
+		if random(0, combatPVENormalDropProbabilityMax-1) < *drop.Probability {
+			dropAssetIDs = append(dropAssetIDs, *drop.ItemID)
+		}
+	}
+	return dropAssetIDs, nil
+}
+
 // startCombatPVE 使用指定敌人组创建并启动一场PVE战斗.
 func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error {
 	if c == nil || c.account == nil || c.record == nil || c.record.GetBase() == nil {
@@ -1020,6 +1295,7 @@ func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error 
 	enemyUnits := make([]*pb.CombatUnit, 0, len(selectedEnemies))
 	pveEnemyKeys := make(map[string]struct{}, len(selectedEnemies))
 	enemyExperiences := make(map[string]uint32, len(selectedEnemies))
+	enemyDropAssetIDs := make(map[string][]uint32, len(selectedEnemies))
 	enemyAIs := make(map[string]*gameconfig.BattleAIEntry, len(selectedEnemies))
 	captureSnapshots := make(map[string]*commonpet.CaptureSnapshot, len(selectedEnemies))
 	for index, enemy := range selectedEnemies {
@@ -1046,6 +1322,10 @@ func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error 
 		if err != nil {
 			return err
 		}
+		normalDropAssetIDs, err := rollCombatPVEEnemyDropAssetIDs(enemy, xutil.RandomU32)
+		if err != nil {
+			return err
+		}
 		// 敌方没有账号内的持久化宠物 UUID, 使用从 1 开始的本场序号生成战斗内唯一的单位键.
 		enemyUnit := &pb.CombatUnit{
 			Camp:     pb.CombatCamp_CombatCamp_Defender,
@@ -1065,6 +1345,7 @@ func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error 
 		enemyKey := combatUnitKeyMapKey(enemyUnit.GetKey())
 		pveEnemyKeys[enemyKey] = struct{}{}
 		enemyExperiences[enemyKey] = enemyExperience
+		enemyDropAssetIDs[enemyKey] = normalDropAssetIDs
 		enemyAIs[enemyKey] = cloneEnemyBattleAI(enemy.BattleAI)
 		if enemyGroup.Captured != nil && *enemyGroup.Captured && enemyPet.SupportsOrdinaryCreation() {
 			snapshot, snapshotErr := commonpet.NewCaptureSnapshot(enemyPet, level, enemyAttributes.savedBase, [4]int32{
@@ -1120,6 +1401,7 @@ func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error 
 		unitKey := combatUnitKeyMapKey(unit.GetKey())
 		_, state.pveEnemy = pveEnemyKeys[unitKey]
 		state.enemyExperience = enemyExperiences[unitKey]
+		state.enemyDropAssetIDs = append([]uint32(nil), enemyDropAssetIDs[unitKey]...)
 		state.captureSnapshot = captureSnapshots[unitKey]
 		if unit.GetPetId() != 0 {
 			petEntry := gameconfig.GGameConfig.Pet.Get(unit.GetPetId())
@@ -1239,9 +1521,9 @@ func (r *CombatRoom) beginCombatRound() {
 		return
 	}
 	r.playerActions = make(map[string]*combatAction)
-	// 已开始的蓄力指令在新回合直接锁定, 不能被客户端选招或超时补防御覆盖.
+	// 已开始的跨回合指令在新回合直接锁定, 不能被客户端选招或超时补防御覆盖.
 	for _, key := range r.requiredPlayerUnitKeys() {
-		if action := continuedCombatChargeAction(r.stateByKey(key)); action != nil {
+		if action := continuedCombatAction(r.stateByKey(key)); action != nil {
 			r.playerActions[combatUnitKeyMapKey(key)] = action
 		}
 	}
@@ -1391,10 +1673,11 @@ func (c *character) newCombatRoomParticipantAdmission(gateway *Gateway) (combatR
 		return admission, fmt.Errorf("exp or pet config is not loaded")
 	}
 
-	vitality := int64(character.GetBase().GetVitality())
-	strength := int64(character.GetBase().GetStrength())
-	toughness := int64(character.GetBase().GetToughness())
-	dexterity := int64(character.GetBase().GetDexterity())
+	attribute := character.GetBase().GetAttribute()
+	vitality := int64(attribute.GetVitality())
+	strength := int64(attribute.GetStrength())
+	toughness := int64(attribute.GetToughness())
+	dexterity := int64(attribute.GetDexterity())
 	if vitality+strength+toughness+dexterity == 0 {
 		return admission, fmt.Errorf("character attribute missing character:%d", character.GetBase().GetUuid())
 	}
@@ -1413,7 +1696,7 @@ func (c *character) newCombatRoomParticipantAdmission(gateway *Gateway) (combatR
 	var equipmentLuckModifierList []int32
 	for _, equipmentType := range supportedCharacterEquipmentTypes {
 		if equipped := *characterEquipmentSlot(character.GetEquipment(), equipmentType); equipped != nil {
-			equipmentLuckModifierList = append(equipmentLuckModifierList, equipmentFixedModifierValueInt32(equipped, pb.EquipmentRecordBase_EquipmentRecordBase_LuckModifier))
+			equipmentLuckModifierList = append(equipmentLuckModifierList, equipmentAttributeValueInt32(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_Luck))
 		}
 	}
 	characterWeaponAttackNumberMin := uint32(0)
@@ -1433,6 +1716,15 @@ func (c *character) newCombatRoomParticipantAdmission(gateway *Gateway) (combatR
 	equipmentSnapshot := &pb.CharacterEquipmentRecord{}
 	if equipment := character.GetEquipment(); equipment != nil {
 		equipmentSnapshot = proto.Clone(equipment).(*pb.CharacterEquipmentRecord)
+	}
+	characterPoisonResistance := int64(0)
+	characterOtherDefensePower := int64(0)
+	for _, equipmentType := range supportedCharacterEquipmentTypes {
+		if equipped := *characterEquipmentSlot(character.GetEquipment(), equipmentType); equipped != nil {
+			characterPoisonResistance += int64(equipmentAttributeValueInt32(equipped, pb.EquipmentRecordAttribute_EquipmentRecordAttribute_PoisonResistance))
+			entry := gameconfig.GGameConfig.Item.Get(equipped.GetAssetId())
+			characterOtherDefensePower += int64(entry.OtherDefence)
+		}
 	}
 	characterUnit := &pb.CombatUnit{
 		Camp:        pb.CombatCamp_CombatCamp_Initiator,
@@ -1454,22 +1746,30 @@ func (c *character) newCombatRoomParticipantAdmission(gateway *Gateway) (combatR
 	characterMaxHP := uint64(characterUnit.GetAttribute().GetHp())
 	characterMaxMP := uint64(characterUnit.GetAttribute().GetMaxMp())
 	characterState := &combatUnitRuntimeState{
-		unit:                  characterUnit,
-		hp:                    characterMaxHP,
-		maxHP:                 characterMaxHP,
-		mp:                    characterMaxMP,
-		maxMP:                 characterMaxMP,
-		alive:                 true,
-		rawVitality:           vitality,
-		rawStrength:           int64(strength),
-		rawToughness:          toughness,
-		rawDexterity:          int64(dexterity),
-		poisonResistance:      int64(effectiveAttribute.GetPoisonResistanceModifier()),
+		unit:             characterUnit,
+		hp:               characterMaxHP,
+		maxHP:            characterMaxHP,
+		mp:               characterMaxMP,
+		maxMP:            characterMaxMP,
+		alive:            true,
+		rawVitality:      vitality,
+		rawStrength:      int64(strength),
+		rawToughness:     toughness,
+		rawDexterity:     int64(dexterity),
+		poisonResistance: characterPoisonResistance,
+		statusTurns:      make(map[pb.CombatStatusType]uint32),
+		statusResistance: map[pb.CombatStatusType]int64{
+			pb.CombatStatusType_CombatStatusType_Poison:    characterPoisonResistance,
+			pb.CombatStatusType_CombatStatusType_Sleep:     int64(effectiveAttribute.GetSleepResistanceModifier()),
+			pb.CombatStatusType_CombatStatusType_Stone:     int64(effectiveAttribute.GetStoneResistanceModifier()),
+			pb.CombatStatusType_CombatStatusType_Drunk:     int64(effectiveAttribute.GetDrunkResistanceModifier()),
+			pb.CombatStatusType_CombatStatusType_Confusion: int64(effectiveAttribute.GetConfusionResistanceModifier()),
+		},
 		characterDuelPoint:    character.GetBase().GetDuelPoint(),
 		charm:                 effectiveAttribute.GetEffectiveCharm(),
 		criticalModifier:      int64(effectiveAttribute.GetCriticalModifier()),
-		otherDamagePower:      int64(effectiveAttribute.GetOtherDamageModifier()),
-		otherDefensePower:     int64(effectiveAttribute.GetOtherDefenseModifier()),
+		otherDamagePower:      int64(effectiveAttribute.GetDamageBonusPercent()),
+		otherDefensePower:     characterOtherDefensePower,
 		weaponType:            effectiveAttribute.GetWeaponType(),
 		weaponAttackNumberMin: characterWeaponAttackNumberMin,
 		weaponAttackNumberMax: characterWeaponAttackNumberMax,
@@ -1614,7 +1914,7 @@ func (p *Account) leaveCombatRoomParticipant(input combatRoomParticipantLeaveInp
 			result.GetRecipientCharacterUuid(),
 		)
 	}
-	expectedLeaveReason := pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Unknown
+	expectedLeaveReason := pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Unspecified
 	switch input.kind {
 	case combatParticipantLeaveKindEscape:
 		expectedLeaveReason = pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Escape
@@ -1622,7 +1922,7 @@ func (p *Account) leaveCombatRoomParticipant(input combatRoomParticipantLeaveInp
 		expectedLeaveReason = pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Defeated
 	}
 	characterKey := sceneCharacterKey{aid: p.aid, characterUUID: input.characterUUID}
-	if expectedLeaveReason == pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Unknown ||
+	if expectedLeaveReason == pb.CombatUnitLeaveReason_CombatUnitLeaveReason_Unspecified ||
 		!combatResultContainsCharacterUnitLeave(
 			result,
 			characterKey,
@@ -1860,8 +2160,8 @@ func planCombatDropPersistence(
 			)
 		}
 		switch {
-		case assetID >= uint32(pb.AssetIDRange_AssetIDRange_Item_Item_Start) &&
-			assetID <= uint32(pb.AssetIDRange_AssetIDRange_Item_Item_End):
+		case assetID >= uint32(pb.AssetID_AssetIDRange_Item_Start) &&
+			assetID < uint32(pb.AssetID_AssetIDRange_Item_Equipment_Start):
 			current, exists := simulatedItemCounts[assetID]
 			if current == math.MaxUint64 || (!exists && slotCount >= maximumBagCount) {
 				plan.discarded = append(plan.discarded, assetID)
@@ -1872,8 +2172,8 @@ func planCombatDropPersistence(
 			}
 			simulatedItemCounts[assetID] = current + 1
 			plan.accepted = append(plan.accepted, combatDropPersistenceEntry{assetID: assetID})
-		case assetID >= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Start) &&
-			assetID <= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_End):
+		case assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Start) &&
+			assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_End):
 			if slotCount >= maximumBagCount || accountRecord == nil ||
 				plan.nextUsedUUID == math.MaxUint64 {
 				plan.discarded = append(plan.discarded, assetID)
@@ -2148,6 +2448,9 @@ func (r *CombatRoom) validOpponentTarget(requested *pb.CombatUnitKey, source *pb
 	if !r.isAlive(requested) {
 		return nil, fmt.Errorf("target is not alive")
 	}
+	if targetState := r.stateByKey(requested); targetState != nil && targetState.hidden {
+		return nil, fmt.Errorf("target is hidden")
+	}
 	sourceCamp, ok := r.unitCamp(source)
 	if !ok {
 		return nil, fmt.Errorf("source unit not found")
@@ -2163,6 +2466,61 @@ func (r *CombatRoom) validOpponentTarget(requested *pb.CombatUnitKey, source *pb
 	return cloneCombatUnitKey(requested), nil
 }
 
+// validAbductTarget在普通敌对目标约束上排除玩家角色.
+// 原版只允许旅程伙伴作用于CHAR_TYPEPET或CHAR_TYPEENEMY, 不能带走人物单位.
+func (r *CombatRoom) validAbductTarget(requested *pb.CombatUnitKey, source *pb.CombatUnitKey) (*pb.CombatUnitKey, error) {
+	target, err := r.validOpponentTarget(requested, source)
+	if err != nil {
+		return nil, err
+	}
+	state := r.stateByKey(target)
+	if state == nil || state.unit == nil || combatKind(state.unit) == combatUnitKindPlayer || combatKind(state.unit) == combatUnitKindUnknown {
+		return nil, fmt.Errorf("abduct target must be a non-character unit")
+	}
+	return target, nil
+}
+
+// validAllyTarget校验治疗目标存在、存活且与来源同阵营.
+func (r *CombatRoom) validAllyTarget(requested *pb.CombatUnitKey, source *pb.CombatUnitKey) (*pb.CombatUnitKey, error) {
+	if requested == nil || combatUnitKeyEmpty(requested) {
+		return nil, fmt.Errorf("target is required")
+	}
+	if !r.isAlive(requested) {
+		return nil, fmt.Errorf("target is not alive")
+	}
+	sourceCamp, ok := r.unitCamp(source)
+	if !ok {
+		return nil, fmt.Errorf("source unit not found")
+	}
+	targetCamp, ok := r.unitCamp(requested)
+	if !ok {
+		return nil, fmt.Errorf("target unit not found")
+	}
+	if sourceCamp != targetCamp {
+		return nil, fmt.Errorf("target must be ally")
+	}
+	return cloneCombatUnitKey(requested), nil
+}
+
+// aliveAllyKeys按开战单位顺序返回来源阵营的全部存活单位.
+func (r *CombatRoom) aliveAllyKeys(source *pb.CombatUnitKey) []*pb.CombatUnitKey {
+	if r == nil || source == nil || r.battleStart == nil {
+		return nil
+	}
+	sourceCamp, ok := r.unitCamp(source)
+	if !ok {
+		return nil
+	}
+	keys := make([]*pb.CombatUnitKey, 0)
+	for _, unit := range r.battleStart.GetUnitList() {
+		if unit.GetCamp() != sourceCamp || !r.isAlive(unit.GetKey()) {
+			continue
+		}
+		keys = append(keys, cloneCombatUnitKey(unit.GetKey()))
+	}
+	return keys
+}
+
 // aliveOpponentKeys 按开战单位顺序返回来源单位的全部存活敌方目标.
 func (r *CombatRoom) aliveOpponentKeys(source *pb.CombatUnitKey) []*pb.CombatUnitKey {
 	if r == nil || source == nil {
@@ -2175,12 +2533,29 @@ func (r *CombatRoom) aliveOpponentKeys(source *pb.CombatUnitKey) []*pb.CombatUni
 	// 遍历 battleStart 而不是 map, 从而保留开战时的稳定站位顺序.
 	keys := make([]*pb.CombatUnitKey, 0)
 	for _, unit := range r.battleStart.GetUnitList() {
-		if unit.GetCamp() == sourceCamp || !r.isAlive(unit.GetKey()) {
+		if unit.GetCamp() == sourceCamp || !r.isAlive(unit.GetKey()) || r.stateByKey(unit.GetKey()).hidden {
 			continue
 		}
 		keys = append(keys, cloneCombatUnitKey(unit.GetKey()))
 	}
 	return keys
+}
+
+// aliveAbductOpponentKeys按开战顺序返回仍可被旅程伙伴选择的敌方非角色单位.
+func (r *CombatRoom) aliveAbductOpponentKeys(source *pb.CombatUnitKey) []*pb.CombatUnitKey {
+	keys := r.aliveOpponentKeys(source)
+	result := make([]*pb.CombatUnitKey, 0, len(keys))
+	for _, key := range keys {
+		state := r.stateByKey(key)
+		if state == nil || state.unit == nil {
+			continue
+		}
+		kind := combatKind(state.unit)
+		if kind == combatUnitKindPet || kind == combatUnitKindEnemy {
+			result = append(result, key)
+		}
+	}
+	return result
 }
 
 // addPVEEnemyDefeatProfit复刻BATTLE_AddProfit的一次死亡扫描.

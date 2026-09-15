@@ -84,7 +84,7 @@ message ItemWarehouseWithdrawRes {
 //0x003007#client->gateway#购买商店商品-请求
 message ShopPurchaseReq {
   uint64 character_uuid = 1; // 执行购买并接收商品的角色 UUID
-  uint32 item_id = 2; // 商品道具 ID, 直接对应 store.yaml 商品 id
+  uint32 item_id = 2; // 商品道具 ID, 直接对应 商店.yaml 商品 id
   uint32 quantity = 3; // 购买份数, 范围为 1-30
 }
 
@@ -97,6 +97,61 @@ message ShopPurchaseRes {
   uint64 used_uuid = 5; // 购买后账号已分配 UUID 游标
   repeated ItemCostResult cost_result_list = 6; // 各资源的实际消耗和最终余额
   repeated EquipmentRecord equipment_record_list = 7; // 新增到角色背包的装备实例
+  uint64 item_remaining_count = 8; // 可堆叠商品交付后的最终持有量; 装备商品固定为0
+}
+
+//0x003009#client->gateway#宠物使用加工技能-请求
+message ItemSynthesisReq {
+  uint64 character_uuid = 1; // 持有宠物和素材的在线角色UUID
+  uint64 pet_uuid = 2; // 已学习加工技能的随身宠物UUID
+  repeated ItemElement material_list = 3; // 1-8种不重复素材, 每种数量1-999
+}
+
+//0x00300A#gateway->client#宠物使用加工技能-回复
+message ItemSynthesisRes {
+  uint64 character_uuid = 1; // 执行加工的角色UUID
+  uint64 pet_uuid = 2; // 实际执行加工的宠物UUID
+  bool matched = 3; // true表示精确命中基础武器配方
+  EquipmentRecord result_equipment = 4; // 命中配方时生成的完整装备实例
+  ItemElement returned_material = 5; // 未命中时按投入数量权重返还的1个素材
+  repeated ItemCostResult material_cost_result_list = 6; // 全部投入素材的消耗和最终余额
+  uint64 used_uuid = 7; // 成功时的账号UUID游标; 未命中时为0
+}
+
+//0x00300B#client->gateway#宠物给背包装备附加技能-请求
+message EquipmentSkillAttachReq {
+  uint64 character_uuid = 1; // 持有宠物、装备和素材的在线角色UUID
+  uint64 pet_uuid = 2; // 已学习加工技能的随身宠物UUID
+  uint64 equipment_uuid = 3; // 角色背包中的目标装备UUID
+  repeated ItemElement material_list = 4; // 1-8种不重复素材, 每种数量1-999
+}
+
+//0x00300C#gateway->client#宠物给背包装备附加技能-回复
+message EquipmentSkillAttachRes {
+  uint64 character_uuid = 1; // 执行附技能的角色UUID
+  uint64 pet_uuid = 2; // 实际执行附技能的宠物UUID
+  uint64 equipment_uuid = 3; // 目标装备UUID, 成功或配方未命中时均保持不变
+  bool matched = 4; // true表示精确命中该装备的一个附技能配方
+  EquipmentRecord result_equipment = 5; // 成功时为附技能后的装备, 未命中时为未改变的原装备
+  repeated ItemCostResult material_cost_result_list = 6; // 全部投入素材的消耗和最终余额
+}
+
+//0x00300D#client->gateway#宠物给背包装备附加元素-请求
+message EquipmentElementAttachReq {
+  uint64 character_uuid = 1; // 持有宠物、装备和素材的在线角色UUID
+  uint64 pet_uuid = 2; // 已学习加工技能的随身宠物UUID
+  uint64 equipment_uuid = 3; // 角色背包中的目标装备UUID
+  repeated ItemElement material_list = 4; // 1-8种不重复素材, 每种数量1-999
+}
+
+//0x00300E#gateway->client#宠物给背包装备附加元素-回复
+message EquipmentElementAttachRes {
+  uint64 character_uuid = 1; // 执行附元素的角色UUID
+  uint64 pet_uuid = 2; // 实际执行附元素的宠物UUID
+  uint64 equipment_uuid = 3; // 目标装备UUID, 成功或配方未命中时均保持不变
+  bool matched = 4; // true表示精确命中该装备的一个附元素配方
+  EquipmentRecord result_equipment = 5; // 成功时为附元素后的装备, 未命中时为未改变的原装备
+  repeated ItemCostResult material_cost_result_list = 6; // 全部投入素材的消耗和最终余额
 }
 
 // 角色道具与货币数量增量: 普通道具落 item_bag, 货币落 asset_count_map, 0 表示耗尽.

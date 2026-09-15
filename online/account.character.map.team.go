@@ -14,17 +14,17 @@ func (p *Account) applyCharacterMapTeamEvent(event *characterTeamMapEvent) {
 	if !ok {
 		return
 	}
-	var joinedGroup *pb.CharacterMapGroup
+	var joinedTeam *pb.CharacterMapTeam
 	if event.eventType == characterTeamMapEventJoin {
-		joinedGroup = characterMapGroupByKeys(viewers, event.orderKeys)
-		if joinedGroup == nil {
+		joinedTeam = characterMapTeamByKeys(viewers, event.orderKeys)
+		if joinedTeam == nil {
 			return
 		}
 	}
 	for _, viewer := range viewers {
 		switch event.eventType {
 		case characterTeamMapEventJoin:
-			p.sendCharacterMapPacket(viewer, newCharacterMapTeamJoinEvent(viewer, joinedGroup))
+			p.sendCharacterMapPacket(viewer, newCharacterMapTeamJoinEvent(viewer, joinedTeam))
 		case characterTeamMapEventLeave:
 			p.sendCharacterMapPacket(viewer, newCharacterMapTeamLeaveEvent(viewer, event.key))
 		case characterTeamMapEventDisband:
@@ -33,12 +33,12 @@ func (p *Account) applyCharacterMapTeamEvent(event *characterTeamMapEvent) {
 	}
 }
 
-// characterMapGroupByKeys 从同一张地图的权威 Presence 快照按队伍顺序构造完整分组.
+// characterMapTeamByKeys 从同一张地图的权威 Presence 快照按队伍顺序构造完整分组.
 // 任一成员缺失时拒绝广播,避免客户端收到不完整的 team_join 后错误覆盖旧名单.
-func characterMapGroupByKeys(
+func characterMapTeamByKeys(
 	presences []sceneCharacterPresence,
 	keys []sceneCharacterKey,
-) *pb.CharacterMapGroup {
+) *pb.CharacterMapTeam {
 	byKey := make(map[sceneCharacterKey]sceneCharacterPresence, len(presences))
 	for _, presence := range presences {
 		byKey[presence.key] = presence
@@ -54,5 +54,5 @@ func characterMapGroupByKeys(
 	if len(ordered) < 2 {
 		return nil
 	}
-	return characterMapGroup(ordered)
+	return characterMapTeam(ordered)
 }

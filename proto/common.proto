@@ -26,7 +26,7 @@ enum Constants {
   Constants_Level_Min = 1; // 角色和宠物等级下限
   Constants_Level_Max = 140; // 角色和宠物等级上限
   Constants_Elemental_Max_Active_Type_Count = 2; // 最多允许同时分配的元素种类数量
-  Constants_Elemental_Total_Point = 10; // 地水火风元素总点数
+  Constants_Elemental_Total_Point = 100; // 地水火风元素总百分比
   Constants_Character_Name_Max_Length = 12; // 角色名称最大长度
   Constants_Mail_Title_Max_Length = 30; // 系统邮件主题最大 Unicode 字符数
   Constants_Mail_Expire_Days = 365; // 系统邮件固定有效天数

@@ -161,27 +161,32 @@ func prepareCharacterAttributeAddPlan(record *pb.CharacterRecord, attributeType 
 
 	next := proto.Clone(record).(*pb.CharacterRecord)
 	base := next.GetBase()
+	attribute := base.GetAttribute()
+	if attribute == nil {
+		attribute = &pb.CharacterAttributePoints{}
+		base.Attribute = attribute
+	}
 	switch attributeType {
 	case pb.CharacterAttributeType_CharacterAttributeType_Vitality:
-		if base.GetVitality() == math.MaxUint32 {
+		if attribute.GetVitality() == math.MaxUint32 {
 			return nil, fmt.Errorf("%w: vitality overflows uint32", errCharacterAttributeAddFailedPrecondition)
 		}
-		base.Vitality++
+		attribute.Vitality++
 	case pb.CharacterAttributeType_CharacterAttributeType_Strength:
-		if base.GetStrength() == math.MaxUint32 {
+		if attribute.GetStrength() == math.MaxUint32 {
 			return nil, fmt.Errorf("%w: strength overflows uint32", errCharacterAttributeAddFailedPrecondition)
 		}
-		base.Strength++
+		attribute.Strength++
 	case pb.CharacterAttributeType_CharacterAttributeType_Toughness:
-		if base.GetToughness() == math.MaxUint32 {
+		if attribute.GetToughness() == math.MaxUint32 {
 			return nil, fmt.Errorf("%w: toughness overflows uint32", errCharacterAttributeAddFailedPrecondition)
 		}
-		base.Toughness++
+		attribute.Toughness++
 	case pb.CharacterAttributeType_CharacterAttributeType_Dexterity:
-		if base.GetDexterity() == math.MaxUint32 {
+		if attribute.GetDexterity() == math.MaxUint32 {
 			return nil, fmt.Errorf("%w: dexterity overflows uint32", errCharacterAttributeAddFailedPrecondition)
 		}
-		base.Dexterity++
+		attribute.Dexterity++
 	default:
 		return nil, fmt.Errorf("%w: attribute %d", errCharacterAttributeAddInvalidArgument, attributeType)
 	}
@@ -201,7 +206,8 @@ func prepareCharacterAttributeResetPlan(record *pb.CharacterRecord, target *pb.C
 	}
 
 	base := record.GetBase()
-	currentTotalPoint := uint64(base.GetVitality()) + uint64(base.GetStrength()) + uint64(base.GetToughness()) + uint64(base.GetDexterity()) + uint64(base.GetAvailablePoint())
+	attribute := base.GetAttribute()
+	currentTotalPoint := uint64(attribute.GetVitality()) + uint64(attribute.GetStrength()) + uint64(attribute.GetToughness()) + uint64(attribute.GetDexterity()) + uint64(base.GetAvailablePoint())
 	if currentTotalPoint < uint64(pb.CharacterLimit_CharacterLimit_CreateAttributeTotalPoint) || currentTotalPoint > characterAttributeResetMaxTotalPoint {
 		return nil, fmt.Errorf("%w: current total point %d is outside [%d,%d]", errCharacterAttributeResetFailedPrecondition, currentTotalPoint, pb.CharacterLimit_CharacterLimit_CreateAttributeTotalPoint, characterAttributeResetMaxTotalPoint)
 	}
@@ -217,10 +223,15 @@ func prepareCharacterAttributeResetPlan(record *pb.CharacterRecord, target *pb.C
 
 	next := proto.Clone(record).(*pb.CharacterRecord)
 	nextBase := next.GetBase()
-	nextBase.Vitality = target.GetVitality()
-	nextBase.Strength = target.GetStrength()
-	nextBase.Toughness = target.GetToughness()
-	nextBase.Dexterity = target.GetDexterity()
+	nextAttribute := nextBase.GetAttribute()
+	if nextAttribute == nil {
+		nextAttribute = &pb.CharacterAttributePoints{}
+		nextBase.Attribute = nextAttribute
+	}
+	nextAttribute.Vitality = target.GetVitality()
+	nextAttribute.Strength = target.GetStrength()
+	nextAttribute.Toughness = target.GetToughness()
+	nextAttribute.Dexterity = target.GetDexterity()
 	nextBase.AvailablePoint = availablePoint
 	return &characterAttributeResetPlan{
 		characterUUID: base.GetUuid(),

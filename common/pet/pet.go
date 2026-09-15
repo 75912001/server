@@ -66,7 +66,7 @@ func EnsureGrowthBaseline(record *pb.PetRecord, currentLevel uint32) error {
 	if record == nil {
 		return fmt.Errorf("pet record is nil")
 	}
-	if currentLevel < uint32(pb.LevelRange_LevelRange_Min) || currentLevel > uint32(pb.LevelRange_LevelRange_Max) {
+	if currentLevel < uint32(pb.Constants_Constants_Level_Min) || currentLevel > uint32(pb.Constants_Constants_Level_Max) {
 		return fmt.Errorf("pet level is out of range: %d", currentLevel)
 	}
 	if _, _, _, _, err := calculatePetPanelAttributes(
@@ -77,11 +77,11 @@ func EnsureGrowthBaseline(record *pb.PetRecord, currentLevel uint32) error {
 	); err != nil {
 		return err
 	}
-	if currentLevel == uint32(pb.LevelRange_LevelRange_Min) {
+	if currentLevel == uint32(pb.Constants_Constants_Level_Min) {
 		return recordGrowthBaseline(record, currentLevel)
 	}
 	if baselineLevel := record.GetGrowthBaselineLevel(); baselineLevel != 0 {
-		if baselineLevel > currentLevel || baselineLevel > uint32(pb.LevelRange_LevelRange_Max) {
+		if baselineLevel > currentLevel || baselineLevel > uint32(pb.Constants_Constants_Level_Max) {
 			return fmt.Errorf("pet growth baseline level %d exceeds current level %d", baselineLevel, currentLevel)
 		}
 		return nil
@@ -256,7 +256,7 @@ func create(pet *gameconfig.PetEntry, level uint32, grade pb.PetGrade) (
 	actualGrade pb.PetGrade,
 	err error) {
 	var vitalOffset, strOffset, toughOffset, dexOffset int32
-	if grade == pb.PetGrade_PetGrade_Unknow {
+	if grade == pb.PetGrade_PetGrade_Unspecified {
 		// 未指定品阶时四维独立随机, 再按四维总偏移计算并保存实际品阶.
 		const randomOffsetRange = uint32(petSavedBaseOffsetMax - petSavedBaseOffsetMin)
 		vitalOffset = int32(xutil.RandomU32(0, randomOffsetRange)) + petSavedBaseOffsetMin
@@ -278,7 +278,7 @@ func create(pet *gameconfig.PetEntry, level uint32, grade pb.PetGrade) (
 		case pb.PetGrade_PetGrade_Mythic:
 			gradeOffset = petSavedBaseOffsetMax
 		default:
-			return 0, 0, 0, 0, 0, 0, 0, 0, pb.PetGrade_PetGrade_Unknow, fmt.Errorf("pet grade is invalid: %s", grade)
+			return 0, 0, 0, 0, 0, 0, 0, 0, pb.PetGrade_PetGrade_Unspecified, fmt.Errorf("pet grade is invalid: %s", grade)
 		}
 		vitalOffset = gradeOffset
 		strOffset = gradeOffset
@@ -292,7 +292,7 @@ func create(pet *gameconfig.PetEntry, level uint32, grade pb.PetGrade) (
 	for index := range savedBases {
 		value := int64(templateBases[index]) + int64(offsets[index])
 		if value < int64(-1<<31) || value > int64(1<<31-1) {
-			return 0, 0, 0, 0, 0, 0, 0, 0, pb.PetGrade_PetGrade_Unknow,
+			return 0, 0, 0, 0, 0, 0, 0, 0, pb.PetGrade_PetGrade_Unspecified,
 				fmt.Errorf("pet saved base overflows int32 index:%d value:%d", index, value)
 		}
 		savedBases[index] = int32(value)
@@ -306,7 +306,7 @@ func create(pet *gameconfig.PetEntry, level uint32, grade pb.PetGrade) (
 	for index := range rawValues {
 		rawValues[index], err = scalePetRawAttribute(savedBases[index], randomPoints[index], initialFactor)
 		if err != nil {
-			return 0, 0, 0, 0, 0, 0, 0, 0, pb.PetGrade_PetGrade_Unknow,
+			return 0, 0, 0, 0, 0, 0, 0, 0, pb.PetGrade_PetGrade_Unspecified,
 				fmt.Errorf("create pet raw attribute failed index:%d: %w", index, err)
 		}
 	}
@@ -323,7 +323,7 @@ func create(pet *gameconfig.PetEntry, level uint32, grade pb.PetGrade) (
 		rawValues[3],
 	)
 	if err != nil {
-		return 0, 0, 0, 0, 0, 0, 0, 0, pb.PetGrade_PetGrade_Unknow, err
+		return 0, 0, 0, 0, 0, 0, 0, 0, pb.PetGrade_PetGrade_Unspecified, err
 	}
 	return savedBaseVital, savedBaseStr, savedBaseTough, savedBaseDex, rawVital, rawStr, rawTough, rawDex, grade, nil
 }
@@ -340,7 +340,7 @@ func NewRecord(pet *gameconfig.PetEntry, petUUID uint64, level uint32, grade pb.
 	if pet.Growth == nil || pet.Growth.InitNum == nil || pet.Growth.BaseVital == nil || pet.Growth.BaseStr == nil || pet.Growth.BaseTough == nil || pet.Growth.BaseDex == nil {
 		return nil, fmt.Errorf("pet growth is incomplete: pet:%d", *pet.ID)
 	}
-	if level < uint32(pb.LevelRange_LevelRange_Min) || level > uint32(pb.LevelRange_LevelRange_Max) {
+	if level < uint32(pb.Constants_Constants_Level_Min) || level > uint32(pb.Constants_Constants_Level_Max) {
 		return nil, fmt.Errorf("pet level is out of range: pet:%d level:%d", *pet.ID, level)
 	}
 	expMin, err := gameconfig.GGameConfig.Exp.GetLevelMinExp(level)

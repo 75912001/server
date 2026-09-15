@@ -5,6 +5,7 @@ import (
 	"math"
 	"strings"
 
+	"server/common"
 	"server/common/gameconfig"
 	pb "server/proto/pb"
 
@@ -81,14 +82,18 @@ func validateCharacterRecord(record *pb.CharacterRecord, seenUUID map[uint64]str
 	if strings.TrimSpace(base.GetNick()) == "" {
 		return fmt.Errorf("nick is empty")
 	}
-	if !assetIDInRange(base.GetAssetId(), pb.AssetIDRange_AssetIDRange_Character_Start, pb.AssetIDRange_AssetIDRange_Character_End) {
+	if !assetIDInRange(base.GetAssetId(), pb.AssetID_AssetIDRange_Character_Start, pb.AssetID_AssetIDRange_Character_End) {
 		return fmt.Errorf("asset id %d is invalid", base.GetAssetId())
 	}
 	if base.GetCreateTimestampMs() <= 0 {
 		return fmt.Errorf("create timestamp is invalid")
 	}
-	if base.GetVitality()+base.GetStrength()+base.GetToughness()+base.GetDexterity() == 0 {
+	attribute := base.GetAttribute()
+	if attribute.GetVitality()+attribute.GetStrength()+attribute.GetToughness()+attribute.GetDexterity() == 0 {
 		return fmt.Errorf("attribute is empty")
+	}
+	if !common.IsValidElementalAllocation(base.GetElemental()) {
+		return fmt.Errorf("elemental allocation is invalid")
 	}
 	if base.GetDuelPoint() > uint32(pb.CharacterLimit_CharacterLimit_MaxDuelPoint) {
 		return fmt.Errorf("duel point %d exceeds limit", base.GetDuelPoint())
@@ -110,7 +115,7 @@ func validateCharacterRecord(record *pb.CharacterRecord, seenUUID map[uint64]str
 	}
 	for assetID, count := range record.GetAssetCountMap() {
 		if !isCharacterAssetItemID(assetID) {
-			return fmt.Errorf("character asset id %d is outside [%d,%d]", assetID, pb.AssetIDRange_AssetIDRange_CharacterAsset_Start, pb.AssetIDRange_AssetIDRange_CharacterAsset_End)
+			return fmt.Errorf("character asset id %d is invalid", assetID)
 		}
 		if count > uint64(math.MaxInt64) {
 			return fmt.Errorf("character asset %d count %d exceeds max int64", assetID, count)
@@ -232,13 +237,13 @@ func validatePetRecord(record *pb.PetRecord, warehouse bool) error {
 	if record.GetUuid() == 0 {
 		return fmt.Errorf("uuid is empty")
 	}
-	if !assetIDInRange(uint64(record.GetAssetId()), pb.AssetIDRange_AssetIDRange_Pet_Start, pb.AssetIDRange_AssetIDRange_Pet_End) {
+	if !assetIDInRange(uint64(record.GetAssetId()), pb.AssetID_AssetIDRange_Pet_Start, pb.AssetID_AssetIDRange_Pet_End) {
 		return fmt.Errorf("asset id %d is invalid", record.GetAssetId())
 	}
-	if record.GetGrade() <= pb.PetGrade_PetGrade_Unknow || record.GetGrade() >= pb.PetGrade_PetGrade_Max {
+	if record.GetGrade() <= pb.PetGrade_PetGrade_Unspecified || record.GetGrade() >= pb.PetGrade_PetGrade_Max {
 		return fmt.Errorf("grade %s is invalid", record.GetGrade())
 	}
-	if record.GetCarryStatus() <= pb.PetCarryStatus_PetCarryStatus_Unknow || record.GetCarryStatus() >= pb.PetCarryStatus_PetCarryStatus_Max {
+	if record.GetCarryStatus() <= pb.PetCarryStatus_PetCarryStatus_Unspecified || record.GetCarryStatus() >= pb.PetCarryStatus_PetCarryStatus_Max {
 		return fmt.Errorf("carry status %s is invalid", record.GetCarryStatus())
 	}
 	if warehouse && record.GetCarryStatus() != pb.PetCarryStatus_PetCarryStatus_Rest {
@@ -254,7 +259,7 @@ func validatePetRecord(record *pb.PetRecord, warehouse bool) error {
 		if skillID == 0 {
 			continue
 		}
-		if !assetIDInRange(uint64(skillID), pb.AssetIDRange_AssetIDRange_Skill_Start, pb.AssetIDRange_AssetIDRange_Skill_End) {
+		if !assetIDInRange(uint64(skillID), pb.AssetID_AssetIDRange_Skill_Start, pb.AssetID_AssetIDRange_Skill_End) {
 			return fmt.Errorf("skill slot %d id %d is invalid", slotIndex, skillID)
 		}
 		if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Skill == nil || gameconfig.GGameConfig.Skill.Get(skillID) == nil {
@@ -296,6 +301,6 @@ func registerAccountRecordUUID(seen map[uint64]struct{}, usedUUID uint64, uuid u
 	return nil
 }
 
-func assetIDInRange(assetID uint64, start pb.AssetIDRange, end pb.AssetIDRange) bool {
+func assetIDInRange(assetID uint64, start pb.AssetID, end pb.AssetID) bool {
 	return assetID >= uint64(start) && assetID <= uint64(end)
 }

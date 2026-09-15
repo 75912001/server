@@ -269,15 +269,16 @@ func (CharacterLimit) EnumDescriptor() ([]byte, []int) {
 	return file_msg_character_proto_rawDescGZIP(), []int{3}
 }
 
+// ElementalPoints 使用原版百分比单位保存地水火风属性.
 type ElementalPoints struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Earth uint32 `protobuf:"varint,1,opt,name=earth,proto3" json:"earth,omitempty"` // 地元素点数, 0-10
-	Water uint32 `protobuf:"varint,2,opt,name=water,proto3" json:"water,omitempty"` // 水元素点数, 0-10
-	Fire  uint32 `protobuf:"varint,3,opt,name=fire,proto3" json:"fire,omitempty"`   // 火元素点数, 0-10
-	Wind  uint32 `protobuf:"varint,4,opt,name=wind,proto3" json:"wind,omitempty"`   // 风元素点数, 0-10
+	Earth uint32 `protobuf:"varint,1,opt,name=earth,proto3" json:"earth,omitempty"` // 地元素百分比, 0-100
+	Water uint32 `protobuf:"varint,2,opt,name=water,proto3" json:"water,omitempty"` // 水元素百分比, 0-100
+	Fire  uint32 `protobuf:"varint,3,opt,name=fire,proto3" json:"fire,omitempty"`   // 火元素百分比, 0-100
+	Wind  uint32 `protobuf:"varint,4,opt,name=wind,proto3" json:"wind,omitempty"`   // 风元素百分比, 0-100
 }
 
 func (x *ElementalPoints) Reset() {
@@ -477,7 +478,7 @@ type CharacterEffectiveAttribute struct {
 	unknownFields protoimpl.UnknownFields
 
 	CharacterUuid               uint64              `protobuf:"varint,1,opt,name=character_uuid,json=characterUuid,proto3" json:"character_uuid,omitempty"`                                               // 角色 UUID
-	Elemental                   *ElementalPoints    `protobuf:"bytes,2,opt,name=elemental,proto3" json:"elemental,omitempty"`                                                                             // 面板-元素点数, 各项限制在0-10
+	Elemental                   *ElementalPoints    `protobuf:"bytes,2,opt,name=elemental,proto3" json:"elemental,omitempty"`                                                                             // 面板-元素百分比, 各项限制在0-100
 	WeaponType                  CharacterWeaponType `protobuf:"varint,3,opt,name=weapon_type,json=weaponType,proto3,enum=account.CharacterWeaponType" json:"weapon_type,omitempty"`                       // 面板武器类型, 未装备时为空手
 	Attack                      uint32              `protobuf:"varint,100,opt,name=attack,proto3" json:"attack,omitempty"`                                                                                // 面板-攻击力
 	Defense                     int32               `protobuf:"varint,101,opt,name=defense,proto3" json:"defense,omitempty"`                                                                              // 面板-防御力, 最低为-100
@@ -680,7 +681,7 @@ type CharacterBaseRecord struct {
 	Nick                  string                    `protobuf:"bytes,2,opt,name=nick,proto3" json:"nick,omitempty"`                                                                      // 角色昵称
 	AssetId               uint64                    `protobuf:"varint,3,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`                                                // 角色资源 ID
 	Exp                   uint64                    `protobuf:"varint,4,opt,name=exp,proto3" json:"exp,omitempty"`                                                                       // 经验值
-	Elemental             *ElementalPoints          `protobuf:"bytes,30,opt,name=elemental,proto3" json:"elemental,omitempty"`                                                           // 地水火风元素点数; 此前为平铺 earth/water/fire/wind(5-8), 收缩为嵌套后新用编号 30
+	Elemental             *ElementalPoints          `protobuf:"bytes,30,opt,name=elemental,proto3" json:"elemental,omitempty"`                                                           // 地水火风元素百分比; 创建时总和必须为100
 	AvailablePoint        uint32                    `protobuf:"varint,9,opt,name=available_point,json=availablePoint,proto3" json:"available_point,omitempty"`                           // 角色可分配属性点
 	Attribute             *CharacterAttributePoints `protobuf:"bytes,31,opt,name=attribute,proto3" json:"attribute,omitempty"`                                                           // 体力腕力耐力速度点数; 此前为平铺 vitality/strength/toughness/dexterity(10-13), 收缩为嵌套后新用编号 31
 	LastLoginTimestampMs  int64                     `protobuf:"varint,14,opt,name=last_login_timestamp_ms,json=lastLoginTimestampMs,proto3" json:"last_login_timestamp_ms,omitempty"`    // 角色最后登录时间戳, 单位毫秒
@@ -927,7 +928,7 @@ type CharacterCreateReq struct {
 	CharacterSlotIndex uint32                    `protobuf:"varint,1,opt,name=character_slot_index,json=characterSlotIndex,proto3" json:"character_slot_index,omitempty"` // 角色创建槽位索引, 从 0 开始; 该槽位已有有效角色时创建失败
 	CharacterId        uint32                    `protobuf:"varint,2,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`                        // 角色资源 ID; 0 表示使用默认角色资源, 非 0 时必须是可创建玩家角色
 	CharacterNick      string                    `protobuf:"bytes,3,opt,name=character_nick,json=characterNick,proto3" json:"character_nick,omitempty"`                   // 角色昵称; 去除首尾空白后 1-12 个字符, 空字符串表示使用默认昵称
-	CharacterElemental *ElementalPoints          `protobuf:"bytes,4,opt,name=character_elemental,json=characterElemental,proto3" json:"character_elemental,omitempty"`    // 角色地水火风元素点数; 必须提交且由 online 校验合法性
+	CharacterElemental *ElementalPoints          `protobuf:"bytes,4,opt,name=character_elemental,json=characterElemental,proto3" json:"character_elemental,omitempty"`    // 角色地水火风元素百分比; 必须提交且总和为100
 	CharacterAttribute *CharacterAttributePoints `protobuf:"bytes,5,opt,name=character_attribute,json=characterAttribute,proto3" json:"character_attribute,omitempty"`    // 角色体力腕力耐力速度点数; 必须提交且由 online 校验合法性
 }
 

@@ -1,74 +1,1858 @@
-# 普通道具-配置
-# 任何修改此文件的行为都需要通知客户端和服务端开发人员.
-# 条目使用 items.item.<id> 结构, ID必须位于普通道具或角色资产协议区间.
-# name和sprite必填; sprite为0时不能配置atlas, 非零时atlas必须引用item目录图集.
-# use可配置角色或宠物经验, 或宠物忠诚度效果; 武器配置位于item.weapon.yaml.
-
+# 普通道具配置, 由Godot道具编辑器从config.raw/item.yaml导出.
+# 当前包含309条已发布普通道具; 素材、货币、武器和装备由独立配置维护.
 items:
   item:
     3000001:
-      name: 宠物修炼丹[1]
+      name: "宠物修炼丹[1]"
       sprite: 0
       use:
         target: pet
         exp: 10000000
     3000002:
-      name: 宠物修炼丹[2]
+      name: "宠物修炼丹[2]"
       sprite: 0
       use:
         target: pet
         exp: 50000000
     3000003:
-      name: 宠物修炼丹[3]
+      name: "宠物修炼丹[3]"
       sprite: 0
       use:
         target: pet
         exp: 100000000
     3000101:
-      name: 角色修炼丹[1]
+      name: "角色修炼丹[1]"
       sprite: 0
       use:
         target: character
         exp: 10000000
     3000102:
-      name: 角色修炼丹[2]
+      name: "角色修炼丹[2]"
       sprite: 0
       use:
         target: character
         exp: 50000000
     3000103:
-      name: 角色修炼丹[3]
+      name: "角色修炼丹[3]"
       sprite: 0
       use:
         target: character
         exp: 100000000
     3000201:
-      name: 宠物罐头[1]
+      name: "宠物罐头[1]"
       sprite: 0
       use:
         target: pet
         loyalty: 10
     3000202:
-      name: 宠物罐头[2]
+      name: "宠物罐头[2]"
       sprite: 0
       use:
         target: pet
         loyalty: 20
     3000203:
-      name: 宠物罐头[3]
+      name: "宠物罐头[3]"
       sprite: 0
       use:
         target: pet
         loyalty: 40
-    3490000:
-      name: 石币
-      atlas: "item/资产"
-      sprite: 6299
-    3490001:
-      name: 银币
-      atlas: "item/资产"
-      sprite: 318832
-    3490002:
-      name: 金币
-      atlas: "item/资产"
-      sprite: 318831
+    3000301:
+      name: 仪的玉
+      secretname: 仪的玉
+      effectstring: 举行仪式时使用的勾玉
+      atlas: "item/道具"
+      sprite: 6774
+    3000302:
+      name: 谜之箱子
+      secretname: 谜之箱子
+      effectstring: 从猜谜怪兽那获得的          谜的箱子
+      atlas: "item/道具"
+      sprite: 126057
+    3000303:
+      name: 猜之箱子
+      secretname: 猜之箱子
+      effectstring: 从猜谜大师的弟子那获得的          猜的箱子
+      atlas: "item/道具"
+      sprite: 126056
+    3090001:
+      name: 耐久力回复药
+      secretname: 耐久力回复药
+      effectstring: 耐久力100前後回复
+      atlas: "item/道具"
+      sprite: 6549
+    3090002:
+      name: 耐久力回复药
+      secretname: 耐久力回复药
+      effectstring: 耐久力200前後回复
+      atlas: "item/道具"
+      sprite: 6550
+    3090003:
+      name: 耐久力回复药
+      secretname: 耐久力回复药
+      effectstring: 耐久力300前後回复
+      atlas: "item/道具"
+      sprite: 6551
+    3090004:
+      name: 耐久力回复药
+      secretname: 耐久力回复药
+      effectstring: 耐久力400前後回复
+      atlas: "item/道具"
+      sprite: 6552
+    3090005:
+      name: 耐久力回复药
+      secretname: 耐久力回复药
+      effectstring: 耐久力500前後回复
+      atlas: "item/道具"
+      sprite: 6553
+    3090006:
+      name: 耐久力回复药
+      secretname: 耐久力回复药
+      effectstring: 耐久力600前後回复
+      atlas: "item/道具"
+      sprite: 6554
+    3090007:
+      name: 耐久力回复药
+      secretname: 耐久力回复药
+      effectstring: 耐久力800前後回复
+      atlas: "item/道具"
+      sprite: 6555
+    3090008:
+      name: 耐久力回复药
+      secretname: 耐久力回复药
+      effectstring: 耐久力1000前後回复
+      atlas: "item/道具"
+      sprite: 6556
+    3090009:
+      name: 气力回复药
+      secretname: 气力回复药
+      effectstring: 气力20前後回复
+      atlas: "item/道具"
+      sprite: 6541
+    3090010:
+      name: 气力回复药
+      secretname: 气力回复药
+      effectstring: 气力40前後回复
+      atlas: "item/道具"
+      sprite: 6542
+    3090011:
+      name: 气力回复药
+      secretname: 气力回复药
+      effectstring: 气力60前後回复
+      atlas: "item/道具"
+      sprite: 6543
+    3090012:
+      name: 气力回复药
+      secretname: 气力回复药
+      effectstring: 气力80前後回复
+      atlas: "item/道具"
+      sprite: 6544
+    3090013:
+      name: 气力回复药
+      secretname: 气力回复药
+      effectstring: 气力100前後回复
+      atlas: "item/道具"
+      sprite: 6545
+    3090014:
+      name: 复活药(100)
+      secretname: 复活药(100)
+      effectstring: 气绝回复成耐力100
+      atlas: "item/道具"
+      sprite: 6557
+    3090015:
+      name: 复活药(300)
+      secretname: 复活药(300)
+      effectstring: 气绝回复成耐力300
+      atlas: "item/道具"
+      sprite: 6557
+    3090016:
+      name: 复活药(500)
+      secretname: 复活药(500)
+      effectstring: 气绝回复成耐力500
+      atlas: "item/道具"
+      sprite: 6557
+    3090017:
+      name: 乌西摩尼叶
+      secretname: 乌西摩尼叶
+      effectstring: 解毒的热带性植物
+      atlas: "item/道具.素材"
+      sprite: 6562
+    3090018:
+      name: 伊西娃丽索叶
+      secretname: 伊西娃丽索叶
+      effectstring: 解除石化的潮湿地带植物
+      atlas: "item/道具.素材"
+      sprite: 6563
+    3090019:
+      name: 摩浦叶
+      secretname: 摩浦叶
+      effectstring: 解除混乱的平原植物
+      atlas: "item/道具.素材"
+      sprite: 6560
+    3090020:
+      name: 西伦恩根
+      secretname: 西伦恩根
+      effectstring: 解除酒醉的乾燥地带植物
+      atlas: "item/道具.素材"
+      sprite: 6564
+    3090021:
+      name: 菲恩叶
+      secretname: 菲恩叶
+      effectstring: 解除睡眠的海边植物
+      atlas: "item/道具.素材"
+      sprite: 6561
+    3090022:
+      name: 奇克拉耐久力之石
+      secretname: 奇克拉耐久力之石
+      effectstring: 非战斗状态自动回复耐久力
+      atlas: "item/道具.素材"
+      sprite: 6769
+    3090023:
+      name: 奇克拉气力之石
+      secretname: 奇克拉气力之石
+      effectstring: 非战斗状态自动回复气力
+      atlas: "item/道具.素材"
+      sprite: 6771
+    3090024:
+      name: 修复之石
+      secretname: 修复之石
+      effectstring: 可修复任何可修复之道具
+      atlas: "item/道具.素材"
+      sprite: 6773
+    3090025:
+      name: 磷暄草
+      secretname: 磷暄草
+      effectstring: 回复的成分 11
+      atlas: "item/道具.素材"
+      sprite: 6842
+    3090026:
+      name: 拾酱草
+      secretname: 拾酱草
+      effectstring: 复活的成分 11
+      atlas: "item/道具.素材"
+      sprite: 6562
+    3090027:
+      name: 月之砂
+      secretname: 月之砂
+      effectstring: 地的成分 11
+      atlas: "item/道具.素材"
+      sprite: 6832
+    3090028:
+      name: 圣洁之水
+      secretname: 圣洁之水
+      effectstring: 水的成分 11
+      atlas: "item/道具.素材"
+      sprite: 6816
+    3090029:
+      name: 炙烈草
+      secretname: 炙烈草
+      effectstring: 火的成分 11
+      atlas: "item/道具.素材"
+      sprite: 6565
+    3090030:
+      name: 塔斯夫的羽毛
+      secretname: 塔斯夫的羽毛
+      effectstring: 风的成分 11
+      atlas: "item/道具.素材"
+      sprite: 6729
+    3090031:
+      name: 深核草
+      secretname: 深核草
+      effectstring: 毒的成分 11
+      atlas: "item/道具.素材"
+      sprite: 6564
+    3090032:
+      name: 灰纳草
+      secretname: 灰纳草
+      effectstring: 石化的成分 11
+      atlas: "item/道具.素材"
+      sprite: 6563
+    3090033:
+      name: 芸酢草
+      secretname: 芸酢草
+      effectstring: 混乱的成分 11
+      atlas: "item/道具.素材"
+      sprite: 6851
+    3090034:
+      name: 浊渍草
+      secretname: 浊渍草
+      effectstring: 酒醉的成分 11
+      atlas: "item/道具.素材"
+      sprite: 6561
+    3090035:
+      name: 梦萝草
+      secretname: 梦萝草
+      effectstring: 睡眠的成分 11
+      atlas: "item/道具.素材"
+      sprite: 6560
+    3090036:
+      name: PK用气力回复药
+      secretname: PK用气力回复药
+      effectstring: 气力200前後回复
+      atlas: "item/道具"
+      sprite: 6543
+    3090037:
+      name: PK用耐久力回复药
+      secretname: PK用耐久力回复药
+      effectstring: 耐久力800前後回复
+      atlas: "item/道具"
+      sprite: 6555
+    3090038:
+      name: 南瓜灯
+      secretname: 南瓜灯
+      effectstring: 吓人的南瓜灯
+      atlas: "item/道具"
+      sprite: 332636
+    3090039:
+      name: 有毒的肉
+      secretname: 有毒的肉
+      effectstring: 肉店老板遗失的毒肉
+      atlas: "item/道具"
+      sprite: 6935
+    3090040:
+      name: 管家的钥匙
+      secretname: 管家的钥匙
+      effectstring: 管家被窃的钥匙
+      atlas: "item/道具.素材"
+      sprite: 6792
+    3090041:
+      name: 聊天室的麦克风
+      secretname: 聊天室的麦克风
+      effectstring: 聊天室主人遗失的麦克风
+      atlas: "item/道具"
+      sprite: 126063
+    3090042:
+      name: 道场的腰带
+      secretname: 道场的腰带
+      effectstring: 道场主人遗失的腰带
+      atlas: "item/装备.腰带"
+      sprite: 327215
+    3090043:
+      name: 阿布的水
+      secretname: 阿布的水
+      effectstring: 气力100前後回复
+      atlas: "item/道具"
+      sprite: 6548
+    3090044:
+      name: 哈罗的香草
+      secretname: 哈罗的香草
+      effectstring: 吃下去後耐久力回复100       生长在哈罗山上的高山植物
+      atlas: "item/道具"
+      sprite: 6566
+    3090045:
+      name: 不可思议的贝壳
+      secretname: 不可思议的贝壳
+      effectstring: 从某处漂流而来的贝壳
+      atlas: "item/道具.素材"
+      sprite: 6810
+    3090046:
+      name: 仙尼亚的花
+      secretname: 仙尼亚的花
+      effectstring: 在萨姆吉尔花圃上摘的花
+      atlas: "item/道具.素材"
+      sprite: 6837
+    3090047:
+      name: 月光花
+      secretname: 月光花
+      effectstring: 月光寄宿着美丽的花
+      atlas: "item/道具.素材"
+      sprite: 6837
+    3090048:
+      name: 仙人钓竿
+      secretname: 仙人钓竿
+      effectstring: 神仙好像用过的钓竿
+      atlas: "item/道具"
+      sprite: 6803
+    3090049:
+      name: 工匠钓竿
+      secretname: 工匠钓竿
+      effectstring: 工匠精心制造的天然钓竿
+      atlas: "item/道具"
+      sprite: 6803
+    3090050:
+      name: 名人的钓竿
+      secretname: 名人的钓竿
+      effectstring: 非常直的钓鱼竿
+      atlas: "item/道具"
+      sprite: 6803
+    3090051:
+      name: 逃走呼拔拔的骨
+      secretname: 逃走呼拔拔的骨
+      effectstring: 制造麻痹解药的材料
+      atlas: "item/道具.素材"
+      sprite: 6788
+    3090052:
+      name: 麻痹解药
+      secretname: 麻痹解药
+      effectstring: 解除麻痹的药
+      atlas: "item/道具"
+      sprite: 7003
+    3090053:
+      name: 萨顿家的秘药
+      secretname: 萨顿家的秘药
+      effectstring: 从气绝回复成500的耐久力
+      atlas: "item/道具"
+      sprite: 6995
+    3090054:
+      name: 马伦的葡萄
+      secretname: 马伦的葡萄
+      effectstring: 战斗中使用的话就会．．
+      atlas: "item/道具"
+      sprite: 6754
+    3090055:
+      name: 马伦的葡萄
+      secretname: 马伦的葡萄
+      effectstring: 战斗中使用的话就会．．
+      atlas: "item/道具"
+      sprite: 6756
+    3090056:
+      name: 马伦的葡萄
+      secretname: 马伦的葡萄
+      effectstring: 战斗中使用的话就会．．
+      atlas: "item/道具"
+      sprite: 6755
+    3090057:
+      name: 马伦的葡萄
+      secretname: 马伦的葡萄
+      effectstring: 战斗中使用的话就会．．
+      atlas: "item/道具"
+      sprite: 6753
+    3090058:
+      name: 马伦的毒蘑菇
+      secretname: 马伦的毒蘑菇
+      effectstring: 战斗中使用的话就会．．
+      atlas: "item/道具"
+      sprite: 6747
+    3090059:
+      name: 哈恩的壶
+      secretname: 哈恩的壶
+      effectstring: 斧职人哈恩爱用的水壶        现在是空的
+      atlas: "item/道具"
+      sprite: 6546
+    3090060:
+      name: 哈恩的壶
+      secretname: 哈恩的壶
+      effectstring: 斧职人哈恩爱用的水壶        水满了
+      atlas: "item/道具"
+      sprite: 6546
+    3090061:
+      name: 良质的木材
+      secretname: 良质的木材
+      effectstring: 木材商看了会高兴的良质木材
+      atlas: "item/道具.素材"
+      sprite: 6846
+    3090062:
+      name: 一级矿石
+      secretname: 一级矿石
+      effectstring: 柯尔克坑道采掘的矿石
+      atlas: "item/道具"
+      sprite: 5680
+    3090063:
+      name: 特级矿石
+      secretname: 特级矿石
+      effectstring: 柯尔克坑道采掘的矿石
+      atlas: "item/道具"
+      sprite: 5662
+    3090064:
+      name: 超特级矿石
+      secretname: 超特级矿石
+      effectstring: 柯尔克坑道采掘的矿石
+      atlas: "item/道具"
+      sprite: 5426
+    3090065:
+      name: 折断的斧头
+      secretname: 折断的斧头
+      effectstring: 折断而无法使用的斧头
+      atlas: "item/道具"
+      sprite: 6027
+    3090066:
+      name: 地的勾玉
+      secretname: 地的勾玉
+      effectstring: 绿色的勾玉
+      atlas: "item/装备.首饰"
+      sprite: 6775
+    3090067:
+      name: 水的勾玉
+      secretname: 水的勾玉
+      effectstring: 青色的勾玉
+      atlas: "item/装备.首饰"
+      sprite: 6776
+    3090068:
+      name: 火的勾玉
+      secretname: 火的勾玉
+      effectstring: 红色的勾玉
+      atlas: "item/道具"
+      sprite: 6774
+    3090069:
+      name: 风的勾玉
+      secretname: 风的勾玉
+      effectstring: 黄色的勾玉
+      atlas: "item/装备.首饰"
+      sprite: 6777
+    3090070:
+      name: 曼模竿
+      secretname: 曼模竿
+      effectstring: 可以做成钓竿的树
+      atlas: "item/道具.素材"
+      sprite: 6793
+    3090071:
+      name: 特沙金竿
+      secretname: 特沙金竿
+      effectstring: 很像可以变成钓鱼竿的木头
+      atlas: "item/道具.素材"
+      sprite: 6796
+    3090072:
+      name: 卡库尔竿
+      secretname: 卡库尔竿
+      effectstring: 有可能做成钓竿的木头
+      atlas: "item/道具.素材"
+      sprite: 6795
+    3090073:
+      name: 超级姆依
+      secretname: 超级姆依
+      effectstring: 钓到姆依 钓鱼线
+      atlas: "item/道具.素材"
+      sprite: 6786
+    3090074:
+      name: 超级海主人
+      secretname: 超级海主人
+      effectstring: 钓到海主人 钓鱼线
+      atlas: "item/道具.素材"
+      sprite: 6784
+    3090075:
+      name: 超级加克拉
+      secretname: 超级加克拉
+      effectstring: 钓到加克拉 钓鱼线
+      atlas: "item/道具.素材"
+      sprite: 6785
+    3090076:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 1
+      atlas: "item/道具"
+      sprite: 6852
+    3090077:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 2
+      atlas: "item/道具"
+      sprite: 6852
+    3090078:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 3
+      atlas: "item/道具"
+      sprite: 6852
+    3090079:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 4
+      atlas: "item/道具"
+      sprite: 6852
+    3090080:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 5
+      atlas: "item/道具"
+      sprite: 6852
+    3090081:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 6
+      atlas: "item/道具"
+      sprite: 6852
+    3090082:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 7
+      atlas: "item/道具"
+      sprite: 6852
+    3090083:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 8
+      atlas: "item/道具"
+      sprite: 6852
+    3090084:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 9
+      atlas: "item/道具"
+      sprite: 6852
+    3090085:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 10
+      atlas: "item/道具"
+      sprite: 6852
+    3090086:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 11
+      atlas: "item/道具"
+      sprite: 6852
+    3090087:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 12
+      atlas: "item/道具"
+      sprite: 6852
+    3090088:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 13
+      atlas: "item/道具"
+      sprite: 6852
+    3090089:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 14
+      atlas: "item/道具"
+      sprite: 6852
+    3090090:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 15
+      atlas: "item/道具"
+      sprite: 6852
+    3090091:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 16
+      atlas: "item/道具"
+      sprite: 6852
+    3090092:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 17
+      atlas: "item/道具"
+      sprite: 6852
+    3090093:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 18
+      atlas: "item/道具"
+      sprite: 6852
+    3090094:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 19
+      atlas: "item/道具"
+      sprite: 6852
+    3090095:
+      name: 恒冰结晶
+      secretname: 恒冰结晶
+      effectstring: 结晶含量等级 20
+      atlas: "item/道具"
+      sprite: 6852
+    3090096:
+      name: 精炼之石1
+      secretname: 精炼之石1
+      effectstring: 石的成分 12
+      atlas: "item/道具"
+      sprite: 370561
+    3090097:
+      name: 精炼之石2
+      secretname: 精炼之石2
+      effectstring: 石的成分 13
+      atlas: "item/道具"
+      sprite: 370562
+    3090098:
+      name: 精炼之石3
+      secretname: 精炼之石3
+      effectstring: 石的成分 14
+      atlas: "item/道具"
+      sprite: 370563
+    3090099:
+      name: 精炼之石4
+      secretname: 精炼之石4
+      effectstring: 石的成分 15
+      atlas: "item/道具"
+      sprite: 370564
+    3090100:
+      name: 精炼之石5
+      secretname: 精炼之石5
+      effectstring: 石的成分 16
+      atlas: "item/道具"
+      sprite: 370565
+    3090101:
+      name: 精炼之石6
+      secretname: 精炼之石6
+      effectstring: 石的成分 17
+      atlas: "item/道具"
+      sprite: 370566
+    3090102:
+      name: 精炼之石7
+      secretname: 精炼之石7
+      effectstring: 石的成分 18
+      atlas: "item/道具"
+      sprite: 370566
+    3090103:
+      name: 精炼之石8
+      secretname: 精炼之石8
+      effectstring: 石的成分 19
+      atlas: "item/道具"
+      sprite: 370566
+    3090104:
+      name: 精炼之石9
+      secretname: 精炼之石9
+      effectstring: 石的成分 20
+      atlas: "item/道具"
+      sprite: 370566
+    3090105:
+      name: 精炼之木1
+      secretname: 精炼之木1
+      effectstring: 木的成分 12
+      atlas: "item/道具"
+      sprite: 370475
+    3090106:
+      name: 精炼之木2
+      secretname: 精炼之木2
+      effectstring: 木的成分 13
+      atlas: "item/道具"
+      sprite: 370476
+    3090107:
+      name: 精炼之木3
+      secretname: 精炼之木3
+      effectstring: 木的成分 14
+      atlas: "item/道具"
+      sprite: 370477
+    3090108:
+      name: 精炼之木4
+      secretname: 精炼之木4
+      effectstring: 木的成分 15
+      atlas: "item/道具"
+      sprite: 370478
+    3090109:
+      name: 精炼之木5
+      secretname: 精炼之木5
+      effectstring: 木的成分 16
+      atlas: "item/道具"
+      sprite: 370479
+    3090110:
+      name: 精炼之木6
+      secretname: 精炼之木6
+      effectstring: 木的成分 17
+      atlas: "item/道具"
+      sprite: 370479
+    3090111:
+      name: 精炼之木7
+      secretname: 精炼之木7
+      effectstring: 木的成分 18
+      atlas: "item/道具"
+      sprite: 370479
+    3090112:
+      name: 精炼之木8
+      secretname: 精炼之木8
+      effectstring: 木的成分 19
+      atlas: "item/道具"
+      sprite: 370479
+    3090113:
+      name: 精炼之木9
+      secretname: 精炼之木9
+      effectstring: 木的成分 20
+      atlas: "item/道具"
+      sprite: 370479
+    3090114:
+      name: 精炼之骨1
+      secretname: 精炼之骨1
+      effectstring: 骨的成分 12
+      atlas: "item/道具"
+      sprite: 370644
+    3090115:
+      name: 精炼之骨2
+      secretname: 精炼之骨2
+      effectstring: 骨的成分 13
+      atlas: "item/道具"
+      sprite: 370646
+    3090116:
+      name: 精炼之骨3
+      secretname: 精炼之骨3
+      effectstring: 骨的成分 14
+      atlas: "item/道具"
+      sprite: 370647
+    3090117:
+      name: 精炼之骨4
+      secretname: 精炼之骨4
+      effectstring: 骨的成分 15
+      atlas: "item/道具"
+      sprite: 370648
+    3090118:
+      name: 精炼之骨5
+      secretname: 精炼之骨5
+      effectstring: 骨的成分 16
+      atlas: "item/道具"
+      sprite: 370649
+    3090119:
+      name: 精炼之骨6
+      secretname: 精炼之骨6
+      effectstring: 骨的成分 17
+      atlas: "item/道具"
+      sprite: 370649
+    3090120:
+      name: 精炼之骨7
+      secretname: 精炼之骨7
+      effectstring: 骨的成分 18
+      atlas: "item/道具"
+      sprite: 370649
+    3090121:
+      name: 精炼之骨8
+      secretname: 精炼之骨8
+      effectstring: 骨的成分 19
+      atlas: "item/道具"
+      sprite: 370649
+    3090122:
+      name: 精炼之骨9
+      secretname: 精炼之骨9
+      effectstring: 骨的成分 20
+      atlas: "item/道具"
+      sprite: 370649
+    3090123:
+      name: 精炼之牙1
+      secretname: 精炼之牙1
+      effectstring: 牙的成分 12
+      atlas: "item/道具"
+      sprite: 370529
+    3090124:
+      name: 精炼之牙2
+      secretname: 精炼之牙2
+      effectstring: 牙的成分 13
+      atlas: "item/道具"
+      sprite: 370530
+    3090125:
+      name: 精炼之牙3
+      secretname: 精炼之牙3
+      effectstring: 牙的成分 14
+      atlas: "item/道具"
+      sprite: 370531
+    3090126:
+      name: 精炼之牙4
+      secretname: 精炼之牙4
+      effectstring: 牙的成分 15
+      atlas: "item/道具"
+      sprite: 370533
+    3090127:
+      name: 精炼之牙5
+      secretname: 精炼之牙5
+      effectstring: 牙的成分 16
+      atlas: "item/道具"
+      sprite: 370534
+    3090128:
+      name: 精炼之牙6
+      secretname: 精炼之牙6
+      effectstring: 牙的成分 17
+      atlas: "item/道具"
+      sprite: 370534
+    3090129:
+      name: 精炼之牙7
+      secretname: 精炼之牙7
+      effectstring: 牙的成分 18
+      atlas: "item/道具"
+      sprite: 370534
+    3090130:
+      name: 精炼之牙8
+      secretname: 精炼之牙8
+      effectstring: 牙的成分 19
+      atlas: "item/道具"
+      sprite: 370534
+    3090131:
+      name: 精炼之牙9
+      secretname: 精炼之牙9
+      effectstring: 牙的成分 20
+      atlas: "item/道具"
+      sprite: 370534
+    3090132:
+      name: 精炼之皮1
+      secretname: 精炼之皮1
+      effectstring: 皮的成分 12
+      atlas: "item/道具"
+      sprite: 370540
+    3090133:
+      name: 精炼之皮2
+      secretname: 精炼之皮2
+      effectstring: 皮的成分 13
+      atlas: "item/道具"
+      sprite: 370541
+    3090134:
+      name: 精炼之皮3
+      secretname: 精炼之皮3
+      effectstring: 皮的成分 14
+      atlas: "item/道具"
+      sprite: 370543
+    3090135:
+      name: 精炼之皮4
+      secretname: 精炼之皮4
+      effectstring: 皮的成分 15
+      atlas: "item/道具"
+      sprite: 370544
+    3090136:
+      name: 精炼之皮5
+      secretname: 精炼之皮5
+      effectstring: 皮的成分 16
+      atlas: "item/道具"
+      sprite: 370545
+    3090137:
+      name: 精炼之皮6
+      secretname: 精炼之皮6
+      effectstring: 皮的成分 17
+      atlas: "item/道具"
+      sprite: 370545
+    3090138:
+      name: 精炼之皮7
+      secretname: 精炼之皮7
+      effectstring: 皮的成分 18
+      atlas: "item/道具"
+      sprite: 370545
+    3090139:
+      name: 精炼之皮8
+      secretname: 精炼之皮8
+      effectstring: 皮的成分 19
+      atlas: "item/道具"
+      sprite: 370545
+    3090140:
+      name: 精炼之皮9
+      secretname: 精炼之皮9
+      effectstring: 皮的成分 20
+      atlas: "item/道具"
+      sprite: 370545
+    3090141:
+      name: 精炼之爪1
+      secretname: 精炼之爪1
+      effectstring: 爪的成分 12
+      atlas: "item/道具"
+      sprite: 370519
+    3090142:
+      name: 精炼之爪2
+      secretname: 精炼之爪2
+      effectstring: 爪的成分 13
+      atlas: "item/道具"
+      sprite: 370520
+    3090143:
+      name: 精炼之爪3
+      secretname: 精炼之爪3
+      effectstring: 爪的成分 14
+      atlas: "item/道具"
+      sprite: 370521
+    3090144:
+      name: 精炼之爪4
+      secretname: 精炼之爪4
+      effectstring: 爪的成分 15
+      atlas: "item/道具"
+      sprite: 370522
+    3090145:
+      name: 精炼之爪5
+      secretname: 精炼之爪5
+      effectstring: 爪的成分 16
+      atlas: "item/道具"
+      sprite: 370523
+    3090146:
+      name: 精炼之爪6
+      secretname: 精炼之爪6
+      effectstring: 爪的成分 17
+      atlas: "item/道具"
+      sprite: 370523
+    3090147:
+      name: 精炼之爪7
+      secretname: 精炼之爪7
+      effectstring: 爪的成分 18
+      atlas: "item/道具"
+      sprite: 370523
+    3090148:
+      name: 精炼之爪8
+      secretname: 精炼之爪8
+      effectstring: 爪的成分 19
+      atlas: "item/道具"
+      sprite: 370523
+    3090149:
+      name: 精炼之爪9
+      secretname: 精炼之爪9
+      effectstring: 爪的成分 20
+      atlas: "item/道具"
+      sprite: 370523
+    3090150:
+      name: 精炼之贝1
+      secretname: 精炼之贝1
+      effectstring: 贝壳的成分 12
+      atlas: "item/道具"
+      sprite: 370592
+    3090151:
+      name: 精炼之贝2
+      secretname: 精炼之贝2
+      effectstring: 贝壳的成分 13
+      atlas: "item/道具"
+      sprite: 370593
+    3090152:
+      name: 精炼之贝3
+      secretname: 精炼之贝3
+      effectstring: 贝壳的成分 14
+      atlas: "item/道具"
+      sprite: 370594
+    3090153:
+      name: 精炼之贝4
+      secretname: 精炼之贝4
+      effectstring: 贝壳的成分 15
+      atlas: "item/道具"
+      sprite: 370595
+    3090154:
+      name: 精炼之贝5
+      secretname: 精炼之贝5
+      effectstring: 贝壳的成分 16
+      atlas: "item/道具"
+      sprite: 370597
+    3090155:
+      name: 精炼之贝6
+      secretname: 精炼之贝6
+      effectstring: 贝壳的成分 17
+      atlas: "item/道具"
+      sprite: 370597
+    3090156:
+      name: 精炼之贝7
+      secretname: 精炼之贝7
+      effectstring: 贝壳的成分 18
+      atlas: "item/道具"
+      sprite: 370597
+    3090157:
+      name: 精炼之贝8
+      secretname: 精炼之贝8
+      effectstring: 贝壳的成分 19
+      atlas: "item/道具"
+      sprite: 370597
+    3090158:
+      name: 精炼之贝9
+      secretname: 精炼之贝9
+      effectstring: 贝壳的成分 20
+      atlas: "item/道具"
+      sprite: 370597
+    3090159:
+      name: 精炼之壳1
+      secretname: 精炼之壳1
+      effectstring: 壳的成分 12
+      atlas: "item/道具"
+      sprite: 370675
+    3090160:
+      name: 精炼之壳2
+      secretname: 精炼之壳2
+      effectstring: 壳的成分 13
+      atlas: "item/道具"
+      sprite: 370677
+    3090161:
+      name: 精炼之壳3
+      secretname: 精炼之壳3
+      effectstring: 壳的成分 14
+      atlas: "item/道具"
+      sprite: 370678
+    3090162:
+      name: 精炼之壳4
+      secretname: 精炼之壳4
+      effectstring: 壳的成分 15
+      atlas: "item/道具"
+      sprite: 370679
+    3090163:
+      name: 精炼之壳5
+      secretname: 精炼之壳5
+      effectstring: 壳的成分 16
+      atlas: "item/道具"
+      sprite: 370680
+    3090164:
+      name: 精炼之壳6
+      secretname: 精炼之壳6
+      effectstring: 壳的成分 17
+      atlas: "item/道具"
+      sprite: 370680
+    3090165:
+      name: 精炼之壳7
+      secretname: 精炼之壳7
+      effectstring: 壳的成分 18
+      atlas: "item/道具"
+      sprite: 370680
+    3090166:
+      name: 精炼之壳8
+      secretname: 精炼之壳8
+      effectstring: 壳的成分 19
+      atlas: "item/道具"
+      sprite: 370680
+    3090167:
+      name: 精炼之壳9
+      secretname: 精炼之壳9
+      effectstring: 壳的成分 20
+      atlas: "item/道具"
+      sprite: 370680
+    3090168:
+      name: 精炼之绳1
+      secretname: 精炼之绳1
+      effectstring: 线的成分 12
+      atlas: "item/道具"
+      sprite: 370708
+    3090169:
+      name: 精炼之绳2
+      secretname: 精炼之绳2
+      effectstring: 线的成分 13
+      atlas: "item/道具"
+      sprite: 370709
+    3090170:
+      name: 精炼之绳3
+      secretname: 精炼之绳3
+      effectstring: 线的成分 14
+      atlas: "item/道具"
+      sprite: 370710
+    3090171:
+      name: 精炼之绳4
+      secretname: 精炼之绳4
+      effectstring: 线的成分 15
+      atlas: "item/道具"
+      sprite: 370711
+    3090172:
+      name: 精炼之绳5
+      secretname: 精炼之绳5
+      effectstring: 线的成分 16
+      atlas: "item/道具"
+      sprite: 370712
+    3090173:
+      name: 精炼之绳6
+      secretname: 精炼之绳6
+      effectstring: 线的成分 17
+      atlas: "item/道具"
+      sprite: 370712
+    3090174:
+      name: 精炼之绳7
+      secretname: 精炼之绳7
+      effectstring: 线的成分 18
+      atlas: "item/道具"
+      sprite: 370712
+    3090175:
+      name: 精炼之绳8
+      secretname: 精炼之绳8
+      effectstring: 线的成分 19
+      atlas: "item/道具"
+      sprite: 370712
+    3090176:
+      name: 精炼之绳9
+      secretname: 精炼之绳9
+      effectstring: 线的成分 20
+      atlas: "item/道具"
+      sprite: 370712
+    3090177:
+      name: 精炼之花1
+      secretname: 精炼之花1
+      effectstring: 花的成分 12
+      atlas: "item/道具"
+      sprite: 370603
+    3090178:
+      name: 精炼之花2
+      secretname: 精炼之花2
+      effectstring: 花的成分 13
+      atlas: "item/道具"
+      sprite: 370604
+    3090179:
+      name: 精炼之花3
+      secretname: 精炼之花3
+      effectstring: 花的成分 14
+      atlas: "item/道具"
+      sprite: 370605
+    3090180:
+      name: 精炼之花4
+      secretname: 精炼之花4
+      effectstring: 花的成分 15
+      atlas: "item/道具"
+      sprite: 370606
+    3090181:
+      name: 精炼之花5
+      secretname: 精炼之花5
+      effectstring: 花的成分 16
+      atlas: "item/道具"
+      sprite: 370608
+    3090182:
+      name: 精炼之花6
+      secretname: 精炼之花6
+      effectstring: 花的成分 17
+      atlas: "item/道具"
+      sprite: 370608
+    3090183:
+      name: 精炼之花7
+      secretname: 精炼之花7
+      effectstring: 花的成分 18
+      atlas: "item/道具"
+      sprite: 370608
+    3090184:
+      name: 精炼之花8
+      secretname: 精炼之花8
+      effectstring: 花的成分 19
+      atlas: "item/道具"
+      sprite: 370608
+    3090185:
+      name: 精炼之花9
+      secretname: 精炼之花9
+      effectstring: 花的成分 20
+      atlas: "item/道具"
+      sprite: 370608
+    3090186:
+      name: 精炼之黏土1
+      secretname: 精炼之黏土1
+      effectstring: 黏土的成分 12
+      atlas: "item/道具"
+      sprite: 370719
+    3090187:
+      name: 精炼之黏土2
+      secretname: 精炼之黏土2
+      effectstring: 黏土的成分 13
+      atlas: "item/道具"
+      sprite: 370720
+    3090188:
+      name: 精炼之黏土3
+      secretname: 精炼之黏土3
+      effectstring: 黏土的成分 14
+      atlas: "item/道具"
+      sprite: 370721
+    3090189:
+      name: 精炼之黏土4
+      secretname: 精炼之黏土4
+      effectstring: 黏土的成分 15
+      atlas: "item/道具"
+      sprite: 370722
+    3090190:
+      name: 精炼之黏土5
+      secretname: 精炼之黏土5
+      effectstring: 黏土的成分 16
+      atlas: "item/道具"
+      sprite: 370723
+    3090191:
+      name: 精炼之黏土6
+      secretname: 精炼之黏土6
+      effectstring: 黏土的成分 17
+      atlas: "item/道具"
+      sprite: 370723
+    3090192:
+      name: 精炼之黏土7
+      secretname: 精炼之黏土7
+      effectstring: 黏土的成分 18
+      atlas: "item/道具"
+      sprite: 370723
+    3090193:
+      name: 精炼之黏土8
+      secretname: 精炼之黏土8
+      effectstring: 黏土的成分 19
+      atlas: "item/道具"
+      sprite: 370723
+    3090194:
+      name: 精炼之黏土9
+      secretname: 精炼之黏土9
+      effectstring: 黏土的成分 20
+      atlas: "item/道具"
+      sprite: 370723
+    3090195:
+      name: 精炼之鳞1
+      secretname: 精炼之鳞1
+      effectstring: 鳞的成分 12
+      atlas: "item/道具"
+      sprite: 370729
+    3090196:
+      name: 精炼之鳞2
+      secretname: 精炼之鳞2
+      effectstring: 鳞的成分 13
+      atlas: "item/道具"
+      sprite: 370730
+    3090197:
+      name: 精炼之鳞3
+      secretname: 精炼之鳞3
+      effectstring: 鳞的成分 14
+      atlas: "item/道具"
+      sprite: 370731
+    3090198:
+      name: 精炼之鳞4
+      secretname: 精炼之鳞4
+      effectstring: 鳞的成分 15
+      atlas: "item/道具"
+      sprite: 370732
+    3090199:
+      name: 精炼之鳞5
+      secretname: 精炼之鳞5
+      effectstring: 鳞的成分 16
+      atlas: "item/道具"
+      sprite: 370734
+    3090200:
+      name: 精炼之鳞6
+      secretname: 精炼之鳞6
+      effectstring: 鳞的成分 17
+      atlas: "item/道具"
+      sprite: 370734
+    3090201:
+      name: 精炼之鳞7
+      secretname: 精炼之鳞7
+      effectstring: 鳞的成分 18
+      atlas: "item/道具"
+      sprite: 370734
+    3090202:
+      name: 精炼之鳞8
+      secretname: 精炼之鳞8
+      effectstring: 鳞的成分 19
+      atlas: "item/道具"
+      sprite: 370734
+    3090203:
+      name: 精炼之鳞9
+      secretname: 精炼之鳞9
+      effectstring: 鳞的成分 20
+      atlas: "item/道具"
+      sprite: 370734
+    3090204:
+      name: 精炼之叶1
+      secretname: 精炼之叶1
+      effectstring: 叶的成分 12
+      atlas: "item/道具"
+      sprite: 370687
+    3090205:
+      name: 精炼之叶2
+      secretname: 精炼之叶2
+      effectstring: 叶的成分 13
+      atlas: "item/道具"
+      sprite: 370686
+    3090206:
+      name: 精炼之叶3
+      secretname: 精炼之叶3
+      effectstring: 叶的成分 14
+      atlas: "item/道具"
+      sprite: 370688
+    3090207:
+      name: 精炼之叶4
+      secretname: 精炼之叶4
+      effectstring: 叶的成分 15
+      atlas: "item/道具"
+      sprite: 370690
+    3090208:
+      name: 精炼之叶5
+      secretname: 精炼之叶5
+      effectstring: 叶的成分 16
+      atlas: "item/道具"
+      sprite: 370691
+    3090209:
+      name: 精炼之叶6
+      secretname: 精炼之叶6
+      effectstring: 叶的成分 17
+      atlas: "item/道具"
+      sprite: 370691
+    3090210:
+      name: 精炼之叶7
+      secretname: 精炼之叶7
+      effectstring: 叶的成分 18
+      atlas: "item/道具"
+      sprite: 370691
+    3090211:
+      name: 精炼之叶8
+      secretname: 精炼之叶8
+      effectstring: 叶的成分 19
+      atlas: "item/道具"
+      sprite: 370691
+    3090212:
+      name: 精炼之叶9
+      secretname: 精炼之叶9
+      effectstring: 叶的成分 20
+      atlas: "item/道具"
+      sprite: 370691
+    3090213:
+      name: 精炼之水晶1
+      secretname: 精炼之水晶1
+      effectstring: 水晶的成分 12
+      atlas: "item/道具"
+      sprite: 370497
+    3090214:
+      name: 精炼之水晶2
+      secretname: 精炼之水晶2
+      effectstring: 水晶的成分 13
+      atlas: "item/道具"
+      sprite: 370498
+    3090215:
+      name: 精炼之水晶3
+      secretname: 精炼之水晶3
+      effectstring: 水晶的成分 14
+      atlas: "item/道具"
+      sprite: 370499
+    3090216:
+      name: 精炼之水晶4
+      secretname: 精炼之水晶4
+      effectstring: 水晶的成分 15
+      atlas: "item/道具"
+      sprite: 370500
+    3090217:
+      name: 精炼之水晶5
+      secretname: 精炼之水晶5
+      effectstring: 水晶的成分 16
+      atlas: "item/道具"
+      sprite: 370502
+    3090218:
+      name: 精炼之水晶6
+      secretname: 精炼之水晶6
+      effectstring: 水晶的成分 17
+      atlas: "item/道具"
+      sprite: 370502
+    3090219:
+      name: 精炼之水晶7
+      secretname: 精炼之水晶7
+      effectstring: 水晶的成分 18
+      atlas: "item/道具"
+      sprite: 370502
+    3090220:
+      name: 精炼之水晶8
+      secretname: 精炼之水晶8
+      effectstring: 水晶的成分 19
+      atlas: "item/道具"
+      sprite: 370502
+    3090221:
+      name: 精炼之水晶9
+      secretname: 精炼之水晶9
+      effectstring: 水晶的成分 20
+      atlas: "item/道具"
+      sprite: 370502
+    3090222:
+      name: 雷龙的骨头
+      secretname: 雷龙的骨头1
+      effectstring: 雷龙的骨头1
+      atlas: "item/道具"
+      sprite: 392549
+    3090223:
+      name: 雷龙的骨头
+      secretname: 雷龙的骨头2
+      effectstring: 雷龙的骨头2
+      atlas: "item/道具"
+      sprite: 392549
+    3090224:
+      name: 雷龙的骨头
+      secretname: 雷龙的骨头3
+      effectstring: 雷龙的骨头3
+      atlas: "item/道具"
+      sprite: 392549
+    3090225:
+      name: 雷龙的骨头
+      secretname: 雷龙的骨头4
+      effectstring: 雷龙的骨头4
+      atlas: "item/道具"
+      sprite: 392549
+    3090226:
+      name: 雷龙的骨头
+      secretname: 雷龙的骨头5
+      effectstring: 雷龙的骨头5
+      atlas: "item/道具"
+      sprite: 392549
+    3090227:
+      name: 雷龙的骨头
+      secretname: 雷龙的骨头6
+      effectstring: 雷龙的骨头6
+      atlas: "item/道具"
+      sprite: 392550
+    3090228:
+      name: 雷龙的骨头
+      secretname: 雷龙的骨头7
+      effectstring: 雷龙的骨头7
+      atlas: "item/道具"
+      sprite: 392550
+    3090229:
+      name: 雷龙的骨头
+      secretname: 雷龙的骨头8
+      effectstring: 雷龙的骨头8
+      atlas: "item/道具"
+      sprite: 392550
+    3090230:
+      name: 雷龙的骨头
+      secretname: 雷龙的骨头9
+      effectstring: 雷龙的骨头9
+      atlas: "item/道具"
+      sprite: 392550
+    3090231:
+      name: 雷龙的骨头
+      secretname: 雷龙的骨头10
+      effectstring: 雷龙的骨头10
+      atlas: "item/道具"
+      sprite: 392550
+    3090232:
+      name: 老虎的骨头
+      secretname: 老虎的骨头1
+      effectstring: 老虎的骨头1
+      atlas: "item/道具"
+      sprite: 392569
+    3090233:
+      name: 老虎的骨头
+      secretname: 老虎的骨头2
+      effectstring: 老虎的骨头2
+      atlas: "item/道具"
+      sprite: 392569
+    3090234:
+      name: 老虎的骨头
+      secretname: 老虎的骨头3
+      effectstring: 老虎的骨头3
+      atlas: "item/道具"
+      sprite: 392569
+    3090235:
+      name: 老虎的骨头
+      secretname: 老虎的骨头4
+      effectstring: 老虎的骨头4
+      atlas: "item/道具"
+      sprite: 392569
+    3090236:
+      name: 老虎的骨头
+      secretname: 老虎的骨头5
+      effectstring: 老虎的骨头5
+      atlas: "item/道具"
+      sprite: 392569
+    3090237:
+      name: 老虎的骨头
+      secretname: 老虎的骨头6
+      effectstring: 老虎的骨头6
+      atlas: "item/道具"
+      sprite: 392570
+    3090238:
+      name: 老虎的骨头
+      secretname: 老虎的骨头7
+      effectstring: 老虎的骨头7
+      atlas: "item/道具"
+      sprite: 392570
+    3090239:
+      name: 老虎的骨头
+      secretname: 老虎的骨头8
+      effectstring: 老虎的骨头8
+      atlas: "item/道具"
+      sprite: 392570
+    3090240:
+      name: 老虎的骨头
+      secretname: 老虎的骨头9
+      effectstring: 老虎的骨头9
+      atlas: "item/道具"
+      sprite: 392570
+    3090241:
+      name: 老虎的骨头
+      secretname: 老虎的骨头10
+      effectstring: 老虎的骨头10
+      atlas: "item/道具"
+      sprite: 392570
+    3090242:
+      name: 有光晕的红石
+      secretname: 有光晕的红石
+      effectstring: 石的成分 11
+      atlas: "item/道具"
+      sprite: 232461
+    3090243:
+      name: 特选神木
+      secretname: 特选神木
+      effectstring: 木的成分 11
+      atlas: "item/道具"
+      sprite: 232462
+    3090244:
+      name: 稀少的龙骨
+      secretname: 稀少的龙骨
+      effectstring: 骨的成分 11
+      atlas: "item/道具"
+      sprite: 232463
+    3090245:
+      name: 光之牙
+      secretname: 光之牙
+      effectstring: 牙的成分 11
+      atlas: "item/道具"
+      sprite: 232464
+    3090246:
+      name: 最好的皮
+      secretname: 最好的皮
+      effectstring: 皮的成分 11
+      atlas: "item/道具"
+      sprite: 232465
+    3090247:
+      name: 最强之爪
+      secretname: 最强之爪
+      effectstring: 爪的成分 11
+      atlas: "item/道具"
+      sprite: 232466
+    3090248:
+      name: 天空的叁连贝
+      secretname: 天空的叁连贝
+      effectstring: 贝壳的成分 11
+      atlas: "item/道具"
+      sprite: 232467
+    3090249:
+      name: 未知的壳
+      secretname: 未知的壳
+      effectstring: 壳的成分 11
+      atlas: "item/道具"
+      sprite: 232468
+    3090250:
+      name: 最坚实的绳
+      secretname: 最坚实的绳
+      effectstring: 线的成分 11
+      atlas: "item/道具"
+      sprite: 232469
+    3090251:
+      name: 不知名的花
+      secretname: 不知名的花
+      effectstring: 花的成分 11
+      atlas: "item/装备.首饰"
+      sprite: 232470
+    3090252:
+      name: 梦幻的黏土
+      secretname: 梦幻的黏土
+      effectstring: 黏土的成分 11
+      atlas: "item/道具"
+      sprite: 232471
+    3090253:
+      name: 圣兽之鳞
+      secretname: 圣兽之鳞
+      effectstring: 鳞的成分 11
+      atlas: "item/道具"
+      sprite: 232472
+    3090254:
+      name: 梦之树的叶
+      secretname: 梦之树的叶
+      effectstring: 叶的成分 11
+      atlas: "item/道具"
+      sprite: 232473
+    3090255:
+      name: 梦幻级的水晶
+      secretname: 梦幻级的水晶
+      effectstring: 水晶的成分 11
+      atlas: "item/道具"
+      sprite: 232474
+    3090256:
+      name: 西基摩的肉
+      secretname: 西基摩的肉
+      effectstring: "暂时增强地属性60%3回合"
+      atlas: "item/道具"
+      sprite: 6934
+    3090257:
+      name: 西基摩的肉
+      secretname: 西基摩的肉
+      effectstring: "暂时增强水属性60%3回合"
+      atlas: "item/道具"
+      sprite: 6934
+    3090258:
+      name: 卡卡摩的肉
+      secretname: 卡卡摩的肉
+      effectstring: "暂时增强火属性60%3回合"
+      atlas: "item/道具"
+      sprite: 6933
+    3090259:
+      name: 卡卡摩的肉
+      secretname: 卡卡摩的肉
+      effectstring: "暂时增强风属性60%3回合"
+      atlas: "item/道具"
+      sprite: 6933
+    3090260:
+      name: 玛蕾菲雅喜欢的花
+      secretname: 玛蕾菲雅喜欢的花
+      effectstring: 玛蕾菲雅所摘下的花
+      atlas: "item/道具.素材"
+      sprite: 6837
+    3090261:
+      name: 布伊比的牙
+      secretname: 布伊比的牙
+      effectstring: 布伊比的牙齿
+      atlas: "item/道具.素材"
+      sprite: 6789
+    3090262:
+      name: "精炼之牙I[测试]"
+      secretname: 精炼之牙I
+      effectstring: 牙的成分 12
+      atlas: "item/道具"
+      sprite: 232464
+    3090263:
+      name: "精炼之牙II[测试]"
+      secretname: 精炼之牙II
+      effectstring: 牙的成分 13
+      atlas: "item/道具"
+      sprite: 232464
+    3090264:
+      name: "精炼之牙III[测试]"
+      secretname: 精炼之牙III
+      effectstring: 牙的成分 14
+      atlas: "item/道具"
+      sprite: 232464
+    3090265:
+      name: "精炼之牙IV[测试]"
+      secretname: 精炼之牙IV
+      effectstring: 牙的成分 15
+      atlas: "item/道具"
+      sprite: 232464
+    3090266:
+      name: "精炼之牙V[测试]"
+      secretname: 精炼之牙V
+      effectstring: 牙的成分 16
+      atlas: "item/道具"
+      sprite: 232464
+    3090267:
+      name: "精炼之牙VI[测试]"
+      secretname: 精炼之牙VI
+      effectstring: 牙的成分 17
+      atlas: "item/道具"
+      sprite: 232464
+    3090268:
+      name: 元素之羽1
+      secretname: 元素之羽1
+      effectstring: 拥有微量元素的羽毛
+      atlas: "item/道具"
+      sprite: 242294
+    3090269:
+      name: 元素之羽2
+      secretname: 元素之羽2
+      effectstring: 拥有些微元素的羽毛
+      atlas: "item/道具"
+      sprite: 242294
+    3090270:
+      name: 元素之羽3
+      secretname: 元素之羽3
+      effectstring: 拥有少量元素的羽毛
+      atlas: "item/道具"
+      sprite: 242294
+    3090271:
+      name: 元素之羽4
+      secretname: 元素之羽4
+      effectstring: 拥有一定成分元素的羽毛
+      atlas: "item/道具"
+      sprite: 242294
+    3090272:
+      name: 元素之羽5
+      secretname: 元素之羽5
+      effectstring: 拥有丰沛元素的羽毛
+      atlas: "item/道具"
+      sprite: 242294
+    3090273:
+      name: 黯之根1
+      secretname: 黯之根1
+      effectstring: 罕见植物的根含有微量坚韧的丝
+      atlas: "item/道具"
+      sprite: 6566
+    3090274:
+      name: 黯之根2
+      secretname: 黯之根2
+      effectstring: 罕见植物的根含有些微坚韧的丝
+      atlas: "item/道具"
+      sprite: 6566
+    3090275:
+      name: 黯之根3
+      secretname: 黯之根3
+      effectstring: 罕见植物的根含有少量坚韧的丝
+      atlas: "item/道具"
+      sprite: 6566
+    3090276:
+      name: 黯之根4
+      secretname: 黯之根4
+      effectstring: 罕见植物的根含有一定份量坚韧的丝
+      atlas: "item/道具"
+      sprite: 6566
+    3090277:
+      name: 黯之根5
+      secretname: 黯之根5
+      effectstring: 罕见植物的根含有丰沛坚韧的丝
+      atlas: "item/道具"
+      sprite: 6566
+    3090278:
+      name: 地骨1
+      secretname: 地骨1
+      effectstring: 带有微量特殊矿质的恐龙骨
+      atlas: "item/道具.素材"
+      sprite: 6791
+    3090279:
+      name: 地骨2
+      secretname: 地骨2
+      effectstring: 带有些微特殊矿质的恐龙骨
+      atlas: "item/道具.素材"
+      sprite: 6791
+    3090280:
+      name: 地骨3
+      secretname: 地骨3
+      effectstring: 带有些少量殊矿质的恐龙骨
+      atlas: "item/道具.素材"
+      sprite: 6791
+    3090281:
+      name: 地骨4
+      secretname: 地骨4
+      effectstring: 带有一定份量特殊矿质的恐龙骨
+      atlas: "item/道具.素材"
+      sprite: 6791
+    3090282:
+      name: 地骨5
+      secretname: 地骨5
+      effectstring: 带有丰沛特殊矿质的恐龙骨
+      atlas: "item/道具.素材"
+      sprite: 6791
+    3090283:
+      name: 炼金粉末
+      secretname: 炼金粉末
+      effectstring: 炼金粉末
+      atlas: "item/道具"
+      sprite: 6825
+    3090284:
+      name: 欧拓首饰
+      secretname: 欧拓首饰
+      effectstring: 具有可以隔绝水的特异功能
+      atlas: "item/道具"
+      sprite: 370734
+    3090285:
+      name: 蒙那工具包1
+      secretname: 蒙那工具包1
+      effectstring: 可以用来强化珊瑚装备的工具包1
+      atlas: "item/道具"
+      sprite: 243578
+    3090286:
+      name: 磷暄草
+      secretname: 磷暄草
+      effectstring: 回复的成分 11
+      atlas: "item/道具"
+      sprite: 370691
+    3090287:
+      name: 拾酱草
+      secretname: 拾酱草
+      effectstring: 复活的成分 11
+      atlas: "item/道具"
+      sprite: 370690
+    3090288:
+      name: 月之砂
+      secretname: 月之砂
+      effectstring: 地的成分 11
+      atlas: "item/道具"
+      sprite: 370583
+    3090289:
+      name: 圣洁之水
+      secretname: 圣洁之水
+      effectstring: 水的成分 11
+      atlas: "item/道具"
+      sprite: 370487
+    3090290:
+      name: 炙烈草
+      secretname: 炙烈草
+      effectstring: 火的成分 11
+      atlas: "item/道具"
+      sprite: 370548
+    3090291:
+      name: 塔斯夫的羽毛
+      secretname: 塔斯夫的羽毛
+      effectstring: 风的成分 11
+      atlas: "item/道具"
+      sprite: 6854
+    3090292:
+      name: 麒麟角
+      secretname: 麒麟角
+      effectstring: 麒麟角
+      atlas: "item/道具"
+      sprite: 392569
+    3090296:
+      name: 雷尔公仔
+      secretname: 雷尔公仔
+      effectstring: 雷尔公仔
+      atlas: "item/道具"
+      sprite: 392580
+    3090300:
+      name: 海盗公仔
+      secretname: 海盗公仔
+      effectstring: 海盗公仔
+      atlas: "item/道具"
+      sprite: 389116
+    3090304:
+      name: 奶牛公仔
+      secretname: 奶牛公仔
+      effectstring: 奶牛公仔
+      atlas: "item/道具"
+      sprite: 392579
+    3090308:
+      name: 忍者公仔
+      secretname: 忍者公仔
+      effectstring: 忍者公仔
+      atlas: "item/道具"
+      sprite: 392578
+    3090313:
+      name: 祝福之石
+      secretname: 祝福之石
+      effectstring: 可升级任何可升级的装备
+      atlas: "item/道具"
+      sprite: 370539

@@ -88,6 +88,15 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	case pb.MsgID_ShopPurchaseReq_CMD:
 		p.onShopPurchaseReq(gateway, pkt)
 		return
+	case pb.MsgID_ItemSynthesisReq_CMD:
+		p.onItemSynthesisReq(gateway, pkt)
+		return
+	case pb.MsgID_EquipmentSkillAttachReq_CMD:
+		p.onEquipmentSkillAttachReq(gateway, pkt)
+		return
+	case pb.MsgID_EquipmentElementAttachReq_CMD:
+		p.onEquipmentElementAttachReq(gateway, pkt)
+		return
 	case pb.MsgID_GMCommandReq_CMD:
 		p.onGMCommandReq(gateway, pkt)
 		return
@@ -172,6 +181,16 @@ func characterBaseRecord(record *pb.CharacterRecord) *pb.CharacterBaseRecord {
 	return proto.Clone(record.GetBase()).(*pb.CharacterBaseRecord)
 }
 
+// sendCharacterNotify 是角色数据变化通知的唯一出口: 所有域变化统一走
+// CharacterNotify(0x001011) 的 oneof 分支下发, 一次操作多域同变时按域连发多条.
+// 调用方必须构造非空 Change 且设置有效 character_uuid.
+func (p *Account) sendCharacterNotify(gateway *Gateway, notify *pb.CharacterNotify) {
+	if gateway == nil || notify == nil || notify.GetCharacterUuid() == 0 || notify.GetChange() == nil {
+		return
+	}
+	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterNotify_CMD), xerror.Success.Code(), notify)
+}
+
 func (p *Account) sendCharacterBaseChangedNotify(gateway *Gateway, record *pb.CharacterRecord) {
 	base := characterBaseRecord(record)
 	if base == nil {
@@ -182,29 +201,59 @@ func (p *Account) sendCharacterBaseChangedNotify(gateway *Gateway, record *pb.Ch
 		xlog.GLog.Errorf("calculate changed character effective attribute failed aid:%d character:%d err:%v", p.aid, base.GetUuid(), err)
 		return
 	}
-	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterBaseChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterBaseChangedNotify{
-		CharacterBaseRecord: base,
-		EffectiveAttribute:  effective,
+	p.sendCharacterNotify(gateway, &pb.CharacterNotify{
+		CharacterUuid: base.GetUuid(),
+		Change: &pb.CharacterNotify_BaseChanged{
+			BaseChanged: &pb.CharacterBaseChanged{
+				CharacterBaseRecord: base,
+				EffectiveAttribute:  effective,
+			},
+		},
 	})
 	if character := p.characterManager.find(base.GetUuid()); character != nil {
 		p.refreshCharacterPresence(character)
 	}
 }
 
+// sendCharacterPetChangedNotify 下发新增或变化宠物的完整记录(按 uuid 合并).
 func (p *Account) sendCharacterPetChangedNotify(gateway *Gateway, characterUUID uint64, petRecordList []*pb.PetRecord) {
-	if characterUUID == 0 || len(petRecordList) == 0 {
-		return
-	}
 	changedPetRecordList := make([]*pb.PetRecord, 0, len(petRecordList))
 	for _, petRecord := range petRecordList {
 		if petRecord != nil {
 			changedPetRecordList = append(changedPetRecordList, proto.Clone(petRecord).(*pb.PetRecord))
 		}
 	}
-	if len(changedPetRecordList) == 0 {
+	if characterUUID == 0 || len(changedPetRecordList) == 0 {
 		return
 	}
-	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterPetChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterPetChangedNotify{CharacterUuid: characterUUID, PetRecordList: changedPetRecordList})
+	p.sendCharacterNotify(gateway, &pb.CharacterNotify{
+		CharacterUuid: characterUUID,
+		Change: &pb.CharacterNotify_PetChanged{
+			PetChanged: &pb.CharacterPetChanged{PetRecordList: changedPetRecordList},
+		},
+	})
+}
+
+// sendCharacterPetRemovedNotify 下发被移出随身列表的宠物 UUID(消耗/离队等).
+func (p *Account) sendCharacterPetRemovedNotify(gateway *Gateway, characterUUID uint64, removedPetUUIDs []uint64) {
+	if characterUUID == 0 || len(removedPetUUIDs) == 0 {
+		return
+	}
+	removedUUIDList := make([]uint64, 0, len(removedPetUUIDs))
+	for _, petUUID := range removedPetUUIDs {
+		if petUUID != 0 {
+			removedUUIDList = append(removedUUIDList, petUUID)
+		}
+	}
+	if len(removedUUIDList) == 0 {
+		return
+	}
+	p.sendCharacterNotify(gateway, &pb.CharacterNotify{
+		CharacterUuid: characterUUID,
+		Change: &pb.CharacterNotify_PetChanged{
+			PetChanged: &pb.CharacterPetChanged{RemovedPetUuidList: removedUUIDList},
+		},
+	})
 }
 
 func (p *Account) sendCharacterItemChangedNotify(gateway *Gateway, characterUUID uint64, itemCountMap map[uint32]uint64) {
@@ -215,7 +264,29 @@ func (p *Account) sendCharacterItemChangedNotify(gateway *Gateway, characterUUID
 	for itemID, count := range itemCountMap {
 		changedItemCountMap[itemID] = count
 	}
-	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterItemChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterItemChangedNotify{CharacterUuid: characterUUID, ItemCountMap: changedItemCountMap})
+	p.sendCharacterNotify(gateway, &pb.CharacterNotify{
+		CharacterUuid: characterUUID,
+		Change: &pb.CharacterNotify_ItemChanged{
+			ItemChanged: &pb.CharacterItemChanged{ItemCountMap: changedItemCountMap},
+		},
+	})
+}
+
+// sendCharacterContainerChangedNotify 下发完整背包容器快照(装备实例增删等结构性变化).
+// usedUUID 仅在本次变化新增了装备实例时传入; 无新增实例传 0.
+func (p *Account) sendCharacterContainerChangedNotify(gateway *Gateway, characterUUID uint64, itemBag *pb.ItemContainerRecord, usedUUID uint64) {
+	if characterUUID == 0 || itemBag == nil {
+		return
+	}
+	p.sendCharacterNotify(gateway, &pb.CharacterNotify{
+		CharacterUuid: characterUUID,
+		Change: &pb.CharacterNotify_ContainerChanged{
+			ContainerChanged: &pb.CharacterContainerChanged{
+				ItemBag:  proto.Clone(itemBag).(*pb.ItemContainerRecord),
+				UsedUuid: usedUUID,
+			},
+		},
+	})
 }
 
 func (p *Account) sendCharacterTaskChangedNotify(gateway *Gateway, characterUUID uint64, taskRecordMap map[uint32]*pb.CharacterTaskRecord) {
@@ -237,41 +308,102 @@ func (p *Account) sendCharacterTaskChangedNotify(gateway *Gateway, characterUUID
 	})
 }
 
-func (p *Account) sendCharacterTaskInventoryChangedNotify(gateway *Gateway, plan *characterTaskMutationPlan) {
-	if plan == nil || !plan.inventoryChanged || plan.next == nil {
-		return
-	}
-	petRecordList := make([]*pb.PetRecord, 0, len(plan.next.GetPetRecordList()))
-	for _, petRecord := range plan.next.GetPetRecordList() {
-		if petRecord != nil {
-			petRecordList = append(petRecordList, proto.Clone(petRecord).(*pb.PetRecord))
-		}
-	}
-	itemBag := &pb.ItemContainerRecord{}
-	if plan.next.GetItemBag() != nil {
-		itemBag = proto.Clone(plan.next.GetItemBag()).(*pb.ItemContainerRecord)
-	}
-	assetCountMap := make(map[uint32]uint64, len(plan.next.GetAssetCountMap()))
-	for itemID, count := range plan.next.GetAssetCountMap() {
-		assetCountMap[itemID] = count
-	}
-	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterTaskInventoryChangedNotify_CMD), xerror.Success.Code(), &pb.CharacterTaskInventoryChangedNotify{
-		CharacterUuid: plan.characterUUID,
-		ItemBag:       itemBag,
-		PetRecordList: petRecordList,
-		UsedUuid:      plan.nextUsedUUID,
-		AssetCountMap: assetCountMap,
-	})
-}
-
 func (p *Account) sendCharacterSystemMailNotify(gateway *Gateway, characterUUID uint64, mailRecord *pb.MailRecord) {
 	if characterUUID == 0 || mailRecord == nil {
 		return
 	}
-	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterSystemMailNotify_CMD), xerror.Success.Code(), &pb.CharacterSystemMailNotify{
+	p.sendCharacterNotify(gateway, &pb.CharacterNotify{
 		CharacterUuid: characterUUID,
-		MailRecord:    proto.Clone(mailRecord).(*pb.MailRecord),
+		Change: &pb.CharacterNotify_SystemMailChanged{
+			SystemMailChanged: &pb.CharacterSystemMailChanged{
+				MailRecord: proto.Clone(mailRecord).(*pb.MailRecord),
+			},
+		},
 	})
+}
+
+// sendCharacterTaskSettlementNotify 拆分原任务库存全量通知: 任务提交/领奖可能同时
+// 改变背包容器、货币资产和随身宠物, 按域连发多条同 CMD 的 CharacterNotify,
+// 客户端按到达顺序逐条应用后即与权威一致. 仅发送实际变化的域.
+func (p *Account) sendCharacterTaskSettlementNotify(gateway *Gateway, plan *characterTaskMutationPlan) {
+	if plan == nil || !plan.inventoryChanged || plan.previous == nil || plan.next == nil {
+		return
+	}
+	// 1. 背包容器: item_bag 结构变化(含装备实例增减)或账号 UUID 游标推进时发完整快照.
+	usedUUID := uint64(0)
+	if plan.nextUsedUUID > plan.previousUsedUUID {
+		usedUUID = plan.nextUsedUUID
+	}
+	if !proto.Equal(plan.previous.GetItemBag(), plan.next.GetItemBag()) || usedUUID != 0 {
+		p.sendCharacterContainerChangedNotify(gateway, plan.characterUUID, plan.next.GetItemBag(), usedUUID)
+	}
+	// 2. 货币资产: 只发变化项的最终数量, 0 表示耗尽.
+	if changedAsset := diffAssetCountMap(plan.previous.GetAssetCountMap(), plan.next.GetAssetCountMap()); len(changedAsset) > 0 {
+		p.sendCharacterItemChangedNotify(gateway, plan.characterUUID, changedAsset)
+	}
+	// 3. 随身宠物: 新增/变化记录与移除 UUID 分开发送(同一分支两个字段独立应用).
+	changedPets, removedPetUUIDs := diffPetRecordList(plan.previous.GetPetRecordList(), plan.next.GetPetRecordList())
+	if len(changedPets) > 0 {
+		p.sendCharacterPetChangedNotify(gateway, plan.characterUUID, changedPets)
+	}
+	if len(removedPetUUIDs) > 0 {
+		p.sendCharacterPetRemovedNotify(gateway, plan.characterUUID, removedPetUUIDs)
+	}
+}
+
+// diffAssetCountMap 返回 previous 与 next 间值有差异的资产项最终数量, 0 表示耗尽/移除.
+func diffAssetCountMap(previous, next map[uint32]uint64) map[uint32]uint64 {
+	changed := make(map[uint32]uint64)
+	for assetID, nextCount := range next {
+		if previous[assetID] != nextCount {
+			changed[assetID] = nextCount
+		}
+	}
+	for assetID := range previous {
+		if _, exists := next[assetID]; !exists {
+			changed[assetID] = 0
+		}
+	}
+	return changed
+}
+
+// diffPetRecordList 返回宠物列表从 previous 到 next 的变化:
+// 新增或内容变化的完整记录列表, 以及被移出列表的 UUID.
+func diffPetRecordList(previous, next []*pb.PetRecord) ([]*pb.PetRecord, []uint64) {
+	nextByUUID := make(map[uint64]*pb.PetRecord, len(next))
+	for _, petRecord := range next {
+		if petRecord != nil {
+			nextByUUID[petRecord.GetUuid()] = petRecord
+		}
+	}
+	changed := make([]*pb.PetRecord, 0)
+	for _, petRecord := range next {
+		if petRecord == nil {
+			continue
+		}
+		previousRecord := findPetRecordByUUID(previous, petRecord.GetUuid())
+		if previousRecord == nil || !proto.Equal(previousRecord, petRecord) {
+			changed = append(changed, proto.Clone(petRecord).(*pb.PetRecord))
+		}
+	}
+	removed := make([]uint64, 0)
+	for _, petRecord := range previous {
+		if petRecord != nil {
+			if _, exists := nextByUUID[petRecord.GetUuid()]; !exists {
+				removed = append(removed, petRecord.GetUuid())
+			}
+		}
+	}
+	return changed, removed
+}
+
+func findPetRecordByUUID(petRecordList []*pb.PetRecord, petUUID uint64) *pb.PetRecord {
+	for _, petRecord := range petRecordList {
+		if petRecord != nil && petRecord.GetUuid() == petUUID {
+			return petRecord
+		}
+	}
+	return nil
 }
 
 func (p *Account) onAccountRobotPingReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
@@ -297,16 +429,10 @@ func newCharacterRecord(characterUUID uint64, resolvedCharacterNick string, req 
 			Uuid:              characterUUID,
 			Nick:              resolvedCharacterNick,
 			AssetId:           uint64(req.GetCharacterId()),
-			Earth:             req.GetCharacterElemental().GetEarth(),
-			Water:             req.GetCharacterElemental().GetWater(),
-			Fire:              req.GetCharacterElemental().GetFire(),
-			Wind:              req.GetCharacterElemental().GetWind(),
+			Elemental:         req.GetCharacterElemental(),
 			DuelPoint:         characterInitialDuelPoint,
 			Charm:             characterInitialCharm,
-			Vitality:          req.GetCharacterAttribute().GetVitality(),
-			Strength:          req.GetCharacterAttribute().GetStrength(),
-			Toughness:         req.GetCharacterAttribute().GetToughness(),
-			Dexterity:         req.GetCharacterAttribute().GetDexterity(),
+			Attribute:         req.GetCharacterAttribute(),
 			CreateTimestampMs: createTimestampMs,
 			LuckState:         &pb.CharacterLuckState{},
 		},

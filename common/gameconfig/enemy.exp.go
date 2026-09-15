@@ -41,9 +41,9 @@ func (p *EnemyExpConfig) load(dir string) error {
 func (p *EnemyExpConfig) configure() error {
 	var err error
 	p.Foreach(func(level uint32, value uint32) bool {
-		if level < uint32(pb.LevelRange_LevelRange_Min) || uint32(pb.LevelRange_LevelRange_Max) < level {
+		if level < uint32(pb.Constants_Constants_Level_Min) || uint32(pb.Constants_Constants_Level_Max) < level {
 			err = errors.Errorf("敌人基础经验等级超出范围: level:%d expected:[%d,%d] %v",
-				level, pb.LevelRange_LevelRange_Min, pb.LevelRange_LevelRange_Max, xruntime.Location())
+				level, pb.Constants_Constants_Level_Min, pb.Constants_Constants_Level_Max, xruntime.Location())
 			return false
 		}
 		return true
@@ -51,9 +51,9 @@ func (p *EnemyExpConfig) configure() error {
 	if err != nil {
 		return err
 	}
-	for lv := uint32(pb.LevelRange_LevelRange_Min); lv <= uint32(pb.LevelRange_LevelRange_Max); lv++ {
+	for lv := uint32(pb.Constants_Constants_Level_Min); lv <= uint32(pb.Constants_Constants_Level_Max); lv++ {
 		if !p.IsExist(lv) {
-			return errors.Errorf("敌人基础经验等级配置不连续: level:%d expected:[%d,%d] %v", lv, pb.LevelRange_LevelRange_Min, lv, xruntime.Location())
+			return errors.Errorf("敌人基础经验等级配置不连续: level:%d expected:[%d,%d] %v", lv, pb.Constants_Constants_Level_Min, lv, xruntime.Location())
 		}
 	}
 	return nil

@@ -21,16 +21,17 @@ var (
 	errShopPurchaseRecordInvalid      = errors.New("shop purchase record is invalid")
 )
 
+// shopPurchaseMaxQuantity 单次购买份数上限(协议范围 1-30).
 const shopPurchaseMaxQuantity = uint32(pb.CharacterLimit_CharacterLimit_MaxItemBagCount)
 
 // shopPurchasePlan 保存一次购买的完整候选账号快照. cache 成功前不修改在线权威档案.
 type shopPurchasePlan struct {
 	characterUUID       uint64
 	itemID              uint32
+	itemCount           uint32
 	quantity            uint32
-	unitCost            uint64
-	totalCost           uint64
-	affectedItem        *pb.ItemElement
+	costResultList      []*pb.ItemCostResult
+	itemRemainingCount  uint64
 	previousUsedUUID    uint64
 	nextUsedUUID        uint64
 	equipmentRecordList []*pb.EquipmentRecord
@@ -42,7 +43,7 @@ type shopPurchasePlan struct {
 
 func (p *Account) onShopPurchaseReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	var req pb.ShopPurchaseReq
-	if err := proto.Unmarshal(pkt.GetBody(), &req); err != nil || req.GetCharacterUuid() == 0 {
+	if err := proto.Unmarshal(pkt.GetBody(), &req); err != nil || req.GetCharacterUuid() == 0 || req.GetItemId() == 0 {
 		p.sendClientErr(gateway, uint32(pb.MsgID_ShopPurchaseRes_CMD), xerror.InvalidArgument.Code())
 		return
 	}
@@ -76,33 +77,28 @@ func (p *Account) onShopPurchaseReq(gateway *Gateway, pkt *pb.OnlineClientPacket
 		return unaryCacheSetAccountRecord(p.aid, nextAccountRecord)
 	}); err != nil {
 		xlog.GLog.Errorf(
-			"persist shop purchase failed aid:%d character:%d item:%d quantity:%d unitCost:%d totalCost:%d err:%v",
+			"persist shop purchase failed aid:%d character:%d item:%d quantity:%d costKinds:%d err:%v",
 			p.aid,
 			plan.characterUUID,
 			plan.itemID,
 			plan.quantity,
-			plan.unitCost,
-			plan.totalCost,
+			len(plan.costResultList),
 			err,
 		)
 		p.sendClientErr(gateway, uint32(pb.MsgID_ShopPurchaseRes_CMD), xerror.Internal.Code())
 		return
 	}
 
-	equipmentUUIDStart := plan.equipmentRecordList[0].GetUuid()
-	equipmentUUIDEnd := plan.equipmentRecordList[len(plan.equipmentRecordList)-1].GetUuid()
 	xlog.GLog.Infof(
-		"shop purchase success aid:%d character:%d item:%d quantity:%d unitCost:%d totalCost:%d affectedItem:%d affectedCount:%d equipmentUUIDStart:%d equipmentUUIDEnd:%d",
+		"shop purchase success aid:%d character:%d item:%d itemCount:%d quantity:%d costKinds:%d equipmentCount:%d itemRemainingCount:%d",
 		p.aid,
 		plan.characterUUID,
 		plan.itemID,
+		plan.itemCount,
 		plan.quantity,
-		plan.unitCost,
-		plan.totalCost,
-		plan.affectedItem.GetAssetId(),
-		plan.affectedItem.GetCount(),
-		equipmentUUIDStart,
-		equipmentUUIDEnd,
+		len(plan.costResultList),
+		len(plan.equipmentRecordList),
+		plan.itemRemainingCount,
 	)
 
 	responseEquipmentRecordList := make([]*pb.EquipmentRecord, 0, len(plan.equipmentRecordList))
@@ -112,11 +108,12 @@ func (p *Account) onShopPurchaseReq(gateway *Gateway, pkt *pb.OnlineClientPacket
 	p.sendClientRes(gateway, uint32(pb.MsgID_ShopPurchaseRes_CMD), xerror.Success.Code(), &pb.ShopPurchaseRes{
 		CharacterUuid:       plan.characterUUID,
 		ItemId:              plan.itemID,
+		ItemCount:           plan.itemCount,
 		Quantity:            plan.quantity,
-		TotalCost:           plan.totalCost,
-		AffectedItem:        proto.Clone(plan.affectedItem).(*pb.ItemElement),
 		UsedUuid:            plan.nextUsedUUID,
+		CostResultList:      cloneItemCostResults(plan.costResultList),
 		EquipmentRecordList: responseEquipmentRecordList,
+		ItemRemainingCount:  plan.itemRemainingCount,
 	})
 }
 
@@ -131,7 +128,15 @@ func validateShopPurchaseCharacterState(character *character) error {
 	return nil
 }
 
-// prepareShopPurchasePlan 在独立账号副本中完成扣币、装备 UUID 分配和背包写入.
+// storeEntryInt 安全解引用商店配置数值字段.
+func storeEntryUint32(value *uint32) uint32 {
+	if value == nil {
+		return 0
+	}
+	return *value
+}
+
+// prepareShopPurchasePlan 依据 商店.yaml 在独立账号副本中完成多资源扣除、装备 UUID 分配和背包写入.
 func prepareShopPurchasePlan(
 	accountRecord *pb.AccountRecord,
 	characterRecord *pb.CharacterRecord,
@@ -141,41 +146,40 @@ func prepareShopPurchasePlan(
 	if accountRecord == nil || characterRecord == nil || characterRecord.GetBase().GetUuid() == 0 || itemID == 0 || quantity == 0 || quantity > shopPurchaseMaxQuantity {
 		return nil, errShopPurchaseInvalidArgument
 	}
-	isWeaponID := itemID >= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_Start) && itemID <= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Weapon_End)
-	isAccessoryID := itemID >= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Accessory_Start) && itemID <= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Accessory_End)
-	if !isWeaponID && !isAccessoryID {
-		return nil, fmt.Errorf("%w: item %d is not supported equipment", errShopPurchaseInvalidArgument, itemID)
+	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Store == nil || gameconfig.GGameConfig.Item == nil {
+		return nil, fmt.Errorf("%w: store or item config is not loaded", errShopPurchaseRecordInvalid)
 	}
-	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Item == nil {
-		return nil, fmt.Errorf("%w: item config is not loaded", errShopPurchaseRecordInvalid)
+	storeEntry, exists := gameconfig.GGameConfig.Store.GetItemEntryByID(itemID)
+	if !exists || storeEntry == nil {
+		return nil, fmt.Errorf("%w: store item %d", errShopPurchaseTargetNotFound, itemID)
+	}
+	itemCount := storeEntryUint32(storeEntry.ItemCount)
+	if itemCount == 0 || storeEntry.Costs == nil {
+		return nil, fmt.Errorf("%w: store item %d has incomplete fields", errShopPurchaseRecordInvalid, itemID)
 	}
 	itemEntry := gameconfig.GGameConfig.Item.Get(itemID)
 	if itemEntry == nil {
 		return nil, fmt.Errorf("%w: item %d", errShopPurchaseTargetNotFound, itemID)
 	}
 	if itemEntry.ID == nil || *itemEntry.ID != itemID {
-		return nil, fmt.Errorf("%w: item %d config id mismatch", errShopPurchaseRecordInvalid, itemID)
+		return nil, fmt.Errorf("%w: store item %d item config id mismatch", errShopPurchaseRecordInvalid, itemID)
 	}
-	if _, err := configuredEquipmentEntry(itemID); err != nil {
+	costAmounts, err := prepareStoreCostAmounts(storeEntry, quantity, characterRecord)
+	if err != nil {
+		if errors.Is(err, errStoreCostInsufficient) {
+			return nil, fmt.Errorf("%w: %v", errShopPurchaseFailedPrecondition, err)
+		}
 		return nil, fmt.Errorf("%w: %v", errShopPurchaseRecordInvalid, err)
 	}
-	if itemEntry.Cost == 0 {
-		return nil, fmt.Errorf("%w: item %d is not sellable", errShopPurchaseFailedPrecondition, itemID)
-	}
-	if itemEntry.Cost > math.MaxUint64/uint64(quantity) {
-		return nil, fmt.Errorf("%w: item %d total cost overflows uint64", errShopPurchaseRecordInvalid, itemID)
-	}
-	totalCost := itemEntry.Cost * uint64(quantity)
-	stoneID := uint32(pb.AssetID_AssetID_Stone)
-	stoneCount := newCharacterItemManager(characterRecord).Count(stoneID)
-	if totalCost > stoneCount {
-		return nil, fmt.Errorf("%w: stone %d is less than total cost %d", errShopPurchaseFailedPrecondition, stoneCount, totalCost)
-	}
-	if itemContainerCount(characterRecord.GetItemBag())+int(quantity) > int(pb.CharacterLimit_CharacterLimit_MaxItemBagCount) {
-		return nil, fmt.Errorf("%w: item bag has %d records and needs %d slots", errShopPurchaseResourceExhausted, itemContainerCount(characterRecord.GetItemBag()), quantity)
-	}
-	if accountRecord.GetUsedUuid() > math.MaxUint64-uint64(quantity) {
-		return nil, fmt.Errorf("%w: account uuid cursor %d cannot allocate %d records", errShopPurchaseResourceExhausted, accountRecord.GetUsedUuid(), quantity)
+	totalDelivered := uint64(itemCount) * uint64(quantity)
+	isEquipment := itemID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Start) && itemID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_End)
+	if isEquipment {
+		if uint64(itemContainerCount(characterRecord.GetItemBag()))+totalDelivered > uint64(pb.CharacterLimit_CharacterLimit_MaxItemBagCount) {
+			return nil, fmt.Errorf("%w: item bag has %d records and needs %d slots", errShopPurchaseResourceExhausted, itemContainerCount(characterRecord.GetItemBag()), totalDelivered)
+		}
+		if accountRecord.GetUsedUuid() > math.MaxUint64-totalDelivered {
+			return nil, fmt.Errorf("%w: account uuid cursor %d cannot allocate %d records", errShopPurchaseResourceExhausted, accountRecord.GetUsedUuid(), totalDelivered)
+		}
 	}
 
 	characterSlot := -1
@@ -202,9 +206,13 @@ func prepareShopPurchasePlan(
 	}
 
 	previousUsedUUID := accountRecord.GetUsedUuid()
-	nextUsedUUID := previousUsedUUID + uint64(quantity)
-	equipmentRecordList := make([]*pb.EquipmentRecord, 0, quantity)
-	for offset := uint64(1); offset <= uint64(quantity); offset++ {
+	nextUsedUUID := previousUsedUUID
+	equipmentRecordList := make([]*pb.EquipmentRecord, 0)
+	if isEquipment {
+		nextUsedUUID += totalDelivered
+		equipmentRecordList = make([]*pb.EquipmentRecord, 0, totalDelivered)
+	}
+	for offset := uint64(1); isEquipment && offset <= totalDelivered; offset++ {
 		equipmentUUID := previousUsedUUID + offset
 		if _, exists := nextCharacter.ItemBag.EquipmentRecordMap[equipmentUUID]; exists {
 			return nil, fmt.Errorf("%w: equipment uuid %d already exists in item bag", errShopPurchaseRecordInvalid, equipmentUUID)
@@ -216,19 +224,30 @@ func prepareShopPurchasePlan(
 		nextCharacter.ItemBag.EquipmentRecordMap[equipmentUUID] = equipmentRecord
 		equipmentRecordList = append(equipmentRecordList, equipmentRecord)
 	}
-	if err := newCharacterItemManager(nextCharacter).Consume(stoneID, totalCost); err != nil {
-		return nil, fmt.Errorf("%w: consume stone: %v", errShopPurchaseRecordInvalid, err)
+	costResultList, err := consumeStoreCostAmounts(nextCharacter, costAmounts)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", errShopPurchaseRecordInvalid, err)
+	}
+	var itemRemainingCount uint64
+	if !isEquipment {
+		itemManager := newCharacterItemManager(nextCharacter)
+		if err := itemManager.Add(itemID, totalDelivered); err != nil {
+			if errors.Is(err, errItemUseFailedPrecondition) {
+				return nil, fmt.Errorf("%w: deliver item %d: %v", errShopPurchaseResourceExhausted, itemID, err)
+			}
+			return nil, fmt.Errorf("%w: deliver item %d: %v", errShopPurchaseRecordInvalid, itemID, err)
+		}
+		itemRemainingCount = itemManager.Count(itemID)
 	}
 	nextAccountRecord.UsedUuid = nextUsedUUID
-	affectedItem := &pb.ItemElement{AssetId: stoneID, Count: newCharacterItemManager(nextCharacter).Count(stoneID)}
 
 	return &shopPurchasePlan{
 		characterUUID:       characterRecord.GetBase().GetUuid(),
 		itemID:              itemID,
+		itemCount:           itemCount,
 		quantity:            quantity,
-		unitCost:            itemEntry.Cost,
-		totalCost:           totalCost,
-		affectedItem:        affectedItem,
+		costResultList:      costResultList,
+		itemRemainingCount:  itemRemainingCount,
 		previousUsedUUID:    previousUsedUUID,
 		nextUsedUUID:        nextUsedUUID,
 		equipmentRecordList: equipmentRecordList,

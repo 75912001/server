@@ -223,7 +223,10 @@ func (p *characterTaskManager) ClaimStepReward(taskID uint32, stepID uint32, now
 	if step == nil || stepRecord == nil || stepRecord.GetStepId() != stepID {
 		return nil, nil, fmt.Errorf("%w: task %d step %d config or record mismatch", errTaskRecordInvalid, taskID, stepID)
 	}
-	if stepRecord.GetCompletedAtMs() == 0 || stepRecord.GetRewardClaimedAtMs() != 0 || step.RewardID == nil || *step.RewardID == 0 {
+	isNormalClaim := stepRecord.GetRewardClaimedAtMs() == 0
+	isReissue := stepRecord.GetRewardClaimedAtMs() != 0 && step.RewardReissue != nil &&
+		!characterTaskCompleted(p.record, taskID) && p.itemCount(*step.RewardReissue.WhenItemAbsent) == 0
+	if stepRecord.GetCompletedAtMs() == 0 || step.RewardID == nil || *step.RewardID == 0 || (!isNormalClaim && !isReissue) {
 		return nil, nil, fmt.Errorf("%w: task %d step %d has no claimable reward", errTaskFailedPrecondition, taskID, stepID)
 	}
 	reward := gameconfig.GGameConfig.Reward.Get(*step.RewardID)
@@ -271,7 +274,7 @@ func (p *characterTaskManager) ClaimStepReward(taskID uint32, stepID uint32, now
 			if err != nil {
 				return nil, nil, err
 			}
-			petRecord, err := petlogic.NewRecord(petEntry, petUUID, *rewardPet.Level, pb.PetGrade_PetGrade_Unknow)
+			petRecord, err := petlogic.NewRecord(petEntry, petUUID, *rewardPet.Level, pb.PetGrade_PetGrade_Unspecified)
 			if err != nil {
 				return nil, nil, fmt.Errorf("%w: create reward pet %d: %v", errTaskRecordInvalid, *rewardPet.PetID, err)
 			}
@@ -280,6 +283,7 @@ func (p *characterTaskManager) ClaimStepReward(taskID uint32, stepID uint32, now
 			p.record.PetRecordList = append(p.record.PetRecordList, petRecord)
 		}
 	}
+	// 补领也刷新领奖时间, 让本次库存与任务记录在同一原子变更中持久化.
 	stepRecord.RewardClaimedAtMs = nowMs
 	changed := map[uint32]*pb.CharacterTaskRecord{taskID: taskRecord}
 	if task.Repeatable != nil && *task.Repeatable && characterTaskRewardsClaimed(p.record, taskID) {
@@ -539,8 +543,8 @@ func completeTaskStep(step *gameconfig.TaskStepEntry, stepRecord *pb.CharacterTa
 }
 
 func isTaskEquipmentID(itemID uint32) bool {
-	return itemID >= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_Start) &&
-		itemID <= uint32(pb.AssetIDRange_AssetIDRange_Item_Equipment_End)
+	return itemID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Start) &&
+		itemID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_End)
 }
 
 func (p *characterTaskManager) itemCount(itemID uint32) uint64 {
@@ -861,7 +865,7 @@ func (p *Account) onTaskSubmitReq(gateway *Gateway, pkt *pb.OnlineClientPacket) 
 		p.sendClientErr(gateway, uint32(pb.MsgID_TaskSubmitRes_CMD), xerror.Internal.Code())
 		return
 	}
-	p.sendCharacterTaskInventoryChangedNotify(gateway, plan)
+	p.sendCharacterTaskSettlementNotify(gateway, plan)
 	p.sendCharacterTaskChangedNotify(gateway, plan.characterUUID, plan.changedTaskRecordMap)
 	if plan.inventoryChanged {
 		p.refreshCharacterPresence(character)
@@ -892,7 +896,7 @@ func (p *Account) onTaskStepRewardClaimReq(gateway *Gateway, pkt *pb.OnlineClien
 		p.sendClientErr(gateway, uint32(pb.MsgID_TaskStepRewardClaimRes_CMD), xerror.Internal.Code())
 		return
 	}
-	p.sendCharacterTaskInventoryChangedNotify(gateway, plan)
+	p.sendCharacterTaskSettlementNotify(gateway, plan)
 	p.sendCharacterTaskChangedNotify(gateway, plan.characterUUID, plan.changedTaskRecordMap)
 	if plan.inventoryChanged {
 		p.refreshCharacterPresence(character)

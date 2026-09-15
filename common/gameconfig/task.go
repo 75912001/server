@@ -54,10 +54,17 @@ type TaskStepEntry struct {
 	ConsumeItems         []TaskItemEntry      `yaml:"consumeItems"`
 	ConsumePets          []TaskPetEntry       `yaml:"consumePets"`
 	RewardID             *uint32              `yaml:"rewardId"`
+	RewardReissue        *TaskRewardReissue   `yaml:"rewardReissue"`
+}
+
+// TaskRewardReissue允许已领取的步骤奖励在任务未完成且指定道具为0时补领.
+// 奖励包必须只包含该道具, 避免补领时重复发放其他奖励.
+type TaskRewardReissue struct {
+	WhenItemAbsent *uint32 `yaml:"whenItemAbsent"`
 }
 
 // TaskChallengeEntry只读取服务端开战所需的敌群. 同一challenge下的
-// npcPetIds和battleBgmIndex由客户端读取, 不参与服务端战斗和任务判定.
+// npcs和battleBgmIndex由客户端读取, 不参与服务端战斗和任务判定.
 type TaskChallengeEntry struct {
 	EnemyGroupID *uint32 `yaml:"enemyGroupId"`
 }
@@ -153,6 +160,10 @@ func configureTaskStep(taskID uint32, expectedStepID uint32, step *TaskStepEntry
 	if step.RewardID == nil {
 		return errors.Errorf("任务步骤缺少rewardId: task:%d step:%d %v", taskID, expectedStepID, xruntime.Location())
 	}
+	if step.RewardReissue != nil && (step.RewardReissue.WhenItemAbsent == nil ||
+		!isItemID(*step.RewardReissue.WhenItemAbsent) || *step.RewardID == 0) {
+		return errors.Errorf("任务步骤rewardReissue无效: task:%d step:%d %v", taskID, expectedStepID, xruntime.Location())
+	}
 	if (len(step.ConsumeItems) > 0 || len(step.ConsumePets) > 0) && *step.CompletionMode != TaskCompletionModeSubmit {
 		return errors.Errorf("配置扣除内容的任务步骤必须主动提交: task:%d step:%d %v", taskID, expectedStepID, xruntime.Location())
 	}
@@ -186,7 +197,7 @@ func configureTaskStep(taskID uint32, expectedStepID uint32, step *TaskStepEntry
 	for petIndex := range step.ConsumePets {
 		pet := &step.ConsumePets[petIndex]
 		if pet.PetID == nil || !isPetID(*pet.PetID) || pet.Level == nil ||
-			*pet.Level < uint32(pb.LevelRange_LevelRange_Min) || *pet.Level > uint32(pb.LevelRange_LevelRange_Max) ||
+			*pet.Level < uint32(pb.Constants_Constants_Level_Min) || *pet.Level > uint32(pb.Constants_Constants_Level_Max) ||
 			pet.Quantity == nil || *pet.Quantity == 0 {
 			return errors.Errorf("任务步骤扣除宠物无效: task:%d step:%d index:%d %v", taskID, expectedStepID, petIndex, xruntime.Location())
 		}
@@ -239,6 +250,19 @@ func (p *TaskConfig) check() error {
 				checkErr = errors.Errorf("任务步骤引用了未定义奖励包: task:%d step:%d reward:%d %v", taskID, stepID, *step.RewardID, xruntime.Location())
 				return false
 			}
+			if step.RewardReissue != nil {
+				itemID := *step.RewardReissue.WhenItemAbsent
+				reward := GGameConfig.Reward.Get(*step.RewardID)
+				if GGameConfig.Item == nil || GGameConfig.Item.Get(itemID) == nil {
+					checkErr = errors.Errorf("任务步骤补领引用了未定义道具: task:%d step:%d item:%d %v", taskID, stepID, itemID, xruntime.Location())
+					return false
+				}
+				if reward == nil || len(reward.Items) != 1 || len(reward.Pets) != 0 ||
+					reward.Items[0].ItemID == nil || *reward.Items[0].ItemID != itemID {
+					checkErr = errors.Errorf("可补领奖励包必须只包含指定道具: task:%d step:%d item:%d %v", taskID, stepID, itemID, xruntime.Location())
+					return false
+				}
+			}
 		}
 		return true
 	})
@@ -253,7 +277,7 @@ func (p *TaskConfig) checkConditions(taskID uint32, stepID uint32, field string,
 		}
 		switch *condition.Kind {
 		case TaskConditionKindCharacterLevel:
-			if condition.Level == nil || *condition.Level < uint32(pb.LevelRange_LevelRange_Min) || *condition.Level > uint32(pb.LevelRange_LevelRange_Max) {
+			if condition.Level == nil || *condition.Level < uint32(pb.Constants_Constants_Level_Min) || *condition.Level > uint32(pb.Constants_Constants_Level_Max) {
 				return errors.Errorf("任务角色等级条件无效: task:%d step:%d field:%s index:%d %v", taskID, stepID, field, index, xruntime.Location())
 			}
 		case TaskConditionKindItemPossession:
@@ -262,7 +286,7 @@ func (p *TaskConfig) checkConditions(taskID uint32, stepID uint32, field string,
 			}
 		case TaskConditionKindPetPossession:
 			if condition.PetID == nil || condition.Level == nil || condition.Quantity == nil || *condition.Quantity == 0 ||
-				*condition.Level < uint32(pb.LevelRange_LevelRange_Min) || *condition.Level > uint32(pb.LevelRange_LevelRange_Max) ||
+				*condition.Level < uint32(pb.Constants_Constants_Level_Min) || *condition.Level > uint32(pb.Constants_Constants_Level_Max) ||
 				GGameConfig.Pet == nil || GGameConfig.Pet.Get(*condition.PetID) == nil {
 				return errors.Errorf("任务持有宠物条件无效: task:%d step:%d field:%s index:%d %v", taskID, stepID, field, index, xruntime.Location())
 			}

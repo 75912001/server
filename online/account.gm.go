@@ -38,6 +38,7 @@ type gmPetAddPlan struct {
 	petUUID          uint64
 	petID            uint32
 	petGrade         pb.PetGrade
+	petLevel         uint32
 	previousUsedUUID uint64
 	nextUsedUUID     uint64
 	previous         *pb.CharacterRecord
@@ -74,9 +75,11 @@ func prepareGMPetAddPlan(accountRecord *pb.AccountRecord, record *pb.CharacterRe
 	}
 	petID := command.GetPetId()
 	petGrade := command.GetPetGrade()
-	if !assetIDInRange(uint64(petID), pb.AssetIDRange_AssetIDRange_Pet_Start, pb.AssetIDRange_AssetIDRange_Pet_End) ||
-		petGrade <= pb.PetGrade_PetGrade_Unknow || petGrade >= pb.PetGrade_PetGrade_Max {
-		return nil, fmt.Errorf("%w: pet id %d or grade %s is invalid", errGMPetAddInvalidArgument, petID, petGrade)
+	petLevel := command.GetLevel()
+	if !assetIDInRange(uint64(petID), pb.AssetID_AssetIDRange_Pet_Start, pb.AssetID_AssetIDRange_Pet_End) ||
+		petGrade <= pb.PetGrade_PetGrade_Unspecified || petGrade >= pb.PetGrade_PetGrade_Max ||
+		petLevel < uint32(pb.Constants_Constants_Level_Min) || petLevel > uint32(pb.Constants_Constants_Level_Max) {
+		return nil, fmt.Errorf("%w: pet id %d, grade %s or level %d is invalid", errGMPetAddInvalidArgument, petID, petGrade, petLevel)
 	}
 	if len(record.GetPetRecordList()) >= int(pb.PetRecordLimit_PetRecordLimit_MaxCarryCount) {
 		return nil, fmt.Errorf("%w: carried pet count %d", errGMPetAddResourceExhausted, len(record.GetPetRecordList()))
@@ -94,7 +97,7 @@ func prepareGMPetAddPlan(accountRecord *pb.AccountRecord, record *pb.CharacterRe
 
 	next := proto.Clone(record).(*pb.CharacterRecord)
 	petUUID := accountRecord.GetUsedUuid() + 1
-	petRecord, err := commonpet.NewRecord(petEntry, petUUID, 1, petGrade)
+	petRecord, err := commonpet.NewRecord(petEntry, petUUID, petLevel, petGrade)
 	if err != nil {
 		return nil, fmt.Errorf("%w: create pet %d: %v", errGMPetAddFailedPrecondition, petID, err)
 	}
@@ -105,6 +108,7 @@ func prepareGMPetAddPlan(accountRecord *pb.AccountRecord, record *pb.CharacterRe
 		petUUID:          petUUID,
 		petID:            petID,
 		petGrade:         petGrade,
+		petLevel:         petLevel,
 		previousUsedUUID: accountRecord.GetUsedUuid(),
 		nextUsedUUID:     petUUID,
 		previous:         record,
@@ -251,18 +255,18 @@ func (p *Account) onGMCommandReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	case *pb.GMCommandReq_PetAdd:
 		plan, err := prepareGMPetAddPlan(p.accountRecord, character.record, command.PetAdd)
 		if err != nil {
-			xlog.GLog.Warnf("prepare gm pet add failed aid:%d character:%d pet:%d grade:%s err:%v", p.aid, req.GetCharacterUuid(), command.PetAdd.GetPetId(), command.PetAdd.GetPetGrade(), err)
+			xlog.GLog.Warnf("prepare gm pet add failed aid:%d character:%d pet:%d grade:%s level:%d err:%v", p.aid, req.GetCharacterUuid(), command.PetAdd.GetPetId(), command.PetAdd.GetPetGrade(), command.PetAdd.GetLevel(), err)
 			p.sendClientErr(gateway, uint32(pb.MsgID_GMCommandRes_CMD), gmCommandResultID(err))
 			return
 		}
 		if err := persistGMPetAddPlan(plan, p.accountRecord, character, func() error {
 			return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
 		}); err != nil {
-			xlog.GLog.Errorf("persist gm pet add failed aid:%d character:%d pet:%d grade:%s uuid:%d err:%v", p.aid, plan.characterUUID, plan.petID, plan.petGrade, plan.petUUID, err)
+			xlog.GLog.Errorf("persist gm pet add failed aid:%d character:%d pet:%d grade:%s level:%d uuid:%d err:%v", p.aid, plan.characterUUID, plan.petID, plan.petGrade, plan.petLevel, plan.petUUID, err)
 			p.sendClientErr(gateway, uint32(pb.MsgID_GMCommandRes_CMD), xerror.Internal.Code())
 			return
 		}
-		xlog.GLog.Infof("gm command success aid:%d account:%s character:%d clientIP:%s command:pet_add pet:%d grade:%s uuid:%d", p.aid, p.account, plan.characterUUID, p.clientIP, plan.petID, plan.petGrade, plan.petUUID)
+		xlog.GLog.Infof("gm command success aid:%d account:%s character:%d clientIP:%s command:pet_add pet:%d grade:%s level:%d uuid:%d", p.aid, p.account, plan.characterUUID, p.clientIP, plan.petID, plan.petGrade, plan.petLevel, plan.petUUID)
 		p.sendCharacterPetChangedNotify(gateway, plan.characterUUID, []*pb.PetRecord{plan.petRecord})
 		p.sendClientRes(gateway, uint32(pb.MsgID_GMCommandRes_CMD), xerror.Success.Code(), &pb.GMCommandRes{
 			CharacterUuid: plan.characterUUID,

@@ -25,8 +25,7 @@ type petSkillSetPlan struct {
 	petUUID           uint64
 	slotIndex         uint32
 	skillID           uint32
-	cost              uint64
-	affectedItem      *pb.ItemElement
+	costResultList    []*pb.ItemCostResult
 	petRecord         *pb.PetRecord
 	characterSlot     int
 	previousCharacter *pb.CharacterRecord
@@ -72,13 +71,13 @@ func (p *Account) onPetSkillSetReq(gateway *Gateway, pkt *pb.OnlineClientPacket)
 		return unaryCacheSetAccountRecord(p.aid, nextAccountRecord)
 	}); err != nil {
 		xlog.GLog.Errorf(
-			"persist pet skill set failed aid:%d character:%d pet:%d slot:%d skill:%d cost:%d err:%v",
+			"persist pet skill set failed aid:%d character:%d pet:%d slot:%d skill:%d costKinds:%d err:%v",
 			p.aid,
 			plan.characterUUID,
 			plan.petUUID,
 			plan.slotIndex,
 			plan.skillID,
-			plan.cost,
+			len(plan.costResultList),
 			err,
 		)
 		p.sendClientErr(gateway, uint32(pb.MsgID_PetSkillSetRes_CMD), xerror.Internal.Code())
@@ -86,12 +85,11 @@ func (p *Account) onPetSkillSetReq(gateway *Gateway, pkt *pb.OnlineClientPacket)
 	}
 
 	p.sendClientRes(gateway, uint32(pb.MsgID_PetSkillSetRes_CMD), xerror.Success.Code(), &pb.PetSkillSetRes{
-		CharacterUuid: plan.characterUUID,
-		PetUuid:       plan.petUUID,
-		SlotIndex:     plan.slotIndex,
-		SkillId:       plan.skillID,
-		Cost:          plan.cost,
-		AffectedItem:  proto.Clone(plan.affectedItem).(*pb.ItemElement),
+		CharacterUuid:  plan.characterUUID,
+		PetUuid:        plan.petUUID,
+		SlotIndex:      plan.slotIndex,
+		SkillId:        plan.skillID,
+		CostResultList: cloneItemCostResults(plan.costResultList),
 	})
 }
 
@@ -106,7 +104,7 @@ func validatePetSkillSetCharacterState(character *character) error {
 	return nil
 }
 
-// preparePetSkillSetPlan 在账号副本中同时完成技能槽写入和石币扣除. skillID为0时只清空槽位且不退款.
+// preparePetSkillSetPlan 在账号副本中同时完成技能槽写入和多资源扣除. skillID为0时只清空槽位且不退款.
 func preparePetSkillSetPlan(
 	accountRecord *pb.AccountRecord,
 	characterRecord *pb.CharacterRecord,
@@ -118,13 +116,13 @@ func preparePetSkillSetPlan(
 		return nil, errPetSkillSetInvalidArgument
 	}
 
-	cost := uint64(0)
+	var costAmounts []storeCostAmount
 	if skillID != 0 {
-		if !assetIDInRange(uint64(skillID), pb.AssetIDRange_AssetIDRange_Skill_Start, pb.AssetIDRange_AssetIDRange_Skill_End) {
+		if !assetIDInRange(uint64(skillID), pb.AssetID_AssetIDRange_Skill_Start, pb.AssetID_AssetIDRange_Skill_End) {
 			return nil, fmt.Errorf("%w: skill %d is outside skill range", errPetSkillSetInvalidArgument, skillID)
 		}
-		if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Skill == nil {
-			return nil, fmt.Errorf("%w: skill config is not loaded", errPetSkillSetRecordInvalid)
+		if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Skill == nil || gameconfig.GGameConfig.Store == nil {
+			return nil, fmt.Errorf("%w: skill or store config is not loaded", errPetSkillSetRecordInvalid)
 		}
 		skillEntry := gameconfig.GGameConfig.Skill.Get(skillID)
 		if skillEntry == nil {
@@ -133,10 +131,21 @@ func preparePetSkillSetPlan(
 		if skillEntry.ID == nil || *skillEntry.ID != skillID {
 			return nil, fmt.Errorf("%w: skill %d config id mismatch", errPetSkillSetRecordInvalid, skillID)
 		}
-		if skillEntry.Cost == nil {
-			return nil, fmt.Errorf("%w: skill %d is not pet-learnable", errPetSkillSetFailedPrecondition, skillID)
+		if !skillEntry.CanBeUsedBy("pet") {
+			return nil, fmt.Errorf("%w: skill %d is not usable by pets", errPetSkillSetFailedPrecondition, skillID)
 		}
-		cost = *skillEntry.Cost
+		storeEntry, exists := gameconfig.GGameConfig.Store.GetSkillEntryByID(skillID)
+		if !exists || storeEntry == nil {
+			return nil, fmt.Errorf("%w: skill %d is not sold", errPetSkillSetFailedPrecondition, skillID)
+		}
+		var err error
+		costAmounts, err = prepareStoreCostAmounts(storeEntry, 1, characterRecord)
+		if err != nil {
+			if errors.Is(err, errStoreCostInsufficient) {
+				return nil, fmt.Errorf("%w: %v", errPetSkillSetFailedPrecondition, err)
+			}
+			return nil, fmt.Errorf("%w: %v", errPetSkillSetRecordInvalid, err)
+		}
 	}
 
 	characterSlot := -1
@@ -170,30 +179,21 @@ func preparePetSkillSetPlan(
 	if len(characterRecord.GetPetRecordList()[petIndex].GetSkillIdList()) != int(pb.PetSkillLimit_PetSkillLimit_MaxSlotCount) {
 		return nil, fmt.Errorf("%w: pet %d skill slot count %d", errPetSkillSetRecordInvalid, petUUID, len(characterRecord.GetPetRecordList()[petIndex].GetSkillIdList()))
 	}
-
-	stoneID := uint32(pb.AssetID_AssetID_Stone)
-	if newCharacterItemManager(characterRecord).Count(stoneID) < cost {
-		return nil, fmt.Errorf("%w: stone is less than skill cost %d", errPetSkillSetFailedPrecondition, cost)
-	}
-
 	nextAccountRecord := proto.Clone(accountRecord).(*pb.AccountRecord)
 	nextCharacter := nextAccountRecord.GetCharacterRecordList()[characterSlot]
 	nextPetRecord := nextCharacter.GetPetRecordList()[petIndex]
-	if cost != 0 {
-		if err := newCharacterItemManager(nextCharacter).Consume(stoneID, cost); err != nil {
-			return nil, fmt.Errorf("%w: consume stone: %v", errPetSkillSetRecordInvalid, err)
-		}
+	costResultList, err := consumeStoreCostAmounts(nextCharacter, costAmounts)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", errPetSkillSetRecordInvalid, err)
 	}
 	nextPetRecord.SkillIdList[slotIndex] = skillID
-	affectedItem := &pb.ItemElement{AssetId: stoneID, Count: newCharacterItemManager(nextCharacter).Count(stoneID)}
 
 	return &petSkillSetPlan{
 		characterUUID:     characterRecord.GetBase().GetUuid(),
 		petUUID:           petUUID,
 		slotIndex:         slotIndex,
 		skillID:           skillID,
-		cost:              cost,
-		affectedItem:      affectedItem,
+		costResultList:    costResultList,
 		petRecord:         nextPetRecord,
 		characterSlot:     characterSlot,
 		previousCharacter: characterRecord,
@@ -209,7 +209,7 @@ func persistPetSkillSetPlan(
 	character *character,
 	persist func(*pb.AccountRecord) error,
 ) error {
-	if plan == nil || accountRecord == nil || character == nil || persist == nil || plan.nextAccountRecord == nil || plan.nextCharacter == nil || plan.petRecord == nil || plan.affectedItem == nil {
+	if plan == nil || accountRecord == nil || character == nil || persist == nil || plan.nextAccountRecord == nil || plan.nextCharacter == nil || plan.petRecord == nil {
 		return errPetSkillSetInvalidArgument
 	}
 	if plan.characterSlot < 0 || plan.characterSlot >= len(accountRecord.GetCharacterRecordList()) || accountRecord.GetCharacterRecordList()[plan.characterSlot] != plan.previousCharacter || character.record != plan.previousCharacter {

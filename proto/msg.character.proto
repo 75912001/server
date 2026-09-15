@@ -33,12 +33,13 @@ enum CharacterAction {
   CharacterAction_Max = 14;
 }
 
+// ElementalPoints 使用原版百分比单位保存地水火风属性.
 message ElementalPoints
 {
-  uint32 earth = 1; // 地元素点数, 0-10
-  uint32 water = 2; // 水元素点数, 0-10
-  uint32 fire = 3; // 火元素点数, 0-10
-  uint32 wind = 4; // 风元素点数, 0-10
+  uint32 earth = 1; // 地元素百分比, 0-100
+  uint32 water = 2; // 水元素百分比, 0-100
+  uint32 fire = 3; // 火元素百分比, 0-100
+  uint32 wind = 4; // 风元素百分比, 0-100
 }
 
 // CharacterAttributePoints 保存角色四项基础属性点.
@@ -86,7 +87,7 @@ message CharacterLuckState {
 // CharacterEffectiveAttribute 是角色基础属性叠加当前装备后的运行期派生快照, 不写入账号档案.
 message CharacterEffectiveAttribute {
   uint64 character_uuid = 1; // 角色 UUID
-  ElementalPoints elemental = 2; // 面板-元素点数, 各项限制在0-10
+  ElementalPoints elemental = 2; // 面板-元素百分比, 各项限制在0-100
   CharacterWeaponType weapon_type = 3; // 面板武器类型, 未装备时为空手
   uint32 attack = 100; // 面板-攻击力
   int32 defense = 101; // 面板-防御力, 最低为-100
@@ -114,7 +115,7 @@ message CharacterBaseRecord {
   string nick = 2; // 角色昵称
   uint64 asset_id = 3; // 角色资源 ID
   uint64 exp = 4; // 经验值
-  ElementalPoints elemental = 30; // 地水火风元素点数; 此前为平铺 earth/water/fire/wind(5-8), 收缩为嵌套后新用编号 30
+  ElementalPoints elemental = 30; // 地水火风元素百分比; 创建时总和必须为100
   uint32 available_point = 9; // 角色可分配属性点
   CharacterAttributePoints attribute = 31; // 体力腕力耐力速度点数; 此前为平铺 vitality/strength/toughness/dexterity(10-13), 收缩为嵌套后新用编号 31
   int64 last_login_timestamp_ms = 14; // 角色最后登录时间戳, 单位毫秒
@@ -143,7 +144,7 @@ message CharacterCreateReq
   uint32 character_slot_index = 1; // 角色创建槽位索引, 从 0 开始; 该槽位已有有效角色时创建失败
   uint32 character_id = 2; // 角色资源 ID; 0 表示使用默认角色资源, 非 0 时必须是可创建玩家角色
   string character_nick = 3; // 角色昵称; 去除首尾空白后 1-12 个字符, 空字符串表示使用默认昵称
-  ElementalPoints character_elemental = 4; // 角色地水火风元素点数; 必须提交且由 online 校验合法性
+  ElementalPoints character_elemental = 4; // 角色地水火风元素百分比; 必须提交且总和为100
   CharacterAttributePoints character_attribute = 5; // 角色体力腕力耐力速度点数; 必须提交且由 online 校验合法性
 }
 

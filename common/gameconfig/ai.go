@@ -57,7 +57,7 @@ type BattleAIEntry struct {
 }
 
 type BattleAISkillEntry struct {
-	// ID 引用 skill.yaml; 攻击、防御、逃跑和特殊技能使用同一种配置.
+	// ID 引用 技能.yaml; 攻击、防御、逃跑和特殊技能使用同一种配置.
 	ID *uint32 `yaml:"id"`
 	// Weight 是相对选择权重, 必须显式填写且在[1,2147483647]范围内; 不使用的技能不配置.
 	Weight *uint32 `yaml:"weight"`

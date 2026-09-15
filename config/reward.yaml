@@ -1,16 +1,14 @@
+# 本文件由任务工坊从config.raw/task.yaml确定性生成, 不要手工编辑.
 # 任务奖励包-配置
-# 奖励包ID必须为正数且唯一; task.yaml中的rewardId为0时表示该步骤没有奖励.
-# items支持普通道具、角色资产和装备实例; pets支持指定等级、随机品质的宠物实例.
-
 rewards:
   - id: 6101
-    name: 卡坦的证明·火难的戒指
+    name: "[任务]卡坦的证明·火难的戒指"
     items:
-      - itemId: 3630000
+      - itemId: 3630347
         quantity: 1
     pets: []
   - id: 6102
-    name: 卡坦的愿望·修宝
+    name: "[任务]卡坦的愿望·修宝"
     items: []
     pets:
       - petId: 4000293
@@ -18,10 +16,32 @@ rewards:
         grade: random
         quantity: 1
   - id: 6202
-    name: 卡坦的愿望·朵拉比斯
+    name: "[任务]卡坦的愿望·朵拉比斯"
     items: []
     pets:
       - petId: 4000332
         level: 1
         grade: random
         quantity: 1
+  - id: 6301
+    name: "[任务]成人仪式·15个仪的玉"
+    items:
+      - itemId: 3000301
+        quantity: 15
+    pets: []
+  - id: 6302
+    name: "[任务]成人仪式·仪之兜"
+    items:
+      - itemId: 3500545
+        quantity: 1
+    pets: []
+  - id: 6303
+    name: "[任务]金布伊-左迪洛斯&&猜之箱子"
+    items:
+      - itemId: 3000303
+        quantity: 1
+    pets:
+      - petId: 4000338
+        level: 1
+        quantity: 1
+        grade: random

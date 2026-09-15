@@ -41,8 +41,8 @@ func IsValidCharacterNick(characterNick string) bool {
 	return 0 < nameRuneCount && nameRuneCount <= int(pb.Constants_Constants_Character_Name_Max_Length)
 }
 
-// IsValidElementalAllocation 判断元素点分配是否合法。
-// 规则: 总点数为 10, 最多 2 种元素, 双元素按地-水-火-风-地判断相邻。
+// IsValidElementalAllocation 判断基础元素百分比分配是否合法.
+// 规则: 总百分比为100, 最多2种元素, 双元素按地-水-火-风-地判断相邻.
 func IsValidElementalAllocation(points *pb.ElementalPoints) bool {
 	values := [...]uint32{
 		points.GetEarth(),

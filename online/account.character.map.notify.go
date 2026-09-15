@@ -18,21 +18,21 @@ func (p *Account) sendCharacterMapPacket(target sceneCharacterPresence, message 
 
 func newCharacterMapJoinEvent(
 	viewer sceneCharacterPresence,
-	group *pb.CharacterMapGroup,
+	team *pb.CharacterMapTeam,
 ) *pb.CharacterMapEventNotify {
 	return &pb.CharacterMapEventNotify{
 		TargetCharacterUuid: viewer.key.characterUUID,
-		Event:               &pb.CharacterMapEventNotify_MapJoin{MapJoin: group},
+		Event:               &pb.CharacterMapEventNotify_MapJoin{MapJoin: team},
 	}
 }
 
 func newCharacterMapTeamJoinEvent(
 	viewer sceneCharacterPresence,
-	group *pb.CharacterMapGroup,
+	team *pb.CharacterMapTeam,
 ) *pb.CharacterMapEventNotify {
 	return &pb.CharacterMapEventNotify{
 		TargetCharacterUuid: viewer.key.characterUUID,
-		Event:               &pb.CharacterMapEventNotify_TeamJoin{TeamJoin: group},
+		Event:               &pb.CharacterMapEventNotify_TeamJoin{TeamJoin: team},
 	}
 }
 
@@ -85,9 +85,6 @@ func (p *Account) refreshCharacterMapPresence(presence sceneCharacterPresence) b
 	}
 	info := mapCharacterInfo(presence)
 	for _, viewer := range viewers {
-		if GCharacterTeamMgr.sameTeam(presence.key, viewer.key) {
-			continue
-		}
 		p.sendCharacterMapPacket(viewer, &pb.CharacterMapEventNotify{
 			TargetCharacterUuid: viewer.key.characterUUID,
 			Event:               &pb.CharacterMapEventNotify_CharacterUpdate{CharacterUpdate: info},
@@ -116,13 +113,13 @@ func characterMapVisibleInfoChanged(previous sceneCharacterPresence, current sce
 	return previousErr != nil || currentErr != nil || previousLevel != currentLevel
 }
 
-func characterMapGroups(presences []sceneCharacterPresence) []*pb.CharacterMapGroup {
+func characterMapTeams(presences []sceneCharacterPresence) []*pb.CharacterMapTeam {
 	byKey := make(map[sceneCharacterKey]sceneCharacterPresence, len(presences))
 	for _, presence := range presences {
 		byKey[presence.key] = presence
 	}
 	seen := make(map[sceneCharacterKey]struct{}, len(presences))
-	groups := make([]*pb.CharacterMapGroup, 0, len(presences))
+	teams := make([]*pb.CharacterMapTeam, 0, len(presences))
 	for _, presence := range presences {
 		if _, exists := seen[presence.key]; exists {
 			continue
@@ -130,31 +127,31 @@ func characterMapGroups(presences []sceneCharacterPresence) []*pb.CharacterMapGr
 		members := GCharacterTeamMgr.orderedMembers(presence.key)
 		if len(members) == 0 {
 			seen[presence.key] = struct{}{}
-			groups = append(groups, characterMapGroup([]sceneCharacterPresence{presence}))
+			teams = append(teams, characterMapTeam([]sceneCharacterPresence{presence}))
 			continue
 		}
-		groupPresences := make([]sceneCharacterPresence, 0, len(members))
+		teamPresences := make([]sceneCharacterPresence, 0, len(members))
 		for _, member := range members {
 			item, exists := byKey[member.key]
 			if !exists {
 				continue
 			}
 			seen[member.key] = struct{}{}
-			groupPresences = append(groupPresences, item)
+			teamPresences = append(teamPresences, item)
 		}
-		if len(groupPresences) > 0 {
-			groups = append(groups, characterMapGroup(groupPresences))
+		if len(teamPresences) > 0 {
+			teams = append(teams, characterMapTeam(teamPresences))
 		}
 	}
-	return groups
+	return teams
 }
 
-func characterMapGroup(presences []sceneCharacterPresence) *pb.CharacterMapGroup {
-	group := &pb.CharacterMapGroup{CharacterList: make([]*pb.MapCharacterInfo, 0, len(presences))}
+func characterMapTeam(presences []sceneCharacterPresence) *pb.CharacterMapTeam {
+	team := &pb.CharacterMapTeam{CharacterList: make([]*pb.MapCharacterInfo, 0, len(presences))}
 	for _, presence := range presences {
-		group.CharacterList = append(group.CharacterList, mapCharacterInfo(presence))
+		team.CharacterList = append(team.CharacterList, mapCharacterInfo(presence))
 	}
-	return group
+	return team
 }
 
 func mapCharacterInfo(presence sceneCharacterPresence) *pb.MapCharacterInfo {

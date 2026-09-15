@@ -3,18 +3,18 @@ package main
 import pb "server/proto/pb"
 
 func isCharacterTestMapID(mapID uint32) bool {
-	return mapID >= uint32(pb.AssetIDRange_AssetIDRange_Map_Test_Start) &&
-		mapID <= uint32(pb.AssetIDRange_AssetIDRange_Map_Test_End)
+	return mapID >= uint32(pb.AssetID_AssetIDRange_Map_Test_Start) &&
+		mapID <= uint32(pb.AssetID_AssetIDRange_Map_Test_End)
 }
 
 func isCharacterTrainingMapID(mapID uint32) bool {
-	return mapID >= uint32(pb.AssetIDRange_AssetIDRange_Map_Training_Start) &&
-		mapID <= uint32(pb.AssetIDRange_AssetIDRange_Map_Training_End)
+	return mapID >= uint32(pb.AssetID_AssetIDRange_Map_Training_Start) &&
+		mapID <= uint32(pb.AssetID_AssetIDRange_Map_Training_End)
 }
 
 func isCharacterTaskMapID(mapID uint32) bool {
-	return mapID >= uint32(pb.AssetIDRange_AssetIDRange_Map_Task_Start) &&
-		mapID <= uint32(pb.AssetIDRange_AssetIDRange_Map_Task_End)
+	return mapID >= uint32(pb.AssetID_AssetIDRange_Map_Task_Start) &&
+		mapID <= uint32(pb.AssetID_AssetIDRange_Map_Task_End)
 }
 
 func isCharacterMapID(mapID uint32) bool {

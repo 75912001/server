@@ -22,7 +22,7 @@ type LevelEntry struct {
 }
 
 func (p *ExpConfig) GetLevel(totalExp uint64) (uint32, error) {
-	for level := uint32(pb.LevelRange_LevelRange_Min); level <= uint32(pb.LevelRange_LevelRange_Max); level++ {
+	for level := uint32(pb.Constants_Constants_Level_Min); level <= uint32(pb.Constants_Constants_Level_Max); level++ {
 		entry := p.Get(level)
 		if entry == nil {
 			return 0, errors.Errorf("经验等级不存在: %d %v", level, xruntime.Location())
@@ -31,7 +31,7 @@ func (p *ExpConfig) GetLevel(totalExp uint64) (uint32, error) {
 			return *entry.Level, nil
 		}
 	}
-	return uint32(pb.LevelRange_LevelRange_Max), nil
+	return uint32(pb.Constants_Constants_Level_Max), nil
 }
 
 func (p *ExpConfig) GetNextLevelTotalExp(totalExp uint64) (uint64, bool, error) {
@@ -39,7 +39,7 @@ func (p *ExpConfig) GetNextLevelTotalExp(totalExp uint64) (uint64, bool, error) 
 	if err != nil {
 		return 0, false, err
 	}
-	if level >= uint32(pb.LevelRange_LevelRange_Max) {
+	if level >= uint32(pb.Constants_Constants_Level_Max) {
 		return 0, false, nil
 	}
 	nextLevelTotalExp, err := p.GetLevelMinExp(level + 1)
@@ -50,7 +50,7 @@ func (p *ExpConfig) GetNextLevelTotalExp(totalExp uint64) (uint64, bool, error) 
 }
 
 func (p *ExpConfig) GetLevelMinExp(level uint32) (uint64, error) {
-	if level < uint32(pb.LevelRange_LevelRange_Min) || level > uint32(pb.LevelRange_LevelRange_Max) {
+	if level < uint32(pb.Constants_Constants_Level_Min) || level > uint32(pb.Constants_Constants_Level_Max) {
 		return 0, errors.Errorf("经验等级不存在: %d %v", level, xruntime.Location())
 	}
 	entry := p.Get(level)
@@ -65,13 +65,13 @@ func (p *ExpConfig) IsMaxLevel(totalExp uint64) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return level >= uint32(pb.LevelRange_LevelRange_Max), nil
+	return level >= uint32(pb.Constants_Constants_Level_Max), nil
 }
 
 func (p *ExpConfig) GetMaxTotalExp() (uint64, error) {
-	entry := p.Get(uint32(pb.LevelRange_LevelRange_Max))
+	entry := p.Get(uint32(pb.Constants_Constants_Level_Max))
 	if entry == nil || entry.MaxExp == nil {
-		return 0, errors.Errorf("最高等级经验配置不完整: level:%d %v", pb.LevelRange_LevelRange_Max, xruntime.Location())
+		return 0, errors.Errorf("最高等级经验配置不完整: level:%d %v", pb.Constants_Constants_Level_Max, xruntime.Location())
 	}
 	return *entry.MaxExp, nil
 }
@@ -93,8 +93,8 @@ func (p *ExpConfig) load(dir string) error {
 }
 
 func (p *ExpConfig) configure(levels map[uint32]*LevelEntry) error {
-	minLevel := uint32(pb.LevelRange_LevelRange_Min)
-	maxLevel := uint32(pb.LevelRange_LevelRange_Max)
+	minLevel := uint32(pb.Constants_Constants_Level_Min)
+	maxLevel := uint32(pb.Constants_Constants_Level_Max)
 	for level, entry := range levels {
 		if level < minLevel || level > maxLevel {
 			return errors.Errorf("经验等级超出协议范围: level:%d expected:[%d,%d] %v", level, minLevel, maxLevel, xruntime.Location())

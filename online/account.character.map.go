@@ -104,16 +104,16 @@ func (p *Account) onCharacterMapEnterReq(gateway *Gateway, packet *pb.OnlineClie
 	for _, presence := range targetPresences {
 		p.dispatchCharacterTeamSceneState(presence)
 	}
-	groupList := characterMapGroups(existing)
-	joinedGroup := characterMapGroup(targetPresences)
+	teamList := characterMapTeams(existing)
+	joinedTeam := characterMapTeam(targetPresences)
 	for _, viewer := range existing {
-		p.sendCharacterMapPacket(viewer, newCharacterMapJoinEvent(viewer, joinedGroup))
+		p.sendCharacterMapPacket(viewer, newCharacterMapJoinEvent(viewer, joinedTeam))
 	}
 	for _, presence := range targetPresences {
 		p.sendCharacterMapPacket(presence, &pb.CharacterMapEnterRes{
 			CharacterUuid: presence.key.characterUUID,
 			MapId:         request.GetMapId(),
-			GroupList:     groupList,
+			TeamList:      teamList,
 		})
 	}
 }

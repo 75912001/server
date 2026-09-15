@@ -18,10 +18,11 @@ message GMItemAddResult {
   uint64 added_count = 2; // 本次实际增加数量
 }
 
-// GMPetAddCommand 表示给发起命令的角色自身增加一只 1 级随身宠物.
+// GMPetAddCommand 表示给发起命令的角色自身增加一只指定等级的随身宠物.
 message GMPetAddCommand {
   uint32 pet_id = 1; // 宠物资源 ID, 必须存在于 pet.yaml
   PetGrade pet_grade = 2; // 宠物品阶, 只允许 Common 到 Mythic
+  uint32 level = 3; // 宠物等级, 只允许 Constants_Level_Min 到 Constants_Level_Max
 }
 
 // GMPetAddResult 表示服务端已持久化的随身宠物增加结果.
@@ -47,7 +48,7 @@ message GMCommandReq {
   uint64 character_uuid = 1; // 发起命令并接收结果的当前账号在线角色 UUID
   oneof command {
     GMItemAddCommand item_add = 10; // 对应客户端文本命令 gm item add <id> <cnt>
-    GMPetAddCommand pet_add = 11; // 对应客户端文本命令 gm pet add <petid> <petGrade>
+    GMPetAddCommand pet_add = 11; // 对应客户端文本命令 gm pet add <petid> <petGrade> <level>
     GMSystemMailAddCommand mail_add = 12; // 对应客户端文本命令 gm mail add <主题>|<正文>
   }
 }

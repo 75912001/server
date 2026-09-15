@@ -15639,7 +15639,7 @@ document_scope:
     base_character_actions:
       excluded: true
       reason: 攻击、防御、逃离、捕获和换宠不是magic.txt精灵/魔法记录.
-      reference: project/server/config/skill.yaml
+      reference: project/server/config/技能.yaml
     profession_skills:
       excluded: true
       known_record_count: 73
@@ -21076,7 +21076,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L2
   source_order: 2
@@ -23482,7 +23482,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L3
   source_order: 3
@@ -26967,7 +26967,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L4
   source_order: 4
@@ -29536,7 +29536,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L5
   source_order: 5
@@ -31680,7 +31680,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L6
   source_order: 6
@@ -31901,7 +31901,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L7
   source_order: 7
@@ -34048,7 +34048,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L8
   source_order: 8
@@ -36494,7 +36494,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L9
   source_order: 9
@@ -40199,7 +40199,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L10
   source_order: 10
@@ -43022,7 +43022,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L11
   source_order: 11
@@ -45615,7 +45615,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L12
   source_order: 12
@@ -45893,7 +45893,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L13
   source_order: 13
@@ -46131,7 +46131,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L14
   source_order: 14
@@ -46239,7 +46239,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L15
   source_order: 15
@@ -46347,7 +46347,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L16
   source_order: 16
@@ -46455,7 +46455,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L17
   source_order: 17
@@ -48777,7 +48777,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L18
   source_order: 18
@@ -51670,7 +51670,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L19
   source_order: 19
@@ -55174,7 +55174,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L20
   source_order: 20
@@ -57893,7 +57893,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: description_option_power_mismatch
     description_first_number: 320
@@ -60489,7 +60489,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L22
   source_order: 22
@@ -60709,7 +60709,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L23
   source_order: 23
@@ -61116,7 +61116,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L24
   source_order: 24
@@ -61223,7 +61223,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: description_option_power_mismatch
     description_first_number: 980
@@ -61334,7 +61334,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: description_option_power_mismatch
     description_first_number: 1180
@@ -61445,7 +61445,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: description_option_power_mismatch
     description_first_number: 1360
@@ -61535,7 +61535,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: description_option_power_mismatch
     description_first_number: 1560
@@ -61724,7 +61724,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: description_option_power_mismatch
     description_first_number: 1800
@@ -61930,7 +61930,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L30
   source_order: 30
@@ -62159,7 +62159,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L31
   source_order: 31
@@ -62343,7 +62343,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L32
   source_order: 32
@@ -62448,7 +62448,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L33
   source_order: 33
@@ -62532,7 +62532,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L34
   source_order: 34
@@ -62616,7 +62616,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L35
   source_order: 35
@@ -62700,7 +62700,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L36
   source_order: 36
@@ -62812,7 +62812,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L37
   source_order: 37
@@ -62896,7 +62896,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L38
   source_order: 38
@@ -62980,7 +62980,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L39
   source_order: 39
@@ -63166,7 +63166,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L40
   source_order: 40
@@ -63485,7 +63485,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L41
   source_order: 41
@@ -64829,7 +64829,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L42
   source_order: 42
@@ -68260,7 +68260,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L43
   source_order: 43
@@ -68384,7 +68384,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L44
   source_order: 44
@@ -68468,7 +68468,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L45
   source_order: 45
@@ -69818,7 +69818,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L46
   source_order: 46
@@ -73403,7 +73403,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L47
   source_order: 47
@@ -74728,7 +74728,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L48
   source_order: 48
@@ -78279,7 +78279,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L49
   source_order: 49
@@ -79611,7 +79611,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L50
   source_order: 50
@@ -83019,7 +83019,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L51
   source_order: 51
@@ -85171,7 +85171,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L52
   source_order: 52
@@ -89556,7 +89556,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L53
   source_order: 53
@@ -90366,7 +90366,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L54
   source_order: 54
@@ -91153,7 +91153,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L55
   source_order: 55
@@ -92038,7 +92038,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L56
   source_order: 56
@@ -92923,7 +92923,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L57
   source_order: 57
@@ -97840,7 +97840,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L58
   source_order: 58
@@ -98627,7 +98627,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L59
   source_order: 59
@@ -99462,7 +99462,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L60
   source_order: 60
@@ -100459,7 +100459,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L61
   source_order: 61
@@ -101365,7 +101365,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L62
   source_order: 62
@@ -106506,7 +106506,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L63
   source_order: 63
@@ -107241,7 +107241,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L64
   source_order: 64
@@ -108008,7 +108008,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L65
   source_order: 65
@@ -108941,7 +108941,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L66
   source_order: 66
@@ -109804,7 +109804,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L67
   source_order: 67
@@ -114804,7 +114804,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L68
   source_order: 68
@@ -115593,7 +115593,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L69
   source_order: 69
@@ -116477,7 +116477,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L70
   source_order: 70
@@ -117532,7 +117532,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L71
   source_order: 71
@@ -118395,7 +118395,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L72
   source_order: 72
@@ -123591,7 +123591,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L73
   source_order: 73
@@ -124362,7 +124362,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L74
   source_order: 74
@@ -125090,7 +125090,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L75
   source_order: 75
@@ -125984,7 +125984,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L76
   source_order: 76
@@ -126781,7 +126781,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L77
   source_order: 77
@@ -131731,7 +131731,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L78
   source_order: 78
@@ -132499,7 +132499,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L79
   source_order: 79
@@ -133321,7 +133321,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L80
   source_order: 80
@@ -134291,7 +134291,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L81
   source_order: 81
@@ -135214,7 +135214,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L82
   source_order: 82
@@ -140254,7 +140254,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L83
   source_order: 83
@@ -140996,7 +140996,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L84
   source_order: 84
@@ -141744,7 +141744,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L85
   source_order: 85
@@ -142655,7 +142655,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L86
   source_order: 86
@@ -143571,7 +143571,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L87
   source_order: 87
@@ -148398,7 +148398,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L88
   source_order: 88
@@ -149179,7 +149179,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L89
   source_order: 89
@@ -150021,7 +150021,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L90
   source_order: 90
@@ -150990,7 +150990,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L91
   source_order: 91
@@ -151842,7 +151842,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L92
   source_order: 92
@@ -156822,7 +156822,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L93
   source_order: 93
@@ -158203,7 +158203,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L94
   source_order: 94
@@ -159589,7 +159589,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L95
   source_order: 95
@@ -161089,7 +161089,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L96
   source_order: 96
@@ -162641,7 +162641,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L97
   source_order: 97
@@ -168486,7 +168486,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L98
   source_order: 98
@@ -169903,7 +169903,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L99
   source_order: 99
@@ -171420,7 +171420,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L100
   source_order: 100
@@ -173139,7 +173139,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L101
   source_order: 101
@@ -174680,7 +174680,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L102
   source_order: 102
@@ -180464,7 +180464,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L103
   source_order: 103
@@ -180618,7 +180618,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L104
   source_order: 104
@@ -180778,7 +180778,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L105
   source_order: 105
@@ -180950,7 +180950,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L106
   source_order: 106
@@ -181110,7 +181110,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L107
   source_order: 107
@@ -181370,7 +181370,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L108
   source_order: 108
@@ -181456,7 +181456,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L109
   source_order: 109
@@ -181610,7 +181610,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L110
   source_order: 110
@@ -181770,7 +181770,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L111
   source_order: 111
@@ -181942,7 +181942,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L112
   source_order: 112
@@ -182140,7 +182140,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L113
   source_order: 113
@@ -182400,7 +182400,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L114
   source_order: 114
@@ -182486,7 +182486,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L115
   source_order: 115
@@ -182633,7 +182633,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L116
   source_order: 116
@@ -182787,7 +182787,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L117
   source_order: 117
@@ -182947,7 +182947,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L118
   source_order: 118
@@ -183113,7 +183113,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L119
   source_order: 119
@@ -183379,7 +183379,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L120
   source_order: 120
@@ -183465,7 +183465,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L121
   source_order: 121
@@ -183619,7 +183619,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L122
   source_order: 122
@@ -183779,7 +183779,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L123
   source_order: 123
@@ -183945,7 +183945,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L124
   source_order: 124
@@ -184105,7 +184105,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L125
   source_order: 125
@@ -184365,7 +184365,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L126
   source_order: 126
@@ -184451,7 +184451,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L127
   source_order: 127
@@ -184976,7 +184976,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L128
   source_order: 128
@@ -185362,7 +185362,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L129
   source_order: 129
@@ -185836,7 +185836,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L130
   source_order: 130
@@ -186423,7 +186423,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L131
   source_order: 131
@@ -186508,7 +186508,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L132
   source_order: 132
@@ -186593,7 +186593,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L133
   source_order: 133
@@ -186829,7 +186829,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L134
   source_order: 134
@@ -186962,7 +186962,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L135
   source_order: 135
@@ -187047,7 +187047,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L136
   source_order: 136
@@ -187614,7 +187614,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L137
   source_order: 137
@@ -187699,7 +187699,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L138
   source_order: 138
@@ -187784,7 +187784,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L139
   source_order: 139
@@ -187898,7 +187898,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L140
   source_order: 140
@@ -188135,7 +188135,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L141
   source_order: 141
@@ -188220,7 +188220,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L142
   source_order: 142
@@ -188769,7 +188769,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L143
   source_order: 143
@@ -188854,7 +188854,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L144
   source_order: 144
@@ -188939,7 +188939,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L145
   source_order: 145
@@ -189053,7 +189053,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L146
   source_order: 146
@@ -189138,7 +189138,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L147
   source_order: 147
@@ -189251,7 +189251,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L148
   source_order: 148
@@ -189472,7 +189472,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L149
   source_order: 149
@@ -189661,7 +189661,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L150
   source_order: 150
@@ -189877,7 +189877,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L151
   source_order: 151
@@ -190093,7 +190093,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L152
   source_order: 152
@@ -190304,7 +190304,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L153
   source_order: 153
@@ -190520,7 +190520,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L154
   source_order: 154
@@ -190724,7 +190724,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L155
   source_order: 155
@@ -190928,7 +190928,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L156
   source_order: 156
@@ -191139,7 +191139,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L157
   source_order: 157
@@ -191349,7 +191349,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L158
   source_order: 158
@@ -191560,7 +191560,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L159
   source_order: 159
@@ -191770,7 +191770,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L160
   source_order: 160
@@ -191974,7 +191974,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L161
   source_order: 161
@@ -192178,7 +192178,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L162
   source_order: 162
@@ -192415,7 +192415,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L163
   source_order: 163
@@ -192625,7 +192625,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L164
   source_order: 164
@@ -192842,7 +192842,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L165
   source_order: 165
@@ -193058,7 +193058,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L166
   source_order: 166
@@ -193301,7 +193301,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L167
   source_order: 167
@@ -193505,7 +193505,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L168
   source_order: 168
@@ -193716,7 +193716,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L169
   source_order: 169
@@ -193926,7 +193926,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L170
   source_order: 170
@@ -194143,7 +194143,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L171
   source_order: 171
@@ -194359,7 +194359,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L172
   source_order: 172
@@ -194563,7 +194563,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L173
   source_order: 173
@@ -194767,7 +194767,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L174
   source_order: 174
@@ -194951,7 +194951,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L175
   source_order: 175
@@ -195312,7 +195312,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L177
   source_order: 176
@@ -195466,7 +195466,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -195629,7 +195629,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -195892,7 +195892,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -196121,7 +196121,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -196350,7 +196350,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -196526,7 +196526,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -196682,7 +196682,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -196838,7 +196838,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -196995,7 +196995,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L187
   source_order: 185
@@ -197147,7 +197147,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L188
   source_order: 186
@@ -197299,7 +197299,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L189
   source_order: 187
@@ -197458,7 +197458,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L190
   source_order: 188
@@ -197589,7 +197589,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L191
   source_order: 189
@@ -197776,7 +197776,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L192
   source_order: 190
@@ -197963,7 +197963,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L193
   source_order: 191
@@ -198150,7 +198150,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L194
   source_order: 192
@@ -198337,7 +198337,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L195
   source_order: 193
@@ -198524,7 +198524,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L196
   source_order: 194
@@ -198659,7 +198659,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L197
   source_order: 195
@@ -198794,7 +198794,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L198
   source_order: 196
@@ -198951,7 +198951,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L199
   source_order: 197
@@ -199142,7 +199142,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L200
   source_order: 198
@@ -199310,7 +199310,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L201
   source_order: 199
@@ -199444,7 +199444,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L202
   source_order: 200
@@ -199626,7 +199626,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L203
   source_order: 201
@@ -199761,7 +199761,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L204
   source_order: 202
@@ -199896,7 +199896,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L205
   source_order: 203
@@ -200051,7 +200051,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L206
   source_order: 204
@@ -200234,7 +200234,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L207
   source_order: 205
@@ -200339,7 +200339,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L208
   source_order: 206
@@ -200465,7 +200465,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L209
   source_order: 207
@@ -200570,7 +200570,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L210
   source_order: 208
@@ -200675,7 +200675,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L211
   source_order: 209
@@ -200820,7 +200820,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L212
   source_order: 210
@@ -200981,7 +200981,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L213
   source_order: 211
@@ -201086,7 +201086,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L214
   source_order: 212
@@ -201225,7 +201225,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L215
   source_order: 213
@@ -201377,7 +201377,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L216
   source_order: 214
@@ -201509,7 +201509,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L217
   source_order: 215
@@ -201740,7 +201740,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L218
   source_order: 216
@@ -201993,7 +201993,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L219
   source_order: 217
@@ -202238,7 +202238,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L220
   source_order: 218
@@ -202325,7 +202325,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L221
   source_order: 219
@@ -202570,7 +202570,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L222
   source_order: 220
@@ -202766,7 +202766,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L223
   source_order: 221
@@ -203003,7 +203003,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L224
   source_order: 222
@@ -203193,7 +203193,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L225
   source_order: 223
@@ -203329,7 +203329,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L226
   source_order: 224
@@ -203465,7 +203465,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L227
   source_order: 225
@@ -203601,7 +203601,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L228
   source_order: 226
@@ -203688,7 +203688,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L229
   source_order: 227
@@ -203775,7 +203775,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L230
   source_order: 228
@@ -203890,7 +203890,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L231
   source_order: 229
@@ -203998,7 +203998,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L232
   source_order: 230
@@ -204113,7 +204113,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L233
   source_order: 231
@@ -204221,7 +204221,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L234
   source_order: 232
@@ -204308,7 +204308,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L235
   source_order: 233
@@ -204395,7 +204395,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L236
   source_order: 234
@@ -204510,7 +204510,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L237
   source_order: 235
@@ -204618,7 +204618,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L238
   source_order: 236
@@ -204753,7 +204753,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L239
   source_order: 237
@@ -204888,7 +204888,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L240
   source_order: 238
@@ -205023,7 +205023,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L241
   source_order: 239
@@ -205158,7 +205158,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L242
   source_order: 240
@@ -205293,7 +205293,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L243
   source_order: 241
@@ -205428,7 +205428,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L244
   source_order: 242
@@ -205563,7 +205563,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L245
   source_order: 243
@@ -205698,7 +205698,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L246
   source_order: 244
@@ -205833,7 +205833,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L247
   source_order: 245
@@ -205968,7 +205968,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L248
   source_order: 246
@@ -206103,7 +206103,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L249
   source_order: 247
@@ -206238,7 +206238,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L250
   source_order: 248
@@ -206373,7 +206373,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L251
   source_order: 249
@@ -206508,7 +206508,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L252
   source_order: 250
@@ -206643,7 +206643,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L253
   source_order: 251
@@ -206778,7 +206778,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L254
   source_order: 252
@@ -206913,7 +206913,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L255
   source_order: 253
@@ -207049,7 +207049,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L256
   source_order: 254
@@ -207213,7 +207213,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L257
   source_order: 255
@@ -207300,7 +207300,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L258
   source_order: 256
@@ -207387,7 +207387,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L259
   source_order: 257
@@ -207474,7 +207474,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L260
   source_order: 258
@@ -207561,7 +207561,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L261
   source_order: 259
@@ -207648,7 +207648,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L262
   source_order: 260
@@ -207783,7 +207783,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L263
   source_order: 261
@@ -207918,7 +207918,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L264
   source_order: 262
@@ -208053,7 +208053,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L265
   source_order: 263
@@ -208188,7 +208188,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L266
   source_order: 264
@@ -208323,7 +208323,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L267
   source_order: 265
@@ -208458,7 +208458,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L268
   source_order: 266
@@ -208593,7 +208593,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L269
   source_order: 267
@@ -208728,7 +208728,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L270
   source_order: 268
@@ -208863,7 +208863,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L271
   source_order: 269
@@ -208998,7 +208998,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L272
   source_order: 270
@@ -209133,7 +209133,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L273
   source_order: 271
@@ -209268,7 +209268,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L274
   source_order: 272
@@ -209403,7 +209403,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L275
   source_order: 273
@@ -209538,7 +209538,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L276
   source_order: 274
@@ -209673,7 +209673,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L277
   source_order: 275
@@ -209808,7 +209808,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L278
   source_order: 276
@@ -209943,7 +209943,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L279
   source_order: 277
@@ -210078,7 +210078,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L280
   source_order: 278
@@ -210213,7 +210213,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L281
   source_order: 279
@@ -210348,7 +210348,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 337
@@ -210485,7 +210485,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 338
@@ -210622,7 +210622,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 339
@@ -210759,7 +210759,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 340
@@ -210896,7 +210896,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 341
@@ -211033,7 +211033,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 342
@@ -211170,7 +211170,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 343
@@ -211307,7 +211307,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 344
@@ -211465,7 +211465,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 348
@@ -211623,7 +211623,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 349
@@ -211781,7 +211781,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 350
@@ -211939,7 +211939,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 351
@@ -212097,7 +212097,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 352
@@ -212234,7 +212234,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 359
@@ -212392,7 +212392,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 360
@@ -212550,7 +212550,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 361
@@ -212708,7 +212708,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 362
@@ -212866,7 +212866,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 370
@@ -213024,7 +213024,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 371
@@ -213202,7 +213202,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 372
@@ -213360,7 +213360,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 373
@@ -213518,7 +213518,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 374
@@ -213696,7 +213696,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 375
@@ -213854,7 +213854,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 376
@@ -214012,7 +214012,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 377
@@ -214170,7 +214170,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 380
@@ -214328,7 +214328,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 381
@@ -214486,7 +214486,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 382
@@ -214644,7 +214644,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 383
@@ -214802,7 +214802,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 384
@@ -214960,7 +214960,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 390
@@ -215138,7 +215138,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: runtime_id_overridden
     overridden_by_source_line: 391
@@ -215275,7 +215275,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L314
   source_order: 312
@@ -215410,7 +215410,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L315
   source_order: 313
@@ -215545,7 +215545,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L316
   source_order: 314
@@ -215680,7 +215680,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L317
   source_order: 315
@@ -215815,7 +215815,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L318
   source_order: 316
@@ -215950,7 +215950,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L319
   source_order: 317
@@ -216085,7 +216085,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L320
   source_order: 318
@@ -216220,7 +216220,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L321
   source_order: 319
@@ -216355,7 +216355,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L322
   source_order: 320
@@ -216490,7 +216490,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L323
   source_order: 321
@@ -216625,7 +216625,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L324
   source_order: 322
@@ -216760,7 +216760,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L325
   source_order: 323
@@ -216895,7 +216895,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L326
   source_order: 324
@@ -217030,7 +217030,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L327
   source_order: 325
@@ -217165,7 +217165,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L328
   source_order: 326
@@ -217300,7 +217300,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L329
   source_order: 327
@@ -217435,7 +217435,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L330
   source_order: 328
@@ -217570,7 +217570,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L331
   source_order: 329
@@ -217705,7 +217705,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L332
   source_order: 330
@@ -217813,7 +217813,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L333
   source_order: 331
@@ -217989,7 +217989,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L334
   source_order: 332
@@ -218095,7 +218095,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L335
   source_order: 333
@@ -218201,7 +218201,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L337
   source_order: 334
@@ -218335,7 +218335,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L338
   source_order: 335
@@ -218469,7 +218469,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L339
   source_order: 336
@@ -218605,7 +218605,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L340
   source_order: 337
@@ -218741,7 +218741,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L341
   source_order: 338
@@ -218877,7 +218877,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L342
   source_order: 339
@@ -219013,7 +219013,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L343
   source_order: 340
@@ -219149,7 +219149,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L344
   source_order: 341
@@ -219285,7 +219285,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L345
   source_order: 342
@@ -219421,7 +219421,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L346
   source_order: 343
@@ -219557,7 +219557,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: true
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies: []
 - record_key: legacy80-magic-L348
   source_order: 344
@@ -219711,7 +219711,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -219867,7 +219867,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -220023,7 +220023,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -220179,7 +220179,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -220335,7 +220335,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -220491,7 +220491,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -220647,7 +220647,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -220803,7 +220803,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -220959,7 +220959,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -221115,7 +221115,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -221251,7 +221251,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -221407,7 +221407,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -221563,7 +221563,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -221719,7 +221719,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -221875,7 +221875,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -222031,7 +222031,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -222187,7 +222187,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -222343,7 +222343,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -222499,7 +222499,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -222655,7 +222655,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -222811,7 +222811,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -222967,7 +222967,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -223143,7 +223143,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -223299,7 +223299,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -223455,7 +223455,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -223631,7 +223631,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -223787,7 +223787,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -223943,7 +223943,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -224099,7 +224099,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -224255,7 +224255,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -224411,7 +224411,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -224567,7 +224567,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -224723,7 +224723,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -224879,7 +224879,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -225035,7 +225035,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -225211,7 +225211,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -225367,7 +225367,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -225523,7 +225523,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -225679,7 +225679,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -225835,7 +225835,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -225991,7 +225991,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
@@ -226167,7 +226167,7 @@ audit_records:
     id: null
     implementation_status: unimplemented
     shared_mechanics_only: false
-    configuration_ref: project/server/config/skill.yaml
+    configuration_ref: project/server/config/技能.yaml
   discrepancies:
   - type: handler_unavailable
     reason: registration_commented_out
