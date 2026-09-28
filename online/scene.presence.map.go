@@ -1,6 +1,9 @@
 package main
 
-import pb "server/proto/pb"
+import (
+	"server/common/gameconfig"
+	pb "server/proto/pb"
+)
 
 func isCharacterTestMapID(mapID uint32) bool {
 	return mapID >= uint32(pb.AssetID_AssetIDRange_Map_Test_Start) &&
@@ -18,11 +21,18 @@ func isCharacterTaskMapID(mapID uint32) bool {
 }
 
 func isCharacterMapID(mapID uint32) bool {
-	return isCharacterTestMapID(mapID) || isCharacterTrainingMapID(mapID) || isCharacterTaskMapID(mapID)
+	return mapID == 1998 || mapID == 2000 || mapID == 2006 ||
+		isCharacterTestMapID(mapID) || isCharacterTrainingMapID(mapID) || isCharacterTaskMapID(mapID) ||
+		(mapID >= uint32(pb.AssetID_AssetIDRange_Map_New_Start) && mapID <= uint32(pb.AssetID_AssetIDRange_Map_New_End))
 }
 
 // joinCharacterMap 在单张可进入地图锁内先取得现有角色副本, 再按完整分组顺序追加新角色.
 func (m *scenePresenceManager) joinCharacterMap(presences []sceneCharacterPresence) ([]sceneCharacterPresence, bool) {
+	return m.joinCharacterMapAt(presences, nil)
+}
+
+// joinCharacterMapAt在持有场景锁时一次确定整队落点, 避免入场后再改坐标产生半完成状态.
+func (m *scenePresenceManager) joinCharacterMapAt(presences []sceneCharacterPresence, landing *pb.MapPathPoint) ([]sceneCharacterPresence, bool) {
 	if len(presences) == 0 || !isCharacterMapID(presences[0].sceneID) {
 		return nil, false
 	}
@@ -47,9 +57,21 @@ func (m *scenePresenceManager) joinCharacterMap(presences []sceneCharacterPresen
 		}
 	}
 	current := scene.characterMapPresencesLocked()
+	spawnX, spawnY := uint32(0), uint32(0)
+	if gameconfig.GGameConfig != nil && gameconfig.GGameConfig.Scene != nil {
+		if config := gameconfig.GGameConfig.Scene.Get(sceneID); config != nil && len(config.Spawn) == 2 {
+			spawnX, spawnY = config.Spawn[0], config.Spawn[1]
+		}
+	}
+	if landing != nil {
+		spawnX, spawnY = landing.X, landing.Y
+	}
 	for _, presence := range presences {
 		scene.byKey[presence.key] = presence
 		scene.mapOrder = append(scene.mapOrder, presence.key)
+		scene.movement[presence.key] = &sceneMapMovement{position: &pb.MapPathPoint{
+			X: spawnX, Y: spawnY, Direction: pb.AssetDirection_AssetDirection_Down,
+		}}
 	}
 	return current, true
 }
@@ -85,7 +107,9 @@ func (m *scenePresenceManager) removeCharacterMap(
 	nextOrder := make([]sceneCharacterKey, 0, len(scene.mapOrder)-len(removeSet))
 	for _, key := range scene.mapOrder {
 		if _, removing := removeSet[key]; removing {
+			scene.stopMovePlanLocked(key)
 			delete(scene.byKey, key)
+			delete(scene.movement, key)
 			continue
 		}
 		nextOrder = append(nextOrder, key)

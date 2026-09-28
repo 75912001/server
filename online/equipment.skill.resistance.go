@@ -41,27 +41,22 @@ func equipmentStatusSpiritResistanceAttribute(skillID uint32) (pb.EquipmentRecor
 	}
 }
 
-// equipmentSkillResistanceModifiers根据实例附加技能实时派生五系抗性修正.
-// 已拥有类别固定为+10, 未拥有类别按不同精灵类别数每类-10, 麻痹不参与.
+// equipmentSkillResistanceModifiers根据实例唯一附加技能实时派生五系抗性修正.
+// 命中异常精灵类别时该类别固定为+10, 其他四类固定为-10, 麻痹不参与.
 func equipmentSkillResistanceModifiers(record *pb.EquipmentRecord) map[pb.EquipmentRecordAttribute]int64 {
-	active := make(map[pb.EquipmentRecordAttribute]struct{}, len(equipmentStatusSpiritResistanceAttributes))
-	if record != nil {
-		for _, skillID := range record.GetAdditionalSkillIdList() {
-			if attribute, ok := equipmentStatusSpiritResistanceAttribute(skillID); ok {
-				active[attribute] = struct{}{}
-			}
-		}
+	if record == nil {
+		return nil
 	}
-	if len(active) == 0 {
+	active, ok := equipmentStatusSpiritResistanceAttribute(record.GetAdditionalSkillId())
+	if !ok {
 		return nil
 	}
 	modifiers := make(map[pb.EquipmentRecordAttribute]int64, len(equipmentStatusSpiritResistanceAttributes))
-	penalty := -equipmentStatusSpiritResistanceBonus * int64(len(active))
 	for _, attribute := range equipmentStatusSpiritResistanceAttributes {
-		if _, exists := active[attribute]; exists {
+		if attribute == active {
 			modifiers[attribute] = equipmentStatusSpiritResistanceBonus
 		} else {
-			modifiers[attribute] = penalty
+			modifiers[attribute] = -equipmentStatusSpiritResistanceBonus
 		}
 	}
 	return modifiers

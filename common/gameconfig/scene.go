@@ -22,6 +22,7 @@ type SceneEntry struct {
 	Name      *string              `yaml:"name"`
 	Width     *uint32              `yaml:"width"`
 	Height    *uint32              `yaml:"height"`
+	Spawn     []uint32             `yaml:"spawn"` // 默认出生格, 由地图编辑器的 default_position 生成
 	Collision *SceneCollisionEntry `yaml:"collision"`
 	Encounter *SceneEncounterEntry `yaml:"encounter"`
 	NPCs      []SceneNPCEntry      `yaml:"npcs"`
@@ -44,11 +45,60 @@ type SceneNPCFunctionOptionEntry struct {
 	Config     map[string]any    `yaml:"config"`
 }
 
+func sceneNPCNonNegativeInteger(value any) (uint64, bool) {
+	switch number := value.(type) {
+	case int:
+		return uint64(number), number >= 0
+	case int64:
+		return uint64(number), number >= 0
+	case uint64:
+		return number, true
+	case uint32:
+		return uint64(number), true
+	default:
+		return 0, false
+	}
+}
+
+// BattleChallengeVictoryTeleport 读取 NPC 选项独有的胜利落点; 未配置时返回 nil.
+func (p *SceneNPCFunctionOptionEntry) BattleChallengeVictoryTeleport() (*SceneWarpTargetEntry, bool) {
+	if p == nil || p.Config == nil {
+		return nil, false
+	}
+	raw, exists := p.Config["victoryTeleport"]
+	if !exists {
+		return nil, true
+	}
+	fields, ok := raw.(map[string]any)
+	if !ok || len(fields) != 3 {
+		return nil, false
+	}
+	mapID, validMap := sceneNPCNonNegativeInteger(fields["mapId"])
+	x, validX := sceneNPCNonNegativeInteger(fields["x"])
+	y, validY := sceneNPCNonNegativeInteger(fields["y"])
+	if !validMap || !validX || !validY || mapID == 0 || mapID > math.MaxUint32 || x > math.MaxUint32 || y > math.MaxUint32 {
+		return nil, false
+	}
+	targetMapID, targetX, targetY := uint32(mapID), uint32(x), uint32(y)
+	return &SceneWarpTargetEntry{MapID: &targetMapID, X: &targetX, Y: &targetY}, true
+}
+
 type SceneCollisionEntry struct {
 	BlockedRows [][]uint32 `yaml:"blockedRows"`
 }
 
 type SceneEncounterEntry struct {
+	Enabled     *bool                       `yaml:"enabled"`
+	EnemyGroups []SceneEnemyGroupEntry      `yaml:"enemyGroups"`
+	Regions     []SceneEncounterRegionEntry `yaml:"regions"`
+}
+
+// 区域采用左上角与格数, 右侧和下侧边界不包含在区域内.
+type SceneEncounterRegionEntry struct {
+	X           *uint32                `yaml:"x"`
+	Y           *uint32                `yaml:"y"`
+	Width       *uint32                `yaml:"width"`
+	Height      *uint32                `yaml:"height"`
 	Enabled     *bool                  `yaml:"enabled"`
 	EnemyGroups []SceneEnemyGroupEntry `yaml:"enemyGroups"`
 }
@@ -100,6 +150,10 @@ func (p *SceneConfig) load(dir string) error {
 		if parseErr != nil || !isSceneID(uint32(filenameSceneID)) {
 			return errors.Errorf("场景配置文件名必须是有效地图ID: %s %v", file.Name(), xruntime.Location())
 		}
+		// 运行时只装载地图编辑器已发布的新图; 旧场景文件保留作编辑资料.
+		if filenameSceneID < 100000 {
+			continue
+		}
 		var root struct {
 			Scenes []*SceneEntry `yaml:"scenes"`
 		}
@@ -144,6 +198,9 @@ func (p *SceneConfig) configure(entries []*SceneEntry) error {
 		if scene.Width == nil || scene.Height == nil || *scene.Width == 0 || *scene.Height == 0 {
 			return errors.Errorf("场景尺寸无效: scene:%d %v", sceneID, xruntime.Location())
 		}
+		if len(scene.Spawn) != 2 || scene.Spawn[0] >= *scene.Width || scene.Spawn[1] >= *scene.Height {
+			return errors.Errorf("场景出生格无效: scene:%d %v", sceneID, xruntime.Location())
+		}
 		if scene.Collision == nil || scene.Collision.BlockedRows == nil {
 			return errors.Errorf("场景缺少 collision.blockedRows: scene:%d %v", sceneID, xruntime.Location())
 		}
@@ -156,7 +213,7 @@ func (p *SceneConfig) configure(entries []*SceneEntry) error {
 		if scene.Encounter == nil {
 			return errors.Errorf("场景缺少 encounter: scene:%d %v", sceneID, xruntime.Location())
 		}
-		if err := validateSceneEncounter(sceneID, scene.Encounter); err != nil {
+		if err := validateSceneEncounter(sceneID, *scene.Width, *scene.Height, scene.Encounter); err != nil {
 			return err
 		}
 		if scene.Warps == nil {
@@ -210,17 +267,46 @@ func validateSceneRows(
 
 func validateSceneEncounter(
 	sceneID uint32,
+	width uint32,
+	height uint32,
 	encounter *SceneEncounterEntry,
 ) error {
-	if encounter.Enabled == nil {
-		return errors.Errorf("场景遇敌配置缺少 enabled: scene:%d %v", sceneID, xruntime.Location())
+	if err := validateSceneEncounterRule(sceneID, "全地图", encounter.Enabled, encounter.EnemyGroups); err != nil {
+		return err
 	}
-	groups := encounter.EnemyGroups
+	for index := range encounter.Regions {
+		region := &encounter.Regions[index]
+		if region.X == nil || region.Y == nil || region.Width == nil || region.Height == nil ||
+			*region.Width == 0 || *region.Height == 0 || *region.X >= width || *region.Y >= height ||
+			*region.Width > width-*region.X || *region.Height > height-*region.Y {
+			return errors.Errorf("场景遇敌区域坐标或尺寸无效: scene:%d region:%d %v", sceneID, index, xruntime.Location())
+		}
+		if err := validateSceneEncounterRule(sceneID, "区域", region.Enabled, region.EnemyGroups); err != nil {
+			return errors.Wrapf(err, "region:%d", index)
+		}
+		for previousIndex := 0; previousIndex < index; previousIndex++ {
+			previous := &encounter.Regions[previousIndex]
+			if *region.X < *previous.X+*previous.Width && *previous.X < *region.X+*region.Width &&
+				*region.Y < *previous.Y+*previous.Height && *previous.Y < *region.Y+*region.Height {
+				return errors.Errorf("场景遇敌区域重叠: scene:%d regions:%d,%d %v", sceneID, previousIndex, index, xruntime.Location())
+			}
+		}
+	}
+	return nil
+}
+
+func validateSceneEncounterRule(sceneID uint32, label string, enabled *bool, groups []SceneEnemyGroupEntry) error {
+	if enabled == nil {
+		return errors.Errorf("场景%s遇敌配置缺少 enabled: scene:%d %v", label, sceneID, xruntime.Location())
+	}
 	if groups == nil {
-		return errors.Errorf("场景遇敌配置缺少 enemyGroups: scene:%d %v", sceneID, xruntime.Location())
+		return errors.Errorf("场景%s遇敌配置缺少 enemyGroups: scene:%d %v", label, sceneID, xruntime.Location())
 	}
-	if *encounter.Enabled && len(groups) == 0 {
-		return errors.Errorf("启用的场景遇敌配置 enemyGroups 不能为空: scene:%d %v", sceneID, xruntime.Location())
+	if *enabled && len(groups) == 0 {
+		return errors.Errorf("启用的场景%s遇敌配置 enemyGroups 不能为空: scene:%d %v", label, sceneID, xruntime.Location())
+	}
+	if !*enabled && len(groups) != 0 {
+		return errors.Errorf("关闭的场景%s遇敌配置 enemyGroups 必须为空: scene:%d %v", label, sceneID, xruntime.Location())
 	}
 	groupIDs := make(map[uint32]struct{}, len(groups))
 	totalWeight := uint64(0)
@@ -293,11 +379,17 @@ func validateSceneNPCs(scene *SceneEntry) error {
 				return errors.Errorf("场景NPC功能名称或config无效: scene:%d npc:%d option:%d %v", sceneID, entityID, optionID, xruntime.Location())
 			}
 			if *option.FunctionID == pb.NpcFunctionID_NpcFunctionID_BattleChallenge {
-				if _, ok := option.BattleChallengeEnemyGroupID(); !ok || len(option.Config) != 1 {
+				_, teleportValid := option.BattleChallengeVictoryTeleport()
+				if _, ok := option.BattleChallengeEnemyGroupID(); !ok || !teleportValid || len(option.Config) > 2 {
 					return errors.Errorf(
-						"场景NPC挑战配置必须且只能包含有效enemyGroupId: scene:%d npc:%d option:%d %v",
+						"场景NPC挑战配置只能包含有效enemyGroupId和victoryTeleport: scene:%d npc:%d option:%d %v",
 						sceneID, entityID, optionID, xruntime.Location(),
 					)
+				}
+				if len(option.Config) == 2 {
+					if _, exists := option.Config["victoryTeleport"]; !exists {
+						return errors.Errorf("场景NPC挑战配置存在未知字段: scene:%d npc:%d option:%d %v", sceneID, entityID, optionID, xruntime.Location())
+					}
 				}
 			}
 		}
@@ -353,13 +445,29 @@ func (p *SceneConfig) check() error {
 				return false
 			}
 		}
+		for _, region := range scene.Encounter.Regions {
+			for _, group := range region.EnemyGroups {
+				if GGameConfig.Enemy.Get(*group.ID) == nil {
+					result = errors.Errorf("场景区域引用了未定义敌人组: scene:%d enemyGroup:%d %v", sceneID, *group.ID, xruntime.Location())
+					return false
+				}
+			}
+		}
 		for npcIndex := range scene.NPCs {
 			npc := &scene.NPCs[npcIndex]
 			for optionIndex := range npc.FunctionOptions {
 				option := &npc.FunctionOptions[optionIndex]
-				if option.FunctionID == nil ||
-					*option.FunctionID != pb.NpcFunctionID_NpcFunctionID_BattleChallenge ||
-					option.Enabled == nil || !*option.Enabled {
+				if option.FunctionID == nil || *option.FunctionID != pb.NpcFunctionID_NpcFunctionID_BattleChallenge {
+					continue
+				}
+				if target, _ := option.BattleChallengeVictoryTeleport(); target != nil {
+					targetScene := p.Get(*target.MapID)
+					if targetScene == nil || !targetScene.IsCoordinateValid(*target.X, *target.Y) {
+						result = errors.Errorf("场景NPC挑战胜利传送目标无效: scene:%d npc:%d option:%d targetScene:%d %v", sceneID, *npc.EntityID, *option.OptionID, *target.MapID, xruntime.Location())
+						return false
+					}
+				}
+				if option.Enabled == nil || !*option.Enabled {
 					continue
 				}
 				enemyGroupID, ok := option.BattleChallengeEnemyGroupID()
@@ -367,19 +475,6 @@ func (p *SceneConfig) check() error {
 					result = errors.Errorf(
 						"场景NPC挑战引用了未定义敌人组: scene:%d npc:%d option:%d enemyGroup:%d %v",
 						sceneID, *npc.EntityID, *option.OptionID, enemyGroupID, xruntime.Location(),
-					)
-					return false
-				}
-			}
-		}
-		for _, warp := range scene.Warps {
-			for _, destination := range warp.Destinations {
-				target := destination.Target
-				targetScene := p.Get(*target.MapID)
-				if targetScene != nil && (*target.X >= *targetScene.Width || *target.Y >= *targetScene.Height) {
-					result = errors.Errorf(
-						"场景传送目标坐标越界: scene:%d warp:%d targetScene:%d x:%d y:%d %v",
-						sceneID, *warp.ID, *target.MapID, *target.X, *target.Y, xruntime.Location(),
 					)
 					return false
 				}

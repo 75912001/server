@@ -36,6 +36,9 @@ type combatRoomParticipant struct {
 	gateway         *Gateway
 	playerCharacter *pb.CombatUnit
 	playerPet       *pb.CombatUnit
+	// petStates保存开战时冻结的Battle/Wait宠物. 只有playerPet对应状态进入房间unitStates,
+	// 其余宠物不会参与目标选择、行动或胜负判断.
+	petStates map[uint64]*combatUnitRuntimeState
 }
 
 // combatRoomParticipantAdmission 是 Account actor 完成档案读取后交给房间的完整入场快照.
@@ -71,6 +74,17 @@ type combatRoomFinishInput struct {
 	rewardErr     error
 }
 
+// 账号结算全部成功后, 房间才执行一次整队胜利传送.
+type combatVictoryTeleport struct {
+	sourceSceneID     uint32
+	sourceNPCEntityID uint32
+	sourceOptionID    uint32
+	targetSceneID     uint32
+	x                 uint32
+	y                 uint32
+	leader            sceneCharacterKey
+}
+
 // combatRoomParticipantLeaveInput 封装仍需收到当前回合结果、但不会继续留在房间的参与者.
 type combatRoomParticipantLeaveInput struct {
 	characterUUID uint64
@@ -88,8 +102,9 @@ type CombatRoom struct {
 
 	battleID string
 	// enemyGroupID在PVE建房时由服务端配置冻结, 仅用于战斗胜利后的任务事件.
-	enemyGroupID uint32
-	round        uint32
+	enemyGroupID    uint32
+	victoryTeleport *combatVictoryTeleport
+	round           uint32
 
 	participantOrder       []combatRoomParticipantKey
 	participants           map[combatRoomParticipantKey]*combatRoomParticipant
@@ -107,6 +122,14 @@ type CombatRoom struct {
 	pveDuelPointBattle bool
 	// abductDisabled对应原版BattleArray.WinFunc限制. 当前PVE Boss组固定禁止旅程伙伴成功.
 	abductDisabled bool
+	// fieldAttribute保存原版战斗场地四属性及其剩余回合数, 只由房间actor读写.
+	fieldAttribute *combatFieldAttributeState
+}
+
+type combatFieldAttributeState struct {
+	element        pb.AssetElemental
+	power          uint32
+	durationRounds uint32
 }
 
 // GCombatRoomMgr 保存当前 online 进程内仍存活的战斗房间.
@@ -127,12 +150,13 @@ func newCombatRoom(
 	battleStart *pb.CombatBattleStartNotify,
 	enemyUnits []*pb.CombatUnit,
 	unitStates map[string]*combatUnitRuntimeState,
+	teleport *combatVictoryTeleport,
 ) (*CombatRoom, error) {
 	seed, err := newCombatRandomSeed()
 	if err != nil {
 		return nil, fmt.Errorf("combat random seed create failed: %w", err)
 	}
-	return newCombatRoomWithSeed(battleID, enemyGroupID, participant, battleStart, enemyUnits, unitStates, seed)
+	return newCombatRoomWithSeed(battleID, enemyGroupID, participant, battleStart, enemyUnits, unitStates, seed, teleport)
 }
 
 // newCombatRoomWithSeed 使用指定种子构造房间, 只供确定性测试和newCombatRoom生产入口复用.
@@ -144,6 +168,7 @@ func newCombatRoomWithSeed(
 	enemyUnits []*pb.CombatUnit,
 	unitStates map[string]*combatUnitRuntimeState,
 	seed uint64,
+	teleport *combatVictoryTeleport,
 ) (*CombatRoom, error) {
 	if enemyGroupID == 0 {
 		return nil, fmt.Errorf("combat enemy group id is zero")
@@ -154,6 +179,7 @@ func newCombatRoomWithSeed(
 	room := &CombatRoom{
 		battleID:         battleID,
 		enemyGroupID:     enemyGroupID,
+		victoryTeleport:  teleport,
 		round:            1,
 		participantOrder: []combatRoomParticipantKey{participant.key},
 		participants: map[combatRoomParticipantKey]*combatRoomParticipant{
@@ -441,6 +467,13 @@ func validateCombatRoomParticipantAdmission(participant *combatRoomParticipant, 
 			return fmt.Errorf("combat room participant state invalid")
 		}
 	}
+	for petUUID, state := range participant.petStates {
+		if petUUID == 0 || state == nil || state.unit == nil || state.unit.GetKey().GetPetUuid() != petUUID ||
+			state.unit.GetKey().GetAid() != participant.key.aid || state.unit.GetKey().GetCharacterUuid() != participant.key.characterUUID ||
+			state.unit.GetCamp() != pb.CombatCamp_CombatCamp_Initiator || state.maxHP == 0 {
+			return fmt.Errorf("combat room participant frozen pet state invalid")
+		}
+	}
 	return nil
 }
 
@@ -591,13 +624,16 @@ func (r *CombatRoom) finishCombat(result *pb.CombatRoundResultNotify) {
 		return
 	}
 	r.clearRoundTimer()
+	allSettled := true
 	for _, key := range r.participantOrder {
 		participant := r.participant(key)
 		if participant == nil || participant.account == nil {
+			allSettled = false
 			continue
 		}
 		participantResult := combatRoundResultForRecipient(result, participant.key.characterUUID)
 		if leaveKind := r.roundParticipantLeaves[key]; leaveKind != combatParticipantLeaveKindUnknown {
+			allSettled = false
 			participantResult.Settlement = nil
 			if err := participant.account.PostCombatRoomParticipantLeftSync(combatRoomParticipantLeaveInput{
 				characterUUID: participant.key.characterUUID,
@@ -614,7 +650,7 @@ func (r *CombatRoom) finishCombat(result *pb.CombatRoundResultNotify) {
 			participant.key,
 			result.GetSettlement().GetBattleResult(),
 		)
-		if err := participant.account.PostCombatRoomFinishedSync(combatRoomFinishInput{
+		err := participant.account.PostCombatRoomFinishedSync(combatRoomFinishInput{
 			characterUUID: participant.key.characterUUID,
 			combatRoom:    r.actor,
 			gateway:       participant.gateway,
@@ -622,8 +658,17 @@ func (r *CombatRoom) finishCombat(result *pb.CombatRoundResultNotify) {
 			enemyGroupID:  r.enemyGroupID,
 			battleReward:  battleReward,
 			rewardErr:     rewardErr,
-		}); err != nil {
+		})
+		if err != nil {
+			allSettled = false
 			xlog.GLog.Errorf("combat room account finish sync failed battle:%s aid:%d character:%d err:%v", r.battleID, participant.key.aid, participant.key.characterUUID, err)
+		}
+	}
+	if allSettled && r.victoryTeleport != nil && result.GetSettlement().GetBattleResult() == pb.CombatBattleResult_CombatBattleResult_InitiatorWin {
+		if participant := r.participant(combatRoomParticipantKey(r.victoryTeleport.leader)); participant != nil {
+			if err := participant.account.PostCombatVictoryTeleportSync(*r.victoryTeleport); err != nil {
+				xlog.GLog.Errorf("combat victory team teleport failed battle:%s npc:%d option:%d err:%v", r.battleID, r.victoryTeleport.sourceNPCEntityID, r.victoryTeleport.sourceOptionID, err)
+			}
 		}
 	}
 	r.finalizeRoundParticipantLeaves()

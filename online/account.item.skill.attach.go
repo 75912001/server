@@ -12,17 +12,15 @@ import (
 )
 
 type equipmentSkillAttachPlan struct {
-	characterUUID     uint64
-	petUUID           uint64
-	equipmentUUID     uint64
-	matched           bool
-	resultEquipment   *pb.EquipmentRecord
-	materialCosts     []*pb.ItemCostResult
-	previousUsedUUID  uint64
-	characterSlot     int
-	previousCharacter *pb.CharacterRecord
-	nextCharacter     *pb.CharacterRecord
-	nextAccountRecord *pb.AccountRecord
+	characterUUID uint64
+	petUUID       uint64
+	equipmentUUID uint64
+	matched       bool
+	skillID       uint32
+	materials     []*pb.ItemElement
+	characterSlot int
+	// materialCosts 在 apply 阶段按消耗后的权威数量填充, 供响应返回.
+	materialCosts []*pb.ItemCostResult
 }
 
 func (p *Account) onEquipmentSkillAttachReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
@@ -43,25 +41,25 @@ func (p *Account) onEquipmentSkillAttachReq(gateway *Gateway, pkt *pb.OnlineClie
 		p.sendClientErr(gateway, uint32(pb.MsgID_EquipmentSkillAttachRes_CMD), itemSynthesisResultID(err))
 		return
 	}
-	if err := persistEquipmentSkillAttachPlan(plan, p.accountRecord, character, func(next *pb.AccountRecord) error {
-		return unaryCacheSetAccountRecord(p.aid, next)
-	}); err != nil {
+	if err := applyEquipmentSkillAttachPlan(plan, p.accountRecord, character, p.deferAccountRecordPersist); err != nil {
 		xlog.GLog.Errorf("persist equipment skill attach failed aid:%d character:%d pet:%d equipment:%d matched:%t err:%v", p.aid, plan.characterUUID, plan.petUUID, plan.equipmentUUID, plan.matched, err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_EquipmentSkillAttachRes_CMD), xerror.Internal.Code())
 		return
 	}
 
-	p.sendCharacterContainerChangedNotify(gateway, plan.characterUUID, plan.nextCharacter.GetItemBag(), 0)
+	p.sendCharacterContainerChangedNotify(gateway, plan.characterUUID, character.record.GetItemBag(), 0)
 	p.sendClientRes(gateway, uint32(pb.MsgID_EquipmentSkillAttachRes_CMD), xerror.Success.Code(), &pb.EquipmentSkillAttachRes{
 		CharacterUuid:          plan.characterUUID,
 		PetUuid:                plan.petUUID,
 		EquipmentUuid:          plan.equipmentUUID,
 		Matched:                plan.matched,
-		ResultEquipment:        proto.Clone(plan.resultEquipment).(*pb.EquipmentRecord),
+		ResultEquipment:        proto.Clone(character.record.GetItemBag().GetEquipmentRecordMap()[plan.equipmentUUID]).(*pb.EquipmentRecord),
 		MaterialCostResultList: cloneItemCostResults(plan.materialCosts),
 	})
 }
 
+// prepareEquipmentSkillAttachPlan 只做校验与变更计算, 不修改账号档案。
+// 原地提交要求 apply 阶段不可失败, 因此所有可能失败的检查都在这里完成。
 func prepareEquipmentSkillAttachPlan(accountRecord *pb.AccountRecord, characterRecord *pb.CharacterRecord, petUUID, equipmentUUID uint64, materials []*pb.ItemElement) (*equipmentSkillAttachPlan, error) {
 	if accountRecord == nil || characterRecord == nil || characterRecord.GetBase().GetUuid() == 0 || petUUID == 0 || equipmentUUID == 0 || len(materials) == 0 || len(materials) > gameconfig.TiangongMaximumMaterialTypes {
 		return nil, errItemSynthesisInvalidArgument
@@ -100,75 +98,61 @@ func prepareEquipmentSkillAttachPlan(accountRecord *pb.AccountRecord, characterR
 	}
 
 	enchantment, matched := gameconfig.GGameConfig.Tiangong.MatchEnchantment(equipment.GetAssetId(), materialCounts)
-	replacementIndex := -1
+	if matched && equipment.GetAdditionalSkillId() == enchantment.SkillID {
+		return nil, fmt.Errorf("%w: equipment %d already has additional skill %d", errItemSynthesisFailedPrecondition, equipmentUUID, enchantment.SkillID)
+	}
+	// MatchEnchantment 未命中时返回 nil, 只有命中才读取技能 ID.
+	skillID := uint32(0)
 	if matched {
-		newStatusSpiritAttribute, newStatusSpirit := equipmentStatusSpiritResistanceAttribute(enchantment.SkillID)
-		for index, skillID := range equipment.GetAdditionalSkillIdList() {
-			if skillID == enchantment.SkillID {
-				return nil, fmt.Errorf("%w: equipment %d already has additional skill %d", errItemSynthesisFailedPrecondition, equipmentUUID, skillID)
-			}
-			if existingAttribute, existingStatusSpirit := equipmentStatusSpiritResistanceAttribute(skillID); newStatusSpirit && existingStatusSpirit && existingAttribute == newStatusSpiritAttribute {
-				replacementIndex = index
-			}
+		skillID = enchantment.SkillID
+	}
+
+	return &equipmentSkillAttachPlan{
+		characterUUID: characterRecord.GetBase().GetUuid(),
+		petUUID:       petUUID,
+		equipmentUUID: equipmentUUID,
+		matched:       matched,
+		skillID:       skillID,
+		materials:     materials,
+		characterSlot: characterSlot,
+	}, nil
+}
+
+// applyEquipmentSkillAttachPlan 把计划原地应用到权威账号档案, 再通知落盘。
+// 与改造前的区别: 不再克隆整个 AccountRecord, 也不再做事后差分解算通知。
+func applyEquipmentSkillAttachPlan(plan *equipmentSkillAttachPlan, accountRecord *pb.AccountRecord, character *character, persist func() error) error {
+	if plan == nil || accountRecord == nil || character == nil || persist == nil || character.record == nil {
+		return errItemSynthesisInvalidArgument
+	}
+	if plan.characterSlot < 0 || plan.characterSlot >= len(accountRecord.GetCharacterRecordList()) ||
+		accountRecord.GetCharacterRecordList()[plan.characterSlot] != character.record {
+		return fmt.Errorf("%w: authoritative account state changed before persistence", errItemSynthesisRecordInvalid)
+	}
+	equipment := character.record.GetItemBag().GetEquipmentRecordMap()[plan.equipmentUUID]
+	if equipment == nil {
+		return fmt.Errorf("%w: equipment %d is missing before apply", errItemSynthesisRecordInvalid, plan.equipmentUUID)
+	}
+
+	itemManager := newCharacterItemManager(character.record)
+	for _, material := range plan.materials {
+		if err := itemManager.Consume(material.GetAssetId(), material.GetCount()); err != nil {
+			return fmt.Errorf("%w: consume material %d: %v", errItemSynthesisRecordInvalid, material.GetAssetId(), err)
+		}
+	}
+	if plan.matched {
+		equipment.AdditionalSkillId = plan.skillID
+		if err := validateEquipmentRecord(equipment, plan.equipmentUUID); err != nil {
+			return fmt.Errorf("%w: attached equipment %d: %v", errItemSynthesisRecordInvalid, plan.equipmentUUID, err)
 		}
 	}
 
-	nextAccountRecord := proto.Clone(accountRecord).(*pb.AccountRecord)
-	nextCharacter := nextAccountRecord.GetCharacterRecordList()[characterSlot]
-	nextEquipment := nextCharacter.GetItemBag().GetEquipmentRecordMap()[equipmentUUID]
-	if nextEquipment == nil {
-		return nil, fmt.Errorf("%w: cloned equipment %d is missing", errItemSynthesisRecordInvalid, equipmentUUID)
-	}
-	nextItemManager := newCharacterItemManager(nextCharacter)
-	for _, material := range materials {
-		if err := nextItemManager.Consume(material.GetAssetId(), material.GetCount()); err != nil {
-			return nil, fmt.Errorf("%w: consume material %d: %v", errItemSynthesisRecordInvalid, material.GetAssetId(), err)
-		}
-	}
-	if matched {
-		if replacementIndex >= 0 {
-			nextEquipment.AdditionalSkillIdList[replacementIndex] = enchantment.SkillID
-		} else {
-			nextEquipment.AdditionalSkillIdList = append(nextEquipment.AdditionalSkillIdList, enchantment.SkillID)
-		}
-		if err := validateEquipmentRecord(nextEquipment, equipmentUUID); err != nil {
-			return nil, fmt.Errorf("%w: attached equipment %d: %v", errItemSynthesisRecordInvalid, equipmentUUID, err)
-		}
-	}
-
-	plan := &equipmentSkillAttachPlan{
-		characterUUID:     characterRecord.GetBase().GetUuid(),
-		petUUID:           petUUID,
-		equipmentUUID:     equipmentUUID,
-		matched:           matched,
-		resultEquipment:   nextEquipment,
-		previousUsedUUID:  accountRecord.GetUsedUuid(),
-		characterSlot:     characterSlot,
-		previousCharacter: characterRecord,
-		nextCharacter:     nextCharacter,
-		nextAccountRecord: nextAccountRecord,
-	}
-	for _, material := range materials {
+	plan.materialCosts = plan.materialCosts[:0]
+	for _, material := range plan.materials {
 		plan.materialCosts = append(plan.materialCosts, &pb.ItemCostResult{
 			ItemId:         material.GetAssetId(),
 			ConsumedCount:  material.GetCount(),
-			RemainingCount: nextItemManager.Count(material.GetAssetId()),
+			RemainingCount: itemManager.Count(material.GetAssetId()),
 		})
 	}
-	return plan, nil
-}
-
-func persistEquipmentSkillAttachPlan(plan *equipmentSkillAttachPlan, accountRecord *pb.AccountRecord, character *character, persist func(*pb.AccountRecord) error) error {
-	if plan == nil || accountRecord == nil || character == nil || persist == nil || plan.nextAccountRecord == nil || plan.nextCharacter == nil || plan.resultEquipment == nil {
-		return errItemSynthesisInvalidArgument
-	}
-	if plan.characterSlot < 0 || plan.characterSlot >= len(accountRecord.GetCharacterRecordList()) || accountRecord.GetCharacterRecordList()[plan.characterSlot] != plan.previousCharacter || character.record != plan.previousCharacter || accountRecord.GetUsedUuid() != plan.previousUsedUUID {
-		return fmt.Errorf("%w: authoritative account state changed before persistence", errItemSynthesisRecordInvalid)
-	}
-	if err := persist(plan.nextAccountRecord); err != nil {
-		return err
-	}
-	accountRecord.CharacterRecordList[plan.characterSlot] = plan.nextCharacter
-	character.record = plan.nextCharacter
-	return nil
+	return persist()
 }

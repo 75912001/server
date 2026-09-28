@@ -59,7 +59,14 @@ func (p *Account) onNPCInteractionReq(gateway *Gateway, packet *pb.OnlineClientP
 		p.sendClientErr(gateway, uint32(pb.MsgID_NpcInteractionRes_CMD), xerror.Internal.Code())
 		return
 	}
-	if err := character.startCombatPVE(gateway, enemyGroupID); err != nil {
+	var teleport *combatVictoryTeleport
+	if target, valid := option.BattleChallengeVictoryTeleport(); !valid {
+		p.sendClientErr(gateway, uint32(pb.MsgID_NpcInteractionRes_CMD), xerror.Internal.Code())
+		return
+	} else if target != nil {
+		teleport = &combatVictoryTeleport{sourceSceneID: character.sceneID, sourceNPCEntityID: request.GetNpcEntityId(), sourceOptionID: request.GetOptionId(), targetSceneID: *target.MapID, x: *target.X, y: *target.Y, leader: key}
+	}
+	if err := character.startCombatPVEWithTeleport(gateway, enemyGroupID, teleport); err != nil {
 		xlog.GLog.Warnf(
 			"npc battle challenge failed aid:%d character:%d scene:%d npc:%d option:%d enemyGroup:%d err:%v",
 			p.aid, request.GetCharacterUuid(), character.sceneID, request.GetNpcEntityId(), request.GetOptionId(), enemyGroupID, err,

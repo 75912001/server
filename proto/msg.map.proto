@@ -3,7 +3,22 @@ syntax = "proto3";
 package account;
 option go_package = "server/proto/pb;pb";
 
+import "asset.proto";
 import "common.proto";
+
+// MapPathPoint 朝向限定为八方向; 服务端移动判定读取坐标, 朝向用于表现和最终停止.
+message MapPathPoint {
+  uint32 x = 1;
+  uint32 y = 2;
+  AssetDirection direction = 3;
+}
+
+message MapMovementState {
+  MapPathPoint position = 1; // 当前已到达的权威格
+  repeated MapPathPoint remaining_path = 2; // 从当前格起的剩余路径, 首项等于 position
+  uint32 next_step_remaining_ms = 3;
+  repeated uint32 step_due_ms = 4; // 剩余路径各位移相对当前快照的累计到期毫秒
+}
 
 // MapCharacterInfo 是练级地图角色列表使用的完整显示快照.
 message MapCharacterInfo {
@@ -15,6 +30,7 @@ message MapCharacterInfo {
   uint64 mount_pet_id = 6; // 当前骑宠资源 ID; 没有骑宠时为 0
   bool team_enabled = 7; // 当前登录会话中是否允许组队
   bool in_combat = 8; // 是否正在战斗; 地图列表据此显示 [vs] 并禁用加入
+  MapMovementState movement = 9; // 地图内权威位置和正在执行的路径
 }
 
 // CharacterMapTeam 是可进入地图的第一层展示节点, 表示一个单人或一支完整队伍.
@@ -27,6 +43,8 @@ message CharacterMapTeam {
 message CharacterMapEnterReq {
   uint64 character_uuid = 1; // 发起进入操作的当前账号角色 UUID
   uint32 map_id = 2; // 0 表示离开当前地图; 非 0 表示当前版本允许进入的测试、练级或任务地图 ID
+  uint32 task_id = 3; // 从任务步骤入口进入时指定任务ID, 服务端据此读取权威落点
+  uint32 step_id = 4; // 与task_id同时设置; 普通地图入口均为0
 }
 
 //0x00101D#gateway->client#进入地图-回复
@@ -34,6 +52,58 @@ message CharacterMapEnterRes {
   uint64 character_uuid = 1; // 本次进入地图的接收角色 UUID
   uint32 map_id = 2; // 服务端确认的目标地图 ID; 0 表示当前不在任何地图中
   repeated CharacterMapTeam team_list = 3; // 目标地图全部其他单人和队伍, 不包含接收角色所在队伍
+  MapMovementState self_movement = 4; // 接收角色的位置和剩余路径
+}
+
+//0x00101F#client->gateway#提交地图移动路径-请求
+message MovePathReq {
+  uint64 character_uuid = 1;
+  repeated MapPathPoint path = 2; // 单点为静止原地转向; 多点为起点及最多 30 个相邻目标格; 不携带地图 ID
+}
+
+//0x001020#gateway->client#提交地图移动路径-回复
+message MovePathRes {
+  uint64 character_uuid = 1;
+  MapMovementState movement = 2; // 成功时为接受的路线; 失败时随错误码返回当前权威快照, 用于撤销预测
+}
+
+//0x001021#gateway->client#地图实体移动-通知
+message EntityMoveNotify {
+  uint64 target_character_uuid = 1;
+  CharacterKey entity = 2;
+  repeated MapPathPoint path = 3; // 服务端保留的完整逐格路径
+  uint32 first_step_remaining_ms = 4;
+  repeated uint32 step_due_ms = 5; // path 中每次位移相对本通知的累计到期毫秒
+}
+
+//0x001022#gateway->client#地图移动逐格同步-通知
+message MoveSyncNotify {
+  uint64 character_uuid = 1;
+  MapPathPoint position = 2;
+}
+
+enum EntityStopReason {
+  EntityStopReason_Completed = 0;
+  EntityStopReason_Replaced = 1;
+  EntityStopReason_Interrupted = 2;
+  EntityStopReason_Blocked = 3;
+  EntityStopReason_Teleport = 4;
+}
+
+//0x001023#gateway->client#地图实体停止-通知
+message EntityStopNotify {
+  uint64 target_character_uuid = 1;
+  CharacterKey entity = 2;
+  MapPathPoint position = 3;
+  EntityStopReason reason = 4;
+}
+
+//0x001024#gateway->client#地图传送-通知
+message TeleportNotify {
+  uint64 character_uuid = 1;
+  uint32 map_id = 2; // 服务端选定的目标地图
+  MapPathPoint position = 3;
+  repeated CharacterMapTeam team_list = 4; // 目标地图现有单人与队伍, 不含本队
 }
 
 //0x00101E#gateway->client#地图角色事件-通知

@@ -32,3 +32,5 @@ grpc:
 
 custom:
   gameConfigDir: /app/config
+  accountRecordFlushIntervalSecond: 10
+  accountRecordFlushWriteCount: 10

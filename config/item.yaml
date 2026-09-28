@@ -1,5 +1,5 @@
 # 普通道具配置, 由Godot道具编辑器从config.raw/item.yaml导出.
-# 当前包含309条已发布普通道具; 素材、货币、武器和装备由独立配置维护.
+# 当前包含314条已发布普通道具; 素材、货币、武器和装备由独立配置维护.
 items:
   item:
     3000001:
@@ -74,132 +74,275 @@ items:
       effectstring: 从猜谜大师的弟子那获得的          猜的箱子
       atlas: "item/道具"
       sprite: 126056
+      use:
+        target: character
+        rewardId: 3000303
+    3000304:
+      name: 雅哈奴的日记
+      secretname: 雅哈奴的日记
+      effectstring: 雅哈奴写的日记
+      atlas: "item/道具"
+      sprite: 6716
+    3000305:
+      name: 群青的水
+      secretname: 群青的水
+      effectstring: 制造「碧青水晶」所必须的水
+      atlas: "item/道具"
+      sprite: 6548
+    3000306:
+      name: 深蓝色石头
+      secretname: 深蓝色石头
+      effectstring: 制造「碧青水晶」所必须的石头
+      atlas: "item/道具"
+      sprite: 6852
+    3000307:
+      name: 碧青水晶
+      secretname: 碧青水晶
+      effectstring: 闪耀着神秘蓝白光芒的水晶
+      atlas: "item/道具"
+      sprite: 5600
+    3000308:
+      name: "不死鸟的羽毛[火]"
+      secretname: "不死鸟的羽毛[火]"
+      effectstring: "魅力 +3 [火 +5]"
+      atlas: "item/道具"
+      sprite: 6855
     3090001:
       name: 耐久力回复药
       secretname: 耐久力回复药
       effectstring: 耐久力100前後回复
       atlas: "item/道具"
       sprite: 6549
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7033
+        hpRecovery: 100
     3090002:
       name: 耐久力回复药
       secretname: 耐久力回复药
       effectstring: 耐久力200前後回复
       atlas: "item/道具"
       sprite: 6550
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7053
+        hpRecovery: 200
     3090003:
       name: 耐久力回复药
       secretname: 耐久力回复药
       effectstring: 耐久力300前後回复
       atlas: "item/道具"
       sprite: 6551
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7053
+        hpRecovery: 300
     3090004:
       name: 耐久力回复药
       secretname: 耐久力回复药
       effectstring: 耐久力400前後回复
       atlas: "item/道具"
       sprite: 6552
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7067
+        hpRecovery: 400
     3090005:
       name: 耐久力回复药
       secretname: 耐久力回复药
       effectstring: 耐久力500前後回复
       atlas: "item/道具"
       sprite: 6553
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7067
+        hpRecovery: 500
     3090006:
       name: 耐久力回复药
       secretname: 耐久力回复药
       effectstring: 耐久力600前後回复
       atlas: "item/道具"
       sprite: 6554
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7067
+        hpRecovery: 600
     3090007:
       name: 耐久力回复药
       secretname: 耐久力回复药
       effectstring: 耐久力800前後回复
       atlas: "item/道具"
       sprite: 6555
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7067
+        hpRecovery: 800
     3090008:
       name: 耐久力回复药
       secretname: 耐久力回复药
       effectstring: 耐久力1000前後回复
       atlas: "item/道具"
       sprite: 6556
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7067
+        hpRecovery: 1000
     3090009:
       name: 气力回复药
       secretname: 气力回复药
       effectstring: 气力20前後回复
       atlas: "item/道具"
       sprite: 6541
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7033
+        mpRecovery: 20
     3090010:
       name: 气力回复药
       secretname: 气力回复药
       effectstring: 气力40前後回复
       atlas: "item/道具"
       sprite: 6542
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7033
+        mpRecovery: 40
     3090011:
       name: 气力回复药
       secretname: 气力回复药
       effectstring: 气力60前後回复
       atlas: "item/道具"
       sprite: 6543
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7033
+        mpRecovery: 60
     3090012:
       name: 气力回复药
       secretname: 气力回复药
       effectstring: 气力80前後回复
       atlas: "item/道具"
       sprite: 6544
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7033
+        mpRecovery: 80
     3090013:
       name: 气力回复药
       secretname: 气力回复药
       effectstring: 气力100前後回复
       atlas: "item/道具"
       sprite: 6545
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7033
+        mpRecovery: 100
     3090014:
       name: 复活药(100)
       secretname: 复活药(100)
       effectstring: 气绝回复成耐力100
       atlas: "item/道具"
       sprite: 6557
+      battleUse:
+        targetScope: singleDeadAlly
+        userEffectId: 7232
+        receiveEffectId: 7120
+        resurrection: 100
     3090015:
       name: 复活药(300)
       secretname: 复活药(300)
       effectstring: 气绝回复成耐力300
       atlas: "item/道具"
       sprite: 6557
+      battleUse:
+        targetScope: singleDeadAlly
+        userEffectId: 7232
+        receiveEffectId: 7141
+        resurrection: 300
     3090016:
       name: 复活药(500)
       secretname: 复活药(500)
       effectstring: 气绝回复成耐力500
       atlas: "item/道具"
       sprite: 6557
+      battleUse:
+        targetScope: singleDeadAlly
+        userEffectId: 7232
+        receiveEffectId: 7162
+        resurrection: 500
     3090017:
       name: 乌西摩尼叶
       secretname: 乌西摩尼叶
       effectstring: 解毒的热带性植物
       atlas: "item/道具.素材"
       sprite: 6562
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7081
+        statusRecovery:
+          statusId: 1
     3090018:
       name: 伊西娃丽索叶
       secretname: 伊西娃丽索叶
       effectstring: 解除石化的潮湿地带植物
       atlas: "item/道具.素材"
       sprite: 6563
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7081
+        statusRecovery:
+          statusId: 4
     3090019:
       name: 摩浦叶
       secretname: 摩浦叶
       effectstring: 解除混乱的平原植物
       atlas: "item/道具.素材"
       sprite: 6560
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7081
+        statusRecovery:
+          statusId: 6
     3090020:
       name: 西伦恩根
       secretname: 西伦恩根
       effectstring: 解除酒醉的乾燥地带植物
       atlas: "item/道具.素材"
       sprite: 6564
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7081
+        statusRecovery:
+          statusId: 5
     3090021:
       name: 菲恩叶
       secretname: 菲恩叶
       effectstring: 解除睡眠的海边植物
       atlas: "item/道具.素材"
       sprite: 6561
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7081
+        statusRecovery:
+          statusId: 3
     3090022:
       name: 奇克拉耐久力之石
       secretname: 奇克拉耐久力之石
@@ -290,12 +433,22 @@ items:
       effectstring: 气力200前後回复
       atlas: "item/道具"
       sprite: 6543
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7053
+        mpRecovery: 200
     3090037:
       name: PK用耐久力回复药
       secretname: PK用耐久力回复药
       effectstring: 耐久力800前後回复
       atlas: "item/道具"
       sprite: 6555
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7067
+        hpRecovery: 800
     3090038:
       name: 南瓜灯
       secretname: 南瓜灯
@@ -332,12 +485,22 @@ items:
       effectstring: 气力100前後回复
       atlas: "item/道具"
       sprite: 6548
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7033
+        mpRecovery: 100
     3090044:
       name: 哈罗的香草
       secretname: 哈罗的香草
       effectstring: 吃下去後耐久力回复100       生长在哈罗山上的高山植物
       atlas: "item/道具"
       sprite: 6566
+      battleUse:
+        targetScope: singleAlly
+        userEffectId: 7232
+        receiveEffectId: 7033
+        hpRecovery: 100
     3090045:
       name: 不可思议的贝壳
       secretname: 不可思议的贝壳
@@ -392,36 +555,74 @@ items:
       effectstring: 从气绝回复成500的耐久力
       atlas: "item/道具"
       sprite: 6995
+      battleUse:
+        targetScope: singleDeadAlly
+        userEffectId: 7232
+        receiveEffectId: 7162
+        resurrection: 500
     3090054:
       name: 马伦的葡萄
       secretname: 马伦的葡萄
       effectstring: 战斗中使用的话就会．．
       atlas: "item/道具"
       sprite: 6754
+      battleUse:
+        targetScope: none
+        fieldAttribute:
+          element: 1
+          power: 50
+          durationRounds: 6
     3090055:
       name: 马伦的葡萄
       secretname: 马伦的葡萄
       effectstring: 战斗中使用的话就会．．
       atlas: "item/道具"
       sprite: 6756
+      battleUse:
+        targetScope: none
+        fieldAttribute:
+          element: 2
+          power: 50
+          durationRounds: 6
     3090056:
       name: 马伦的葡萄
       secretname: 马伦的葡萄
       effectstring: 战斗中使用的话就会．．
       atlas: "item/道具"
       sprite: 6755
+      battleUse:
+        targetScope: none
+        fieldAttribute:
+          element: 3
+          power: 50
+          durationRounds: 6
     3090057:
       name: 马伦的葡萄
       secretname: 马伦的葡萄
       effectstring: 战斗中使用的话就会．．
       atlas: "item/道具"
       sprite: 6753
+      battleUse:
+        targetScope: none
+        fieldAttribute:
+          element: 4
+          power: 50
+          durationRounds: 6
     3090058:
       name: 马伦的毒蘑菇
       secretname: 马伦的毒蘑菇
       effectstring: 战斗中使用的话就会．．
       atlas: "item/道具"
       sprite: 6747
+      battleUse:
+        targetScope: singleOpponent
+        userEffectId: 7232
+        receiveEffectId: 7092
+        statusChange:
+          statusId: 1
+          durationActions: 8
+          baseSuccess: 15
+          levelDifferenceRange: 30
     3090059:
       name: 哈恩的壶
       secretname: 哈恩的壶
@@ -1610,24 +1811,48 @@ items:
       effectstring: "暂时增强地属性60%3回合"
       atlas: "item/道具"
       sprite: 6934
+      battleUse:
+        targetScope: none
+        fieldAttribute:
+          element: 1
+          power: 60
+          durationRounds: 3
     3090257:
       name: 西基摩的肉
       secretname: 西基摩的肉
       effectstring: "暂时增强水属性60%3回合"
       atlas: "item/道具"
       sprite: 6934
+      battleUse:
+        targetScope: none
+        fieldAttribute:
+          element: 2
+          power: 60
+          durationRounds: 3
     3090258:
       name: 卡卡摩的肉
       secretname: 卡卡摩的肉
       effectstring: "暂时增强火属性60%3回合"
       atlas: "item/道具"
       sprite: 6933
+      battleUse:
+        targetScope: none
+        fieldAttribute:
+          element: 3
+          power: 60
+          durationRounds: 3
     3090259:
       name: 卡卡摩的肉
       secretname: 卡卡摩的肉
       effectstring: "暂时增强风属性60%3回合"
       atlas: "item/道具"
       sprite: 6933
+      battleUse:
+        targetScope: none
+        fieldAttribute:
+          element: 4
+          power: 60
+          durationRounds: 3
     3090260:
       name: 玛蕾菲雅喜欢的花
       secretname: 玛蕾菲雅喜欢的花

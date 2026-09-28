@@ -28,6 +28,29 @@ func (p *Account) onCharacterMapEnterReq(gateway *Gateway, packet *pb.OnlineClie
 		return
 	}
 	base := character.record.GetBase()
+	var taskEntryPoint *pb.MapPathPoint
+	if request.GetTaskId() != 0 || request.GetStepId() != 0 {
+		if request.GetTaskId() == 0 || request.GetStepId() == 0 || request.GetMapId() == 0 ||
+			gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Task == nil || gameconfig.GGameConfig.Scene == nil {
+			p.sendClientErr(gateway, uint32(pb.MsgID_CharacterMapEnterRes_CMD), xerror.InvalidArgument.Code())
+			return
+		}
+		task := gameconfig.GGameConfig.Task.Get(request.GetTaskId())
+		if task == nil || int(request.GetStepId()) > len(task.Steps) {
+			p.sendClientErr(gateway, uint32(pb.MsgID_CharacterMapEnterRes_CMD), xerror.FailedPrecondition.Code())
+			return
+		}
+		step := task.Steps[request.GetStepId()-1]
+		record := character.record.GetTaskRecordMap()[request.GetTaskId()]
+		if step.Navigation == nil || *step.Navigation.MapID != request.GetMapId() || record == nil ||
+			int(request.GetStepId()) > len(record.GetStepRecordList()) || record.GetStepRecordList()[request.GetStepId()-1].GetStartedAtMs() == 0 {
+			p.sendClientErr(gateway, uint32(pb.MsgID_CharacterMapEnterRes_CMD), xerror.FailedPrecondition.Code())
+			return
+		}
+		if step.Navigation.X != nil {
+			taskEntryPoint = &pb.MapPathPoint{X: *step.Navigation.X, Y: *step.Navigation.Y}
+		}
+	}
 	if character.sceneID == request.GetMapId() {
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterMapEnterRes_CMD), xerror.AlreadyExists.Code())
 		return
@@ -40,10 +63,6 @@ func (p *Account) onCharacterMapEnterReq(gateway *Gateway, packet *pb.OnlineClie
 		targetScene := gameconfig.GGameConfig.Scene.Get(request.GetMapId())
 		if targetScene == nil {
 			p.sendClientErr(gateway, uint32(pb.MsgID_CharacterMapEnterRes_CMD), xerror.NotFound.Code())
-			return
-		}
-		if !characterMapEncounterEnabled(targetScene) {
-			p.sendClientErr(gateway, uint32(pb.MsgID_CharacterMapEnterRes_CMD), xerror.FailedPrecondition.Code())
 			return
 		}
 	}
@@ -95,7 +114,7 @@ func (p *Account) onCharacterMapEnterReq(gateway *Gateway, packet *pb.OnlineClie
 		})
 		return
 	}
-	existing, joined := GScenePresenceMgr.joinCharacterMap(targetPresences)
+	existing, joined := GScenePresenceMgr.joinCharacterMapAt(targetPresences, taskEntryPoint)
 	if !joined {
 		xlog.GLog.Errorf("join character map failed aid:%d character:%d map:%d", p.aid, key.characterUUID, request.GetMapId())
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterMapEnterRes_CMD), xerror.Internal.Code())
@@ -114,6 +133,7 @@ func (p *Account) onCharacterMapEnterReq(gateway *Gateway, packet *pb.OnlineClie
 			CharacterUuid: presence.key.characterUUID,
 			MapId:         request.GetMapId(),
 			TeamList:      teamList,
+			SelfMovement:  GScenePresenceMgr.movementSnapshot(presence.sceneID, presence.key),
 		})
 	}
 }
@@ -159,6 +179,9 @@ func (p *Account) removeCharacterMapEntrySource(presences []sceneCharacterPresen
 	if isCharacterMapID(presences[0].sceneID) {
 		keys := make([]sceneCharacterKey, 0, len(presences))
 		for _, presence := range presences {
+			p.sendMapStopEvents(presence.sceneID,
+				GScenePresenceMgr.stopCharacterMove(presence.sceneID, presence.key),
+				pb.EntityStopReason_EntityStopReason_Interrupted)
 			keys = append(keys, presence.key)
 		}
 		_, viewers, ok := GScenePresenceMgr.removeCharacterMap(presences[0].sceneID, keys)
@@ -180,6 +203,8 @@ func (p *Account) removeCharacterMapEntrySource(presences []sceneCharacterPresen
 }
 
 func (p *Account) removeCharacterMapPresence(sceneID uint32, key sceneCharacterKey) bool {
+	p.sendMapStopEvents(sceneID, GScenePresenceMgr.stopCharacterMove(sceneID, key),
+		pb.EntityStopReason_EntityStopReason_Interrupted)
 	_, viewers, ok := GScenePresenceMgr.removeCharacterMap(sceneID, []sceneCharacterKey{key})
 	if !ok {
 		return false

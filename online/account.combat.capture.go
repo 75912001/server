@@ -51,7 +51,7 @@ func (p *Account) captureCombatPet(input combatRoomCaptureInput) combatRoomCaptu
 		return combatRoomCaptureResult{reason: pb.CombatCaptureFailureReason_CombatCaptureFailureReason_Persistence, err: fmt.Errorf("capture pet character is no longer in this battle")}
 	}
 	petRecord, reason, err := persistCombatCapturedPet(p.accountRecord, character, input.snapshot, func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+		return p.deferAccountRecordPersist()
 	})
 	if err != nil || petRecord == nil {
 		return combatRoomCaptureResult{reason: reason, err: err}

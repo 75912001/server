@@ -6,6 +6,7 @@ import (
 	pb "server/proto/pb"
 
 	xerror "github.com/75912001/xlib/error"
+	xlog "github.com/75912001/xlib/log"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -61,6 +62,10 @@ func (p *Account) onCharacterTeamOperationReq(gateway *Gateway, packet *pb.Onlin
 		response.Operation = &pb.CharacterTeamOperationRes_Join{Join: &pb.CharacterTeamJoinRes{}}
 		target := operation.Join.GetTarget()
 		targetKey := sceneCharacterKey{aid: target.GetAid(), characterUUID: target.GetCharacterUuid()}
+		if isCharacterMapID(character.sceneID) && !GScenePresenceMgr.canJoinMovingTeam(character.sceneID, key, targetKey) {
+			p.sendClientErr(gateway, uint32(pb.MsgID_CharacterTeamOperationRes_CMD), xerror.FailedPrecondition.Code())
+			return
+		}
 		mutation, operationErr = GCharacterTeamMgr.join(
 			character.sceneID,
 			key,
@@ -86,6 +91,11 @@ func (p *Account) onCharacterTeamOperationReq(gateway *Gateway, packet *pb.Onlin
 	if operationErr != nil {
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterTeamOperationRes_CMD), characterTeamResultID(operationErr))
 		return
+	}
+	if !joinOperation && isCharacterMapID(character.sceneID) {
+		p.sendMapStopEvents(character.sceneID,
+			GScenePresenceMgr.stopCharacterMove(character.sceneID, key),
+			pb.EntityStopReason_EntityStopReason_Interrupted)
 	}
 	if joinOperation && character.autoEncounterEnabled {
 		character.autoEncounterEnabled = false
@@ -130,6 +140,34 @@ func (p *Account) removeFailedCombatAdmissionMember(leaderKey sceneCharacterKey,
 }
 
 func (p *Account) applyCharacterTeamMutation(mutation characterTeamMutation) {
+	if len(mutation.compactFollowers) > 0 {
+		source, found := GScenePresenceMgr.find(mutation.compactFrom)
+		if !found || !isCharacterMapID(source.sceneID) {
+			xlog.GLog.Errorf("team position compaction source missing removed:%d", mutation.compactFrom.characterUUID)
+		} else {
+			p.sendMapStopEvents(source.sceneID,
+				GScenePresenceMgr.stopCharacterMove(source.sceneID, mutation.compactFrom),
+				pb.EntityStopReason_EntityStopReason_Interrupted)
+			moves, compacted := GScenePresenceMgr.compactCharacterTeamPositions(source.sceneID, mutation.compactFrom, mutation.compactFollowers)
+			if !compacted {
+				xlog.GLog.Errorf("team position compaction failed scene:%d removed:%d", source.sceneID, mutation.compactFrom.characterUUID)
+			} else {
+				p.sendMapMoveEvents(source.sceneID, moves, false)
+				viewers := GScenePresenceMgr.characterMapPresences(source.sceneID)
+				for _, move := range moves {
+					p.sendScenePresencePacket(move.presence, uint32(pb.MsgID_MoveSyncNotify_CMD), xerror.Success.Code(),
+						&pb.MoveSyncNotify{CharacterUuid: move.presence.key.characterUUID, Position: move.position})
+					info := mapCharacterInfo(move.presence)
+					for _, viewer := range viewers {
+						p.sendCharacterMapPacket(viewer, &pb.CharacterMapEventNotify{
+							TargetCharacterUuid: viewer.key.characterUUID,
+							Event:               &pb.CharacterMapEventNotify_CharacterUpdate{CharacterUpdate: info},
+						})
+					}
+				}
+			}
+		}
+	}
 	p.applyCharacterMapTeamEvent(mutation.mapEvent)
 }
 

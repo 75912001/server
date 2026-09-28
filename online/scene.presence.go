@@ -30,9 +30,12 @@ type scenePresenceManager struct {
 }
 
 type scenePresence struct {
-	mu       sync.RWMutex
-	byKey    map[sceneCharacterKey]sceneCharacterPresence
-	mapOrder []sceneCharacterKey
+	mu              sync.RWMutex
+	byKey           map[sceneCharacterKey]sceneCharacterPresence
+	mapOrder        []sceneCharacterKey
+	movement        map[sceneCharacterKey]*sceneMapMovement
+	movePlans       map[sceneCharacterKey]*sceneMovePlan
+	nextMoveVersion uint64
 }
 
 var GScenePresenceMgr = newScenePresenceManager()
@@ -42,7 +45,11 @@ func newScenePresenceManager() *scenePresenceManager {
 }
 
 func newScenePresence() *scenePresence {
-	return &scenePresence{byKey: make(map[sceneCharacterKey]sceneCharacterPresence)}
+	return &scenePresence{
+		byKey:     make(map[sceneCharacterKey]sceneCharacterPresence),
+		movement:  make(map[sceneCharacterKey]*sceneMapMovement),
+		movePlans: make(map[sceneCharacterKey]*sceneMovePlan),
+	}
 }
 
 func (m *scenePresenceManager) scene(sceneID uint32, create bool) *scenePresence {

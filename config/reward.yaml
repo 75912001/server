@@ -3,12 +3,14 @@
 rewards:
   - id: 6101
     name: "[任务]卡坦的证明·火难的戒指"
+    mode: all
     items:
       - itemId: 3630347
         quantity: 1
     pets: []
   - id: 6102
     name: "[任务]卡坦的愿望·修宝"
+    mode: all
     items: []
     pets:
       - petId: 4000293
@@ -17,6 +19,7 @@ rewards:
         quantity: 1
   - id: 6202
     name: "[任务]卡坦的愿望·朵拉比斯"
+    mode: all
     items: []
     pets:
       - petId: 4000332
@@ -25,18 +28,46 @@ rewards:
         quantity: 1
   - id: 6301
     name: "[任务]成人仪式·15个仪的玉"
+    mode: all
     items:
       - itemId: 3000301
         quantity: 15
     pets: []
   - id: 6302
     name: "[任务]成人仪式·仪之兜"
+    mode: all
     items:
-      - itemId: 3500545
+      - itemId: 3500551
+        quantity: 1
+    pets: []
+  - id: 3000303
+    name: "[道具]猜之箱子·金布伊"
+    mode: all
+    items: []
+    pets:
+      - petId: 4000245
+        level: 1
+        grade: random
+        quantity: 1
+  - id: 7001
+    name: "[任务]金布伊·金布伊"
+    mode: all
+    items: []
+    pets:
+      - petId: 4000245
+        level: 1
+        grade: random
+        quantity: 1
+  - id: 7002
+    name: "[任务]金布伊·谜之箱子"
+    mode: all
+    items:
+      - itemId: 3000302
         quantity: 1
     pets: []
   - id: 6303
-    name: "[任务]金布伊-左迪洛斯&&猜之箱子"
+    name: "[任务]金布伊·左迪洛斯与猜之箱子"
+    mode: all
     items:
       - itemId: 3000303
         quantity: 1
@@ -45,3 +76,80 @@ rewards:
         level: 1
         quantity: 1
         grade: random
+  - id: 3000304
+    name: "[任务]琉璃洞窟·拉鲁的项链"
+    mode: all
+    items:
+      - itemId: 3660578
+        quantity: 1
+    pets: []
+  - id: 3000305
+    name: "[任务]琉璃洞窟·雅哈奴的日记"
+    mode: all
+    items:
+      - itemId: 3000304
+        quantity: 1
+    pets: []
+  - id: 3000306
+    name: "[任务]琉璃洞窟·大地的羁绊"
+    mode: all
+    items:
+      - itemId: 3660577
+        quantity: 1
+    pets: []
+  - id: 6501
+    name: "[任务]玄黄洞窟·风的竖琴"
+    mode: all
+    items:
+      - itemId: 3640190
+        quantity: 1
+    pets: []
+  - id: 6502
+    name: "[任务]玄黄洞窟·风的锁[风]"
+    mode: all
+    items:
+      - itemId: 3660576
+        quantity: 1
+    pets: []
+  - id: 3000307
+    name: "[任务]碧青洞窟·群青的水"
+    mode: all
+    items:
+      - itemId: 3000305
+        quantity: 1
+    pets: []
+  - id: 3000308
+    name: "[任务]碧青洞窟·碧青水晶"
+    mode: all
+    items:
+      - itemId: 3000307
+        quantity: 1
+    pets: []
+  - id: 3000309
+    name: "[任务]碧青洞窟·水的戒指[水]"
+    mode: all
+    items:
+      - itemId: 3630145
+        quantity: 1
+    pets: []
+  - id: 6701
+    name: "[任务]深红洞窟·不死鸟的羽毛[火]"
+    mode: all
+    items:
+      - itemId: 3000308
+        quantity: 1
+    pets: []
+  - id: 6702
+    name: "[任务]深红洞窟·火的羽毛饰品[火]"
+    mode: all
+    items:
+      - itemId: 3660575
+        quantity: 1
+    pets: []
+  - id: 6801
+    name: "[任务]漆黑洞窟·精灵王之弓"
+    mode: all
+    items:
+      - itemId: 3941432
+        quantity: 1
+    pets: []

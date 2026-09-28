@@ -40,7 +40,8 @@ func combatNoGuardBlocked(state *combatUnitRuntimeState) bool {
 		return true
 	}
 	return state.statusTurns[pb.CombatStatusType_CombatStatusType_Sleep] > 0 ||
-		state.statusTurns[pb.CombatStatusType_CombatStatusType_Stone] > 0
+		state.statusTurns[pb.CombatStatusType_CombatStatusType_Stone] > 0 ||
+		state.statusTurns[pb.CombatStatusType_CombatStatusType_Paralysis] > 0
 }
 
 func (r *CombatRoom) executeStatusSpirit(action *combatAction, events *[]*combatStepResult) {
@@ -67,7 +68,7 @@ func (r *CombatRoom) executeStatusSpirit(action *combatAction, events *[]*combat
 		UnitKey: cloneCombatUnitKey(action.unitKey),
 		AssetDeltaList: []*pb.CombatAssetDelta{{
 			AssetType: pb.CombatAssetType_CombatAssetType_MP,
-			Delta:     combatClampDelta(uint64(action.statusMPCost)),
+			Delta:     combatClampDecreaseDelta(uint64(action.statusMPCost)),
 			After:     combatClampUint32(attacker.mp),
 		}},
 	}}
@@ -115,7 +116,8 @@ func (r *CombatRoom) processCombatControlBeforeAction(action *combatAction, even
 		return false
 	}
 	blocked := state.statusTurns[pb.CombatStatusType_CombatStatusType_Sleep] > 0 ||
-		state.statusTurns[pb.CombatStatusType_CombatStatusType_Stone] > 0
+		state.statusTurns[pb.CombatStatusType_CombatStatusType_Stone] > 0 ||
+		state.statusTurns[pb.CombatStatusType_CombatStatusType_Paralysis] > 0
 	statusDeltas := make([]*pb.CombatStatusDelta, 0, len(state.statusTurns))
 	for statusType, remaining := range state.statusTurns {
 		// 剧毒有独立的行动前扣血和到期致死流程, 不能在通用状态循环中再次递减.

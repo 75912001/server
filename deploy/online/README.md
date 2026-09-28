@@ -4,13 +4,15 @@
 
 镜像内时区为 `Asia/Shanghai`，容器日志时间与宿主机本地时间保持一致。
 
-online 启动时会先加载共享游戏配置. 镜像构建会把仓库 `config/` 整体复制到 `/app/config`, `deploy/online/*.yaml` 使用 `custom.gameConfigDir: /app/config`. `scene/*.yaml` 根节点不含格式版本字段; 单人或组队 PVE 自动遇敌从 `scene/*.yaml -> enemy.group.yaml` 读取敌人条目, 分别引用 `pet.yaml` 和 `ai.yaml`, 每张地图直接读取平铺的 `encounter.enabled` 和 `encounter.enemyGroups`, 再按权重选择敌人组. 敌人组直接引用宠物模板, 数量和等级来自敌人组, 属性来自宠物模板, 战斗技能、权重和目标策略由每个敌人的 `battleAI` 引用提供. `pet.yaml` 不再包含 AI 引用; 旧 `enemies[].skill` 和 AI 分离权重字段会导致启动失败, 发布时须同时更新代码和整套配置. server 只校验服务端消费字段和跨表引用; 角色展示字段、宠物展示字段、客户端 PNG、`.tpsheet` 和 frame 资源仍由 sa.desktop 校验.
+online 启动时会先加载共享游戏配置. 镜像构建会把仓库 `config/` 整体复制到 `/app/config`, `deploy/online/*.yaml` 使用 `custom.gameConfigDir: /app/config`. `scene/*.yaml` 根节点不含格式版本字段; 单人或组队 PVE 自动遇敌从 `scene/*.yaml -> enemy.group.yaml` 读取敌人条目, 分别引用 `pet.yaml` 和 `ai.yaml`. 每张地图的 `encounter.enabled` 和 `encounter.enemyGroups` 是区域外默认规则; 可选的 `encounter.regions` 按角色权威地图格覆盖该规则. 安全区跳过本轮并保留开关. 敌人组直接引用宠物模板, 数量和等级来自敌人组, 属性来自宠物模板, 战斗技能、权重和目标策略由每个敌人的 `battleAI` 引用提供. `pet.yaml` 不再包含 AI 引用; 旧 `enemies[].skill` 和 AI 分离权重字段会导致启动失败, 发布时须同时更新代码和整套配置. server 只校验服务端消费字段和跨表引用; 角色展示字段、宠物展示字段、客户端 PNG、`.tpsheet` 和 frame 资源仍由 sa.desktop 校验.
+
+新地图ID为100000-200000(含两端). 地图编辑器保存草稿不会写入`scene/*.yaml`; 发布才生成对应场景文件, 撤回会移除该文件. Online只在启动时读取场景配置, 因此发布或撤回后需重新构建镜像并重启实例才生效.
 
 装备配置还要求镜像内包含铠甲, 头盔, 盾牌, 手套, 腰带, 鞋子和首饰7个 `item.equipment.<类型>.yaml`. 装备编辑器发布后一次写入这些文件, 由既有整目录复制流程进入镜像; 任一文件缺失, 分组错误或 ID 超出对应范围都会使启动失败. 不增加部署参数, 更新运行配置仍需按原流程重新构建镜像并重启实例.
 
 任务系统还要求镜像内包含`task.yaml`和`reward.yaml`. 两表与道具、敌群引用在启动时校验, 缺失或错误时直接启动失败. Godot任务编辑器只修改仓库源文件, 不更新已运行容器; 修改运行任务后需要按原流程重新构建镜像并重启实例. 配置目录仍由现有`custom.gameConfigDir`指定, 不增加部署参数.
 
-旧非料理原子合成功能已暂停, Online启动时不读取或校验`item.synthesis.yaml`. 宠物“加工”读取`道具.天工司.yaml`, 校验基础武器、附技能和附元素配方的道具与技能引用; 基础制造允许多个产物共享素材签名并在命中时等概率随机, 同一装备的附技能和附元素素材签名仍必须唯一. 现代宠物技能`8100200`分别通过`ItemSynthesisReq`制造武器、通过`EquipmentSkillAttachReq`给角色背包装备附技能、通过`EquipmentElementAttachReq`写入或替换固定值20的地水火风元素; 已穿戴装备和仓库装备不在这些入口处理. 配置文件随`config/`整目录进入镜像, 不增加部署参数.
+旧非料理原子合成功能已暂停, Online启动时不读取或校验`item.synthesis.yaml`. 宠物“加工”读取`道具.天工司.yaml`, 校验基础装备、附技能和附元素配方的道具与技能引用; 武器、铠甲、头盔、盾牌、手套、腰带、鞋子和首饰都可作为基础制造产物. 基础制造允许多个产物共享素材签名并在命中时等概率随机, 同一装备的附技能和附元素素材签名仍必须唯一. 现代宠物技能`8100200`分别通过`ItemSynthesisReq`制造装备、通过`EquipmentSkillAttachReq`给角色背包装备附技能、通过`EquipmentElementAttachReq`写入或替换固定值20的地水火风元素; 已穿戴装备和仓库装备不在这些入口处理. 配置文件随`config/`整目录进入镜像, 不增加部署参数.
 
 ## gRPC 消息大小
 

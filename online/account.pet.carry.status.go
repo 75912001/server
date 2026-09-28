@@ -3,6 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math"
+
+	"server/common/gameconfig"
 
 	pb "server/proto/pb"
 
@@ -45,8 +48,27 @@ func (p *Account) onPetCarryStatusSetReq(gateway *Gateway, pkt *pb.OnlineClientP
 		p.sendClientErr(gateway, uint32(pb.MsgID_PetCarryStatusSetRes_CMD), xerror.NotFound.Code())
 		return
 	}
+	if character.combatRoom != nil {
+		p.sendClientErr(gateway, uint32(pb.MsgID_PetCarryStatusSetRes_CMD), xerror.FailedPrecondition.Code())
+		return
+	}
 
-	plan, err := preparePetCarryStatusChangePlan(character.record, change.GetPetUuid(), change.GetCarryStatus())
+	characterAssetID := character.record.GetBase().GetAssetId()
+	if characterAssetID > math.MaxUint32 || gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Character == nil {
+		p.sendClientErr(gateway, uint32(pb.MsgID_PetCarryStatusSetRes_CMD), xerror.Internal.Code())
+		return
+	}
+	characterConfig := gameconfig.GGameConfig.Character.Get(uint32(characterAssetID))
+	if characterConfig == nil {
+		p.sendClientErr(gateway, uint32(pb.MsgID_PetCarryStatusSetRes_CMD), xerror.Internal.Code())
+		return
+	}
+	plan, err := preparePetCarryStatusChangePlan(
+		character.record,
+		change.GetPetUuid(),
+		change.GetCarryStatus(),
+		characterConfig.CanMount,
+	)
 	if err != nil {
 		resultID := xerror.Internal.Code()
 		switch {
@@ -70,7 +92,7 @@ func (p *Account) onPetCarryStatusSetReq(gateway *Gateway, pkt *pb.OnlineClientP
 	}
 
 	if err := persistPetCarryStatusChange(plan, func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+		return p.deferAccountRecordPersist()
 	}); err != nil {
 		xlog.GLog.Errorf(
 			"set account record after pet carry status change failed aid:%d character:%d pet:%d status:%s err:%v",
@@ -95,6 +117,7 @@ func preparePetCarryStatusChangePlan(
 	characterRecord *pb.CharacterRecord,
 	targetPetUUID uint64,
 	targetStatus pb.PetCarryStatus,
+	canMount func(petID uint32) bool,
 ) (*petCarryStatusChangePlan, error) {
 	if characterRecord == nil || targetPetUUID == 0 {
 		return nil, fmt.Errorf("%w: character or pet uuid is empty", errPetCarryStatusInvalidArgument)
@@ -144,6 +167,15 @@ func preparePetCarryStatusChangePlan(
 	}
 	if targetPet == nil {
 		return nil, fmt.Errorf("%w: pet uuid %d", errPetCarryStatusTargetNotFound, targetPetUUID)
+	}
+	if targetStatus == pb.PetCarryStatus_PetCarryStatus_Mount &&
+		(canMount == nil || !canMount(targetPet.GetAssetId())) {
+		return nil, fmt.Errorf(
+			"%w: character %d cannot mount pet %d",
+			errPetCarryStatusFailedPrecondition,
+			characterRecord.GetBase().GetAssetId(),
+			targetPet.GetAssetId(),
+		)
 	}
 	if targetStatus == pb.PetCarryStatus_PetCarryStatus_Mount && targetPet.GetLoyalty() != 100 {
 		return nil, fmt.Errorf(

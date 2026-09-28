@@ -33,6 +33,7 @@ const (
 	combatActionKindPoisonAttack
 	combatActionKindStoneAttack
 	combatActionKindConfusionAttack
+	combatActionKindDrunkAttack
 	combatActionKindSleepAttack
 	combatActionKindDeepPoisonAttack
 	combatActionKindChargeAttack
@@ -42,9 +43,13 @@ const (
 	combatActionKindPowerBalance
 	combatActionKindShowMercy
 	combatActionKindCapture
+	combatActionKindSwitchPet
 	combatActionKindAbduct
 	combatActionKindStatusSpirit
 	combatActionKindHealingSpirit
+	combatActionKindStatusRecovery
+	combatActionKindItem
+	combatActionKindEquipment
 )
 
 // combatEffectKind只用于服务端结算器内部区分原子结果, 不进入线上协议.
@@ -60,6 +65,7 @@ const (
 	combatEffectKindKnockback
 	combatEffectKindEscape
 	combatEffectKindUnitLeave
+	combatEffectKindUnitEnter
 	combatEffectKindActionOnly
 	combatEffectKindStatus
 	combatEffectKindCapture
@@ -67,6 +73,9 @@ const (
 	combatEffectKindHeal
 	combatEffectKindReaction
 	combatEffectKindVisibility
+	combatEffectKindItemUsed
+	combatEffectKindFieldAttribute
+	combatEffectKindEquipmentChanged
 )
 
 // combatHitResult保留旧结算器可组合的命中标记. 协议出口会归一化为
@@ -127,11 +136,14 @@ func (d *combatDamageDetail) GetHpAfter() uint32 {
 
 // combatAction是服务端根据技能.yaml解析出的回合行为, 不进入客户端协议和持久化数据.
 type combatAction struct {
-	unitKey     *pb.CombatUnitKey
-	kind        combatActionKind
-	skillID     uint32
-	targetKey   *pb.CombatUnitKey
-	actionValue int64
+	unitKey       *pb.CombatUnitKey
+	kind          combatActionKind
+	skillID       uint32
+	targetKey     *pb.CombatUnitKey
+	switchPetUUID uint64
+	equipmentType pb.EquipmentType
+	equipmentUUID uint64
+	actionValue   int64
 	// actionValueFrozen表示跨回合续招沿用首次行动值, 本回合不得重新计算或消耗随机数.
 	actionValueFrozen bool
 	comboMember       bool
@@ -158,6 +170,9 @@ type combatAction struct {
 	// 混乱攻击参数只来自已经校验的配置, 不接受客户端提交状态类型或持续次数.
 	confusionDurationActions       uint32
 	confusionAttackPercentModifier int32
+	// 泥醉攻击参数只来自已经校验的配置, 成功时按原版把加1后的时长折半.
+	drunkDurationActions       uint32
+	drunkAttackPercentModifier int32
 	// 催眠攻击参数只来自已经校验的配置, 不接受客户端提交状态类型或持续次数.
 	sleepDurationActions       uint32
 	sleepAttackPercentModifier int32
@@ -196,6 +211,13 @@ type combatAction struct {
 	healPower       uint32
 	healTargetScope string
 	healMPCost      uint32
+	// 净化精灵参数在提交时冻结; statusType只允许五种普通异常, 不包含剧毒.
+	recoveryStatusType  pb.CombatStatusType
+	recoveryTargetScope string
+	recoveryMPCost      uint32
+	// 战斗道具效果在提交时复制配置, 执行阶段先由账号actor持久化扣除一个道具.
+	itemID        uint32
+	itemBattleUse gameconfig.ItemBattleUseEntry
 	// 连击开始执行后按普通攻击命令参与后续反击资格判断.
 	// 一击必杀和三种普通异常攻击也在主动出手时提升为相同的反击资格.
 	counterCommandPromotedToAttack bool
@@ -269,6 +291,10 @@ func (a *combatAction) isConfusionAttack() bool {
 	return a != nil && a.kind == combatActionKindConfusionAttack
 }
 
+func (a *combatAction) isDrunkAttack() bool {
+	return a != nil && a.kind == combatActionKindDrunkAttack
+}
+
 func (a *combatAction) isSleepAttack() bool {
 	return a != nil && a.kind == combatActionKindSleepAttack
 }
@@ -313,6 +339,14 @@ func (a *combatAction) isHealingSpirit() bool {
 	return a != nil && a.kind == combatActionKindHealingSpirit
 }
 
+func (a *combatAction) isStatusRecovery() bool {
+	return a != nil && a.kind == combatActionKindStatusRecovery
+}
+
+func (a *combatAction) isItem() bool {
+	return a != nil && a.kind == combatActionKindItem
+}
+
 func (a *combatAction) usesMultiSegmentDamageDivision() bool {
 	return a != nil && (a.isContinuationAttack() || a.weaponDamageDivision)
 }
@@ -321,11 +355,11 @@ func (a *combatAction) canCounter() bool {
 	if a == nil {
 		return false
 	}
-	return a.isAttack() || a.isNoGuard() || ((a.isContinuationAttack() || a.isMightyAttack() || a.isPoisonAttack() || a.isStoneAttack() || a.isConfusionAttack() || a.isSleepAttack() || a.isDeepPoisonAttack() || a.isGuardian() || a.isPowerBalance()) && a.counterCommandPromotedToAttack)
+	return a.isAttack() || a.isNoGuard() || ((a.isContinuationAttack() || a.isMightyAttack() || a.isPoisonAttack() || a.isStoneAttack() || a.isConfusionAttack() || a.isDrunkAttack() || a.isSleepAttack() || a.isDeepPoisonAttack() || a.isGuardian() || a.isPowerBalance()) && a.counterCommandPromotedToAttack)
 }
 
 func (a *combatAction) promoteSpecialAttackCommand() {
-	if a != nil && (a.isContinuationAttack() || a.isMightyAttack() || a.isPoisonAttack() || a.isStoneAttack() || a.isConfusionAttack() || a.isSleepAttack() || a.isDeepPoisonAttack() || a.isGuardian() || a.isPowerBalance()) {
+	if a != nil && (a.isContinuationAttack() || a.isMightyAttack() || a.isPoisonAttack() || a.isStoneAttack() || a.isConfusionAttack() || a.isDrunkAttack() || a.isSleepAttack() || a.isDeepPoisonAttack() || a.isGuardian() || a.isPowerBalance()) {
 		a.counterCommandPromotedToAttack = true
 	}
 }
@@ -504,7 +538,7 @@ func combatKind(unit *pb.CombatUnit) combatUnitKind {
 	if unit.GetKey().GetAid() != 0 && unit.GetPetId() != 0 {
 		return combatUnitKindPet
 	}
-	if unit.GetKey().GetAid() == 0 && unit.GetPetId() != 0 {
+	if unit.GetKey().GetAid() == 0 && (unit.GetPetId() != 0 || unit.GetCharacterId() != 0) {
 		return combatUnitKindEnemy
 	}
 	return combatUnitKindUnknown
@@ -512,6 +546,17 @@ func combatKind(unit *pb.CombatUnit) combatUnitKind {
 
 func combatPetElementalPoints(entry *gameconfig.PetEntry) *pb.ElementalPoints {
 	if entry == nil {
+		return &pb.ElementalPoints{}
+	}
+	growthAttribute := entry.GrowthAttribute
+	if growthAttribute == nil && entry.Elemental != nil {
+		growthAttribute = &gameconfig.GrowthAttributeEntry{Elemental: entry.Elemental}
+	}
+	return combatGrowthAttributeElementalPoints(growthAttribute)
+}
+
+func combatGrowthAttributeElementalPoints(entry *gameconfig.GrowthAttributeEntry) *pb.ElementalPoints {
+	if entry == nil || entry.Elemental == nil {
 		return &pb.ElementalPoints{}
 	}
 	value := func(elemental pb.AssetElemental) uint32 {
@@ -676,11 +721,18 @@ func combatClampUint32(value uint64) uint32 {
 	return uint32(value)
 }
 
-func combatClampDelta(value uint64) int32 {
+func combatClampDecreaseDelta(value uint64) int32 {
 	if value > math.MaxInt32 {
 		return -math.MaxInt32
 	}
 	return -int32(value)
+}
+
+func combatClampIncreaseDelta(value uint64) int32 {
+	if value > math.MaxInt32 {
+		return math.MaxInt32
+	}
+	return int32(value)
 }
 
 // combatActionValue按单位当前敏捷计算本回合行动值.
@@ -757,7 +809,8 @@ func combatDodgeCoreThreshold(attacker *combatUnitRuntimeState, defender *combat
 
 func (r *CombatRoom) combatDodge(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState, targetDodgeBonus uint32) bool {
 	if r == nil || r.random == nil || attacker == nil || defender == nil ||
-		attacker.unit == nil || defender.unit == nil || defender.guard {
+		attacker.unit == nil || defender.unit == nil || defender.guard ||
+		defender.statusTurns[pb.CombatStatusType_CombatStatusType_Paralysis] > 0 {
 		return false
 	}
 	percentage := combatDodgeCoreThreshold(attacker, defender, targetDodgeBonus)
@@ -980,7 +1033,20 @@ func combatElementMatrixDamage(attackerElement [combatElementCount]int64, defend
 func (r *CombatRoom) combatElementAdjustedDamage(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState, damage int64) int64 {
 	attackerElement := combatEffectiveElementArray(attacker)
 	defenderElement := combatEffectiveElementArray(defender)
-	return combatElementMatrixDamage(attackerElement, defenderElement, damage)
+	damage = combatElementMatrixDamage(attackerElement, defenderElement, damage)
+	if r == nil || r.fieldAttribute == nil || r.fieldAttribute.power == 0 {
+		return damage
+	}
+	index := int(r.fieldAttribute.element) - 1
+	if index < combatElementEarth || index > combatElementWind {
+		return damage
+	}
+	attackFactor := 0.5 + float64(attackerElement[index])*float64(r.fieldAttribute.power)*0.00005
+	defenseFactor := 0.5 + float64(defenderElement[index])*float64(r.fieldAttribute.power)*0.00005
+	if defenseFactor <= 0 {
+		return damage
+	}
+	return int64(float64(damage) * attackFactor / defenseFactor)
 }
 
 // combatEffectiveAttackPower把本回合技能修正应用于只读开战攻击力.
@@ -1473,7 +1539,8 @@ func combatCounterThreshold(attacker *combatUnitRuntimeState, defender *combatUn
 		}
 		return threshold, false
 	}
-	percentage := float32(base)
+	// 敌人成员可在模板值上追加反击修正; 玩家宠物未配置该覆盖时仍保持原版零修正路径.
+	percentage := float32(base + attacker.counterModifier)
 	modifier := int64(attacker.noGuardCounterPercent)
 	if modifier > 127 {
 		// 原版把无防守反击参数取自低字节后, 对128..255执行乘-1的历史字节语义.
@@ -1497,7 +1564,8 @@ func combatCounterThreshold(attacker *combatUnitRuntimeState, defender *combatUn
 func (r *CombatRoom) combatCounterCheck(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState) bool {
 	// 8.5的玩家与宠物/敌人反击入口都会先检查攻守双方装备. 任一玩家持远程
 	// 投掷武器时直接失败且不消费反击随机数, 与本次候选反击者的单位类型无关.
-	if combatPlayerUsesThrowingWeapon(attacker) || combatPlayerUsesThrowingWeapon(defender) {
+	if combatPlayerUsesThrowingWeapon(attacker) || combatPlayerUsesThrowingWeapon(defender) ||
+		attacker.statusTurns[pb.CombatStatusType_CombatStatusType_Paralysis] > 0 {
 		return false
 	}
 	threshold, inclusive := combatCounterThreshold(attacker, defender)
@@ -1640,6 +1708,10 @@ type combatEffectResult struct {
 	Reaction          *pb.CombatReactionDetail
 	Hidden            bool
 	UnitLeaveReason   pb.CombatUnitLeaveReason
+	UnitEnter         *pb.CombatUnitEnterDetail
+	ItemUsed          *pb.CombatItemUsedDetail
+	FieldAttribute    *pb.CombatFieldAttributeDetail
+	EquipmentChanged  *pb.CombatEquipmentChangedDetail
 }
 
 func combatAppendEffect(event *combatStepResult, effect *combatEffectResult) {
@@ -1677,7 +1749,7 @@ func combatAppendDamageEffect(event *combatStepResult, attacker *combatUnitRunti
 		if application.appliedDamage > 0 {
 			unitDelta.AssetDeltaList = []*pb.CombatAssetDelta{{
 				AssetType: pb.CombatAssetType_CombatAssetType_HP,
-				Delta:     combatClampDelta(application.appliedDamage),
+				Delta:     combatClampDecreaseDelta(application.appliedDamage),
 				After:     combatClampUint32(application.hpAfter),
 			}}
 		}
@@ -1889,6 +1961,7 @@ func (r *CombatRoom) executeSingleAttackWithBoomerangModifier(action *combatActi
 	poisonAttack := action.isPoisonAttack() && !counter
 	stoneAttack := action.isStoneAttack() && !counter
 	confusionAttack := action.isConfusionAttack() && !counter
+	drunkAttack := action.isDrunkAttack() && !counter
 	sleepAttack := action.isSleepAttack() && !counter
 	deepPoisonAttack := action.isDeepPoisonAttack() && !counter
 	// 完整回合会在行动前预激活STATUSCHANGE修正, 这里再次按未改写的专用命令赋值,
@@ -1899,6 +1972,8 @@ func (r *CombatRoom) executeSingleAttackWithBoomerangModifier(action *combatActi
 		attacker.roundAttackPercentModifier = action.stoneAttackPercentModifier
 	} else if confusionAttack {
 		attacker.roundAttackPercentModifier = action.confusionAttackPercentModifier
+	} else if drunkAttack {
+		attacker.roundAttackPercentModifier = action.drunkAttackPercentModifier
 	} else if sleepAttack {
 		attacker.roundAttackPercentModifier = action.sleepAttackPercentModifier
 	} else if deepPoisonAttack {
@@ -1997,11 +2072,19 @@ func (r *CombatRoom) executeSingleAttackWithBoomerangModifier(action *combatActi
 	if confusionAttack && roll.damage > 0 {
 		r.tryInflictCombatConfusion(attacker, defender, action.confusionDurationActions, event)
 	}
+	if drunkAttack && roll.damage > 0 {
+		r.tryInflictCombatDrunk(attacker, defender, action.drunkDurationActions, event)
+	}
 	if sleepAttack && roll.damage > 0 {
 		r.tryInflictCombatSleep(attacker, defender, action.sleepDurationActions, event)
 	}
 	if deepPoisonAttack && roll.damage > 0 {
 		r.tryInflictCombatDeepPoison(attacker, defender, action.deepPoisonDurationActions, event)
+	}
+	if !counter && action.isAttack() && !action.comboMember && roll.damage > 0 &&
+		combatKind(attacker.unit) == combatUnitKindPlayer &&
+		attacker.weaponType == pb.CharacterWeaponType_CharacterWeaponType_ThrowingStone {
+		r.tryInflictCombatThrowingStoneParalysis(attacker, defender, event)
 	}
 	r.appendCombatDefeatEffects(event, attacker, defender, application, counter)
 	*events = append(*events, event)
@@ -2682,34 +2765,28 @@ func (r *CombatRoom) combatEscapeChance(state *combatUnitRuntimeState, escapeAtt
 // combatParticipantLeavingStates 返回玩家角色离场时必须同时移除的全部运行态, 且角色始终排在首位.
 //
 // 8.5 BATTLE_Exit处理玩家角色时, 会同时取角色Entry后方配对的战宠Entry并将两者移出战斗.
-// 当前协议没有依赖固定槽位i+5查找战宠, 而是通过CombatUnitKey中的aid和character_uuid建立归属关系;
-// 这样既保持角色与战宠共同离场的业务结果, 也不把8.5内存数组布局泄漏到现代房间模型.
+// 当前房间直接使用participant.playerPet确定此刻出战的宠物, 避免换宠后从开战快照
+// 取到已收回的旧宠; 不把8.5固定槽位i+5的内存布局泄漏到现代房间模型.
 //
 // 只有玩家角色会携带战宠离场. 敌方单位由AI触发逃跑时只移除自己. 查找时不要求战宠alive,
 // 因为8.5退出流程同样会清理已经倒下但仍占据配对Entry的战宠. 已经escaped的战宠不会重复下发状态变化.
 func (r *CombatRoom) combatParticipantLeavingStates(escapee *combatUnitRuntimeState) []*combatUnitRuntimeState {
 	leavingStates := []*combatUnitRuntimeState{escapee}
-	if r == nil || escapee == nil || !combatUnitIsPlayerCharacter(escapee.unit) || r.battleStart == nil {
+	if r == nil || escapee == nil || !combatUnitIsPlayerCharacter(escapee.unit) {
 		return leavingStates
 	}
 	escapeeKey := escapee.unit.GetKey()
 	if escapeeKey == nil {
 		return leavingStates
 	}
-	for _, unit := range r.battleStart.GetUnitList() {
-		if unit == nil || unit.GetCamp() != escapee.unit.GetCamp() || combatKind(unit) != combatUnitKindPet {
-			continue
+	participant := r.participant(combatRoomParticipantKey{
+		aid: escapeeKey.GetAid(), characterUUID: escapeeKey.GetCharacterUuid(),
+	})
+	if participant != nil && participant.playerPet != nil {
+		petState := r.stateByKey(participant.playerPet.GetKey())
+		if petState != nil && !petState.escaped {
+			leavingStates = append(leavingStates, petState)
 		}
-		unitKey := unit.GetKey()
-		if unitKey == nil || unitKey.GetAid() != escapeeKey.GetAid() || unitKey.GetCharacterUuid() != escapeeKey.GetCharacterUuid() {
-			continue
-		}
-		petState := r.stateByKey(unitKey)
-		if petState == nil || petState.escaped {
-			continue
-		}
-		leavingStates = append(leavingStates, petState)
-		break
 	}
 	return leavingStates
 }
@@ -2954,8 +3031,16 @@ func buildCombatProtocolEffect(effect *combatEffectResult) *pb.CombatEffect {
 		result.Detail = &pb.CombatEffect_Reaction{Reaction: effect.Reaction}
 	case combatEffectKindUnitLeave:
 		result.Detail = &pb.CombatEffect_UnitLeave{UnitLeave: &pb.CombatUnitLeaveDetail{Reason: effect.UnitLeaveReason}}
+	case combatEffectKindUnitEnter:
+		result.Detail = &pb.CombatEffect_UnitEnter{UnitEnter: effect.UnitEnter}
 	case combatEffectKindVisibility:
 		result.Detail = &pb.CombatEffect_Visibility{Visibility: &pb.CombatVisibilityDetail{Hidden: effect.Hidden}}
+	case combatEffectKindItemUsed:
+		result.Detail = &pb.CombatEffect_ItemUsed{ItemUsed: effect.ItemUsed}
+	case combatEffectKindFieldAttribute:
+		result.Detail = &pb.CombatEffect_FieldAttribute{FieldAttribute: effect.FieldAttribute}
+	case combatEffectKindEquipmentChanged:
+		result.Detail = &pb.CombatEffect_EquipmentChanged{EquipmentChanged: effect.EquipmentChanged}
 	default:
 		return nil
 	}
@@ -3334,6 +3419,13 @@ func (r *CombatRoom) executeStandaloneAction(action *combatAction, actionByUnit 
 		if outcome.continueCounter {
 			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
 		}
+	case action.isDrunkAttack():
+		// 原版STATUSCHANGE进入攻击循环时转为ATTACK; 反击只继承本回合攻击力且不附加状态.
+		action.promoteSpecialAttackCommand()
+		outcome := r.executeSingleAttack(action, false, events)
+		if outcome.continueCounter {
+			r.executeCounterChain(action, outcome.defender, actionByUnit, events)
+		}
 	case action.isSleepAttack():
 		// 原版STATUSCHANGE进入攻击循环时转为ATTACK; 反击只继承本回合攻击力且不附加状态.
 		action.promoteSpecialAttackCommand()
@@ -3382,12 +3474,20 @@ func (r *CombatRoom) executeStandaloneAction(action *combatAction, actionByUnit 
 		r.executeEscape(action, events)
 	case action.kind == combatActionKindCapture:
 		r.executeCapture(action, events)
+	case action.kind == combatActionKindSwitchPet:
+		r.executeSwitchPet(action, events)
 	case action.isAbduct():
 		r.executeAbduct(action, events)
 	case action.isStatusSpirit():
 		r.executeStatusSpirit(action, events)
 	case action.isHealingSpirit():
 		r.executeHealingSpirit(action, events)
+	case action.isStatusRecovery():
+		r.executeStatusRecovery(action, events)
+	case action.isItem():
+		r.executeCombatItem(action, events)
+	case action.kind == combatActionKindEquipment:
+		r.executeCombatEquipmentChange(action, events)
 	case action.isAttack():
 		action.segmentCount = r.combatPlayerAttackSegmentCount(action)
 		firstEventIndex := len(*events)
@@ -3496,6 +3596,8 @@ func (r *CombatRoom) activateRoundStatusAttacks(actions []*combatAction) {
 			state.roundAttackPercentModifier = action.stoneAttackPercentModifier
 		case action.isConfusionAttack():
 			state.roundAttackPercentModifier = action.confusionAttackPercentModifier
+		case action.isDrunkAttack():
+			state.roundAttackPercentModifier = action.drunkAttackPercentModifier
 		case action.isSleepAttack():
 			state.roundAttackPercentModifier = action.sleepAttackPercentModifier
 		case action.isDeepPoisonAttack():
@@ -3604,6 +3706,7 @@ func (r *CombatRoom) completeCombatRound(playerActions []*combatAction) {
 	if settlement == nil {
 		settlement = r.battleSettlementIfFinished()
 	}
+	r.advanceCombatFieldAttribute(&stepResults)
 	eventList := r.takePendingUnitLeaveEvents()
 	eventList = append(eventList, buildCombatProtocolEvents(stepResults)...)
 	result := &pb.CombatRoundResultNotify{

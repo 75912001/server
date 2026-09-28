@@ -3,11 +3,15 @@ package main
 import pb "server/proto/pb"
 
 // combatOrdinaryStatusAttackThreshold复刻BATTLE_StatusAttackCheck的普通异常攻击分支.
-// PVE等级差乘2后限制在[-40,40], 再叠加基础30、施放者幸运、目标对应抗性
-// 和目标基础体力占比惩罚. 原版只设80上限, RAND(1,100)严格小于阈值才成功.
+// 麻痹只使用20减目标抗性; 其他状态使用等级差、幸运和体力占比惩罚.
+// 原版只给非麻痹状态设置80上限, RAND(1,100)严格小于阈值才成功.
 func combatOrdinaryStatusAttackThreshold(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState, statusType pb.CombatStatusType) int64 {
 	if attacker == nil || defender == nil || attacker.unit == nil || defender.unit == nil {
 		return 0
+	}
+	if statusType == pb.CombatStatusType_CombatStatusType_Paralysis {
+		// 原版麻痹独立使用20减目标抗性, 不叠加等级、幸运或体力占比.
+		return 20 - defender.statusResistance[statusType]
 	}
 	total := defender.rawVitality + defender.rawStrength + defender.rawToughness + defender.rawDexterity
 	if total == 0 {
@@ -29,6 +33,10 @@ func combatStoneThreshold(attacker *combatUnitRuntimeState, defender *combatUnit
 
 func combatConfusionThreshold(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState) int64 {
 	return combatOrdinaryStatusAttackThreshold(attacker, defender, pb.CombatStatusType_CombatStatusType_Confusion)
+}
+
+func combatDrunkThreshold(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState) int64 {
+	return combatOrdinaryStatusAttackThreshold(attacker, defender, pb.CombatStatusType_CombatStatusType_Drunk)
 }
 
 func combatSleepThreshold(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState) int64 {
@@ -80,8 +88,11 @@ func (r *CombatRoom) tryInflictCombatOrdinaryStatus(attacker *combatUnitRuntimeS
 		defender.statusTurns = make(map[pb.CombatStatusType]uint32)
 	}
 	remaining := durationActions + 1
+	if statusType == pb.CombatStatusType_CombatStatusType_Drunk {
+		remaining /= 2
+	}
 	defender.statusTurns[statusType] = remaining
-	if statusType == pb.CombatStatusType_CombatStatusType_Stone || statusType == pb.CombatStatusType_CombatStatusType_Sleep {
+	if statusType == pb.CombatStatusType_CombatStatusType_Stone || statusType == pb.CombatStatusType_CombatStatusType_Sleep || statusType == pb.CombatStatusType_CombatStatusType_Paralysis {
 		defender.guard = false
 		defender.guardianProtectedUnitKey = nil
 		clearCombatNoGuardState(defender)
@@ -108,8 +119,16 @@ func (r *CombatRoom) tryInflictCombatStone(attacker *combatUnitRuntimeState, def
 	r.tryInflictCombatOrdinaryStatus(attacker, defender, durationActions, pb.CombatStatusType_CombatStatusType_Stone, step)
 }
 
+func (r *CombatRoom) tryInflictCombatThrowingStoneParalysis(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState, step *combatStepResult) {
+	r.tryInflictCombatOrdinaryStatus(attacker, defender, 0, pb.CombatStatusType_CombatStatusType_Paralysis, step)
+}
+
 func (r *CombatRoom) tryInflictCombatConfusion(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState, durationActions uint32, step *combatStepResult) {
 	r.tryInflictCombatOrdinaryStatus(attacker, defender, durationActions, pb.CombatStatusType_CombatStatusType_Confusion, step)
+}
+
+func (r *CombatRoom) tryInflictCombatDrunk(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState, durationActions uint32, step *combatStepResult) {
+	r.tryInflictCombatOrdinaryStatus(attacker, defender, durationActions, pb.CombatStatusType_CombatStatusType_Drunk, step)
 }
 
 func (r *CombatRoom) tryInflictCombatSleep(attacker *combatUnitRuntimeState, defender *combatUnitRuntimeState, durationActions uint32, step *combatStepResult) {

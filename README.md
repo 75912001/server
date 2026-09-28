@@ -24,4 +24,8 @@ go get github.com/75912001/xlib@latest
 
 一键重建本地 Docker 部署的 `gateway`/`cache`/`online`/`login` 四个 `.1` 服务实例。
 
+## 可开启道具与奖励包
+
+`reward.yaml`中的奖励包必须显式配置`mode: all`或`mode: randomOne`. `all`发放根级全部内容; `randomOne`按候选顺序累计正整数相对权重抽取一个组并完整发放. 普通道具可通过`use: {target: character, rewardId: ...}`引用奖励包, 沿用`ItemUseReq/Res`; 服务端在克隆档案中先扣除1个道具, 校验所有候选容量与UUID, 再发奖并一次持久化, 失败不发布候选状态. `3000303`猜之箱子固定获得1只1级随机品质金布伊`4000245`.
+
 ## 待办

@@ -1,16 +1,4 @@
-# 敌人战斗AI配置, 由enemy.group.yaml显式引用.
-# 任何修改此文件的行为都需要通知客户端和服务端开发人员
-
-# id: AI配置ID, 由enemy.group.yaml的enemies[].battleAI引用.
-# skills[].id: 敌人持有的技能ID, 必须存在于技能.yaml且支持敌方执行.
-# skills[].weight: 相对选择权重, 整数范围[1,2147483647]; 不使用的技能不配置.
-# 同一AI的技能ID不得重复, 总权重必须处于[1,2147483647].
-# 技能按列表顺序划分权重区间, 不使用固定七槽或出生技能下标.
-# 敌人技能、权重及目标策略全部来自此文件; pet.yaml skill只负责新宠物出生技能.
-# targetScope: allOpponents/playerCharacters/playerPets/partyLeader
-# targetSelection: random/highestHp/lowestHp/highestAttack/highestAgility/lowestAgility/elementalSubdue
-# targetRandomRollMax: 仅非random策略使用; RAND(0,value)为0时随机选择, 否则使用策略最优目标
-
+# 本文件由AI编辑器从config.raw/ai.yaml中的已发布配置确定性生成, 不要手工编辑.
 ai:
   - id: 1
     skills:
@@ -22,14 +10,12 @@ ai:
         weight: 1
     targetScope: allOpponents
     targetSelection: random
-
   - id: 2
     skills:
       - id: 8000001
         weight: 1
     targetScope: allOpponents
     targetSelection: random
-
   - id: 3
     skills:
       - id: 8000001
@@ -38,7 +24,6 @@ ai:
         weight: 5
     targetScope: allOpponents
     targetSelection: random
-
   - id: 4
     skills:
       - id: 8000001
@@ -47,7 +32,6 @@ ai:
         weight: 1
     targetScope: allOpponents
     targetSelection: random
-
   - id: 5
     skills:
       - id: 8000001
@@ -56,7 +40,6 @@ ai:
         weight: 1
     targetScope: allOpponents
     targetSelection: random
-
   - id: 6
     skills:
       - id: 8000001
@@ -67,7 +50,6 @@ ai:
         weight: 1
     targetScope: allOpponents
     targetSelection: random
-
   - id: 7
     skills:
       - id: 8000001
@@ -78,7 +60,6 @@ ai:
         weight: 1
     targetScope: allOpponents
     targetSelection: random
-
   - id: 8
     skills:
       - id: 8000001
@@ -89,14 +70,12 @@ ai:
         weight: 1
     targetScope: allOpponents
     targetSelection: random
-
   - id: 9
     skills:
       - id: 8000001
         weight: 10
     targetScope: allOpponents
     targetSelection: random
-
   - id: 10
     skills:
       - id: 8000001
@@ -105,7 +84,6 @@ ai:
         weight: 1
     targetScope: allOpponents
     targetSelection: random
-
   - id: 11
     skills:
       - id: 8000001
@@ -114,7 +92,6 @@ ai:
         weight: 1
     targetScope: allOpponents
     targetSelection: random
-
   - id: 12
     skills:
       - id: 8000001
@@ -126,8 +103,6 @@ ai:
     targetScope: allOpponents
     targetSelection: lowestHp
     targetRandomRollMax: 1
-
-  # 阿布洞窟地下7楼, 查罕·乌尔夫 (4900294).
   - id: 13
     skills:
       - id: 8000001
@@ -140,8 +115,6 @@ ai:
         weight: 1
     targetScope: allOpponents
     targetSelection: random
-
-  # 阿布洞窟地下7楼, 查罕·吉鲁 (4900295).
   - id: 14
     skills:
       - id: 8000001
@@ -152,8 +125,6 @@ ai:
         weight: 1
     targetScope: playerCharacters
     targetSelection: random
-
-  # 阿布洞窟地下7楼, 查罕·鲁多 (4900296).
   - id: 15
     skills:
       - id: 8000001
@@ -164,8 +135,6 @@ ai:
         weight: 1
     targetScope: playerCharacters
     targetSelection: random
-
-  # 阿布洞窟地下7楼, 龟之助 (4900297).
   - id: 16
     skills:
       - id: 8000001
@@ -177,10 +146,8 @@ ai:
     targetScope: allOpponents
     targetSelection: lowestHp
     targetRandomRollMax: 1
-
-  # 阿布洞窟地下7楼, 加格彦 (4900298, 原版贝洛彦).
   - id: 17
-    skills: # 任务-阿布洞窟地下7楼守护者
+    skills:
       - id: 8000001
         weight: 1
       - id: 8100061
@@ -188,7 +155,6 @@ ai:
     targetScope: allOpponents
     targetSelection: highestHp
     targetRandomRollMax: 1
-
   - id: 18
     skills:
       - id: 8000001
@@ -197,10 +163,728 @@ ai:
         weight: 1
     targetScope: allOpponents
     targetSelection: random
-
   - id: 19
-    skills: # 测试[只防守]
+    skills:
       - id: 8000002
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 20
+    skills:
+      - id: 8000001
+        weight: 2
+      - id: 8000002
+        weight: 2
+      - id: 8100030
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 21
+    skills:
+      - id: 8000001
+        weight: 2
+      - id: 8000002
+        weight: 1
+      - id: 8100061
+        weight: 1
+      - id: 8100060
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 22
+    skills:
+      - id: 8000001
+        weight: 5
+      - id: 8000002
+        weight: 1
+      - id: 8100090
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 23
+    skills:
+      - id: 8000001
+        weight: 3
+      - id: 8000002
+        weight: 2
+      - id: 8100030
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 24
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100030
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 25
+    skills:
+      - id: 8000001
+        weight: 4
+      - id: 8000002
+        weight: 1
+      - id: 8100151
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 26
+    skills:
+      - id: 8000001
+        weight: 3
+      - id: 8000002
+        weight: 1
+      - id: 8100110
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 27
+    skills:
+      - id: 8000001
+        weight: 5
+      - id: 8000002
+        weight: 1
+      - id: 8100010
+        weight: 5
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 28
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 2
+      - id: 8100030
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 29
+    skills:
+      - id: 8000001
+        weight: 3
+      - id: 8000002
+        weight: 1
+      - id: 8100030
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 30
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100031
+        weight: 1
+      - id: 8100030
+        weight: 1
+      - id: 8100041
+        weight: 1
+      - id: 8100003
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 31
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8100152
+        weight: 1
+      - id: 8100013
+        weight: 1
+      - id: 8100012
+        weight: 1
+      - id: 8100011
+        weight: 1
+      - id: 8100010
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: lowestHp
+    targetRandomRollMax: 1
+  - id: 32
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100110
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 33
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100080
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 34
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100061
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 35
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100041
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: lowestHp
+    targetRandomRollMax: 1
+  - id: 36
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100090
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 38
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100030
+        weight: 1
+      - id: 8100031
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 39
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100100
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 40
+    skills:
+      - id: 8000002
+        weight: 1
+      - id: 8100030
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 41
+    skills:
+      - id: 8100051
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 37
+    skills:
+      - id: 8100000
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 42
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100040
+        weight: 1
+      - id: 8100030
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: lowestHp
+    targetRandomRollMax: 1
+  - id: 43
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100040
+        weight: 1
+      - id: 8100030
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 44
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: lowestHp
+    targetRandomRollMax: 1
+  - id: 45
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100040
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 46
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8100150
+        weight: 1
+      - id: 8100010
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 47
+    skills:
+      - id: 8000001
+        weight: 5
+      - id: 8000002
+        weight: 1
+      - id: 8100003
+        weight: 1
+      - id: 8100030
+        weight: 3
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 48
+    skills:
+      - id: 8000001
+        weight: 3
+      - id: 8000002
+        weight: 1
+      - id: 8100150
+        weight: 1
+      - id: 8100003
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: lowestHp
+    targetRandomRollMax: 1
+  - id: 49
+    skills:
+      - id: 8000001
+        weight: 3
+      - id: 8000002
+        weight: 1
+      - id: 8100030
+        weight: 1
+      - id: 8100003
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: lowestHp
+    targetRandomRollMax: 1
+  - id: 50
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100060
+        weight: 1
+      - id: 8100061
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 51
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8100050
+        weight: 1
+      - id: 8100051
+        weight: 1
+      - id: 8100052
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 52
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100003
+        weight: 1
+    targetScope: playerCharacters
+    targetSelection: lowestHp
+    targetRandomRollMax: 1
+  - id: 53
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100040
+        weight: 1
+      - id: 8100041
+        weight: 1
+      - id: 8100052
+        weight: 1
+      - id: 8100003
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: lowestHp
+    targetRandomRollMax: 1
+  - id: 54
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100061
+        weight: 1
+      - id: 8100090
+        weight: 1
+      - id: 8100080
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 55
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100010
+        weight: 1
+      - id: 8100011
+        weight: 1
+      - id: 8100012
+        weight: 1
+      - id: 8100013
+        weight: 1
+    targetScope: playerCharacters
+    targetSelection: lowestHp
+    targetRandomRollMax: 1
+  - id: 56
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100040
+        weight: 1
+      - id: 8100041
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 57
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8000003
+        weight: 8
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 58
+    skills:
+      - id: 8000001
+        weight: 2
+      - id: 8100151
+        weight: 1
+      - id: 8100051
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 59
+    skills:
+      - id: 8000001
+        weight: 2
+      - id: 8100151
+        weight: 1
+      - id: 8100051
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: lowestHp
+    targetRandomRollMax: 1
+  - id: 60
+    skills:
+      - id: 8000001
+        weight: 2
+      - id: 8100152
+        weight: 1
+      - id: 8100052
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: highestHp
+    targetRandomRollMax: 1
+  - id: 61
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100000
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 62
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100100
+        weight: 1
+      - id: 8100030
+        weight: 1
+      - id: 8100031
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 63
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100051
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 64
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 2
+      - id: 8100030
+        weight: 1
+      - id: 8100010
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 65
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100012
+        weight: 1
+      - id: 8100011
+        weight: 1
+      - id: 8100010
+        weight: 1
+      - id: 8100152
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 66
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100090
+        weight: 1
+      - id: 8100030
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 67
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100090
+        weight: 1
+      - id: 8100110
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 68
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100150
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 69
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100080
+        weight: 1
+      - id: 8100030
+        weight: 1
+      - id: 8100031
+        weight: 1
+      - id: 8100003
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 70
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100050
+        weight: 1
+      - id: 8100051
+        weight: 1
+      - id: 8100052
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 71
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100152
+        weight: 1
+      - id: 8100013
+        weight: 1
+      - id: 8100012
+        weight: 1
+      - id: 8100011
+        weight: 1
+      - id: 8100010
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 72
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100052
+        weight: 1
+      - id: 8100152
+        weight: 1
+      - id: 8100013
+        weight: 1
+      - id: 8100031
+        weight: 1
+      - id: 8100110
+        weight: 1
+      - id: 8100090
+        weight: 1
+      - id: 8100003
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 73
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100040
+        weight: 1
+      - id: 8100041
+        weight: 1
+      - id: 8100052
+        weight: 1
+      - id: 8100003
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 74
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100110
+        weight: 3
+      - id: 8100010
+        weight: 1
+      - id: 8100011
+        weight: 1
+      - id: 8100012
+        weight: 1
+      - id: 8100013
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 75
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100090
+        weight: 3
+      - id: 8100010
+        weight: 1
+      - id: 8100011
+        weight: 1
+      - id: 8100012
+        weight: 1
+      - id: 8100013
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 76
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100100
+        weight: 1
+      - id: 8100010
+        weight: 1
+      - id: 8100011
+        weight: 1
+      - id: 8100012
+        weight: 1
+      - id: 8100013
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 77
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100080
+        weight: 2
+      - id: 8100152
+        weight: 1
+    targetScope: allOpponents
+    targetSelection: random
+  - id: 78
+    skills:
+      - id: 8000001
+        weight: 1
+      - id: 8000002
+        weight: 1
+      - id: 8100060
+        weight: 1
+      - id: 8100061
+        weight: 1
+      - id: 8100152
         weight: 1
     targetScope: allOpponents
     targetSelection: random

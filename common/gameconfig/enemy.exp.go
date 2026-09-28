@@ -67,34 +67,36 @@ func (p *EnemyExpConfig) assemble() error {
 	return nil
 }
 
-func (p *EnemyExpConfig) GenerateEnemyExp(petID uint32, lv uint32) (uint32, error) {
-	if GGameConfig == nil || GGameConfig.Pet == nil {
-		return 0, errors.Errorf("生成怪物经验失败, 宠物配置未加载 %v", xruntime.Location())
+func (p *EnemyExpConfig) GenerateEnemyExp(growthAttributeID uint32, lv uint32) (uint32, error) {
+	if GGameConfig == nil || GGameConfig.GrowthAttribute == nil {
+		return 0, errors.Errorf("生成怪物经验失败, 成长属性配置未加载 %v", xruntime.Location())
 	}
-	pet := GGameConfig.Pet.Get(petID)
-	if pet == nil {
-		return 0, errors.Errorf("生成怪物经验失败, 宠物不存在: id:%d %v", petID, xruntime.Location())
+	growthAttribute := GGameConfig.GrowthAttribute.Get(growthAttributeID)
+	if growthAttribute == nil {
+		return 0, errors.Errorf("生成怪物经验失败, 成长属性不存在: id:%d %v", growthAttributeID, xruntime.Location())
 	}
 	baseExp, ok := p.Find(lv)
 	if !ok {
 		return 0, errors.Errorf("敌人基础经验等级不存在: level:%d", lv)
 	}
-	if pet.Growth == nil || pet.Attribute == nil ||
-		pet.Growth.BaseVital == nil || pet.Growth.BaseStr == nil ||
-		pet.Growth.BaseTough == nil || pet.Growth.BaseDex == nil ||
-		pet.Attribute.Critical == nil || pet.Attribute.Counter == nil ||
-		pet.Attribute.Get == nil || pet.Attribute.PoisonResist == nil ||
-		pet.Attribute.ParalysisResist == nil || pet.Attribute.SleepResist == nil ||
-		pet.Attribute.StoneResist == nil || pet.Attribute.DrunkResist == nil ||
-		pet.Attribute.ConfusionResist == nil || pet.Attribute.Rare == nil {
-		return 0, errors.Errorf("生成怪物经验失败, 宠物成长或属性配置不完整: id:%d %v",
-			petID, xruntime.Location())
+	growth := growthAttribute.Growth
+	attribute := growthAttribute.Attribute
+	if growth == nil || attribute == nil ||
+		growth.BaseVital == nil || growth.BaseStr == nil ||
+		growth.BaseTough == nil || growth.BaseDex == nil ||
+		attribute.Critical == nil || attribute.Counter == nil ||
+		attribute.Get == nil || attribute.PoisonResist == nil ||
+		attribute.ParalysisResist == nil || attribute.SleepResist == nil ||
+		attribute.StoneResist == nil || attribute.DrunkResist == nil ||
+		attribute.ConfusionResist == nil || attribute.Rare == nil {
+		return 0, errors.Errorf("生成怪物经验失败, 成长属性配置不完整: id:%d %v",
+			growthAttributeID, xruntime.Location())
 	}
 
-	baseSum := uint64(*pet.Growth.BaseVital) +
-		uint64(*pet.Growth.BaseStr) +
-		uint64(*pet.Growth.BaseTough) +
-		uint64(*pet.Growth.BaseDex)
+	baseSum := uint64(*growth.BaseVital) +
+		uint64(*growth.BaseStr) +
+		uint64(*growth.BaseTough) +
+		uint64(*growth.BaseDex)
 	rank := petRankFromBaseSum(baseSum)
 	rankBonus := [...]float32{2.5, 2.0, 1.5, 1.0, 0.5, 0.0}[rank]
 
@@ -103,30 +105,30 @@ func (p *EnemyExpConfig) GenerateEnemyExp(petID uint32, lv uint32) (uint32, erro
 	// C float精度中逐步进行, 最后赋给C int并向零截断. 这里不能改写成
 	// “百分整数先乘等级再除100”: float32在整数边界附近的舍入可能使最终
 	// 经验相差1, 负alpha还会被无符号转换放大成完全错误的巨值.
-	attributeSum := int64(*pet.Attribute.Critical) +
-		int64(*pet.Attribute.Counter) +
-		int64(*pet.Attribute.Get) +
-		int64(*pet.Attribute.PoisonResist) +
-		int64(*pet.Attribute.ParalysisResist) +
-		int64(*pet.Attribute.SleepResist) +
-		int64(*pet.Attribute.StoneResist) +
-		int64(*pet.Attribute.DrunkResist) +
-		int64(*pet.Attribute.ConfusionResist)
-	alpha := float32(float64(attributeSum)/100.0 + float64(*pet.Attribute.Rare))
+	attributeSum := int64(*attribute.Critical) +
+		int64(*attribute.Counter) +
+		int64(*attribute.Get) +
+		int64(*attribute.PoisonResist) +
+		int64(*attribute.ParalysisResist) +
+		int64(*attribute.SleepResist) +
+		int64(*attribute.StoneResist) +
+		int64(*attribute.DrunkResist) +
+		int64(*attribute.ConfusionResist)
+	alpha := float32(float64(attributeSum)/100.0 + float64(*attribute.Rare))
 	expFloat := float32(baseExp) + (rankBonus+alpha)*float32(lv)
 	if expFloat < 1 {
 		return 1, nil
 	}
 	if expFloat > float32(math.MaxInt32) {
-		return 0, errors.Errorf("生成怪物经验超出C int范围: pet:%d level:%d value:%v %v",
-			petID, lv, expFloat, xruntime.Location())
+		return 0, errors.Errorf("生成怪物经验超出C int范围: growthAttribute:%d level:%d value:%v %v",
+			growthAttributeID, lv, expFloat, xruntime.Location())
 	}
 	return uint32(expFloat), nil
 }
 
 // GenerateEnemyDefeatExperience一次完成“生成怪物经验+按等级差衰减”. // todo menglc [优化] 直接使用该函数, GenerateEnemyExp / CalculateEnemyDefeatExperience 可以改成内部的函数, 或者直接原地展开, 移除那两个函数.
-func (p *EnemyExpConfig) GenerateEnemyDefeatExperience(petID uint32, enemyLevel uint32, attackerLevel uint32) (uint64, error) {
-	enemyExp, err := p.GenerateEnemyExp(petID, enemyLevel)
+func (p *EnemyExpConfig) GenerateEnemyDefeatExperience(growthAttributeID uint32, enemyLevel uint32, attackerLevel uint32) (uint64, error) {
+	enemyExp, err := p.GenerateEnemyExp(growthAttributeID, enemyLevel)
 	if err != nil {
 		return 0, err
 	}

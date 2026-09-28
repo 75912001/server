@@ -29,6 +29,8 @@ type SkillEntry struct {
 	StoneAttack *SkillStoneAttackEntry `yaml:"stoneAttack"`
 	// ConfusionAttack 非 nil 表示物理攻击附加普通混乱, 时长按原版写入运行态时另加1.
 	ConfusionAttack *SkillConfusionAttackEntry `yaml:"confusionAttack"`
+	// DrunkAttack 非 nil 表示物理攻击附加普通酒醉, 原版把加1后的时长折半写入运行态.
+	DrunkAttack *SkillDrunkAttackEntry `yaml:"drunkAttack"`
 	// SleepAttack 非 nil 表示物理攻击附加普通睡眠, 时长按原版写入运行态时另加1.
 	SleepAttack *SkillSleepAttackEntry `yaml:"sleepAttack"`
 	// DeepPoisonAttack 非 nil 表示物理攻击附加剧毒, 到期在目标行动前强制致死.
@@ -59,6 +61,12 @@ type SkillEntry struct {
 	HealingSpirit  *SkillHealingSpiritEntry  `yaml:"healingSpirit"`
 	MoistureSpirit *SkillMoistureSpiritEntry `yaml:"moistureSpirit"`
 	GraceSpirit    *SkillGraceSpiritEntry    `yaml:"graceSpirit"`
+	// 五类净化精灵只解除各自对应的普通异常状态, 剧毒使用独立状态且不在毒净化范围内.
+	PoisonRecovery    *SkillPoisonRecoveryEntry    `yaml:"poisonRecovery"`
+	StoneRecovery     *SkillStoneRecoveryEntry     `yaml:"stoneRecovery"`
+	ConfusionRecovery *SkillConfusionRecoveryEntry `yaml:"confusionRecovery"`
+	DrunkRecovery     *SkillDrunkRecoveryEntry     `yaml:"drunkRecovery"`
+	SleepRecovery     *SkillSleepRecoveryEntry     `yaml:"sleepRecovery"`
 }
 
 type SkillContinuationAttackEntry struct {
@@ -91,6 +99,11 @@ type SkillStoneAttackEntry struct {
 }
 
 type SkillConfusionAttackEntry struct {
+	DurationActions       *uint32 `yaml:"durationActions"`
+	AttackPercentModifier *int32  `yaml:"attackPercentModifier"`
+}
+
+type SkillDrunkAttackEntry struct {
 	DurationActions       *uint32 `yaml:"durationActions"`
 	AttackPercentModifier *int32  `yaml:"attackPercentModifier"`
 }
@@ -172,6 +185,66 @@ type SkillHealingSpiritEntry struct {
 
 type SkillMoistureSpiritEntry SkillHealingSpiritEntry
 type SkillGraceSpiritEntry SkillHealingSpiritEntry
+
+type SkillPoisonRecoveryEntry struct {
+	StatusID        *uint32 `yaml:"statusId"`
+	CastEffectID    *uint32 `yaml:"castEffectId"`
+	CleanseEffectID *uint32 `yaml:"cleanseEffectId"`
+}
+
+type SkillStoneRecoveryEntry SkillPoisonRecoveryEntry
+type SkillConfusionRecoveryEntry SkillPoisonRecoveryEntry
+type SkillDrunkRecoveryEntry SkillPoisonRecoveryEntry
+type SkillSleepRecoveryEntry SkillPoisonRecoveryEntry
+
+type SkillStatusRecoveryParameters struct {
+	StatusID        uint32
+	CastEffectID    uint32
+	CleanseEffectID uint32
+}
+
+// StatusRecoveryParameters返回五类净化配置块中唯一存在的一种.
+func (p *SkillEntry) StatusRecoveryParameters() (*SkillStatusRecoveryParameters, bool) {
+	if p == nil {
+		return nil, false
+	}
+	var entry *SkillPoisonRecoveryEntry
+	switch {
+	case p.PoisonRecovery != nil:
+		entry = p.PoisonRecovery
+	case p.StoneRecovery != nil:
+		entry = (*SkillPoisonRecoveryEntry)(p.StoneRecovery)
+	case p.ConfusionRecovery != nil:
+		entry = (*SkillPoisonRecoveryEntry)(p.ConfusionRecovery)
+	case p.DrunkRecovery != nil:
+		entry = (*SkillPoisonRecoveryEntry)(p.DrunkRecovery)
+	case p.SleepRecovery != nil:
+		entry = (*SkillPoisonRecoveryEntry)(p.SleepRecovery)
+	default:
+		return nil, false
+	}
+	if entry.StatusID == nil || entry.CastEffectID == nil || entry.CleanseEffectID == nil {
+		return nil, false
+	}
+	return &SkillStatusRecoveryParameters{
+		StatusID:        *entry.StatusID,
+		CastEffectID:    *entry.CastEffectID,
+		CleanseEffectID: *entry.CleanseEffectID,
+	}, true
+}
+
+func checkStatusRecovery(name string, entry *SkillPoisonRecoveryEntry, expectedStatusID uint32) error {
+	if entry == nil || entry.StatusID == nil || entry.CastEffectID == nil || entry.CleanseEffectID == nil {
+		return errors.Errorf("%s缺少完整净化参数 %v", name, xruntime.Location())
+	}
+	if *entry.StatusID != expectedStatusID {
+		return errors.Errorf("%s statusId必须为%d: value:%d %v", name, expectedStatusID, *entry.StatusID, xruntime.Location())
+	}
+	if *entry.CastEffectID == 0 || *entry.CleanseEffectID == 0 {
+		return errors.Errorf("%s表现资源ID不能为0 %v", name, xruntime.Location())
+	}
+	return nil
+}
 
 type SkillHealingSpiritParameters struct {
 	HealPower    uint32
@@ -302,7 +375,8 @@ func (p *SkillEntry) UnmarshalYAML(node *yaml.Node) error {
 		}
 		statusSpirit := behavior == "poisonSpirit" || behavior == "stoneSpirit" || behavior == "confusionSpirit" || behavior == "drunkSpirit" || behavior == "sleepSpirit"
 		healingSpirit := behavior == "healingSpirit" || behavior == "moistureSpirit" || behavior == "graceSpirit"
-		if behavior != "mightyAttack" && behavior != "poisonAttack" && behavior != "stoneAttack" && behavior != "confusionAttack" && behavior != "sleepAttack" && behavior != "deepPoisonAttack" && behavior != "chargeAttack" && behavior != "earthRound" && behavior != "guardian" && behavior != "noGuard" && behavior != "powerBalance" && behavior != "showMercy" && behavior != "abduct" && behavior != "processing" && !statusSpirit && !healingSpirit {
+		statusRecovery := behavior == "poisonRecovery" || behavior == "stoneRecovery" || behavior == "confusionRecovery" || behavior == "drunkRecovery" || behavior == "sleepRecovery"
+		if behavior != "mightyAttack" && behavior != "poisonAttack" && behavior != "stoneAttack" && behavior != "confusionAttack" && behavior != "drunkAttack" && behavior != "sleepAttack" && behavior != "deepPoisonAttack" && behavior != "chargeAttack" && behavior != "earthRound" && behavior != "guardian" && behavior != "noGuard" && behavior != "powerBalance" && behavior != "showMercy" && behavior != "abduct" && behavior != "processing" && !statusSpirit && !healingSpirit && !statusRecovery {
 			continue
 		}
 		parameters := node.Content[index+1]
@@ -323,22 +397,29 @@ func (p *SkillEntry) UnmarshalYAML(node *yaml.Node) error {
 			if behavior == "confusionAttack" && name != "durationActions" && name != "attackPercentModifier" {
 				return errors.Errorf("技能 confusionAttack 不接受未知参数: %s", name)
 			}
+			if behavior == "drunkAttack" && name != "durationActions" && name != "attackPercentModifier" {
+				return errors.Errorf("技能 drunkAttack 不接受未知参数: %s", name)
+			}
 			if behavior == "sleepAttack" && name != "durationActions" && name != "attackPercentModifier" {
 				return errors.Errorf("技能 sleepAttack 不接受未知参数: %s", name)
 			}
 			if behavior == "deepPoisonAttack" && name != "durationActions" && name != "attackPercentModifier" {
 				return errors.Errorf("技能 deepPoisonAttack 不接受未知参数: %s", name)
 			}
+			if statusRecovery && name != "statusId" && name != "castEffectId" && name != "cleanseEffectId" {
+				return errors.Errorf("技能 %s 不接受未知参数: %s", behavior, name)
+			}
 			integerField := behavior == "mightyAttack" && (name == "damageMultiplier" || name == "targetDodgeBonus") ||
 				behavior == "poisonAttack" && (name == "durationActions" || name == "attackPercentModifier") ||
 				behavior == "stoneAttack" && (name == "durationActions" || name == "attackPercentModifier") ||
 				behavior == "confusionAttack" && (name == "durationActions" || name == "attackPercentModifier") ||
+				behavior == "drunkAttack" && (name == "durationActions" || name == "attackPercentModifier") ||
 				behavior == "sleepAttack" && (name == "durationActions" || name == "attackPercentModifier") ||
 				behavior == "deepPoisonAttack" && (name == "durationActions" || name == "attackPercentModifier") ||
 				behavior == "chargeAttack" && (name == "chargeRounds" || name == "attackPercentModifier") ||
 				behavior == "earthRound" && name == "damagePercentModifier" ||
 				behavior == "guardian" && (name == "attackPercentModifier" || name == "defensePercentModifier") ||
-				behavior == "noGuard" && (name == "dodgePercent" || name == "counterPercent" || name == "criticalPercent") || statusSpirit || healingSpirit
+				behavior == "noGuard" && (name == "dodgePercent" || name == "counterPercent" || name == "criticalPercent") || statusSpirit || healingSpirit || statusRecovery
 			integerField = integerField || behavior == "powerBalance" && (name == "attackPercentModifier" || name == "defensePercentModifier") ||
 				behavior == "abduct" && name == "loyaltyThreshold"
 			if integerField && parameters.Content[field+1].ShortTag() != "!!int" {
@@ -402,6 +483,20 @@ func (p *SkillConfusionAttackEntry) check() error {
 	}
 	if *p.AttackPercentModifier < -100 || *p.AttackPercentModifier > 0 {
 		return errors.Errorf("混乱攻击 confusionAttack.attackPercentModifier 超出-100至0范围: value:%d %v", *p.AttackPercentModifier, xruntime.Location())
+	}
+	return nil
+}
+
+func (p *SkillDrunkAttackEntry) check() error {
+	if p.DurationActions == nil || p.AttackPercentModifier == nil {
+		return errors.Errorf("泥醉攻击缺少 drunkAttack.durationActions 或 attackPercentModifier %v", xruntime.Location())
+	}
+	// 原版先把技能turn加1, 再按整数除法折半写入酒醉状态.
+	if *p.DurationActions < 1 || *p.DurationActions > 32767 {
+		return errors.Errorf("泥醉攻击 drunkAttack.durationActions 超出1至32767范围: value:%d %v", *p.DurationActions, xruntime.Location())
+	}
+	if *p.AttackPercentModifier < -100 || *p.AttackPercentModifier > 0 {
+		return errors.Errorf("泥醉攻击 drunkAttack.attackPercentModifier 超出-100至0范围: value:%d %v", *p.AttackPercentModifier, xruntime.Location())
 	}
 	return nil
 }
@@ -558,6 +653,15 @@ func (p *SkillConfig) configure(entries []*SkillEntry) error {
 				return errors.Errorf("混乱攻击只允许pet使用且不接受mpCost或targetScope: ID:%d %v", *skill.ID, xruntime.Location())
 			}
 		}
+		if skill.DrunkAttack != nil {
+			behaviorCount++
+			if err := skill.DrunkAttack.check(); err != nil {
+				return errors.Wrapf(err, "技能参数错误: ID:%d", *skill.ID)
+			}
+			if !skill.CanBeUsedBy("pet") || skill.CanBeUsedBy("character") || skill.MPCost != nil || skill.TargetScope != "" {
+				return errors.Errorf("泥醉攻击只允许pet使用且不接受mpCost或targetScope: ID:%d %v", *skill.ID, xruntime.Location())
+			}
+		}
 		if skill.SleepAttack != nil {
 			behaviorCount++
 			if err := skill.SleepAttack.check(); err != nil {
@@ -674,6 +778,35 @@ func (p *SkillConfig) configure(entries []*SkillEntry) error {
 				return errors.Errorf("%s targetScope必须为%s: ID:%d value:%s %v", spirit.name, spirit.targetScope, *skill.ID, skill.TargetScope, xruntime.Location())
 			}
 			if err := checkHealingSpirit(spirit.name, spirit.entry); err != nil {
+				return errors.Wrapf(err, "技能参数错误: ID:%d", *skill.ID)
+			}
+		}
+		statusRecoveries := []struct {
+			name     string
+			entry    *SkillPoisonRecoveryEntry
+			statusID uint32
+		}{
+			{name: "净化精灵(毒)", entry: skill.PoisonRecovery, statusID: 1},
+			{name: "净化精灵(石化)", entry: (*SkillPoisonRecoveryEntry)(skill.StoneRecovery), statusID: 4},
+			{name: "净化精灵(混乱)", entry: (*SkillPoisonRecoveryEntry)(skill.ConfusionRecovery), statusID: 6},
+			{name: "净化精灵(酒醉)", entry: (*SkillPoisonRecoveryEntry)(skill.DrunkRecovery), statusID: 5},
+			{name: "净化精灵(睡眠)", entry: (*SkillPoisonRecoveryEntry)(skill.SleepRecovery), statusID: 3},
+		}
+		for _, recovery := range statusRecoveries {
+			if recovery.entry == nil {
+				continue
+			}
+			behaviorCount++
+			if skill.MPCost == nil {
+				return errors.Errorf("净化精灵技能缺少mpCost: ID:%d %v", *skill.ID, xruntime.Location())
+			}
+			if !skill.CanBeUsedBy("character") || skill.CanBeUsedBy("pet") {
+				return errors.Errorf("净化精灵技能只允许character使用: ID:%d %v", *skill.ID, xruntime.Location())
+			}
+			if skill.TargetScope != "singleAlly" && skill.TargetScope != "allyCamp" {
+				return errors.Errorf("净化精灵技能targetScope必须为singleAlly或allyCamp: ID:%d value:%s %v", *skill.ID, skill.TargetScope, xruntime.Location())
+			}
+			if err := checkStatusRecovery(recovery.name, recovery.entry, recovery.statusID); err != nil {
 				return errors.Wrapf(err, "技能参数错误: ID:%d", *skill.ID)
 			}
 		}

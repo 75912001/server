@@ -6,6 +6,7 @@ import (
 
 	xactor "github.com/75912001/xlib/actor"
 	xlog "github.com/75912001/xlib/log"
+	xtimer "github.com/75912001/xlib/timer"
 )
 
 type Account struct {
@@ -18,6 +19,13 @@ type Account struct {
 	actor          *xactor.Actor[uint64]
 
 	characterManager *characterMgr // 账号内全部角色的在线, 自动遇敌和 CombatRoom actor 指针
+
+	// accountRecordDirty 表示账号档案存在未落盘的修改.
+	accountRecordDirty bool
+	// accountRecordWriteCount 是当前落盘窗口内累计的写次数, 落盘成功后清零.
+	accountRecordWriteCount int
+	// accountRecordFlushTimer 是待触发的延迟落盘定时器, nil 表示当前没有待触发任务.
+	accountRecordFlushTimer *xtimer.Second
 }
 
 func newAccount(aid uint64) *Account {

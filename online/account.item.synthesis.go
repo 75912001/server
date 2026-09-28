@@ -25,18 +25,18 @@ var (
 )
 
 type itemSynthesisPlan struct {
-	characterUUID          uint64
-	petUUID                uint64
-	matched                bool
-	resultEquipment        *pb.EquipmentRecord
-	returnedMaterial       *pb.ItemElement
+	characterUUID uint64
+	petUUID       uint64
+	matched       bool
+	characterSlot int
+	materials     []*pb.ItemElement
+	// nextUsedUUID 与 newEquipment 只在命中配方时有效, 装备在 prepare 阶段建好、apply 阶段插入.
+	nextUsedUUID uint64
+	newEquipment *pb.EquipmentRecord
+	// selectedMaterialID 只在未命中配方时有效, 表示返还哪种素材.
+	selectedMaterialID uint32
+	// materialCostResultList 在 apply 阶段按消耗后的权威数量填充, 供响应返回.
 	materialCostResultList []*pb.ItemCostResult
-	previousUsedUUID       uint64
-	nextUsedUUID           uint64
-	characterSlot          int
-	previousCharacter      *pb.CharacterRecord
-	nextCharacter          *pb.CharacterRecord
-	nextAccountRecord      *pb.AccountRecord
 }
 
 func (p *Account) onItemSynthesisReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
@@ -57,9 +57,7 @@ func (p *Account) onItemSynthesisReq(gateway *Gateway, pkt *pb.OnlineClientPacke
 		p.sendClientErr(gateway, uint32(pb.MsgID_ItemSynthesisRes_CMD), itemSynthesisResultID(err))
 		return
 	}
-	if err := persistItemSynthesisPlan(plan, p.accountRecord, character, func(next *pb.AccountRecord) error {
-		return unaryCacheSetAccountRecord(p.aid, next)
-	}); err != nil {
+	if err := applyItemSynthesisPlan(plan, p.accountRecord, character, p.deferAccountRecordPersist); err != nil {
 		xlog.GLog.Errorf("persist item synthesis failed aid:%d character:%d pet:%d matched:%t err:%v", p.aid, plan.characterUUID, plan.petUUID, plan.matched, err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_ItemSynthesisRes_CMD), xerror.Internal.Code())
 		return
@@ -69,7 +67,7 @@ func (p *Account) onItemSynthesisReq(gateway *Gateway, pkt *pb.OnlineClientPacke
 	if plan.matched {
 		notifyUsedUUID = plan.nextUsedUUID
 	}
-	p.sendCharacterContainerChangedNotify(gateway, plan.characterUUID, plan.nextCharacter.GetItemBag(), notifyUsedUUID)
+	p.sendCharacterContainerChangedNotify(gateway, plan.characterUUID, character.record.GetItemBag(), notifyUsedUUID)
 	response := &pb.ItemSynthesisRes{
 		CharacterUuid:          plan.characterUUID,
 		PetUuid:                plan.petUUID,
@@ -77,10 +75,10 @@ func (p *Account) onItemSynthesisReq(gateway *Gateway, pkt *pb.OnlineClientPacke
 		MaterialCostResultList: cloneItemCostResults(plan.materialCostResultList),
 	}
 	if plan.matched {
-		response.ResultEquipment = proto.Clone(plan.resultEquipment).(*pb.EquipmentRecord)
+		response.ResultEquipment = proto.Clone(plan.newEquipment).(*pb.EquipmentRecord)
 		response.UsedUuid = plan.nextUsedUUID
 	} else {
-		response.ReturnedMaterial = proto.Clone(plan.returnedMaterial).(*pb.ItemElement)
+		response.ReturnedMaterial = &pb.ItemElement{AssetId: plan.selectedMaterialID, Count: 1}
 	}
 	p.sendClientRes(gateway, uint32(pb.MsgID_ItemSynthesisRes_CMD), xerror.Success.Code(), response)
 }
@@ -161,61 +159,33 @@ func prepareItemSynthesisPlan(accountRecord *pb.AccountRecord, characterRecord *
 		}
 	}
 
-	nextAccountRecord := proto.Clone(accountRecord).(*pb.AccountRecord)
-	nextCharacter := nextAccountRecord.GetCharacterRecordList()[characterSlot]
-	nextItemManager := newCharacterItemManager(nextCharacter)
-	for _, material := range materials {
-		if err := nextItemManager.Consume(material.GetAssetId(), material.GetCount()); err != nil {
-			return nil, fmt.Errorf("%w: consume material %d: %v", errItemSynthesisRecordInvalid, material.GetAssetId(), err)
-		}
-	}
-
-	plan := &itemSynthesisPlan{
-		characterUUID:     characterRecord.GetBase().GetUuid(),
-		petUUID:           petUUID,
-		matched:           matched,
-		previousUsedUUID:  accountRecord.GetUsedUuid(),
-		nextUsedUUID:      accountRecord.GetUsedUuid(),
-		characterSlot:     characterSlot,
-		previousCharacter: characterRecord,
-		nextCharacter:     nextCharacter,
-		nextAccountRecord: nextAccountRecord,
-	}
+	nextUsedUUID := accountRecord.GetUsedUuid()
+	var newEquipment *pb.EquipmentRecord
 	if matched {
-		plan.nextUsedUUID++
-		equipment, err := newEquipmentRecord(plan.nextUsedUUID, recipe.ID)
+		nextUsedUUID++
+		// 新装备是全新对象而非克隆, 因此在 prepare 阶段构建, apply 阶段只做插入.
+		equipment, err := newEquipmentRecord(nextUsedUUID, recipe.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%w: create equipment %d: %v", errItemSynthesisRecordInvalid, recipe.ID, err)
 		}
-		if nextCharacter.ItemBag == nil {
-			nextCharacter.ItemBag = &pb.ItemContainerRecord{}
-		}
-		if nextCharacter.ItemBag.EquipmentRecordMap == nil {
-			nextCharacter.ItemBag.EquipmentRecordMap = make(map[uint64]*pb.EquipmentRecord)
-		}
-		if _, exists := nextCharacter.ItemBag.EquipmentRecordMap[equipment.GetUuid()]; exists {
+		if _, exists := characterRecord.GetItemBag().GetEquipmentRecordMap()[equipment.GetUuid()]; exists {
 			return nil, fmt.Errorf("%w: equipment uuid %d already exists", errItemSynthesisRecordInvalid, equipment.GetUuid())
 		}
-		nextCharacter.ItemBag.EquipmentRecordMap[equipment.GetUuid()] = equipment
-		nextAccountRecord.UsedUuid = plan.nextUsedUUID
-		plan.resultEquipment = equipment
-	} else {
-		if selectedMaterialID == 0 {
-			return nil, fmt.Errorf("%w: returned material was not selected", errItemSynthesisRecordInvalid)
-		}
-		if err := nextItemManager.Add(selectedMaterialID, 1); err != nil {
-			return nil, fmt.Errorf("%w: return material %d: %v", errItemSynthesisRecordInvalid, selectedMaterialID, err)
-		}
-		plan.returnedMaterial = &pb.ItemElement{AssetId: selectedMaterialID, Count: 1}
+		newEquipment = equipment
+	} else if selectedMaterialID == 0 {
+		return nil, fmt.Errorf("%w: returned material was not selected", errItemSynthesisRecordInvalid)
 	}
-	for _, material := range materials {
-		plan.materialCostResultList = append(plan.materialCostResultList, &pb.ItemCostResult{
-			ItemId:         material.GetAssetId(),
-			ConsumedCount:  material.GetCount(),
-			RemainingCount: nextItemManager.Count(material.GetAssetId()),
-		})
-	}
-	return plan, nil
+
+	return &itemSynthesisPlan{
+		characterUUID:      characterRecord.GetBase().GetUuid(),
+		petUUID:            petUUID,
+		matched:            matched,
+		characterSlot:      characterSlot,
+		materials:          materials,
+		nextUsedUUID:       nextUsedUUID,
+		newEquipment:       newEquipment,
+		selectedMaterialID: selectedMaterialID,
+	}, nil
 }
 
 func validateItemSynthesisPet(characterRecord *pb.CharacterRecord, petUUID uint64) error {
@@ -256,20 +226,50 @@ func validateItemSynthesisMaterials(characterRecord *pb.CharacterRecord, materia
 	return materialCounts, totalUnits, itemManager, nil
 }
 
-func persistItemSynthesisPlan(plan *itemSynthesisPlan, accountRecord *pb.AccountRecord, character *character, persist func(*pb.AccountRecord) error) error {
-	if plan == nil || accountRecord == nil || character == nil || persist == nil || plan.nextAccountRecord == nil || plan.nextCharacter == nil {
+// applyItemSynthesisPlan 把计划原地应用到权威账号档案, 再通知落盘。
+// 与改造前的区别: 不再克隆整个 AccountRecord, 也不再做事后差分解算通知。
+func applyItemSynthesisPlan(plan *itemSynthesisPlan, accountRecord *pb.AccountRecord, character *character, persist func() error) error {
+	if plan == nil || accountRecord == nil || character == nil || persist == nil || character.record == nil {
 		return errItemSynthesisInvalidArgument
 	}
-	if plan.characterSlot < 0 || plan.characterSlot >= len(accountRecord.GetCharacterRecordList()) || accountRecord.GetCharacterRecordList()[plan.characterSlot] != plan.previousCharacter || character.record != plan.previousCharacter || accountRecord.GetUsedUuid() != plan.previousUsedUUID {
+	if plan.characterSlot < 0 || plan.characterSlot >= len(accountRecord.GetCharacterRecordList()) ||
+		accountRecord.GetCharacterRecordList()[plan.characterSlot] != character.record {
 		return fmt.Errorf("%w: authoritative account state changed before persistence", errItemSynthesisRecordInvalid)
 	}
-	if err := persist(plan.nextAccountRecord); err != nil {
-		return err
+
+	itemManager := newCharacterItemManager(character.record)
+	for _, material := range plan.materials {
+		if err := itemManager.Consume(material.GetAssetId(), material.GetCount()); err != nil {
+			return fmt.Errorf("%w: consume material %d: %v", errItemSynthesisRecordInvalid, material.GetAssetId(), err)
+		}
 	}
-	accountRecord.CharacterRecordList[plan.characterSlot] = plan.nextCharacter
-	accountRecord.UsedUuid = plan.nextUsedUUID
-	character.record = plan.nextCharacter
-	return nil
+	if plan.matched {
+		if character.record.ItemBag == nil {
+			character.record.ItemBag = &pb.ItemContainerRecord{}
+		}
+		if character.record.ItemBag.EquipmentRecordMap == nil {
+			character.record.ItemBag.EquipmentRecordMap = make(map[uint64]*pb.EquipmentRecord)
+		}
+		if _, exists := character.record.ItemBag.EquipmentRecordMap[plan.newEquipment.GetUuid()]; exists {
+			return fmt.Errorf("%w: equipment uuid %d already exists", errItemSynthesisRecordInvalid, plan.newEquipment.GetUuid())
+		}
+		character.record.ItemBag.EquipmentRecordMap[plan.newEquipment.GetUuid()] = plan.newEquipment
+		accountRecord.UsedUuid = plan.nextUsedUUID
+	} else {
+		if err := itemManager.Add(plan.selectedMaterialID, 1); err != nil {
+			return fmt.Errorf("%w: return material %d: %v", errItemSynthesisRecordInvalid, plan.selectedMaterialID, err)
+		}
+	}
+
+	plan.materialCostResultList = plan.materialCostResultList[:0]
+	for _, material := range plan.materials {
+		plan.materialCostResultList = append(plan.materialCostResultList, &pb.ItemCostResult{
+			ItemId:         material.GetAssetId(),
+			ConsumedCount:  material.GetCount(),
+			RemainingCount: itemManager.Count(material.GetAssetId()),
+		})
+	}
+	return persist()
 }
 
 func itemSynthesisResultID(err error) uint32 {

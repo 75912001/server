@@ -1,5 +1,7 @@
 # Online 服务测试指南
 
+任务60第1步应从 110007 (29,48) 入场. 只有从该地图3名守卫的 NPC 挑战选项发起并战胜敌群70000后, 整队才到 110007 (30,30); 任务页挑战和普通遇敌不应触发. 任务入口请求的任务ID和步骤ID必须成对填写, 坐标由服务端配置决定.
+
 ## 适用范围
 
 修改 Account actor、共享配置加载、角色、宠物、商店或邮箱业务、`CombatRoom`、回合动作、gateway stream 路由或 online gRPC handler 时使用本文档.
@@ -23,6 +25,7 @@ GOCACHE="$PWD/.gocache" go test ./gateway ./cache ./login
 
 ```text
 character.yaml
+growth.attribute.yaml
 技能.yaml
 ai.yaml
 enemy.group.yaml
@@ -57,27 +60,33 @@ scene/*.yaml
 验证要点:
 
 - 缺少任一必需文件时, online 明确启动失败.
+- `character.yaml` 的每个角色必须显式提供数组类型的 `mounts`; 空数组及0-N条配置合法, 每条 `petId` 必须存在且同一角色内不可重复. 进入骑乘时必须同时满足角色形象配置授权和忠诚度100, 未授权宠物及无骑乘能力角色返回 `FailedPrecondition` 且不修改状态; 已处于未授权骑乘状态时仍允许切回等待.
 - `技能.yaml` 的 ID、`usableBy` 和连续攻击段数非法时加载失败; 服务端配置不包含客户端展示用的名称和说明, 残留旧 `cost` 字段必须加载失败.
 - `mightyAttack` 必须为对象, 同时提供整数倍率1-655和目标闪避加值0-32767; 空值、缺项、小数、越界和与 `continuationAttack` 并存均加载失败.
 - `poisonAttack` 必须同时提供整数 `durationActions` (1-32767) 和 `attackPercentModifier` (-100至0); 与 `continuationAttack` 或 `mightyAttack` 并存, 空值, 缺项, 字符串, 小数及越界均加载失败. RAW中8100060必须保持3次/-30%/2500石币且为`pending_test`, 正式双端、商店、出生技能和AI不得包含它; 8100061仍为已发布的5次/-30%/4000石币.
 - `stoneAttack` 必须同时提供整数 `durationActions` (1-32767) 和 `attackPercentModifier` (-100至0); 空值、缺项、字符串、小数、越界、其他行为块并存、角色可用、`mpCost`或`targetScope`均加载失败. RAW中8100080/8100509必须保持3/-30和9/-30、2300石币及`pending_test`, 原版708保持未实现; 正式双端、商店、出生技能和AI不得包含两个现代ID.
 - `confusionAttack` 必须同时提供整数 `durationActions` (1-32767) 和 `attackPercentModifier` (-100至0); 空值、缺项、字符串、小数、越界、未知字段、其他行为块并存、角色可用、`mpCost`或`targetScope`均加载失败. RAW中8100090/8100510必须保持3/-30和9/-30、2000石币及`pending_test`, 原版709保持未实现; 正式双端、商店、出生技能和AI不得包含两个现代ID.
 - `sleepAttack` 必须同时提供整数 `durationActions` (1-32767) 和 `attackPercentModifier` (-100至0); 空值、缺项、字符串、小数、越界、未知字段、其他行为块并存、角色可用、`mpCost`或`targetScope`均加载失败. RAW中8100110/8100511必须保持3/-30和9/-30、2500石币及`pending_test`, 原版710保持未实现; 正式双端、商店、出生技能和AI不得包含两个现代ID.
-- 五系异常精灵必须分别使用 `poisonSpirit`, `stoneSpirit`, `confusionSpirit`, `drunkSpirit`, `sleepSpirit` 独立参数块, 状态ID固定为1、4、6、5、3. `mpCost` 必须属于技能且为非负整数, `targetScope` 只允许 `singleOpponent` 或 `opponentCamp`; 装备配置通过 `magicid` 提供自带技能, 装备实例通过 `additional_skill_id_list` 保存配置之外后期添加的技能, 两者都不接受装备侧耗蓝或成功率.
-- 治愈、滋润、恩惠必须分别使用 `healingSpirit`, `moistureSpirit`, `graceSpirit` 独立参数块, `targetScope` 固定为 `self`, `singleAlly`, `allyCamp`. 每个目标独立执行基础治疗量90%-110%随机和体力倍率, 排除死亡单位并限制到最大HP; 角色体力点按1%/点, 宠物原始百倍体力按0.005%/点折算.
+- 五系异常精灵必须分别使用 `poisonSpirit`, `stoneSpirit`, `confusionSpirit`, `drunkSpirit`, `sleepSpirit` 独立参数块, 状态ID固定为1、4、6、5、3. `mpCost` 必须属于技能且为非负整数, `targetScope` 只允许 `singleOpponent` 或 `opponentCamp`; 装备配置通过 `magicid` 提供自带技能, 装备实例通过单值 `additional_skill_id` 保存配置之外后期添加的唯一技能, 两者都不接受装备侧耗蓝或成功率.
+- 五系净化精灵必须分别使用`poisonRecovery`, `stoneRecovery`, `confusionRecovery`, `drunkRecovery`, `sleepRecovery`独立参数块, 状态ID固定为1、4、6、5、3, 且完整保存7004施法和7081净化特效. Lv1固定3 MP及`singleAlly`, Lv2固定9 MP及`allyCamp`, 只允许角色使用并与其他行为块互斥.
+- 治愈、滋润、恩惠必须分别使用 `healingSpirit`, `moistureSpirit`, `graceSpirit` 独立参数块, `targetScope` 固定为 `self`, `singleAlly`, `allyCamp`. 每个目标独立执行基础治疗量90%-110%随机和体力倍率, 排除死亡单位并限制到最大HP; 角色体力点按1%/点, 宠物原始百倍体力按0.005%/点折算. `CombatAssetDelta.delta`中的技能MP消耗必须为负数, 实际HP恢复必须为正数并等于`after-before`; 客户端只用正HP恢复量生成绿色治疗数字.
 - `item.yaml`、`道具.素材.yaml`和`item.currency.yaml`分别只允许普通道具、素材和货币分组, 8个`道具.武器.<类型>.yaml`和7个`item.equipment.<类型>.yaml`必须各自只包含文件名对应的唯一分组; 所有文件使用`items.<group>.<id>`结构并合并为统一运行期索引. 文件缺失、分组放错文件、未知分组, 空非装备或武器分组、ID超出分组区间、非法 `atlas` 路径、18项固化数值范围或攻击次数范围倒置、非法职业、非法武器类型或非法元素配置均应加载失败. 七类装备文件允许空发布分组.
-- 旧 `item.synthesis.yaml` 对应功能已暂停, Online 运行时不读取该文件; 其独立解析和算法单元测试仍保留. `道具.天工司.yaml`的基础配方必须有1-8种不重复素材, 数量1-999, 产物必须是已配置武器且素材必须存在; 不同产物允许共享素材签名, 候选按武器ID升序建立索引并在命中时等概率随机一个. `attributes`只允许`ground/water/fire/wind`, 每件装备最多4种元素, 每种元素的素材规则与基础配方一致, 且同一装备下素材签名不得重复.
+- 旧 `item.synthesis.yaml` 对应功能已暂停, Online 运行时不读取该文件; 其独立解析和算法单元测试仍保留. `道具.天工司.yaml`的基础配方必须有1-8种不重复素材, 数量1-999, 产物必须是已配置装备且素材必须存在; 武器及7类非武器装备都可作为产物. 不同产物允许共享素材签名, 候选按装备ID升序建立索引并在命中时等概率随机一个. `attributes`只允许`ground/water/fire/wind`, 每件装备最多4种元素, 每种元素的素材规则与基础配方一致, 且同一装备下素材签名不得重复.
 - 8个`道具.武器.<类型>.yaml`的`attacknum`, `attack`, `defence`, `quick`, `hp`, `mp`, `luck`, `charm`, `avoid`, `poison`, `paralysis`, `sleep`, `stone`, `drunk`, `confusion`, `critical`, `counter_modifier`, `damage_bonus_percent`, `crit_damage_bonus_percent`必须使用恰好两个整数的`[min, max]`数组; 后三项按万分比配置且当前不接入战斗公式, 七类装备继续兼容旧`_min/_max`字段.
 - 普通道具 `sprite` 为0时不能配置 `atlas`, `sprite` 大于0时必须配置以 `item/` 开头的无扩展名 `atlas`; 七类装备在服务端允许按 C/S 归属独立省略展示字段, 但 sprite 出现时必须为正数, atlas 出现时必须合法. 武器和七类装备不能配置 `use`. `equipmentAccessory` 有条目时必须配置合法 `accessory_type`, 并与 proto 子区间相符.
+- 奖励包必须显式配置`all`或`randomOne`; 随机候选权重大于0且总和不溢出, 每个候选组内容非空并独立校验引用、数量、宠物等级和重复ID. 可开启普通道具的`rewardId`与经验/忠诚度互斥且目标固定为角色. 开箱在扣除1个箱子的候选档案上校验所有随机结果容量和UUID, Cache失败时角色档案及`used_uuid`均保持不变.
+- `growth.attribute.yaml`必须先于宠物和敌群加载; ID非零唯一, 元素总和与相邻关系、成长整数边界、Rank派生及`panelReference`重算必须通过. `pet.yaml`只允许非零`growthAttributeId`和出生技能, 残留内联成长字段或未知成长引用必须失败.
+- `PetRecord.growth_attribute_id`为必填冻结引用. 0或不存在的引用必须拒绝账号档案; 合法非默认引用必须继续驱动升级、元素和固有战斗特性, 不得回退到`pet.yaml`默认值.
 - `pet.yaml skill` 的非 0 ID 不存在于 `技能.yaml` 时加载失败.
 - `ai.yaml` 的 ID 必须为非零唯一整数. `skills[]` 必须非空, 技能 ID 必须存在且不重复, 每项必须显式提供正整数权重, 单项和总权重不超过2147483647且总权重大于0; 目标范围和目标策略保持原有校验. 权重为0或缺失时必须加载失败, 列表允许超过7项.
 - `pet.yaml creationMode` 只允许省略或填写 `fusionEgg`. 普通宠物应用品阶偏移后的 `SavedBase*` 和原版公式计算出的 `Raw*` 使用 `int32`, 允许为0或负数; protobuf 往返、档案绑定和战斗构造不得发生无符号下溢. 派生后的最大生命和攻击仍必须大于0. GM 增宠请求必须校验1-140级目标等级, 并生成对应等级的经验、成长基线和四维; 0级或超过上限必须无损拒绝. 融合蛋允许保留原版占位成长, 但 `common/pet.NewRecord` 和 GM 普通创建入口必须拒绝, 且拒绝时不得修改 UUID 游标或角色宠物列表.
-- `scene/*.yaml` 不得设置格式版本字段; 地图 ID 必须是客户端正整数 `map_id`, 地图尺寸和 `collision.blockedRows` 必须合法. 当前配置目录包含70000至70002这3张任务地图, 80000、80001、80010、80020、80030、80040、80050、80060、80070这9张测试地图, 以及90001和90010至90130按10递增的14张练级地图; `CharacterMapEnterReq` 必须接受已配置且遇敌有效的任务、测试或练级地图.
+- `scene/*.yaml` 不得设置格式版本字段; 地图 ID 必须是客户端正整数 `map_id`, 地图尺寸和 `collision.blockedRows` 必须合法. 当前配置目录包含70000至70002这3张任务地图, 80000、80001、80010、80020、80030、80040、80050、80060、80070这9张测试地图, 以及90001和90010至90130按10递增的14张练级地图; 运行时只加载已发布新图; `CharacterMapEnterReq` 对原图及旧任务、测试、练级地图应返回不可进入.
 - 阻挡区、传送起点越界或已存在目标地图的落点越界时加载失败.
+- 新地图100000和200000在存在已发布`scene/<map_id>.yaml`时可加载和进入; 200001应被拒绝. 草稿和已撤回新图没有服务端场景文件, 不能进入. 新地图允许`encounter.enabled=false`, 发布或撤回均在下次Online重启后生效. 当前`CharacterBaseRecord`不保存地图ID, 角色重新上线从地图0开始, 不存在撤回地图的存档位置迁移.
 - `encounter.enabled` 必须设置; 启用遇敌时 `encounter.enemyGroups` 必须引用至少一个已存在的敌人组, 总权重必须大于0.
-- `enemy.group.yaml enemies[].id` 必须引用存在的宠物模板; 每个敌人的 `battleAI` 必填且引用存在的 AI. 缺失、0或未知 AI 均加载失败. `normalDrops`可省略, 配置时最多10项, 每项必须引用正式道具并提供`[1,10000]`万分比; 相同道具允许作为多个独立槽位重复出现. `pet.yaml` 可以独立于 AI 表加载, 其技能只用于出生模板.
+- `enemy.group.yaml enemies[]`必须在`petId`和`characterId`中且仅配置一个, 旧`id`字段必须失败; 每个成员必须显式引用存在的`growthAttributeId`和`battleAI`. 角色成员必须配置`unarmed/axe/stick/spear/bow`之一, 宠物成员禁止`weapon`. `normalDrops`可省略, 配置时最多10项, 每项必须引用正式道具并提供`[1,10000]`万分比; 相同道具允许作为多个独立槽位重复出现.
 - 旧 `pet.yaml battleAI`、`enemies[].skill`、`attackWeight`、`defenseWeight`、`escapeWeight` 和 `skillSlotWeights` 必须明确报错. AI 中不支持的 NPC 技能必须使 Online 在注册 etcd 和 gRPC 前启动失败.
-- 除阿布洞窟敌群70000外, 当前敌人必须引用 AI 1, 攻击、防御、逃跑权重保持 `10:1:1`; 敌群70000的五名守护者按顺序引用 AI 13-17并保持各自配置权重.
+- 除阿布洞窟敌群70000、琉璃洞窟九楼敌群70003和十四楼敌群70004、漆黑洞窟抓宠敌群70012外, 当前敌人必须引用 AI 1, 攻击、防御、逃跑权重保持 `10:1:1`; 敌群70000的五名守护者按顺序引用 AI 13-17, 敌群70003按固定十人阵容引用 AI `21,21,21,22,22,20,23,23,24,24`, 敌群70004引用 AI `30,25,25,26,26,27,28,28,29,29`, 敌群70012的四名守护兽统一引用 AI 57并保持攻击、防御、逃跑权重`1:1:8`.
 - 多数宠物出生技能保持 `[8000001,8000002,0,0,0,0,0]`, 查罕·乌尔夫和查罕·吉鲁的出生技能继续包含 `8100003`; 敌人选择只读取`enemy.group.yaml`引用的AI, 不回退宠物出生技能.
 - 配置加载失败后不注册 etcd, 不启动 gRPC 业务入口.
 
@@ -86,17 +95,33 @@ scene/*.yaml
 - Boss 成员必须且只能配置 `level` 或 `levelRange`; 普通组成员允许省略二者并使用组级规则, 但同样拒绝同时配置.
 - 验证固定等级、闭区间及单点区间加载成功; 缺失Boss等级、互斥字段同时出现、范围倒置、元素数量错误和协议等级越界必须失败.
 - 五名阿布洞窟守护者必须保持原顺序, 只配置原版 `[39,41]`、`[38,40]`、`[37,39]`、`[35,38]`、`[40,43]`, 不保留固定 `level`.
+- 琉璃洞窟九楼敌群70003必须保持10名Boss成员的原顺序, 主怪4000308固定67级, 其余成员使用`[62,65]`, 全组不可捕获且无普通掉落.
+- 琉璃洞窟十四楼敌群70004必须保持10名Boss成员的原顺序, 主怪4000321固定73级, 4000277和4000276使用`[65,66]`, 其余随从使用`[62,65]`; 全组固定5品质、不可捕获且无普通掉落.
+- 漆黑洞窟地下6楼抓宠敌群70012必须在任务专用宠物4100000至4100003中等权随机生成1-3只, 固定50级、允许捕获且`babyRate: 0`; 当前地下6楼仅负责可选捕宠, 任务不得检查或消耗这些宠物. 未来实际执行角色转生时, 必须在服务端点击处理阶段按转生次数重新校验并成功后消耗对应50级任务宠物, 不得使用复用外观的普通宠物ID.
 - 建房等级测试验证成员范围的两个端点、每次创建独立抽取、成员范围优先于组级范围, 并保留固定等级不消耗随机数和玩家等级偏移边界检查.
 
 ```bash
 GOCACHE="$PWD/.gocache" go test ./common/gameconfig ./online -run 'EnemyGroupMemberLevelModes|EnemyGroupProjectGuardianLevelRanges|CombatPVEEnemyLevel' -count=1
 ```
 
+## 敌人显示名称与品质范围
+
+- `enemies[].displayName`可省略; 省略时开战协议动态使用当前宠物模板名称, 配置时必须为去除首尾空白后的非空字符串, 并写入`CombatUnit.display_name`. 客户端目标选择、动作提示和开发者战况日志优先使用该字段, 空值兼容回退宠物配置名.
+- `enemies[].gradeRange`可省略或配置普通至神话`[1,5]`内的二元闭区间. 省略时继续按体力、腕力、耐力、速度顺序各执行一次`RAND(0,4)`并映射为`-2..+2`; 配置后从625种原始等概率四维组合中均匀抽取品阶落在范围内的组合, 保留原分布的条件概率.
+- 战斗属性、捕获快照和捕获后的实际品阶共用同一份四维结果, 不重新抽取品阶.
+- 聚焦验证命令: `GOCACHE="$PWD/.gocache" go test ./common/gameconfig ./online ./proto/pb -run 'EnemyGroupMemberDisplayNameAndGradeRange|CombatPVEEnemyGradeRange|CombatPVEEnemyDisplayName|CapturePreservesConfiguredEnemyGradeRange' -count=1`.
+
+## 敌人成员战斗属性修正
+
+- `enemies[].attributeModifiers`可省略, 或按需配置`poisonResist/paralysisResist/sleepResist/stoneResist/drunkResist/confusionResist/critical/counter`; 每项必须是`[-100,100]`内的整数, 缺省项按0处理.
+- 建房时只对该敌人成员冻结“宠物模板原值+成员修正值”. 六类抗性分别进入对应异常状态抗性, 毒抗同时更新旧中毒链路; 暴击和反击进入敌方物理判定. 不修改共享宠物模板、玩家宠物或捕获后的宠物档案.
+- 聚焦验证命令: `GOCACHE="$PWD/.gocache" go test ./common/gameconfig ./online -run 'EnemyGroupMemberDisplayNameAndGradeRange|ApplyEnemyAttributeModifiers|ApplyPetBattleTraitsSnapshotsStatusResistance|CombatCounterThreshold85NonPlayer' -count=1`.
+
 ## 敌人普通掉落
 
 - 每个`enemies[].normalDrops[]`在敌人实例创建时按配置顺序独立执行一次`RAND(0,9999) < probability`; 未配置掉落不消费随机数.
 - 抽中的现代道具ID冻结到敌人运行态, 后续继续复用击杀动作归属、玩家临时三格和战后背包/装备实例持久化流程. DP战不分配普通掉落.
-- 武器、首饰和六类普通防具掉落都必须创建独立`EquipmentRecord`并进入背包. 阿布洞窟70000的`3500574`头盔与`3510568`胸甲必须和经验、任务60进度共用一次原子持久化; 失败时背包、UUID、经验和任务记录全部回滚.
+- 武器、首饰和六类普通防具掉落都必须创建独立`EquipmentRecord`并进入背包. 阿布洞窟70000的`3500552`鲁德的兜与`3510568`胸甲必须和经验、任务60进度共用一次原子持久化; 失败时背包、UUID、经验和任务记录全部回滚.
 - 聚焦验证命令: `GOCACHE="$PWD/.gocache" go test ./common/gameconfig ./online -run 'EnemyGroupNormalDrop|CombatPVEEnemyDrop|PVEEnemyDrop|CombatDrop' -count=1`.
 
 ## 角色任务
@@ -107,10 +132,15 @@ GOCACHE="$PWD/.gocache" go test ./common/gameconfig ./online -run 'EnemyGroupMem
 GOCACHE="$PWD/.gocache" go test ./common/gameconfig ./online ./proto/pb -run 'Task|Reward' -count=1
 ```
 
-- task.yaml必须校验正整数唯一任务ID、从1连续编号的非空步骤、非空完成条件、合法条件字段及现有任务/道具/宠物/敌群/奖励包引用. reward.yaml允许空rewards数组, 非空奖励包必须至少包含合法且不重复的道具/装备或宠物; 所有数量为正, 奖励宠物必须配置合法等级和`grade: random`.
-- completionMode省略时为automatic. consumeItems和consumePets仅允许submit; itemPossession与petPossession只检查持有, 后者按宠物ID和实际等级精确匹配. taskRewardsClaimed要求前置任务全部步骤完成且奖励全部领取. battleVictory不能用于接取、开始或submit完成条件.
+- task.yaml必须校验正整数唯一任务ID、从1连续编号的非空步骤、合法条件字段及现有任务/道具/宠物/敌群/奖励包引用. automatic和submit要求非空完成条件; persistent只允许作为无完成条件、挑战、消耗和奖励且包含合法交互的最后一步. reward.yaml允许空rewards数组, 非空奖励包必须至少包含合法且不重复的道具/装备或宠物; 所有数量为正, 奖励宠物必须配置合法等级和`grade: random`.
+- completionMode省略时为automatic. consumeItems和consumePets仅允许submit; itemPossession与petPossession只检查持有, 后者按宠物ID和实际等级精确匹配. taskRewardsClaimed要求前置任务全部步骤完成且奖励全部领取; anyTaskRewardsClaimed要求非空且无重复的前置任务中任意一个全部领奖. battleVictory不能用于接取、开始或submit完成条件. `completionRequiresRewardsClaimed`默认false, 为true时全部步骤领奖前任务仍未完成. persistent步骤启动后永不自动完成且Submit必须拒绝.
 - 阿布洞窟60必须是非主线、无接取条件、单步骤、enemyGroupId 70000、rewardId 0. 其他敌群胜利、失败或未接取均不得完成.
 - 卡坦任务61必须按两批扣除4只25级宠物, 第一批领取火难的戒指, 第二批交回戒指并领取1级随机品质修宝. 任务62必须以任务61全部领奖为前置, 按两批扣除另外4只25级宠物并领取1级随机品质朵拉比斯.
+- 琉璃洞窟任务64必须以成人仪式63全部领奖为前置, 依次领取拉鲁的项链和雅哈奴的日记、战胜敌群70003和70004、向女神蒂亚特同时提交两件信物并领取大地的羁绊. 70004胜利不能越过70003, 两件信物均不得配置`rewardReissue`.
+- 玄黄洞窟任务65必须以成人仪式63全部领奖为前置, 按顺序战胜敌群70005、70007、70008和70009, 完成威尔、姆哈萨和梦德的串行交谈, 领取风的竖琴后提交该首饰并领取风的锁[风]. 任何后续敌群胜利均不能越过前序步骤, 风的竖琴不得配置`rewardReissue`.
+- 碧青洞窟任务66必须达到65级、成人仪式63全部领奖, 且琉璃洞窟64或玄黄洞窟65任一任务全部领奖. 任务依次战胜70010和70011, 再通过步骤导航进入地图70006并确认持有随机遇敌掉落的深蓝色石头、向菲伊领取群青的水、向贤者同时提交两种材料取得碧青水晶, 最后提交水晶并领取水的戒指[水]. 70006胜利事件本身不能推进步骤, 三种任务道具均不得配置`rewardReissue`.
+- 深红洞窟任务67必须以成人仪式63全部领奖为前置, 按70013、领取不死鸟的羽毛[火]、70014、70015和向伊拉提交羽毛的顺序推进. 后续敌群胜利不能越序; 羽毛只能首次领取一次且不得配置`rewardReissue`, 伊拉提交原子扣除羽毛, 火的羽毛饰品[火]必须生成独立装备实例且不可重复领取.
+- 漆黑洞窟任务68必须达到80级且任务64至67全部领奖, 挑战70016后仅检查四大证明而不消耗, 领取奖励6801中的精灵王之弓3941432后才算完成. 任务69必须在任务68领奖后接取, 地图70012仅是可选捕宠入口; 70017胜利后启动最后的persistent步骤. characterRebirth交互必须完整保存0至4转的50级任务宠物要求, 当前点击不发送请求、不修改档案且不消费宠物, 5转及以上只显示角色转生上限.
 - 多任务并行, 单任务步骤串行. 无奖励步骤完成后completed_at_ms与reward_claimed_at_ms相同, 后补奖励不产生历史可领取状态.
 - 步骤奖励独立领取, 重复领取必须拒绝. 仅显式配置`rewardReissue.whenItemAbsent`的纯单道具奖励允许补领, 且必须同时满足任务未完成、步骤奖励已领取、指定道具当前持有量为0; 仍持有任意数量或任务已完成时拒绝. 背包满、宠物栏满、数量溢出、UUID耗尽、扣除不足、Cache失败必须保留原任务、完整库存和UUID游标.
 - 提交和领奖成功后, 服务端连发 `CharacterNotify` 各变化域分支: `container_changed`携带完整角色背包与账号UUID游标并原子替换, `item_changed`增量合并货币资产, `pet_changed`处理随身宠物增删; 客户端按到达顺序应用这些权威快照后再合并任务记录增量. 任务记录增量只含变化任务ID. 任务/步骤数量、时间顺序或串行状态非法时拒绝绑定.
@@ -141,11 +171,13 @@ GOCACHE="$PWD/.gocache" go test ./online -run 'TestApply(Character|Pet)Experienc
 
 ## 全局道具商店购买
 
+- 110007地图5号NPC与全局商店共用商品`3090043`阿布的水, 每份1件、100石币, 购买数量1-30. 两个入口都发送既有`ShopPurchaseReq`; 6号NPC没有启用购买选项. 运行`go test ./online -run TestPrepareShopPurchasePlanAbuWater -count=1`覆盖多件交付、余额不足、背包已满和错误商品.
+- 该协议只包含角色、商品和数量, 不携带NPC或请求唯一标识. NPC是否开放由客户端发布地图决定; 服务端允许全局商店从任意地图购买同一商品. 客户端等待响应期间拒绝重复发送; 两次独立且有效的服务端请求会分别购买.
 - `ShopPurchaseReq` 和 `ShopPurchaseRes` 的消息 ID 分别保持为 `0x003007` 和 `0x003008`.
 - 服务端 `商店.yaml` 使用无 `type` 的扁平 `items`, 只包含开放购买商品. 请求以道具 ID 直接定位同 ID 商品, 并按 `costs[]` 同时结算全部资源; 空 `costs` 表示免费, 重复资源、非正数量、余额不足和购买数量为0必须拒绝.
 - 角色必须属于当前账号、已经在线且不在战斗中. 任一支付资源不足或背包满时不得修改账号档案; 装备购买数量超过剩余格数或 UUID 游标耗尽时同样拒绝.
 - 素材等可堆叠商品按 `item_count × quantity` 增加普通背包最终数量, 已持有同种商品时不新增背包格, 且不得分配装备 UUID 或创建 `EquipmentRecord`. 成功响应通过 `item_remaining_count` 返回商品最终持有量.
-- 成功购买多件装备时, 新装备 UUID 必须从旧 `used_uuid + 1` 连续递增. 每件记录只在 `record_base_map` 保存18项随机基础属性中的非0值, `record_modifier_map` 和 `additional_skill_id_list` 初始为空; 配置元素数值非0时通过 `element_attribute` 同时保存元素类型和原版1-100百分比值. 每项基础属性在对应配置闭区间内且不同实例分别创建, 并一次性扣除总价.
+- 成功购买多件装备时, 新装备 UUID 必须从旧 `used_uuid + 1` 连续递增. 每件记录只在 `record_base_map` 保存18项随机基础属性中的非0值, `record_modifier_map` 初始为空且 `additional_skill_id` 初始为0; 配置元素数值非0时通过 `element_attribute` 同时保存元素类型和原版1-100百分比值. 每项基础属性在对应配置闭区间内且不同实例分别创建, 并一次性扣除总价.
 - cache 持久化失败必须保留原角色资源、背包和 UUID 游标; 成功响应的 `cost_result_list` 必须完整返回每项实际消耗及最终余额, 同时返回最新游标和完整的本次新增装备列表.
 
 ## 宠物加工
@@ -155,9 +187,9 @@ GOCACHE="$PWD/.gocache" go test ./online -run 'TestApply(Character|Pet)Experienc
 - 29/30 个背包位置允许加工; 30/30 拒绝且不扣材料, 即使投入会被完全消耗也不例外.
 - 离线、战斗中、未学习 `8100200`、素材不足均按 `FailedPrecondition` 拒绝. 还覆盖非法或重复素材、宠物不存在、UUID 耗尽和持久化失败回滚.
 - `EquipmentSkillAttachReq/Res`消息ID固定为`0x00300B/0x00300C`, 请求使用装备UUID和聚合后的素材列表. 目标只允许位于当前角色背包, 且复用宠物加工资格、角色状态及操作前至少一个空位的约束.
-- 附技能精确命中时必须保留装备UUID及全部既有档案字段; 不同系技能追加, 同系异常精灵技能原位替换, 消耗全部投入且不推进账号UUID. 未命中时消耗全部投入并返回完整原装备; 重复附加同一技能必须无损拒绝.
-- 装备附加技能只要求技能存在, 不要求`usableBy`包含`character`; 不存在、重复、两个同系异常精灵技能或等于装备配置自带技能的实例技能仍必须被档案校验拒绝. cache失败必须回滚装备和全部素材变化.
-- 五系异常精灵抗性必须只按`additional_skill_id_list`实时派生: 已拥有类别固定`+10`, 未拥有类别按不同类别数`N`取`-10*N`; 麻痹、配置自带技能和普通技能不参与. 派生值与`record_base_map`和`record_modifier_map`相加, 不新增协议或存档字段.
+- 附技能精确命中时必须保留装备UUID及全部其他档案字段; 无附加技能时写入, 已有不同技能时覆盖唯一的`additional_skill_id`, 消耗全部投入且不推进账号UUID. 未命中时消耗全部投入并返回完整原装备; 重复附加同一技能必须无损拒绝.
+- 装备附加技能只要求技能存在, 不要求`usableBy`包含`character`; 非0技能不存在或等于装备配置自带技能时必须被档案校验拒绝. cache失败必须回滚装备和全部素材变化.
+- 五系异常精灵抗性必须只按单值`additional_skill_id`实时派生: 唯一附加技能属于异常精灵时, 对应类别固定`+10`, 其他四类固定`-10`; 麻痹、配置自带技能和普通技能不参与. 派生值与`record_base_map`和`record_modifier_map`相加, 不新增协议或存档字段.
 - `EquipmentElementAttachReq/Res`消息ID固定为`0x00300D/0x00300E`, 与附技能共享目标装备、宠物加工资格、非战斗状态、素材及操作前空位校验.
 - 附元素精确命中时写入固定值20, 保留装备UUID和其他档案字段; 无元素直接写入, 异系元素覆盖, 同系元素无损拒绝. 未命中时消耗全部投入并返回完整原装备; 命中和未命中均不推进账号UUID, cache失败必须回滚装备和素材变化.
 
@@ -182,15 +214,16 @@ GOCACHE="$PWD/.gocache" go test ./online -run ShopPurchase
 
 ## 角色装备换装
 
-- `CharacterEquipmentReplaceReq` 和 `CharacterEquipmentReplaceRes` 的消息 ID 分别保持为 `0x00100F` 和 `0x001010`; 当前接受 `EquipmentType_Weapon`, `EquipmentType_Accessory1` 和 `EquipmentType_Accessory2`, `equipment_uuid=0` 表示卸下.
-- 只允许当前账号中已上线且不在战斗中的角色换装. 装备 UUID 必须位于该角色背包; `record_base_map`基础属性必须非0且位于当前配置闭区间, `record_modifier_map`附加修正必须非0、使用已知属性key且处于int32范围, 缺失key按0校验. `additional_skill_id_list`只允许不重复、不同系、配置表之外的已知技能, 不以`usableBy`限制档案写入; `element_attribute`必须同时包含合法元素和原版1-100百分比值. 任一结构非法或UUID/配置不匹配均应拒绝.
+- `CharacterEquipmentReplaceReq` 和 `CharacterEquipmentReplaceRes` 的消息 ID 分别保持为 `0x00100F` 和 `0x001010`; 当前接受 `EquipmentType_Weapon`, `EquipmentType_Helmet`, `EquipmentType_Chest`, `EquipmentType_Shield`, `EquipmentType_Belt`, `EquipmentType_Boots`, `EquipmentType_Accessory1` 和 `EquipmentType_Accessory2`, `equipment_uuid=0` 表示卸下.
+- 只允许当前账号中已上线且不在战斗中的角色换装. 装备 UUID 必须位于该角色背包; `record_base_map`基础属性必须非0且位于当前配置闭区间, `record_modifier_map`附加修正必须非0、使用已知属性key且处于int32范围, 缺失key按0校验. 非0的`additional_skill_id`只允许配置表之外的已知技能, 不以`usableBy`限制档案写入; `element_attribute`必须同时包含合法元素和原版1-100百分比值. 任一结构非法或UUID/配置不匹配均应拒绝.
 - 装备时校验角色等级. 当前角色没有职业档案字段, 所有 `neprof != 0` 的装备都必须明确拒绝, 不得把未知职业当成满足要求.
 - 替换时新装备进入目标部位, 旧装备回到背包; 卸下时目标部位装备回到背包且必须有剩余容量. 计划构造和 cache 持久化失败不得修改原背包、穿戴记录或运行中角色引用.
 - 成功响应必须同时返回完整 `item_bag`、本次替换部位的 `equipment` 和同一候选档案计算出的 `effective_attribute`; 卸下时 `equipment` 不设置. 角色创建、角色档案、宠物配置、`effective_attribute.elemental`和战斗快照全链路统一使用原版0-100百分比值, 基础分配总和为100, 装备值直接叠加后封顶100. 连续请求由 Account actor 按收到顺序串行处理, 不依赖客户端禁止重复操作.
-- 账号校验必须覆盖背包、仓库和已穿戴武器及两个首饰位之间的 UUID 全局唯一性, 并拒绝尚未开放的六个防具部位.
-- 六类防具允许作为合法装备实例保存在背包或仓库, 但当前换装请求和角色档案仍必须拒绝把防具写入尚未开放的穿戴部位.
+- 账号校验必须覆盖背包、仓库和已穿戴武器、头盔、胸甲、盾牌、腰带、靴子及两个首饰位之间的 UUID 全局唯一性, 并拒绝尚未开放的手套位.
+- 六类防具允许作为合法装备实例保存在背包或仓库. 头盔、胸甲、盾牌、腰带和靴子分别只允许进入各自的 `EquipmentType`; 手套仍必须被换装请求及角色档案拒绝.
 - 两个首饰位允许六类不同类型的全部组合, 同类型即使 ID 和 UUID 不同也必须拒绝. 满背包允许同一部位的原子替换, 卸下仍要求空位. 原枚举值1和3及档案字段 tag 1和3必须保持不变.
 - 运行 `GOCACHE="$PWD/.gocache" go test ./common/gameconfig ./online -run TestAccessory -count=1` 验证类型和 ID 边界, 穿戴互斥, 购买实例, 持久化失败, 属性叠加和战斗快照.
+- 运行 `GOCACHE="$PWD/.gocache" go test ./online -run 'Test(Chest|Helmet|ShieldBeltAndBoots)' -count=1` 验证头盔、胸甲、盾牌、腰带和靴子类型、等级和职业限制, 满背包替换/卸下, 持久化失败回滚, 有效属性和战斗快照.
 
 ## 统一技能测试
 
@@ -200,11 +233,20 @@ GOCACHE="$PWD/.gocache" go test ./online -run ShopPurchase
 - `8000002` 生成以自身为目标的防御动作.
 - `8000003` 生成逃跑动作.
 - `8000004` 生成捕获动作, 缺少目标、同阵营目标或未知目标必须拒绝. 捕获不开放给玩家宠物和敌方 NPC.
-- `8000005-8000007` 已配置但未开放, 必须返回业务错误且不写入本回合动作.
+- `8000005` 换宠覆盖非法UUID、非所属、错误携带状态、死亡宠物、重复选择当前宠物、仅收回、直接放出和正常替换; 校验失败不写入本回合动作.
+- 项目真实`config/技能.yaml`必须完整包含`8000001-8000007`七项基础战斗动作, 避免测试注入配置掩盖正式发布缺项.
+- 换宠必须验证`UnitLeave(Switch) -> UnitEnter`顺序、主人宠物位、旧宠动作失效、新宠下回合资格、临时状态清理、多宠经验结算、cache失败回滚及战斗期间普通携带状态修改拒绝.
+- 换宠后角色成功逃跑必须对当前出战宠物下发`escaped=true`和`UnitLeave(Escape)`; 开战快照中的旧宠不得替代新宠. 运行`go test -buildvcs=false ./online -run 'TestCombatEscape' -count=1`覆盖该场景.
+- `8000006`仅允许人物提交已配置`battleUse`的堆叠道具, 要求`item_uuid=0,item_count=1`; 按存活友方、倒下友方、敌方或无目标范围拒绝越权目标.
+- 战斗道具在实际出手时扣除1个并持久化; 保存失败或库存不足不得产生效果. 回复按原版90%-110%浮动并封顶, 复活恢复存活状态, 净化只移除指定普通异常, 中毒不覆盖已有普通异常, 场地属性按回合递减并在到期时下发清除.
+- `8000007`仅允许人物指定开放装备部位和背包装备UUID, UUID 0为协议级卸下; 目标、换宠和道具参数必须为空. 验证替换、卸下、装备并发变化、cache失败、成功后的完整装备/有效属性通知, 以及战斗运行态的攻防敏、运气、武器、抗性和HP/MP上限同步; 新上限下降时只夹紧当前值.
 - `技能.yaml` 不存在的 ID 必须拒绝.
 - `8200130-8200139`、`8200150-8200159`、`8200160-8200169`、`8200170-8200179`、`8200180-8200189` 只允许玩家角色从九个部位的开战装备快照取得. 未装备、MP不足和非法单体目标必须拒绝; 群体技能由服务端展开敌方存活单位, 每个目标独立判定且整次只扣一次技能MP.
+- `8200070/8200090/8200100/8200110/8200120`只接受单个存活友方目标, `8200071/8200091/8200101/8200111/8200121`拒绝指定目标并展开己方全部存活单位. 技能从九个装备部位快照取得, 未装备、MP不足、敌方或死亡目标必须拒绝; 无匹配状态仍扣除一次MP并产生行动.
+- 毒净化删除Poison并下发既有`CombatStatusDelta Remove`, 不删除DeepPoison; 因而猛毒、毒雾和普通毒攻击可被解除, 剧毒不能. 石化净化删除硬化、石化和石化攻击共用的Stone状态; 其余三类只能删除自身对应状态, 不影响无关状态.
 - 异常命中拒绝覆盖任何已有普通异常. 睡眠和石化在最后一次计数仍阻止原动作; 混乱有80%概率改为攻击随机存活单位且不选自己; 酒醉期间敏捷减半并增加20-30点被闪避率, 到期恢复; 中毒沿用行动前毒伤且不能致死. 物理死亡必须清除五系状态.
 - `go test ./common/gameconfig ./online -run StatusSpirit -count=1` 覆盖生产配置、装备授权、技能耗蓝、状态成功率、范围和控制时序.
+- `go test ./common/gameconfig ./online -run StatusRecovery -count=1`覆盖净化配置、装备授权、范围、耗蓝、普通毒与剧毒边界及状态移除协议.
 
 宠物学习与档案:
 
@@ -228,13 +270,13 @@ GOCACHE="$PWD/.gocache" go test ./online -run ShopPurchase
 - `8100003` 不得清除目标Guard、参加合击、成为反击者或触发受击目标反击. 运行 `go test ./online -run 'TestCombat(GuardBreak|Standby)' -count=1` 覆盖成功、失败、随机数和动作步骤.
 - 一击必杀只生成一个主动步骤, 三档倍率必须作用于暴击、Guard和最低伤害后的结果, 保持C float舍入、0伤害MISS和普通暴击表现. 30/40/50点闪避先加再按基础75%封顶, Guard跳过闪避, 后置装备闪避继续独立判定.
 - 一击必杀不得参加合击或消费合击资格随机; 行动前不能反击, 行动后可以反击. 后续反击必须与普通Attack的伤害、闪避和随机序列一致, 同时保留声明技能ID. 参数及技能归属使用冻结快照, 非持有者、非法目标和角色指令必须拒绝.
-- 突击30/31和三重突击605保留原版描述及4000/8000/8500学习价格证据, 验证 `chargeAttack` 必填整数, 1-10/0-32767边界和五种攻击机制互斥. 605使用测试配置注入 `8100605 -> 3/+250`; 玩家宠物和NPC均须持有技能, 角色和非法目标必须拒绝; 提交后修改请求对象或配置不得改变蓄力参数及目标.
+- 突击30/31和三重突击605保留原版描述及4000/8000/8500学习价格证据, 验证 `chargeAttack` 必填整数, 1-10/0-32767边界和五种攻击机制互斥. 605从正式配置加载 `8100605 -> 3/+250`; 玩家宠物和NPC均须持有技能, 角色和非法目标必须拒绝; 提交后修改请求对象或配置不得改变蓄力参数及目标.
 - 三档突击前1/2/3次行动只蓄力, 不提前命中或消费攻击随机; 第2/3/4次行动的单次物理结果与基础攻击力按原版C double公式修正后的普通攻击完全一致, 包括随机抽取次数. 释放攻击力约为190%/210%/350%, 读取当时基础攻击力; 目标失效只在释放时重选, NPC后续回合不得再次抽AI.
 - 突击不参加合击, 自身等待和释放时都不能反击; 目标按普通资格和概率反击. 普通非致死伤害保留蓄力, 每次行动前正常处理一次毒伤, 死亡和离场清理续招. 玩家角色全灭仍正常结束战斗.
 - 真实请求和序列化战报应覆盖首次选招确认, 后续宠物自动锁定, 角色仍需选招, 重复请求拒绝, 超时保留续招, 旧超时回调失效, 释放后的下一回合恢复选择. `next_round_auto_action_unit_key_list` 必须包含剩余计数为0但尚未释放的宠物, 不包含释放完成的宠物.
-- `go test -buildvcs=false ./common/gameconfig ./online -run Charge -count=1` 覆盖三档突击配置, 结算和跨回合协议; `python -B tool/test_skill_catalog.py` 检查目录30/31/605映射、605的3/+250运行参数及 `pending_test` 人工状态.
+- `go test -buildvcs=false ./common/gameconfig ./online -run Charge -count=1` 覆盖三档突击配置, 结算和跨回合协议; `python -B tool/test_skill_catalog.py` 检查目录30/31/605映射、605的3/+250运行参数及 `published` 人工状态.
 
-- 地球一周121通过测试配置注入`8100121 -> earthRound.damagePercentModifier: 200`. 配置测试覆盖必填整数、0-32767边界、字符串、小数和行为块互斥, 且只允许宠物使用并拒绝`mpCost/targetScope`; 目录测试确认原版120不出现在编辑器RAW, 121保持`pending_test`且正式C/S配置不包含现代ID.
+- 地球一周121从正式配置加载`8100121 -> earthRound.damagePercentModifier: 200`. 配置测试覆盖必填整数、0-32767边界、字符串、小数和行为块互斥, 且只允许宠物使用并拒绝`mpCost/targetScope`; 目录测试确认原版120不出现在编辑器RAW, 121保持`published`且正式C/S配置包含现代ID.
 - 首次行动必须冻结技能ID、目标、参数和行动值, 只输出`Visibility(hidden=true)`及`hidden_changed/hidden`权威增量. 隐藏单位保持存活和在场, 但敌对单体、群体、物理、异常魔法及AI候选都必须排除. 下一回合玩家宠物和NPC直接续招, 原目标失效时按普通目标调整规则重选.
 - 释放步骤必须先输出`Visibility(hidden=false)`, 再输出普通单段Damage; 最终伤害严格等于相同随机序列普通物理结果的3倍. 两阶段均不参加合击且施放者不取得反击资格, 目标仍走普通反击; 死亡和离场清理续招与隐藏. 运行`go test ./common/gameconfig ./online ./proto/pb -run EarthRound -count=1`覆盖该链路.
 
@@ -259,6 +301,7 @@ GOCACHE="$PWD/.gocache" go test ./online -run ShopPurchase
 - 正伤害附石化必须先解除Sleep, 再检查其余普通异常; 冲突不抽随机, MISS和0伤害不唤醒也不判定. 概率覆盖等级差、幸运、石化抗性、体力比例、80上限、无下限及严格`<`. 成功分别写4/10, 每一点都阻止行动, 中间只Update、最后只Remove且没有空Action/Wait. 防御翻倍, 受伤不解除, 不刷新, 死亡和离场清理. 合击在执行前排除本回合新受控成员, 单人降级为普通攻击. 运行`go test ./common/gameconfig ./online -run 'StoneAttack|CombatControlStatusesFollowOriginalActionTiming|CombatComboDropsNewlyControlledMember' -count=1`覆盖该链路.
 - 混乱攻击90/510验证双端配置冻结3/-30和9/-30, 玩家宠物/NPC入口、角色和未持有拒绝、101攻击向零截断为71、守护转移、反击及回合恢复. 正伤害后按Damage、Sleep Remove、Confusion Add顺序输出; 已有其他普通异常时不抽状态随机, 成功分别写4/10.
 - 混乱运行态验证前3/9次行动先Update再按80%判定改写, 最终1->0只Remove并执行原动作. 改写严格按判定、阵营、0-9起点三次随机顺序, 从下一格循环扫描, 排除自身、隐藏、死亡和离场, 无候选才回退普通敌方目标. 覆盖友伤、Guard/NoGuard/Guardian清理、首名脱离合击和尾成员继续合击. 运行`go test ./common/gameconfig ./online -run 'Confusion|CombatControlStatusesFollowOriginalActionTiming' -count=1`覆盖该链路.
+- 泥醉攻击100使用现代ID`8100100`, 验证`drunkAttack`配置边界、行为互斥、仅宠物可用、玩家宠物/NPC入口和参数冻结. 主动段按-30%攻击修正执行普通物理伤害, 仅正伤害后使用普通异常阈值和酒醉抗性; 已有普通异常不抽数, 反击不附加状态. 成功把`(3+1)/2`写为2次行动的Drunk状态并下发协议事件, 不清除姿态且不取消动作; 客户端复用8615状态表现. 运行`go test ./common/gameconfig ./online -run DrunkAttack -count=1`覆盖服务端链路, `test_make_skill_core.tscn`和`test_combat_status_spirit.tscn`覆盖编辑器校验和8615表现.
 - 催眠攻击110/511验证玩家宠物与NPC冻结3/-30和9/-30、非法入口和目标拒绝、101攻击向零截断为71、反击及回合恢复. 覆盖`Damage -> Sleep Remove -> Sleep Add`重施顺序、其他异常拒绝且不抽数、睡眠抗性和严格概率边界、4/10次行动取消、最终Remove、姿态清理及合击排除. 公共唤醒回归覆盖普通单段、多段、反击、合击和其他特殊物理正伤害; MISS/0伤害不唤醒, PoisonAttack主动正伤害仍不唤醒. 运行`go test ./common/gameconfig ./online -run 'SleepAttack|Physical.*Wake|CombatControlStatusesFollowOriginalActionTiming' -count=1`覆盖该链路.
 - `go test ./common/gameconfig ./online -run Poison -count=1` 覆盖上述60/61中毒链路及现有protobuf序列化往返, 同时检查死亡或离场不继续扣血, 物理致死时清理中毒.
 - 未持有技能即使存在于 `技能.yaml` 也必须拒绝.
@@ -323,24 +366,25 @@ go test ./online -run 'TestCharacterTeam|TestTryBindCombatRoom|TestCombatRoomDet
 - `CharacterTeamOperationReq` 和 `CharacterTeamOperationRes` 必须恰好设置一个对应的 `join`、`leave`、`disband` 或 `kick` oneof 分支. 未设置、请求与回复分支不匹配、缺少完整 `join.target` 或 `kick.target` 必须拒绝; 四种成功回复的分支都必须为空结构.
 - 加入目标只允许是请求中完整指定、位于同一非0地图、开启组队且不在战斗的未组队角色或实际队长; 加入不校验面对、朝向、格坐标或距离. 普通成员、地图0角色、关闭组队开关和战斗中角色必须拒绝.
 - 加入和踢出目标按 `aid + character_uuid` 区分, 同一 aid 的不同角色 UUID 不得互相覆盖.
-- 新成员追加到队尾; 普通成员离开或被踢后列表必须紧凑前移. 队伍只剩队长时自动删除, 队长主动解散或被强制移除时清除全部成员.
+- 新成员追加到队尾; 普通成员离开或被踢后列表必须紧凑前移. 中间成员离开后, 后续成员依次走向前一人的原格, 本人和同地图观察者都收到一步行走通知, 服务端权威位置与地图资料同步更新. 队伍只剩队长时自动删除, 队长主动解散或被强制移除时清除全部成员.
+- 普通队员左键移动不得启动客户端预走或发送多点路径; 服务端拒绝其多点移动请求, 但静止时接受当前格的单点转向请求并广播新朝向.
 - 加入成功必须立即关闭新队员的自动遇敌并清除 timer; 普通队员后续提交开启或关闭请求都必须返回 `FailedPrecondition` 且保持关闭, 队长不受该限制.
 - 战斗中禁止切换组队开关以及加入、解散和踢出. 普通成员主动离队必须成功且只改变队伍关系, 原 CombatRoom 指针和本场参战资格保持不变. 普通倒地不得解除队伍; 成功逃跑和角色 Ultimate 击飞必须解除, 宠物击飞不得误删角色队伍.
 - 队长自动遇敌必须冻结同地图队伍顺序. 每名成员由所属 Account actor 在一次同步消息中完成读取、满 HP 快照和 CombatRoom 指针绑定; 无战宠合法. 成功成员按冻结顺序紧凑占用0至4号位, 战宠占用对应位置加5.
 - 普通成员入场失败不得阻塞有效成员开战. 仍在线的失败成员仅在仍属于原队长当前队伍时被踢出; 已离线成员不要求踢队, 任何失败成员都不得进入 `CombatBattleStartNotify`.
 - 手工联调2-5个在线角色: 目标在队伍页开启组队, 请求者输入完整目标 aid 和角色 UUID 后点击加入. 成功后新成员、队长、原队员和同地图无关角色都收到各自 UUID 的 `team_join`, 事件中的完整队伍顺序一致; 离开、踢出或解散只通过 `team_leave`/`team_disband` 更新队伍节点, 客户端据事件命中自己触发队伍页刷新, 不再有单独的点对点队伍变化通知. 验证离开、踢出和解散不弹确认框, 测试、练级或任务地图中的显示队伍节点继续由地图事件独立更新.
 
-## 测试、练级与任务地图角色列表
+## 已发布新地图角色列表
 
 聚焦测试命令:
 
 ```bash
-GOCACHE="$PWD/.gocache" go test ./online -run "^(TestCharacterMap|TestScenePresenceCharacterMap|TestCharacterTeamMutationCarriesSmallMapEvents|TestSelectCombatPVEMapEnemyGroupUsesFlatEncounter)" -count=1
+GOCACHE="$PWD/.gocache" go test ./online -run "^(TestCharacterMap|TestScenePresenceCharacterMap|TestCharacterTeamMutationCarriesSmallMapEvents|TestSelectCombatPVEMapEnemyGroup)" -count=1
 ```
 
-- `CharacterBaseRecord` 必须保留字段号18和字段名 `scene_id`, 但不得定义或持久化该字段. 测试、练级或任务地图 ID 只保存在 `character.sceneID` 运行态; 进入非0地图后离线必须归零并移除旧 Presence, 再次上线不得恢复旧地图, 且应允许重新进入同一地图. 单人从非0地图请求 `map_id=0` 时应将运行态设为0、从旧 Presence 移除、只向旧地图广播 `map_leave`, 并返回 `map_id=0` 和空队伍列表; 地图0本身不得创建 Presence 或发送地图事件. 已在0再次请求0必须返回 `AlreadyExists`.
-- 战斗中或已组队角色请求地图0必须返回 `FailedPrecondition`, 不自动离队或解散. 非0目标只接受任务范围`[70000,79999]`、测试范围`[80000,89999]`或练级范围`[90000,99999]`中配置存在且 `encounter.enabled=true`、`encounter.enemyGroups`有效的地图. 单人进入只迁移自己; 队长进入迁移完整队伍; 普通成员主动进入和任一成员战斗中必须拒绝.
-- 非0地图 Presence 只保存成员展示数据, 不保存坐标、朝向或格子索引; 移动和转向请求必须拒绝. 自动遇敌只使用当前地图平铺的 `encounter.enabled` 和 `encounter.enemyGroups`. 开启自动遇敌时角色必须存在于当前非0地图 Presence; 离开到地图0必须取消 timer 和开关, 并只向本人回复 `CombatAutoEncounterSetRes(enabled=false)`.
+- `CharacterBaseRecord` 必须保留字段号18和字段名 `scene_id`, 但不得定义或持久化该字段. 已发布新地图 ID 只保存在 `character.sceneID` 运行态; 进入非0地图后离线必须归零并移除旧 Presence, 再次上线不得恢复旧地图, 且应允许重新进入同一地图. 单人从非0地图请求 `map_id=0` 时应将运行态设为0、从旧 Presence 移除、只向旧地图广播 `map_leave`, 并返回 `map_id=0` 和空队伍列表; 地图0本身不得创建 Presence 或发送地图事件. 已在0再次请求0必须返回 `AlreadyExists`.
+- 战斗中或已组队角色请求地图0必须返回 `FailedPrecondition`, 不自动离队或解散. 非0目标只接受已发布且配置存在的`[100000,200000]`新地图; 未发布新图、原图及旧任务、测试、练级地图均不得进入. 单人进入只迁移自己; 队长进入迁移完整队伍; 普通成员主动进入和任一成员战斗中必须拒绝.
+- 非0地图 Presence 保存成员展示数据和格子移动状态; 移动请求按地图碰撞与传送数据校验, 朝向只校验八方向枚举合法性, 不按位移改写. 自动遇敌按角色权威地图格匹配 `encounter.regions`, 未命中时使用全地图 `encounter.enabled` 和 `encounter.enemyGroups`; 安全区跳过本轮并保留开关. 开启自动遇敌时角色必须存在于当前非0地图 Presence; 离开到地图0必须取消 timer 和开关, 并只向本人回复 `CombatAutoEncounterSetRes(enabled=false)`.
 - 非0地图的 `CharacterMapEnterRes.team_list` 必须排除自己的队伍. 队伍节点长度为1时按单人展示, 大于1时第一项是队长、后续项是队员.
 - `map_join` 携带完整新队伍节点; `team_join` 向同地图全部观察者携带合并后的完整队伍, 客户端据成员身份原子移除旧队伍节点并把新队伍追加到末尾, 接收者属于该队时不得显示自己的队伍. `map_leave`、`team_leave` 和 `team_disband` 只携带定位所需的角色键. 队长直接离开地图只发送队长 `map_leave`; 队伍解散后队长单人离开依次发送 `team_disband` 和 `map_leave`.
 - 列表保持加入顺序. 成员离队后追加为单人, 解散后原成员依次追加为单人, 离开地图只删除条目且不重排其他条目.
@@ -372,11 +416,12 @@ GOCACHE="$PWD/.gocache" go test ./online -run "^(TestCharacterMap|TestScenePrese
 - 攻击、闪避、暴击、伤害、权威 HP 和死亡结果一致.
 - 10级以上且装备快照武器槽为空的玩家普通攻击按BaseLuck生成1、2、3或5至10段, 永不生成4段; 每段保持完整普通攻击伤害, 原目标死亡后剩余段改选存活敌方, 攻击者死亡、敌方全灭或段数耗尽时停止, 整组只检查一次反击.
 - 玩家已装备武器时, 每次实际行动必须在命令分派前只从 `attacknum: [min, max]` 闭区间抽取一次段数; 非普通攻击仍消耗该随机值, 但不使用其段数或爪分摊. 爪普通攻击按计划总段数分摊正伤害, 原目标死亡后每个剩余段独立重选存活敌方; 弓以外的其他当前武器不分摊. 缺失装备快照不得误触发武器路径, 合击成员与反击仍保持单段.
-- 开战快照使用服务器有效属性和装备实例基础属性与附加修正合计后的运气/暴击值, 元素来自实例 `element_attribute`, 额外伤害/防御继续合并当前武器和两个首饰位配置; 更换同配置但实例值不同的装备时, 战斗数值必须采用实际实例而不是重新随机.
+- 开战快照使用服务器有效属性和装备实例基础属性与附加修正合计后的运气/暴击值, 元素来自实例 `element_attribute`, 额外伤害/防御继续合并当前武器、头盔、胸甲和两个首饰位配置; 更换同配置但实例值不同的装备时, 战斗数值必须采用实际实例而不是重新随机.
 - 回旋镖必须按声明目标所在排扫描. Initiator排内顺序为`4,2,0,1,3`, Defender为`3,1,0,2,4`; 后排在各偏移上加5. 声明目标死亡仍保留原排, 整排无有效目标时才从全部存活敌方随机一次决定回退排. 空位、死亡和离场单位跳过, `attacknum`随机仍消费但不限制同行实际目标数, 每个有效位置最多攻击一次.
 - 回旋镖每个目标先完整执行物理攻击, 再用C `float`乘0.3并向零截断, 不补最低1点. 缩放前1至3点正伤害得到0后仍保持Normal或Critical表现, 缩放前0伤害保持Miss/Guard. 回旋镖在合击资格随机前排除且攻守任一方装备时不进入反击随机. 运行`GOCACHE="$PWD/.gocache" go test ./online -run TestCombatBoomerang -count=1`覆盖目标表、伤害边界、死亡声明目标、空排回退、攻击次数忽略、合击和反击.
 - 弓的两个 `aBowW` 分支必须按声明目标列生成“同行位置后紧跟另一排同列”的十站位表, 每个站位只出现一次. 空位、死亡和离场单位不消耗 `attacknum`; 3箭只攻击顺序中前3个有效站位, 10箭最多各攻击10个有效站位一次, 击倒目标后继续扫描剩余站位. 固定随机向量必须覆盖两张精确候选表、跳空位、跳死亡、无重复目标和候选耗尽.
 - 弓暴击必须保留普通暴击概率、随机次数和 `critical=true`, 但伤害只能使用普通伤害, 不得追加非弓暴击的防御与等级增伤. 弓在合击随机前排除且不消费该随机数; 角色反击使用实际武器类型的原版相性表, 弓、回旋镖、投掷斧和投掷石任一方参与时不得进入反击随机. 当前尚未实现的装备魔法、变身禁远程、守护代挡、状态抗性及其他投掷武器专用行为不得在回归说明中宣称完成.
+- 玩家投掷石主动普通攻击的每个正伤害段按`20-目标抗麻`及严格`RAND(1,100)<阈值`判定; 零抗麻实际19%, 成功写1次行动的麻痹, 立即清除防御姿态并取消下一次行动, 最后只发状态Remove. 已有异常不抽数, 睡眠先唤醒, 致死伤害保留概率抽数但不写状态; 0伤害、反击及弓/回旋镖/投掷斧不附该状态. `GOCACHE="$PWD/.gocache" go test ./online -run TestCombatThrowingStoneParalysis -count=1`覆盖这些边界.
 - 防御在行动排序前生效, 并按独立动作返回.
 - 合击只生成真实成员动作; 每个成员都携带独立 Damage 表现结果, 前序成员不显示伤害且没有 HP 差量, 首成员记录完整顶层来源, 最后一名成员显示并统一应用累计伤害.
 - 反击链、最大深度和行动顺序稳定.
@@ -387,6 +432,14 @@ GOCACHE="$PWD/.gocache" go test ./online -run "^(TestCharacterMap|TestScenePrese
 - 正常战斗结束后取消 timer、清理 CombatRoom actor 指针, `CombatFlowCompleteReq` 后按开关恢复自动遇敌.
 - 角色下线或运行态清理后立即清除自己的 CombatRoom actor 指针并通知房间. 房间必须把该角色及战宠的 `UnitLeave(Detached)`放在下一条回合结果的其他战斗效果之前, 只取消该参与者的未执行动作; 其余参与者继续, 房间为空时才无结算关闭.
 - 玩家角色 Ultimate 击飞必须在 `Knockback` 后追加 `UnitLeave(Defeated)`, 同时清除其战宠、把角色运行态地图设为0并移出旧 Presence; 其他参与者继续战斗.
+
+## 地图格子移动
+
+格子移动的 `scene.presence.movement_test.go` 覆盖200ms/283ms耗时、阻挡截断、八方向枚举校验、真实上一格重锚定及伪造起点拒绝、半格连续改点保留到期时间、旧回调失效、途中观察者快照、4人从首步起紧邻跟随并跨路线替换保持连续、中间成员离开后队尾逐位补位和广播, 以及阻挡与传送重叠时保留传送格. 请求入口测试通过 Gateway actor 捕获实际协议包, 验证本人只收到路径回复、观察者只收到一次路线广播、MoveSync仅发本人、最终停止发给双方, 拒绝响应携带完整权威快照且不额外同步. 可单独运行:
+
+```bash
+GOCACHE="$PWD/.gocache" go test ./online -run 'TestCharacterMove|TestCharacterTeamSnake|TestSceneFollowDirection|TestOrdinaryTeamMember' -count=1
+```
 
 ## Docker 验证
 

@@ -2,24 +2,28 @@ package gameconfig
 
 func Load(dir string) (err error) {
 	GGameConfig = &Manager{
-		Skill:     newSkillConfig(),
-		AI:        newAIConfig(),
-		Pet:       newPetConfig(),
-		Character: newCharacterConfig(),
-		Enemy:     newEnemyGroupConfig(),
-		EnemyExp:  newEnemyExpConfig(),
-		Scene:     newSceneConfig(),
-		Exp:       newExpConfig(),
-		Item:      newItemConfig(),
-		Tiangong:  newTiangongConfig(),
-		Reward:    newRewardConfig(),
-		Task:      newTaskConfig(),
-		Store:     newStoreConfig(),
+		Skill:           newSkillConfig(),
+		AI:              newAIConfig(),
+		GrowthAttribute: newGrowthAttributeConfig(),
+		Pet:             newPetConfig(),
+		Character:       newCharacterConfig(),
+		Enemy:           newEnemyGroupConfig(),
+		EnemyExp:        newEnemyExpConfig(),
+		Scene:           newSceneConfig(),
+		Exp:             newExpConfig(),
+		Item:            newItemConfig(),
+		Tiangong:        newTiangongConfig(),
+		Reward:          newRewardConfig(),
+		Task:            newTaskConfig(),
+		Store:           newStoreConfig(),
 	}
 	if err := GGameConfig.Skill.load(dir); err != nil {
 		return err
 	}
 	if err := GGameConfig.AI.load(dir); err != nil {
+		return err
+	}
+	if err := GGameConfig.GrowthAttribute.load(dir); err != nil {
 		return err
 	}
 	if err := GGameConfig.Pet.load(dir); err != nil {
@@ -62,6 +66,9 @@ func Load(dir string) (err error) {
 	if err := GGameConfig.AI.check(); err != nil {
 		return err
 	}
+	if err := GGameConfig.GrowthAttribute.check(); err != nil {
+		return err
+	}
 	if err := GGameConfig.Pet.check(); err != nil {
 		return err
 	}
@@ -100,6 +107,9 @@ func Load(dir string) (err error) {
 		return err
 	}
 	if err := GGameConfig.AI.assemble(); err != nil {
+		return err
+	}
+	if err := GGameConfig.GrowthAttribute.assemble(); err != nil {
 		return err
 	}
 	if err := GGameConfig.Pet.assemble(); err != nil {

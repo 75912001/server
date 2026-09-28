@@ -22,15 +22,18 @@ func UpgradeRecord(record *pb.PetRecord, upgradeCount uint32) error {
 	if upgradeCount == 0 {
 		return nil
 	}
-	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Pet == nil {
-		return fmt.Errorf("pet config is not loaded: %d", record.GetAssetId())
+	if record.GetGrowthAttributeId() == 0 {
+		return fmt.Errorf("pet growth attribute id is empty: pet:%d", record.GetAssetId())
 	}
-	petEntry := gameconfig.GGameConfig.Pet.Get(record.GetAssetId())
-	if petEntry == nil {
-		return fmt.Errorf("pet config not found: %d", record.GetAssetId())
+	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.GrowthAttribute == nil {
+		return fmt.Errorf("growth attribute config is not loaded: %d", record.GetGrowthAttributeId())
+	}
+	growthAttribute := gameconfig.GGameConfig.GrowthAttribute.Get(record.GetGrowthAttributeId())
+	if growthAttribute == nil || growthAttribute.Growth == nil {
+		return fmt.Errorf("growth attribute config not found: %d", record.GetGrowthAttributeId())
 	}
 	newRawVitality, newRawStrength, newRawToughness, newRawDexterity, err := upgrade(
-		petEntry,
+		growthAttribute.Growth,
 		upgradeCount,
 		record.GetSavedBaseVitality(),
 		record.GetSavedBaseStrength(),
@@ -150,7 +153,7 @@ func randomFourPointDistribution() (vital uint32, str uint32, tough uint32, dex 
 }
 
 // upgrade 使用加载宠物配置时生成的 Rank 计算逐级成长, 不在升级时重复推导 Rank.
-func upgrade(pet *gameconfig.PetEntry, upgradeCount uint32,
+func upgrade(growth *gameconfig.PetGrowthEntry, upgradeCount uint32,
 	savedBaseVital int32,
 	savedBaseStr int32,
 	savedBaseTough int32,
@@ -167,7 +170,10 @@ func upgrade(pet *gameconfig.PetEntry, upgradeCount uint32,
 		// 零次升级必须保留调用方传入的当前 Raw, 避免 1 级宠物的初始属性被清零.
 		return rawVital, rawStr, rawTough, rawDex, nil
 	}
-	rankMin, rankMax := gameconfig.PetRankGrowthRange(pet.Growth.Rank)
+	if growth == nil {
+		return 0, 0, 0, 0, fmt.Errorf("pet growth is nil")
+	}
+	rankMin, rankMax := gameconfig.PetRankGrowthRange(growth.Rank)
 	savedBases := [4]int32{savedBaseVital, savedBaseStr, savedBaseTough, savedBaseDex}
 	rawValues := [4]int32{rawVital, rawStr, rawTough, rawDex}
 	for i := uint32(0); i < upgradeCount; i++ {
@@ -243,8 +249,14 @@ func petGradeFromRandomOffsetTotal(totalOffset int) pb.PetGrade {
 	}
 }
 
+// GradeFromSavedBaseOffsetTotal按宠物四维基础偏移总和返回实际品阶.
+// 敌人生成与捕获必须共用这一映射, 避免战斗个体和捕获档案的品阶不一致.
+func GradeFromSavedBaseOffsetTotal(totalOffset int) pb.PetGrade {
+	return petGradeFromRandomOffsetTotal(totalOffset)
+}
+
 // 创建
-func create(pet *gameconfig.PetEntry, level uint32, grade pb.PetGrade) (
+func create(growth *gameconfig.PetGrowthEntry, level uint32, grade pb.PetGrade) (
 	savedBaseVital int32,
 	savedBaseStr int32,
 	savedBaseTough int32,
@@ -286,7 +298,7 @@ func create(pet *gameconfig.PetEntry, level uint32, grade pb.PetGrade) (
 		dexOffset = gradeOffset
 	}
 
-	templateBases := [4]uint32{*pet.Growth.BaseVital, *pet.Growth.BaseStr, *pet.Growth.BaseTough, *pet.Growth.BaseDex}
+	templateBases := [4]uint32{*growth.BaseVital, *growth.BaseStr, *growth.BaseTough, *growth.BaseDex}
 	offsets := [4]int32{vitalOffset, strOffset, toughOffset, dexOffset}
 	savedBases := [4]int32{}
 	for index := range savedBases {
@@ -300,7 +312,7 @@ func create(pet *gameconfig.PetEntry, level uint32, grade pb.PetGrade) (
 	savedBaseVital, savedBaseStr, savedBaseTough, savedBaseDex = savedBases[0], savedBases[1], savedBases[2], savedBases[3]
 
 	randomVital, randomStr, randomTough, randomDex := randomFourPointDistribution()
-	initialFactor := float64(*pet.Growth.InitNum)
+	initialFactor := float64(*growth.InitNum)
 	randomPoints := [4]uint32{randomVital, randomStr, randomTough, randomDex}
 	rawValues := [4]int32{}
 	for index := range rawValues {
@@ -311,7 +323,7 @@ func create(pet *gameconfig.PetEntry, level uint32, grade pb.PetGrade) (
 		}
 	}
 	rawVital, rawStr, rawTough, rawDex, err = upgrade(
-		pet,
+		growth,
 		level-1,
 		savedBaseVital,
 		savedBaseStr,
@@ -337,8 +349,12 @@ func NewRecord(pet *gameconfig.PetEntry, petUUID uint64, level uint32, grade pb.
 	if !pet.SupportsOrdinaryCreation() {
 		return nil, fmt.Errorf("%w: pet:%d mode:%q", ErrOrdinaryCreationUnsupported, *pet.ID, pet.CreationMode)
 	}
-	if pet.Growth == nil || pet.Growth.InitNum == nil || pet.Growth.BaseVital == nil || pet.Growth.BaseStr == nil || pet.Growth.BaseTough == nil || pet.Growth.BaseDex == nil {
+	if pet.GrowthAttributeID == nil || *pet.GrowthAttributeID == 0 || pet.GrowthAttribute == nil || pet.GrowthAttribute.Growth == nil {
 		return nil, fmt.Errorf("pet growth is incomplete: pet:%d", *pet.ID)
+	}
+	growth := pet.GrowthAttribute.Growth
+	if growth.InitNum == nil || growth.BaseVital == nil || growth.BaseStr == nil || growth.BaseTough == nil || growth.BaseDex == nil {
+		return nil, fmt.Errorf("pet growth is incomplete: pet:%d growthAttribute:%d", *pet.ID, *pet.GrowthAttributeID)
 	}
 	if level < uint32(pb.Constants_Constants_Level_Min) || level > uint32(pb.Constants_Constants_Level_Max) {
 		return nil, fmt.Errorf("pet level is out of range: pet:%d level:%d", *pet.ID, level)
@@ -347,7 +363,7 @@ func NewRecord(pet *gameconfig.PetEntry, petUUID uint64, level uint32, grade pb.
 	if err != nil {
 		return nil, err
 	}
-	savedBaseVital, savedBaseStr, savedBaseTough, savedBaseDex, rawVital, rawStr, rawTough, rawDex, actualGrade, err := create(pet, level, grade)
+	savedBaseVital, savedBaseStr, savedBaseTough, savedBaseDex, rawVital, rawStr, rawTough, rawDex, actualGrade, err := create(growth, level, grade)
 	if err != nil {
 		return nil, err
 	}
@@ -370,6 +386,7 @@ func NewRecord(pet *gameconfig.PetEntry, petUUID uint64, level uint32, grade pb.
 		RawStrength:        rawStr,
 		RawToughness:       rawTough,
 		RawDexterity:       rawDex,
+		GrowthAttributeId:  *pet.GrowthAttributeID,
 		CreateTimestampMs:  time.Now().UnixMilli(),
 	}
 	if err := recordGrowthBaseline(record, level); err != nil {

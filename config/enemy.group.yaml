@@ -2,10 +2,10 @@
 # 敌人组运行配置
 enemyGroups:
   - id: 70000
-    name: "[任务][阿布洞窟地下7楼守护者]"
+    name: "[任务][阿布洞窟][地下7楼守护者]"
     isBoss: true
     enemies:
-      - id: 4900294
+      - growthAttributeId: 486
         battleAI: 13
         levelRange:
           - 39
@@ -13,7 +13,10 @@ enemyGroups:
         normalDrops:
           - itemId: 3510568
             probability: 100
-      - id: 4900295
+        displayName: 查罕·乌尔夫
+        characterId: 1600300
+        weapon: unarmed
+      - growthAttributeId: 487
         battleAI: 14
         levelRange:
           - 38
@@ -21,24 +24,34 @@ enemyGroups:
         normalDrops:
           - itemId: 3930606
             probability: 100
-      - id: 4900296
+        displayName: 查罕·吉鲁
+        characterId: 1600400
+        weapon: spear
+      - growthAttributeId: 488
         battleAI: 15
         levelRange:
           - 37
           - 39
         normalDrops:
-          - itemId: 3500574
+          - itemId: 3500552
             probability: 100
-      - id: 4900297
+        displayName: 查罕·鲁多
+        characterId: 1600400
+        weapon: unarmed
+      - petId: 4000261
+        growthAttributeId: 73
         battleAI: 16
         levelRange:
           - 35
           - 38
-      - id: 4900298
+        displayName: 龟之助
+      - growthAttributeId: 490
         battleAI: 17
         levelRange:
           - 40
           - 43
+        displayName: 加格彦
+        petId: 4000258
   - id: 70001
     name: "[任务][卡坦的愿望][1]"
     countRange:
@@ -48,16 +61,20 @@ enemyGroups:
       - 25
       - 25
     enemies:
-      - id: 4000311
+      - petId: 4000311
+        growthAttributeId: 155
         battleAI: 1
         weight: 1
-      - id: 4000312
+      - petId: 4000312
+        growthAttributeId: 156
         battleAI: 1
         weight: 1
-      - id: 4000309
+      - petId: 4000309
+        growthAttributeId: 153
         battleAI: 1
         weight: 1
-      - id: 4000310
+      - petId: 4000310
+        growthAttributeId: 154
         battleAI: 1
         weight: 1
   - id: 70002
@@ -69,604 +86,776 @@ enemyGroups:
       - 25
       - 25
     enemies:
-      - id: 4000333
+      - petId: 4000333
+        growthAttributeId: 201
         battleAI: 1
         weight: 1
-      - id: 4000334
+      - petId: 4000334
+        growthAttributeId: 202
         battleAI: 1
         weight: 1
-      - id: 4000335
+      - petId: 4000335
+        growthAttributeId: 203
         battleAI: 1
         weight: 1
-      - id: 4000336
+      - petId: 4000336
+        growthAttributeId: 204
         battleAI: 1
         weight: 1
   - id: 80000
     name: "测试[人龙系][1]"
     isBoss: true
     enemies:
-      - id: 4000277
+      - petId: 4000277
+        growthAttributeId: 1
         battleAI: 1
         level: 1
-      - id: 4000278
+      - petId: 4000278
+        growthAttributeId: 2
         battleAI: 1
         level: 1
-      - id: 4000279
+      - petId: 4000279
+        growthAttributeId: 3
         battleAI: 1
         level: 1
-      - id: 4000280
+      - petId: 4000280
+        growthAttributeId: 4
         battleAI: 1
         level: 1
-      - id: 4000360
+      - petId: 4000360
+        growthAttributeId: 5
         battleAI: 1
         level: 1
-      - id: 4000613
+      - petId: 4000613
+        growthAttributeId: 6
         battleAI: 1
         level: 1
-      - id: 4000614
+      - petId: 4000614
+        growthAttributeId: 7
         battleAI: 1
         level: 1
-      - id: 4000615
+      - petId: 4000615
+        growthAttributeId: 8
         battleAI: 1
         level: 1
   - id: 80001
     name: "测试[人龙系][2]"
     isBoss: true
     enemies:
-      - id: 4001503
+      - petId: 4001503
+        growthAttributeId: 9
         battleAI: 1
         level: 1
-      - id: 4001504
+      - petId: 4001504
+        growthAttributeId: 10
         battleAI: 1
         level: 1
-      - id: 4001505
+      - petId: 4001505
+        growthAttributeId: 11
         battleAI: 1
         level: 1
-      - id: 4001506
+      - petId: 4001506
+        growthAttributeId: 12
         battleAI: 1
         level: 1
-      - id: 4001507
+      - petId: 4001507
+        growthAttributeId: 13
         battleAI: 1
         level: 1
-      - id: 4001564
+      - petId: 4001564
+        growthAttributeId: 14
         battleAI: 1
         level: 1
   - id: 80010
     name: "测试[老虎系]"
     isBoss: true
     enemies:
-      - id: 4000301
+      - petId: 4000301
+        growthAttributeId: 15
         battleAI: 1
         level: 1
-      - id: 4000302
+      - petId: 4000302
+        growthAttributeId: 16
         battleAI: 1
         level: 1
-      - id: 4000303
+      - petId: 4000303
+        growthAttributeId: 17
         battleAI: 1
         level: 1
-      - id: 4000304
+      - petId: 4000304
+        growthAttributeId: 18
         battleAI: 1
         level: 1
-      - id: 4000635
+      - petId: 4000635
+        growthAttributeId: 19
         battleAI: 1
         level: 1
-      - id: 4000636
+      - petId: 4000636
+        growthAttributeId: 20
         battleAI: 1
         level: 1
-      - id: 4000637
+      - petId: 4000637
+        growthAttributeId: 21
         battleAI: 1
         level: 1
-      - id: 4000638
+      - petId: 4000638
+        growthAttributeId: 22
         battleAI: 1
         level: 1
   - id: 80020
     name: "测试[暴龙系]"
     isBoss: true
     enemies:
-      - id: 4000337
+      - petId: 4000337
+        growthAttributeId: 23
         battleAI: 1
         level: 1
-      - id: 4000338
+      - petId: 4000338
+        growthAttributeId: 24
         battleAI: 1
         level: 1
-      - id: 4000339
+      - petId: 4000339
+        growthAttributeId: 25
         battleAI: 1
         level: 1
-      - id: 4000340
+      - petId: 4000340
+        growthAttributeId: 26
         battleAI: 1
         level: 1
-      - id: 4000670
+      - petId: 4000670
+        growthAttributeId: 27
         battleAI: 1
         level: 1
-      - id: 4000671
+      - petId: 4000671
+        growthAttributeId: 28
         battleAI: 1
         level: 1
-      - id: 4000672
+      - petId: 4000672
+        growthAttributeId: 29
         battleAI: 1
         level: 1
-      - id: 4000673
+      - petId: 4000673
+        growthAttributeId: 30
         battleAI: 1
         level: 1
   - id: 80030
     name: "测试[加美系]"
     isBoss: true
     enemies:
-      - id: 4000249
+      - petId: 4000249
+        growthAttributeId: 31
         battleAI: 1
         level: 1
-      - id: 4000250
+      - petId: 4000250
+        growthAttributeId: 32
         battleAI: 1
         level: 1
-      - id: 4000251
+      - petId: 4000251
+        growthAttributeId: 33
         battleAI: 1
         level: 1
-      - id: 4000252
+      - petId: 4000252
+        growthAttributeId: 34
         battleAI: 1
         level: 1
-      - id: 4000590
+      - petId: 4000590
+        growthAttributeId: 35
         battleAI: 1
         level: 1
-      - id: 4000591
+      - petId: 4000591
+        growthAttributeId: 36
         battleAI: 1
         level: 1
-      - id: 4000592
+      - petId: 4000592
+        growthAttributeId: 37
         battleAI: 1
         level: 1
-      - id: 4000593
+      - petId: 4000593
+        growthAttributeId: 38
         battleAI: 1
         level: 1
   - id: 80040
     name: "测试[乌力系]"
     isBoss: true
     enemies:
-      - id: 4000240
+      - petId: 4000240
+        growthAttributeId: 39
         battleAI: 1
         level: 1
-      - id: 4000242
+      - petId: 4000242
+        growthAttributeId: 40
         battleAI: 1
         level: 1
-      - id: 4000241
+      - petId: 4000241
+        growthAttributeId: 41
         battleAI: 1
         level: 1
-      - id: 4000243
+      - petId: 4000243
+        growthAttributeId: 42
         battleAI: 1
         level: 1
-      - id: 4000354
+      - petId: 4000354
+        growthAttributeId: 43
         battleAI: 1
         level: 1
-      - id: 4000584
+      - petId: 4000584
+        growthAttributeId: 44
         battleAI: 1
         level: 1
-      - id: 4000585
+      - petId: 4000585
+        growthAttributeId: 45
         battleAI: 1
         level: 1
-      - id: 4000586
+      - petId: 4000586
+        growthAttributeId: 46
         battleAI: 1
         level: 1
-      - id: 4001450
+      - petId: 4001450
+        growthAttributeId: 47
         battleAI: 1
         level: 1
   - id: 80050
     name: "测试[布伊系]"
     isBoss: true
     enemies:
-      - id: 4000244
+      - petId: 4000244
+        growthAttributeId: 48
         battleAI: 1
         level: 1
-      - id: 4000246
+      - petId: 4000246
+        growthAttributeId: 49
         battleAI: 1
         level: 1
-      - id: 4000247
+      - petId: 4000247
+        growthAttributeId: 50
         battleAI: 1
         level: 1
-      - id: 4000248
+      - petId: 4000248
+        growthAttributeId: 51
         battleAI: 1
         level: 1
-      - id: 4000588
+      - petId: 4000588
+        growthAttributeId: 52
         battleAI: 1
         level: 1
-      - id: 4001566
+      - petId: 4001566
+        growthAttributeId: 53
         battleAI: 1
         level: 1
-      - id: 4000245
+      - petId: 4000245
+        growthAttributeId: 54
         battleAI: 1
         level: 1
-      - id: 4000587
+      - petId: 4000587
+        growthAttributeId: 55
         battleAI: 1
         level: 1
-      - id: 4000589
+      - petId: 4000589
+        growthAttributeId: 56
         battleAI: 1
         level: 1
   - id: 80060
     name: "测试[乌宝宝系]"
     isBoss: true
     enemies:
-      - id: 4000253
+      - petId: 4000253
+        growthAttributeId: 57
         battleAI: 1
         level: 1
-      - id: 4000254
+      - petId: 4000254
+        growthAttributeId: 58
         battleAI: 1
         level: 1
-      - id: 4000255
+      - petId: 4000255
+        growthAttributeId: 59
         battleAI: 1
         level: 1
-      - id: 4000256
+      - petId: 4000256
+        growthAttributeId: 60
         battleAI: 1
         level: 1
-      - id: 4000594
+      - petId: 4000594
+        growthAttributeId: 61
         battleAI: 1
         level: 1
-      - id: 4000595
+      - petId: 4000595
+        growthAttributeId: 62
         battleAI: 1
         level: 1
-      - id: 4000596
+      - petId: 4000596
+        growthAttributeId: 63
         battleAI: 1
         level: 1
-      - id: 4000597
+      - petId: 4000597
+        growthAttributeId: 64
         battleAI: 1
         level: 1
   - id: 80070
     name: "测试[大舌头系]"
     isBoss: true
     enemies:
-      - id: 4000257
+      - petId: 4000257
+        growthAttributeId: 65
         battleAI: 1
         level: 1
-      - id: 4000258
+      - petId: 4000258
+        growthAttributeId: 66
         battleAI: 1
         level: 1
-      - id: 4000259
+      - petId: 4000259
+        growthAttributeId: 67
         battleAI: 1
         level: 1
-      - id: 4000260
+      - petId: 4000260
+        growthAttributeId: 68
         battleAI: 1
         level: 1
-      - id: 4000598
+      - petId: 4000598
+        growthAttributeId: 69
         battleAI: 1
         level: 1
-      - id: 4000599
+      - petId: 4000599
+        growthAttributeId: 70
         battleAI: 1
         level: 1
-      - id: 4000600
+      - petId: 4000600
+        growthAttributeId: 71
         battleAI: 1
         level: 1
-      - id: 4000601
+      - petId: 4000601
+        growthAttributeId: 72
         battleAI: 1
         level: 1
   - id: 80080
     name: "测试[乌龟系]"
     isBoss: true
     enemies:
-      - id: 4000261
+      - petId: 4000261
+        growthAttributeId: 73
         battleAI: 1
         level: 1
-      - id: 4000262
+      - petId: 4000262
+        growthAttributeId: 74
         battleAI: 1
         level: 1
-      - id: 4000263
+      - petId: 4000263
+        growthAttributeId: 75
         battleAI: 1
         level: 1
-      - id: 4000264
+      - petId: 4000264
+        growthAttributeId: 76
         battleAI: 1
         level: 1
-      - id: 4000602
+      - petId: 4000602
+        growthAttributeId: 77
         battleAI: 1
         level: 1
-      - id: 4000603
+      - petId: 4000603
+        growthAttributeId: 78
         battleAI: 1
         level: 1
-      - id: 4000604
+      - petId: 4000604
+        growthAttributeId: 79
         battleAI: 1
         level: 1
-      - id: 4000605
+      - petId: 4000605
+        growthAttributeId: 80
         battleAI: 1
         level: 1
   - id: 80090
     name: "测试[特洛昆系]"
     isBoss: true
     enemies:
-      - id: 4000265
+      - petId: 4000265
+        growthAttributeId: 81
         battleAI: 1
         level: 1
-      - id: 4000266
+      - petId: 4000266
+        growthAttributeId: 82
         battleAI: 1
         level: 1
-      - id: 4000267
+      - petId: 4000267
+        growthAttributeId: 83
         battleAI: 1
         level: 1
-      - id: 4000268
+      - petId: 4000268
+        growthAttributeId: 84
         battleAI: 1
         level: 1
-      - id: 4000359
+      - petId: 4000359
+        growthAttributeId: 85
         battleAI: 1
         level: 1
-      - id: 4000606
+      - petId: 4000606
+        growthAttributeId: 86
         battleAI: 1
         level: 1
-      - id: 4000607
+      - petId: 4000607
+        growthAttributeId: 87
         battleAI: 1
         level: 1
-      - id: 4000608
+      - petId: 4000608
+        growthAttributeId: 88
         battleAI: 1
         level: 1
   - id: 80100
     name: "测试[呼拔拔系]"
     isBoss: true
     enemies:
-      - id: 4000269
+      - petId: 4000269
+        growthAttributeId: 89
         battleAI: 1
         level: 1
-      - id: 4000270
+      - petId: 4000270
+        growthAttributeId: 90
         battleAI: 1
         level: 1
-      - id: 4000271
+      - petId: 4000271
+        growthAttributeId: 91
         battleAI: 1
         level: 1
-      - id: 4000272
+      - petId: 4000272
+        growthAttributeId: 92
         battleAI: 1
         level: 1
-      - id: 4000609
+      - petId: 4000609
+        growthAttributeId: 93
         battleAI: 1
         level: 1
-      - id: 4000610
+      - petId: 4000610
+        growthAttributeId: 94
         battleAI: 1
         level: 1
-      - id: 4000611
+      - petId: 4000611
+        growthAttributeId: 95
         battleAI: 1
         level: 1
-      - id: 4000612
+      - petId: 4000612
+        growthAttributeId: 96
         battleAI: 1
         level: 1
   - id: 80110
     name: "测试[穿山甲系]"
     isBoss: true
     enemies:
-      - id: 4000273
+      - petId: 4000273
+        growthAttributeId: 97
         battleAI: 1
         level: 1
-      - id: 4000274
+      - petId: 4000274
+        growthAttributeId: 98
         battleAI: 1
         level: 1
-      - id: 4000275
+      - petId: 4000275
+        growthAttributeId: 99
         battleAI: 1
         level: 1
-      - id: 4000276
+      - petId: 4000276
+        growthAttributeId: 100
         battleAI: 1
         level: 1
-      - id: 4000355
+      - petId: 4000355
+        growthAttributeId: 101
         battleAI: 1
         level: 1
-      - id: 4000356
+      - petId: 4000356
+        growthAttributeId: 102
         battleAI: 1
         level: 1
-      - id: 4000357
+      - petId: 4000357
+        growthAttributeId: 103
         battleAI: 1
         level: 1
-      - id: 4000358
+      - petId: 4000358
+        growthAttributeId: 104
         battleAI: 1
         level: 1
   - id: 80120
     name: "测试[克克尔系]"
     isBoss: true
     enemies:
-      - id: 4000281
+      - petId: 4000281
+        growthAttributeId: 105
         battleAI: 1
         level: 1
-      - id: 4000282
+      - petId: 4000282
+        growthAttributeId: 106
         battleAI: 1
         level: 1
-      - id: 4000283
+      - petId: 4000283
+        growthAttributeId: 107
         battleAI: 1
         level: 1
-      - id: 4000284
+      - petId: 4000284
+        growthAttributeId: 108
         battleAI: 1
         level: 1
-      - id: 4000616
+      - petId: 4000616
+        growthAttributeId: 109
         battleAI: 1
         level: 1
-      - id: 4000617
+      - petId: 4000617
+        growthAttributeId: 110
         battleAI: 1
         level: 1
-      - id: 4000618
+      - petId: 4000618
+        growthAttributeId: 111
         battleAI: 1
         level: 1
-      - id: 4000619
+      - petId: 4000619
+        growthAttributeId: 112
         battleAI: 1
         level: 1
   - id: 80130
     name: "测试[凯比系]"
     isBoss: true
     enemies:
-      - id: 4000285
+      - petId: 4000285
+        growthAttributeId: 113
         battleAI: 1
         level: 1
-      - id: 4000286
+      - petId: 4000286
+        growthAttributeId: 114
         battleAI: 1
         level: 1
-      - id: 4000287
+      - petId: 4000287
+        growthAttributeId: 115
         battleAI: 1
         level: 1
-      - id: 4000288
+      - petId: 4000288
+        growthAttributeId: 116
         battleAI: 1
         level: 1
-      - id: 4000620
+      - petId: 4000620
+        growthAttributeId: 117
         battleAI: 1
         level: 1
-      - id: 4000621
+      - petId: 4000621
+        growthAttributeId: 118
         battleAI: 1
         level: 1
-      - id: 4000622
+      - petId: 4000622
+        growthAttributeId: 119
         battleAI: 1
         level: 1
-      - id: 4000623
+      - petId: 4000623
+        growthAttributeId: 120
         battleAI: 1
         level: 1
   - id: 80140
     name: "测试[猩猩系]"
     isBoss: true
     enemies:
-      - id: 4000289
+      - petId: 4000289
+        growthAttributeId: 121
         battleAI: 1
         level: 1
-      - id: 4000290
+      - petId: 4000290
+        growthAttributeId: 122
         battleAI: 1
         level: 1
-      - id: 4000291
+      - petId: 4000291
+        growthAttributeId: 123
         battleAI: 1
         level: 1
-      - id: 4000292
+      - petId: 4000292
+        growthAttributeId: 124
         battleAI: 1
         level: 1
-      - id: 4000624
+      - petId: 4000624
+        growthAttributeId: 125
         battleAI: 1
         level: 1
-      - id: 4000625
+      - petId: 4000625
+        growthAttributeId: 126
         battleAI: 1
         level: 1
-      - id: 4000626
+      - petId: 4000626
+        growthAttributeId: 127
         battleAI: 1
         level: 1
-      - id: 4000627
+      - petId: 4000627
+        growthAttributeId: 128
         battleAI: 1
         level: 1
   - id: 80150
     name: "测试[布克系]"
     isBoss: true
     enemies:
-      - id: 4000293
+      - petId: 4000293
+        growthAttributeId: 129
         battleAI: 1
         level: 1
-      - id: 4000294
+      - petId: 4000294
+        growthAttributeId: 130
         battleAI: 1
         level: 1
-      - id: 4000295
+      - petId: 4000295
+        growthAttributeId: 131
         battleAI: 1
         level: 1
-      - id: 4000296
+      - petId: 4000296
+        growthAttributeId: 132
         battleAI: 1
         level: 1
-      - id: 4000361
+      - petId: 4000361
+        growthAttributeId: 133
         battleAI: 1
         level: 1
-      - id: 4000628
+      - petId: 4000628
+        growthAttributeId: 134
         battleAI: 1
         level: 1
-      - id: 4000629
+      - petId: 4000629
+        growthAttributeId: 135
         battleAI: 1
         level: 1
-      - id: 4000630
+      - petId: 4000630
+        growthAttributeId: 136
         battleAI: 1
         level: 1
   - id: 80160
     name: "测试[卡克尔系]"
     isBoss: true
     enemies:
-      - id: 4000297
+      - petId: 4000297
+        growthAttributeId: 137
         battleAI: 1
         level: 1
-      - id: 4000298
+      - petId: 4000298
+        growthAttributeId: 138
         battleAI: 1
         level: 1
-      - id: 4000299
+      - petId: 4000299
+        growthAttributeId: 139
         battleAI: 1
         level: 1
-      - id: 4000300
+      - petId: 4000300
+        growthAttributeId: 140
         battleAI: 1
         level: 1
-      - id: 4000631
+      - petId: 4000631
+        growthAttributeId: 141
         battleAI: 1
         level: 1
-      - id: 4000632
+      - petId: 4000632
+        growthAttributeId: 142
         battleAI: 1
         level: 1
-      - id: 4000633
+      - petId: 4000633
+        growthAttributeId: 143
         battleAI: 1
         level: 1
-      - id: 4000634
+      - petId: 4000634
+        growthAttributeId: 144
         battleAI: 1
         level: 1
   - id: 80170
     name: "测试[犀牛系]"
     isBoss: true
     enemies:
-      - id: 4000305
+      - petId: 4000305
+        growthAttributeId: 145
         battleAI: 1
         level: 1
-      - id: 4000306
+      - petId: 4000306
+        growthAttributeId: 146
         battleAI: 1
         level: 1
-      - id: 4000307
+      - petId: 4000307
+        growthAttributeId: 147
         battleAI: 1
         level: 1
-      - id: 4000308
+      - petId: 4000308
+        growthAttributeId: 148
         battleAI: 1
         level: 1
-      - id: 4000639
+      - petId: 4000639
+        growthAttributeId: 149
         battleAI: 1
         level: 1
-      - id: 4000640
+      - petId: 4000640
+        growthAttributeId: 150
         battleAI: 1
         level: 1
-      - id: 4000641
+      - petId: 4000641
+        growthAttributeId: 151
         battleAI: 1
         level: 1
-      - id: 4000642
+      - petId: 4000642
+        growthAttributeId: 152
         battleAI: 1
         level: 1
   - id: 80180
     name: "测试[鲨鱼系]"
     isBoss: true
     enemies:
-      - id: 4000309
+      - petId: 4000309
+        growthAttributeId: 153
         battleAI: 1
         level: 1
-      - id: 4000310
+      - petId: 4000310
+        growthAttributeId: 154
         battleAI: 1
         level: 1
-      - id: 4000311
+      - petId: 4000311
+        growthAttributeId: 155
         battleAI: 1
         level: 1
-      - id: 4000312
+      - petId: 4000312
+        growthAttributeId: 156
         battleAI: 1
         level: 1
-      - id: 4000643
+      - petId: 4000643
+        growthAttributeId: 157
         battleAI: 1
         level: 1
-      - id: 4000644
+      - petId: 4000644
+        growthAttributeId: 158
         battleAI: 1
         level: 1
-      - id: 4000645
+      - petId: 4000645
+        growthAttributeId: 159
         battleAI: 1
         level: 1
-      - id: 4000646
+      - petId: 4000646
+        growthAttributeId: 160
         battleAI: 1
         level: 1
   - id: 80190
     name: "测试[飞天蛙系]"
     isBoss: true
     enemies:
-      - id: 4000313
+      - petId: 4000313
+        growthAttributeId: 161
         battleAI: 1
         level: 1
-      - id: 4000314
+      - petId: 4000314
+        growthAttributeId: 162
         battleAI: 1
         level: 1
-      - id: 4000315
+      - petId: 4000315
+        growthAttributeId: 163
         battleAI: 1
         level: 1
-      - id: 4000316
+      - petId: 4000316
+        growthAttributeId: 164
         battleAI: 1
         level: 1
-      - id: 4000647
+      - petId: 4000647
+        growthAttributeId: 165
         battleAI: 1
         level: 1
-      - id: 4000648
+      - petId: 4000648
+        growthAttributeId: 166
         battleAI: 1
         level: 1
-      - id: 4000649
+      - petId: 4000649
+        growthAttributeId: 167
         battleAI: 1
         level: 1
-      - id: 4000650
+      - petId: 4000650
+        growthAttributeId: 168
         battleAI: 1
         level: 1
   - id: 90001
@@ -679,10 +868,12 @@ enemyGroups:
       - 5
     captured: false
     enemies:
-      - id: 4000240
+      - petId: 4000240
+        growthAttributeId: 39
         battleAI: 1
         weight: 100
-      - id: 4000242
+      - petId: 4000242
+        growthAttributeId: 40
         battleAI: 1
         weight: 100
   - id: 90010
@@ -695,13 +886,16 @@ enemyGroups:
       - 15
     captured: false
     enemies:
-      - id: 4000261
+      - petId: 4000261
+        growthAttributeId: 73
         battleAI: 1
         weight: 100
-      - id: 4000263
+      - petId: 4000263
+        growthAttributeId: 75
         battleAI: 1
         weight: 100
-      - id: 4000264
+      - petId: 4000264
+        growthAttributeId: 76
         battleAI: 1
         weight: 100
   - id: 90020
@@ -714,10 +908,12 @@ enemyGroups:
       - 30
     captured: false
     enemies:
-      - id: 4000257
+      - petId: 4000257
+        growthAttributeId: 65
         battleAI: 1
         weight: 100
-      - id: 4000258
+      - petId: 4000258
+        growthAttributeId: 66
         battleAI: 1
         weight: 100
   - id: 90030
@@ -730,10 +926,12 @@ enemyGroups:
       - 40
     captured: false
     enemies:
-      - id: 4000318
+      - petId: 4000318
+        growthAttributeId: 170
         battleAI: 1
         weight: 100
-      - id: 4000319
+      - petId: 4000319
+        growthAttributeId: 171
         battleAI: 1
         weight: 100
   - id: 90040
@@ -746,10 +944,12 @@ enemyGroups:
       - 50
     captured: false
     enemies:
-      - id: 4000244
+      - petId: 4000244
+        growthAttributeId: 48
         battleAI: 1
         weight: 100
-      - id: 4000246
+      - petId: 4000246
+        growthAttributeId: 49
         battleAI: 1
         weight: 100
   - id: 90050
@@ -762,10 +962,12 @@ enemyGroups:
       - 60
     captured: false
     enemies:
-      - id: 4000325
+      - petId: 4000325
+        growthAttributeId: 185
         battleAI: 1
         weight: 100
-      - id: 4000328
+      - petId: 4000328
+        growthAttributeId: 188
         battleAI: 1
         weight: 100
   - id: 90060
@@ -778,16 +980,20 @@ enemyGroups:
       - 70
     captured: false
     enemies:
-      - id: 4000273
+      - petId: 4000273
+        growthAttributeId: 97
         battleAI: 1
         weight: 100
-      - id: 4000274
+      - petId: 4000274
+        growthAttributeId: 98
         battleAI: 1
         weight: 100
-      - id: 4000275
+      - petId: 4000275
+        growthAttributeId: 99
         battleAI: 1
         weight: 100
-      - id: 4000276
+      - petId: 4000276
+        growthAttributeId: 100
         battleAI: 1
         weight: 100
   - id: 90070
@@ -800,7 +1006,8 @@ enemyGroups:
       - 80
     captured: false
     enemies:
-      - id: 4000264
+      - petId: 4000264
+        growthAttributeId: 76
         battleAI: 1
         weight: 100
   - id: 90080
@@ -813,7 +1020,8 @@ enemyGroups:
       - 90
     captured: false
     enemies:
-      - id: 4000264
+      - petId: 4000264
+        growthAttributeId: 76
         battleAI: 1
         weight: 100
   - id: 90090
@@ -826,13 +1034,16 @@ enemyGroups:
       - 100
     captured: false
     enemies:
-      - id: 4000345
+      - petId: 4000345
+        growthAttributeId: 217
         battleAI: 1
         weight: 100
-      - id: 4000346
+      - petId: 4000346
+        growthAttributeId: 218
         battleAI: 1
         weight: 100
-      - id: 4000349
+      - petId: 4000349
+        growthAttributeId: 221
         battleAI: 1
         weight: 100
   - id: 90100
@@ -845,16 +1056,20 @@ enemyGroups:
       - 110
     captured: false
     enemies:
-      - id: 4000309
+      - petId: 4000309
+        growthAttributeId: 153
         battleAI: 1
         weight: 100
-      - id: 4000310
+      - petId: 4000310
+        growthAttributeId: 154
         battleAI: 1
         weight: 100
-      - id: 4000311
+      - petId: 4000311
+        growthAttributeId: 155
         battleAI: 1
         weight: 100
-      - id: 4000312
+      - petId: 4000312
+        growthAttributeId: 156
         battleAI: 1
         weight: 100
   - id: 90110
@@ -867,7 +1082,8 @@ enemyGroups:
       - 120
     captured: false
     enemies:
-      - id: 4000322
+      - petId: 4000322
+        growthAttributeId: 178
         battleAI: 1
         weight: 100
   - id: 90120
@@ -880,10 +1096,12 @@ enemyGroups:
       - 130
     captured: false
     enemies:
-      - id: 4000656
+      - petId: 4000656
+        growthAttributeId: 183
         battleAI: 1
         weight: 100
-      - id: 4000657
+      - petId: 4000657
+        growthAttributeId: 184
         battleAI: 1
         weight: 100
   - id: 90130
@@ -896,34 +1114,932 @@ enemyGroups:
       - 140
     captured: false
     enemies:
-      - id: 4000655
+      - petId: 4000655
+        growthAttributeId: 182
         battleAI: 1
         weight: 100
   - id: 80200
     name: "测试[海主人系]"
     enemies:
-      - id: 4000317
+      - petId: 4000317
+        growthAttributeId: 169
         battleAI: 1
         level: 1
-      - id: 4000318
+      - petId: 4000318
+        growthAttributeId: 170
         battleAI: 1
         level: 1
-      - id: 4000319
+      - petId: 4000319
+        growthAttributeId: 171
         battleAI: 1
         level: 1
-      - id: 4000320
+      - petId: 4000320
+        growthAttributeId: 172
         battleAI: 1
         level: 1
-      - id: 4000651
+      - petId: 4000651
+        growthAttributeId: 173
         battleAI: 1
         level: 1
-      - id: 4000652
+      - petId: 4000652
+        growthAttributeId: 174
         battleAI: 1
         level: 1
-      - id: 4000653
+      - petId: 4000653
+        growthAttributeId: 175
         battleAI: 1
         level: 1
-      - id: 4000654
+      - petId: 4000654
+        growthAttributeId: 176
         battleAI: 1
         level: 1
     isBoss: true
+  - id: 80210
+    name: "测试[雷龙系]"
+    enemies:
+      - petId: 4000321
+        growthAttributeId: 177
+        battleAI: 1
+        level: 1
+      - petId: 4000322
+        growthAttributeId: 178
+        battleAI: 1
+        level: 1
+      - petId: 4000323
+        growthAttributeId: 179
+        battleAI: 1
+        level: 1
+      - petId: 4000324
+        growthAttributeId: 180
+        battleAI: 1
+        level: 1
+      - petId: 4000362
+        growthAttributeId: 181
+        battleAI: 1
+        level: 1
+      - petId: 4000655
+        growthAttributeId: 182
+        battleAI: 1
+        level: 1
+      - petId: 4000657
+        growthAttributeId: 184
+        battleAI: 1
+        level: 1
+      - petId: 4000656
+        growthAttributeId: 183
+        battleAI: 1
+        level: 1
+    isBoss: true
+  - id: 70003
+    name: "[任务][琉璃洞窟][九楼]"
+    enemies:
+      - petId: 4000258
+        growthAttributeId: 66
+        battleAI: 21
+        levelRange:
+          - 62
+          - 65
+        displayName: 大贝洛
+      - petId: 4000258
+        growthAttributeId: 66
+        battleAI: 21
+        levelRange:
+          - 62
+          - 65
+        displayName: 大贝洛
+      - petId: 4000258
+        growthAttributeId: 66
+        battleAI: 21
+        levelRange:
+          - 62
+          - 65
+        displayName: 大贝洛
+      - petId: 4000267
+        growthAttributeId: 83
+        battleAI: 22
+        levelRange:
+          - 62
+          - 65
+        displayName: 大塔洛
+      - petId: 4000267
+        growthAttributeId: 83
+        battleAI: 22
+        levelRange:
+          - 62
+          - 65
+        displayName: 大塔洛
+      - petId: 4000308
+        growthAttributeId: 148
+        battleAI: 20
+        level: 67
+        displayName: 大地守护兽·特洛
+      - petId: 4000300
+        growthAttributeId: 140
+        battleAI: 23
+        levelRange:
+          - 62
+          - 65
+        displayName: 大卡拉
+      - petId: 4000300
+        growthAttributeId: 140
+        battleAI: 23
+        levelRange:
+          - 62
+          - 65
+        displayName: 大卡拉
+      - petId: 4000307
+        growthAttributeId: 147
+        battleAI: 24
+        levelRange:
+          - 62
+          - 65
+        displayName: 大特里
+      - petId: 4000307
+        growthAttributeId: 147
+        battleAI: 24
+        levelRange:
+          - 62
+          - 65
+        displayName: 大特里
+    isBoss: true
+  - id: 70004
+    name: "[任务][琉璃洞窟][十四楼]"
+    enemies:
+      - petId: 4000321
+        growthAttributeId: 177
+        battleAI: 30
+        level: 73
+        gradeRange:
+          - 5
+          - 5
+        displayName: 大地守护兽·布洛
+        attributeModifiers:
+          poisonResist: 50
+          paralysisResist: 50
+          sleepResist: 50
+          stoneResist: 50
+          drunkResist: 50
+          confusionResist: 50
+      - petId: 4000277
+        growthAttributeId: 1
+        battleAI: 25
+        levelRange:
+          - 65
+          - 66
+        gradeRange:
+          - 5
+          - 5
+        displayName: 大里赛
+      - petId: 4000277
+        growthAttributeId: 1
+        battleAI: 25
+        levelRange:
+          - 65
+          - 66
+        gradeRange:
+          - 5
+          - 5
+        displayName: 大里赛
+      - petId: 4000276
+        growthAttributeId: 100
+        battleAI: 26
+        levelRange:
+          - 65
+          - 66
+        gradeRange:
+          - 5
+          - 5
+        displayName: 大洛基
+      - petId: 4000276
+        growthAttributeId: 100
+        battleAI: 26
+        levelRange:
+          - 65
+          - 66
+        gradeRange:
+          - 5
+          - 5
+        displayName: 大洛基
+      - petId: 4000281
+        growthAttributeId: 105
+        battleAI: 27
+        levelRange:
+          - 62
+          - 65
+        gradeRange:
+          - 5
+          - 5
+        displayName: 大克雷
+      - petId: 4000262
+        growthAttributeId: 74
+        battleAI: 28
+        levelRange:
+          - 62
+          - 65
+        gradeRange:
+          - 5
+          - 5
+        displayName: 大米特
+      - petId: 4000262
+        growthAttributeId: 74
+        battleAI: 28
+        levelRange:
+          - 62
+          - 65
+        gradeRange:
+          - 5
+          - 5
+        displayName: 大米特
+      - petId: 4000300
+        growthAttributeId: 140
+        battleAI: 29
+        levelRange:
+          - 62
+          - 65
+        gradeRange:
+          - 5
+          - 5
+        displayName: 大卡拉
+      - petId: 4000300
+        growthAttributeId: 140
+        battleAI: 29
+        levelRange:
+          - 62
+          - 65
+        gradeRange:
+          - 5
+          - 5
+        displayName: 大卡拉
+    isBoss: true
+  - id: 70005
+    name: "[任务][玄黄洞窟][地下8楼]"
+    enemies:
+      - petId: 4000360
+        growthAttributeId: 491
+        battleAI: 31
+        level: 70
+        displayName: 风的守护兽
+      - petId: 4000251
+        growthAttributeId: 492
+        battleAI: 32
+        levelRange:
+          - 66
+          - 67
+        displayName: 风加比奥
+      - petId: 4000251
+        growthAttributeId: 492
+        battleAI: 32
+        levelRange:
+          - 66
+          - 67
+        displayName: 风加比奥
+      - petId: 4000299
+        growthAttributeId: 493
+        battleAI: 33
+        levelRange:
+          - 66
+          - 67
+        displayName: 风由它
+      - petId: 4000299
+        growthAttributeId: 493
+        battleAI: 33
+        levelRange:
+          - 66
+          - 67
+        displayName: 风由它
+      - petId: 4000285
+        growthAttributeId: 494
+        battleAI: 34
+        levelRange:
+          - 66
+          - 67
+        displayName: 风凯比特
+      - petId: 4000253
+        growthAttributeId: 495
+        battleAI: 35
+        levelRange:
+          - 66
+          - 67
+        displayName: 风乌宝宝
+      - petId: 4000253
+        growthAttributeId: 495
+        battleAI: 35
+        levelRange:
+          - 66
+          - 67
+        displayName: 风乌宝宝
+      - petId: 4000252
+        growthAttributeId: 496
+        battleAI: 36
+        levelRange:
+          - 66
+          - 67
+        displayName: 风加斯
+      - petId: 4000252
+        growthAttributeId: 496
+        battleAI: 36
+        levelRange:
+          - 66
+          - 67
+        displayName: 风加斯
+    isBoss: true
+  - id: 70006
+    name: "[任务][碧青洞窟][深蓝色石头]"
+    isBoss: true
+    enemies:
+      - petId: 4000277
+        growthAttributeId: 1
+        battleAI: 1
+        levelRange:
+          - 83
+          - 85
+        displayName: 利则诺顿
+      - petId: 4000280
+        growthAttributeId: 4
+        battleAI: 1
+        levelRange:
+          - 83
+          - 85
+        displayName: 邦奇诺
+      - petId: 4000433
+        growthAttributeId: 497
+        battleAI: 37
+        level: 1
+        displayName: 深蓝色石头
+        normalDrops:
+          - itemId: 3000306
+            probability: 8000
+      - petId: 4000277
+        growthAttributeId: 1
+        battleAI: 1
+        levelRange:
+          - 83
+          - 85
+        displayName: 利则诺顿
+      - petId: 4000280
+        growthAttributeId: 4
+        battleAI: 1
+        levelRange:
+          - 83
+          - 85
+        displayName: 邦奇诺
+  - id: 70007
+    name: "[任务][玄黄洞窟][地下14楼]"
+    enemies:
+      - petId: 4000313
+        growthAttributeId: 498
+        battleAI: 38
+        level: 75
+        displayName: 风的守护兽
+      - petId: 4000359
+        growthAttributeId: 499
+        battleAI: 39
+        levelRange:
+          - 67
+          - 68
+        displayName: 风宝克尔
+      - petId: 4000359
+        growthAttributeId: 499
+        battleAI: 39
+        levelRange:
+          - 67
+          - 68
+        displayName: 风宝克尔
+      - petId: 4000302
+        growthAttributeId: 500
+        battleAI: 24
+        levelRange:
+          - 67
+          - 68
+        displayName: 风贝鲁伊卡
+      - petId: 4000302
+        growthAttributeId: 500
+        battleAI: 24
+        levelRange:
+          - 67
+          - 68
+        displayName: 风贝鲁伊卡
+      - petId: 4000261
+        growthAttributeId: 501
+        battleAI: 40
+        levelRange:
+          - 67
+          - 68
+        displayName: 风龟之盾
+      - petId: 4000334
+        growthAttributeId: 502
+        battleAI: 41
+        levelRange:
+          - 67
+          - 68
+        displayName: 风克克洛斯
+      - petId: 4000334
+        growthAttributeId: 502
+        battleAI: 41
+        levelRange:
+          - 67
+          - 68
+        displayName: 风克克洛斯
+      - petId: 4000261
+        growthAttributeId: 501
+        battleAI: 40
+        levelRange:
+          - 67
+          - 68
+        displayName: 风龟之盾
+      - petId: 4000261
+        growthAttributeId: 501
+        battleAI: 40
+        levelRange:
+          - 67
+          - 68
+        displayName: 风龟之盾
+    isBoss: true
+  - id: 70008
+    name: "[任务][玄黄洞窟][萨伊那斯.盗贼]"
+    isBoss: true
+    enemies:
+      - characterId: 1600400
+        weapon: unarmed
+        growthAttributeId: 504
+        battleAI: 43
+        level: 68
+        displayName: 波卡
+      - characterId: 1600300
+        weapon: axe
+        growthAttributeId: 503
+        battleAI: 42
+        level: 65
+        displayName: 戴斯
+      - characterId: 1600300
+        weapon: spear
+        growthAttributeId: 505
+        battleAI: 42
+        level: 65
+        displayName: 达姿
+      - petId: 4000270
+        growthAttributeId: 506
+        battleAI: 44
+        level: 60
+        displayName: 盗贼呼拔拔
+      - petId: 4000271
+        growthAttributeId: 507
+        battleAI: 45
+        level: 60
+        displayName: 盗贼多萨金格
+  - id: 70009
+    name: "[任务][玄黄洞窟][盗贼的基地最底层.唐/悟]"
+    isBoss: true
+    enemies:
+      - characterId: 1600300
+        weapon: axe
+        growthAttributeId: 508
+        battleAI: 46
+        levelRange:
+          - 59
+          - 61
+        displayName: 唐
+        normalDrops:
+          - itemId: 3910706
+            probability: 100
+      - characterId: 1600400
+        weapon: spear
+        growthAttributeId: 509
+        battleAI: 47
+        levelRange:
+          - 59
+          - 61
+        displayName: 悟
+        normalDrops:
+          - itemId: 3930701
+            probability: 100
+      - petId: 4000269
+        growthAttributeId: 510
+        battleAI: 48
+        levelRange:
+          - 54
+          - 56
+        displayName: 盗贼拉奇鲁哥
+      - petId: 4000272
+        growthAttributeId: 511
+        battleAI: 49
+        levelRange:
+          - 54
+          - 56
+        displayName: 盗贼鲁尼帖斯
+  - id: 70010
+    name: "[任务][碧青洞窟][地下8楼]"
+    isBoss: true
+    enemies:
+      - petId: 4000346
+        growthAttributeId: 512
+        battleAI: 38
+        displayName: 水的守护兽
+        level: 70
+      - petId: 4000317
+        growthAttributeId: 513
+        battleAI: 24
+        displayName: 水邦奇
+        levelRange:
+          - 66
+          - 67
+      - petId: 4000257
+        growthAttributeId: 514
+        battleAI: 38
+        displayName: 水贝洛恩
+        levelRange:
+          - 66
+          - 67
+      - petId: 4000351
+        growthAttributeId: 515
+        battleAI: 50
+        displayName: 水兰贝鲁斯
+        levelRange:
+          - 66
+          - 67
+      - petId: 4000351
+        growthAttributeId: 515
+        battleAI: 50
+        displayName: 水兰贝鲁斯
+        levelRange:
+          - 66
+          - 67
+      - petId: 4000311
+        growthAttributeId: 516
+        battleAI: 51
+        displayName: 水加格
+        levelRange:
+          - 66
+          - 67
+      - petId: 4000306
+        growthAttributeId: 517
+        battleAI: 52
+        displayName: 水贝恩达斯
+        levelRange:
+          - 66
+          - 67
+      - petId: 4000306
+        growthAttributeId: 517
+        battleAI: 52
+        displayName: 水贝恩达斯
+        levelRange:
+          - 66
+          - 67
+      - petId: 4000311
+        growthAttributeId: 516
+        battleAI: 51
+        displayName: 水加格
+        levelRange:
+          - 66
+          - 67
+      - petId: 4000311
+        growthAttributeId: 516
+        battleAI: 51
+        displayName: 水加格
+        levelRange:
+          - 66
+          - 67
+  - id: 70011
+    name: "[任务][碧青洞窟][地下14楼]"
+    isBoss: true
+    enemies:
+      - petId: 4000338
+        growthAttributeId: 518
+        battleAI: 53
+        displayName: 水的守护兽
+        level: 75
+      - petId: 4000345
+        growthAttributeId: 519
+        battleAI: 38
+        displayName: 水史多拉奇顿
+        levelRange:
+          - 67
+          - 68
+      - petId: 4000345
+        growthAttributeId: 519
+        battleAI: 38
+        displayName: 水史多拉奇顿
+        levelRange:
+          - 67
+          - 68
+      - petId: 4000259
+        growthAttributeId: 520
+        battleAI: 54
+        displayName: 水贝洛库尔
+        levelRange:
+          - 67
+          - 68
+      - petId: 4000259
+        growthAttributeId: 520
+        battleAI: 54
+        displayName: 水贝洛库尔
+        levelRange:
+          - 67
+          - 68
+      - petId: 4000284
+        growthAttributeId: 521
+        battleAI: 55
+        displayName: 水利斯基
+        levelRange:
+          - 67
+          - 68
+      - petId: 4000297
+        growthAttributeId: 522
+        battleAI: 56
+        displayName: 水卡克尔
+        levelRange:
+          - 67
+          - 68
+      - petId: 4000297
+        growthAttributeId: 522
+        battleAI: 56
+        displayName: 水卡克尔
+        levelRange:
+          - 67
+          - 68
+      - petId: 4000284
+        growthAttributeId: 521
+        battleAI: 55
+        displayName: 水利斯基
+        levelRange:
+          - 67
+          - 68
+      - petId: 4000284
+        growthAttributeId: 521
+        battleAI: 55
+        displayName: 水利斯基
+        levelRange:
+          - 67
+          - 68
+  - id: 70012
+    name: "[任务][漆黑的洞窟]捉守护兽"
+    countRange:
+      - 1
+      - 3
+    levelRange:
+      - 50
+      - 50
+    captured: true
+    babyRate: 0
+    enemies:
+      - petId: 4100000
+        growthAttributeId: 523
+        battleAI: 57
+        weight: 1
+      - petId: 4100001
+        growthAttributeId: 524
+        battleAI: 57
+        weight: 1
+      - petId: 4100002
+        growthAttributeId: 525
+        battleAI: 57
+        weight: 1
+      - petId: 4100003
+        growthAttributeId: 526
+        battleAI: 57
+        weight: 1
+  - id: 70013
+    name: "[任务][深红洞窟][拉多拉山山顶不死鸟守卫]"
+    isBoss: true
+    enemies:
+      - petId: 4000336
+        growthAttributeId: 530
+        battleAI: 60
+        displayName: 不死鸟奇宝
+        levelRange: [69, 72]
+      - petId: 4000334
+        growthAttributeId: 528
+        battleAI: 59
+        displayName: 不死鸟克克洛斯
+        levelRange: [69, 72]
+      - petId: 4000334
+        growthAttributeId: 528
+        battleAI: 59
+        displayName: 不死鸟克克洛斯
+        levelRange: [69, 72]
+      - petId: 4000333
+        growthAttributeId: 527
+        battleAI: 58
+        displayName: 不死鸟火鸡
+        levelRange: [69, 72]
+      - petId: 4000333
+        growthAttributeId: 527
+        battleAI: 58
+        displayName: 不死鸟火鸡
+        levelRange: [69, 72]
+      - petId: 4000334
+        growthAttributeId: 528
+        battleAI: 59
+        displayName: 不死鸟克克洛斯
+        levelRange: [69, 72]
+      - petId: 4000336
+        growthAttributeId: 530
+        battleAI: 60
+        displayName: 不死鸟奇宝
+        levelRange: [69, 72]
+      - petId: 4000336
+        growthAttributeId: 530
+        battleAI: 60
+        displayName: 不死鸟奇宝
+        levelRange: [69, 72]
+      - petId: 4000335
+        growthAttributeId: 529
+        battleAI: 58
+        displayName: 不死鸟霍尔克
+        levelRange: [69, 72]
+      - petId: 4000335
+        growthAttributeId: 529
+        battleAI: 58
+        displayName: 不死鸟霍尔克
+        levelRange: [69, 72]
+  - id: 70014
+    name: "[任务][深红洞窟][地下7楼火的守护兽]"
+    isBoss: true
+    enemies:
+      - petId: 4000280
+        growthAttributeId: 531
+        battleAI: 61
+        displayName: 火的守护兽
+        level: 70
+      - petId: 4000265
+        growthAttributeId: 532
+        battleAI: 62
+        displayName: 火阿哥亚
+        levelRange: [63, 65]
+      - petId: 4000265
+        growthAttributeId: 532
+        battleAI: 62
+        displayName: 火阿哥亚
+        levelRange: [63, 65]
+      - petId: 4000353
+        growthAttributeId: 533
+        battleAI: 63
+        displayName: 火诺斯多洛斯
+        levelRange: [61, 63]
+      - petId: 4000353
+        growthAttributeId: 533
+        battleAI: 63
+        displayName: 火诺斯多洛斯
+        levelRange: [61, 63]
+      - petId: 4000263
+        growthAttributeId: 534
+        battleAI: 64
+        displayName: 火卡梅兰恩
+        levelRange: [61, 63]
+      - petId: 4000285
+        growthAttributeId: 535
+        battleAI: 34
+        displayName: 火凯比特
+        levelRange: [61, 63]
+      - petId: 4000285
+        growthAttributeId: 535
+        battleAI: 34
+        displayName: 火凯比特
+        levelRange: [61, 63]
+      - petId: 4000263
+        growthAttributeId: 534
+        battleAI: 64
+        displayName: 火卡梅兰恩
+        levelRange: [61, 63]
+      - petId: 4000263
+        growthAttributeId: 534
+        battleAI: 64
+        displayName: 火卡梅兰恩
+        levelRange: [61, 63]
+  - id: 70015
+    name: "[任务][深红洞窟][地下9楼火的守护兽]"
+    isBoss: true
+    enemies:
+      - petId: 4000339
+        growthAttributeId: 536
+        battleAI: 65
+        displayName: 火的守护兽
+        level: 75
+      - petId: 4000260
+        growthAttributeId: 537
+        battleAI: 66
+        displayName: 火贝洛宝利
+        levelRange: [63, 65]
+      - petId: 4000260
+        growthAttributeId: 537
+        battleAI: 66
+        displayName: 火贝洛宝利
+        levelRange: [63, 65]
+      - petId: 4000303
+        growthAttributeId: 538
+        battleAI: 52
+        displayName: 火格鲁西斯
+        levelRange: [65, 67]
+      - petId: 4000303
+        growthAttributeId: 538
+        battleAI: 52
+        displayName: 火格鲁西斯
+        levelRange: [65, 67]
+      - petId: 4000296
+        growthAttributeId: 539
+        battleAI: 67
+        displayName: 火多洛加
+        levelRange: [65, 67]
+      - petId: 4000249
+        growthAttributeId: 540
+        battleAI: 45
+        displayName: 火加美
+        levelRange: [63, 65]
+      - petId: 4000249
+        growthAttributeId: 540
+        battleAI: 45
+        displayName: 火加美
+        levelRange: [63, 65]
+      - petId: 4000269
+        growthAttributeId: 541
+        battleAI: 68
+        displayName: 火拉奇鲁哥
+        levelRange: [65, 67]
+      - petId: 4000269
+        growthAttributeId: 541
+        battleAI: 68
+        displayName: 火拉奇鲁哥
+        levelRange: [65, 67]
+  - id: 70016
+    name: "[任务][漆黑的洞窟][地下10楼漆黑的守护兽]"
+    isBoss: true
+    enemies:
+      - petId: 4000355
+        growthAttributeId: 542
+        battleAI: 69
+        displayName: 漆黑的守护兽
+        level: 110
+      - petId: 4000346
+        growthAttributeId: 543
+        battleAI: 38
+        displayName: 黑色萨美洛斯
+        level: 100
+      - petId: 4000280
+        growthAttributeId: 544
+        battleAI: 70
+        displayName: 黑色邦奇诺
+        level: 100
+      - petId: 4000308
+        growthAttributeId: 545
+        battleAI: 24
+        displayName: 黑色多洛布斯
+        level: 100
+      - petId: 4000360
+        growthAttributeId: 546
+        battleAI: 71
+        displayName: 黑色布鲁顿
+        level: 100
+  - id: 70017
+    name: "[任务][漆黑的洞窟][地下20楼帖拉所伊朵]"
+    isBoss: true
+    enemies:
+      - petId: 4000340
+        growthAttributeId: 547
+        battleAI: 72
+        displayName: 帖拉所伊朵
+        level: 120
+      - petId: 4000338
+        growthAttributeId: 548
+        battleAI: 73
+        displayName: 黑色左迪洛斯
+        level: 105
+      - petId: 4000339
+        growthAttributeId: 549
+        battleAI: 65
+        displayName: 黑色巴朵兰恩
+        level: 105
+      - petId: 4000321
+        growthAttributeId: 550
+        battleAI: 30
+        displayName: 黑色布洛多斯
+        level: 105
+      - petId: 4000313
+        growthAttributeId: 551
+        battleAI: 38
+        displayName: 黑色奇卡洛斯
+        level: 105
+      - petId: 4000342
+        growthAttributeId: 552
+        battleAI: 74
+        displayName: 黑色摩娜西普
+        level: 100
+      - petId: 4000341
+        growthAttributeId: 553
+        battleAI: 75
+        displayName: 黑色布伊德
+        level: 100
+      - petId: 4000343
+        growthAttributeId: 554
+        battleAI: 76
+        displayName: 黑色卡伊霍恩
+        level: 100
+      - petId: 4000344
+        growthAttributeId: 555
+        battleAI: 77
+        displayName: 黑色拉伊霍恩
+        level: 100
+      - petId: 4000393
+        growthAttributeId: 556
+        battleAI: 78
+        displayName: 黑色邦达霍恩
+        level: 100

@@ -33,7 +33,7 @@ func (r *CombatRoom) processCombatDeepPoisonBeforeAction(action *combatAction, s
 		UnitKey: unitKey,
 		AssetDeltaList: []*pb.CombatAssetDelta{{
 			AssetType: pb.CombatAssetType_CombatAssetType_HP,
-			Delta:     combatClampDelta(damage),
+			Delta:     combatClampDecreaseDelta(damage),
 			After:     combatClampUint32(state.hp),
 		}},
 		StatusDeltaList: []*pb.CombatStatusDelta{{
@@ -109,7 +109,7 @@ func (r *CombatRoom) appendCombatDeepPoisonDeath(state *combatUnitRuntimeState, 
 			UnitKey: unitKey,
 			AssetDeltaList: []*pb.CombatAssetDelta{{
 				AssetType: pb.CombatAssetType_CombatAssetType_HP,
-				Delta:     combatClampDelta(damage),
+				Delta:     combatClampDecreaseDelta(damage),
 				After:     0,
 			}},
 			AliveChanged:    true,

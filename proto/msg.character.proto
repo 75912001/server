@@ -190,6 +190,7 @@ message CharacterNotify {
     CharacterContainerChanged container_changed = 12;    // 完整背包容器全量替换
     CharacterSystemMailChanged system_mail_changed = 13; // 新增系统邮件
     CharacterPetChanged pet_changed = 14;                // 随身宠物变化(增/改/删)
+    CharacterEquipmentChanged equipment_changed = 15;    // 战斗换装后的背包、穿戴和有效属性
   }
 }
 
@@ -197,6 +198,13 @@ message CharacterNotify {
 message CharacterBaseChanged {
   CharacterBaseRecord character_base_record = 1; // cache持久化成功后的角色基础权威快照
   CharacterEffectiveAttribute effective_attribute = 2; // 变化后的完整有效属性快照
+}
+
+// 战斗换装持久化成功后的私有角色档案快照. 只发送给装备所属账号.
+message CharacterEquipmentChanged {
+  ItemContainerRecord item_bag = 1;
+  CharacterEquipmentRecord equipment = 2;
+  CharacterEffectiveAttribute effective_attribute = 3;
 }
 
 //0x001009#client->gateway#修改角色设置-请求

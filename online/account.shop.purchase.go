@@ -24,21 +24,21 @@ var (
 // shopPurchaseMaxQuantity 单次购买份数上限(协议范围 1-30).
 const shopPurchaseMaxQuantity = uint32(pb.CharacterLimit_CharacterLimit_MaxItemBagCount)
 
-// shopPurchasePlan 保存一次购买的完整候选账号快照. cache 成功前不修改在线权威档案.
+// shopPurchasePlan 保存一次购买的完整变更计划. 校验阶段不修改在线权威档案.
 type shopPurchasePlan struct {
 	characterUUID       uint64
 	itemID              uint32
 	itemCount           uint32
 	quantity            uint32
-	costResultList      []*pb.ItemCostResult
-	itemRemainingCount  uint64
-	previousUsedUUID    uint64
+	isEquipment         bool
+	totalDelivered      uint64
+	costAmounts         []storeCostAmount
 	nextUsedUUID        uint64
 	equipmentRecordList []*pb.EquipmentRecord
 	characterSlot       int
-	previousCharacter   *pb.CharacterRecord
-	nextCharacter       *pb.CharacterRecord
-	nextAccountRecord   *pb.AccountRecord
+	// costResultList 与 itemRemainingCount 在 apply 阶段按消耗后的权威数量填充, 供响应返回.
+	costResultList     []*pb.ItemCostResult
+	itemRemainingCount uint64
 }
 
 func (p *Account) onShopPurchaseReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
@@ -73,9 +73,7 @@ func (p *Account) onShopPurchaseReq(gateway *Gateway, pkt *pb.OnlineClientPacket
 		return
 	}
 
-	if err := persistShopPurchasePlan(plan, p.accountRecord, character, func(nextAccountRecord *pb.AccountRecord) error {
-		return unaryCacheSetAccountRecord(p.aid, nextAccountRecord)
-	}); err != nil {
+	if err := applyShopPurchasePlan(plan, p.accountRecord, character, p.deferAccountRecordPersist); err != nil {
 		xlog.GLog.Errorf(
 			"persist shop purchase failed aid:%d character:%d item:%d quantity:%d costKinds:%d err:%v",
 			p.aid,
@@ -193,91 +191,110 @@ func prepareShopPurchasePlan(
 		return nil, fmt.Errorf("%w: character %d record slot not found", errShopPurchaseRecordInvalid, characterRecord.GetBase().GetUuid())
 	}
 
-	nextAccountRecord := proto.Clone(accountRecord).(*pb.AccountRecord)
-	nextCharacter := nextAccountRecord.GetCharacterRecordList()[characterSlot]
-	if nextCharacter.ItemBag == nil {
-		nextCharacter.ItemBag = &pb.ItemContainerRecord{}
-	}
-	if nextCharacter.ItemBag.ItemCountMap == nil {
-		nextCharacter.ItemBag.ItemCountMap = make(map[uint32]uint64)
-	}
-	if nextCharacter.ItemBag.EquipmentRecordMap == nil {
-		nextCharacter.ItemBag.EquipmentRecordMap = make(map[uint64]*pb.EquipmentRecord)
-	}
-
 	previousUsedUUID := accountRecord.GetUsedUuid()
 	nextUsedUUID := previousUsedUUID
 	equipmentRecordList := make([]*pb.EquipmentRecord, 0)
 	if isEquipment {
 		nextUsedUUID += totalDelivered
 		equipmentRecordList = make([]*pb.EquipmentRecord, 0, totalDelivered)
-	}
-	for offset := uint64(1); isEquipment && offset <= totalDelivered; offset++ {
-		equipmentUUID := previousUsedUUID + offset
-		if _, exists := nextCharacter.ItemBag.EquipmentRecordMap[equipmentUUID]; exists {
-			return nil, fmt.Errorf("%w: equipment uuid %d already exists in item bag", errShopPurchaseRecordInvalid, equipmentUUID)
-		}
-		equipmentRecord, err := newEquipmentRecord(equipmentUUID, itemID)
-		if err != nil {
-			return nil, fmt.Errorf("%w: create equipment %d: %v", errShopPurchaseRecordInvalid, equipmentUUID, err)
-		}
-		nextCharacter.ItemBag.EquipmentRecordMap[equipmentUUID] = equipmentRecord
-		equipmentRecordList = append(equipmentRecordList, equipmentRecord)
-	}
-	costResultList, err := consumeStoreCostAmounts(nextCharacter, costAmounts)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %v", errShopPurchaseRecordInvalid, err)
-	}
-	var itemRemainingCount uint64
-	if !isEquipment {
-		itemManager := newCharacterItemManager(nextCharacter)
-		if err := itemManager.Add(itemID, totalDelivered); err != nil {
-			if errors.Is(err, errItemUseFailedPrecondition) {
-				return nil, fmt.Errorf("%w: deliver item %d: %v", errShopPurchaseResourceExhausted, itemID, err)
+		for offset := uint64(1); offset <= totalDelivered; offset++ {
+			equipmentUUID := previousUsedUUID + offset
+			if _, exists := characterRecord.GetItemBag().GetEquipmentRecordMap()[equipmentUUID]; exists {
+				return nil, fmt.Errorf("%w: equipment uuid %d already exists in item bag", errShopPurchaseRecordInvalid, equipmentUUID)
 			}
-			return nil, fmt.Errorf("%w: deliver item %d: %v", errShopPurchaseRecordInvalid, itemID, err)
+			// 新装备是全新对象而非克隆, 因此在这里构建, apply 阶段只做插入.
+			equipmentRecord, err := newEquipmentRecord(equipmentUUID, itemID)
+			if err != nil {
+				return nil, fmt.Errorf("%w: create equipment %d: %v", errShopPurchaseRecordInvalid, equipmentUUID, err)
+			}
+			equipmentRecordList = append(equipmentRecordList, equipmentRecord)
 		}
-		itemRemainingCount = itemManager.Count(itemID)
+	} else if err := validateShopPurchaseBagDelivery(characterRecord, itemID, costAmounts); err != nil {
+		return nil, err
 	}
-	nextAccountRecord.UsedUuid = nextUsedUUID
 
 	return &shopPurchasePlan{
 		characterUUID:       characterRecord.GetBase().GetUuid(),
 		itemID:              itemID,
 		itemCount:           itemCount,
 		quantity:            quantity,
-		costResultList:      costResultList,
-		itemRemainingCount:  itemRemainingCount,
-		previousUsedUUID:    previousUsedUUID,
+		isEquipment:         isEquipment,
+		totalDelivered:      totalDelivered,
+		costAmounts:         costAmounts,
 		nextUsedUUID:        nextUsedUUID,
 		equipmentRecordList: equipmentRecordList,
 		characterSlot:       characterSlot,
-		previousCharacter:   characterRecord,
-		nextCharacter:       nextCharacter,
-		nextAccountRecord:   nextAccountRecord,
 	}, nil
 }
 
-// persistShopPurchasePlan 先持久化完整候选账号快照, 成功后再一次性提交在线内存引用.
-func persistShopPurchasePlan(
-	plan *shopPurchasePlan,
-	accountRecord *pb.AccountRecord,
-	character *character,
-	persist func(*pb.AccountRecord) error,
-) error {
-	if plan == nil || accountRecord == nil || character == nil || persist == nil || plan.nextAccountRecord == nil || plan.nextCharacter == nil {
+// validateShopPurchaseBagDelivery 预判非装备交付是否需要新堆叠, 使 apply 阶段的 Add 不可能失败.
+// 成本消耗可能腾出槽位, 因此按"扣除成本后的堆叠数"判断, 避免比改造前更早地拒绝购买.
+func validateShopPurchaseBagDelivery(characterRecord *pb.CharacterRecord, itemID uint32, costAmounts []storeCostAmount) error {
+	if isCharacterAssetItemID(itemID) {
+		return nil
+	}
+	if _, exists := characterRecord.GetItemBag().GetItemCountMap()[itemID]; exists {
+		return nil
+	}
+	itemManager := newCharacterItemManager(characterRecord)
+	freed := uint64(0)
+	for _, amount := range costAmounts {
+		if amount.itemID == itemID || isCharacterAssetItemID(amount.itemID) {
+			continue
+		}
+		if itemManager.Count(amount.itemID) == amount.count {
+			freed++
+		}
+	}
+	current := uint64(itemContainerCount(characterRecord.GetItemBag()))
+	if current < freed {
+		freed = current
+	}
+	if current-freed >= uint64(pb.CharacterLimit_CharacterLimit_MaxItemBagCount) {
+		return fmt.Errorf("%w: item bag has no empty slot", errShopPurchaseResourceExhausted)
+	}
+	return nil
+}
+
+// applyShopPurchasePlan 把计划原地应用到权威账号档案, 再通知落盘。
+// 与改造前的区别: 不再克隆整个 AccountRecord, 也不再做事后差分解算通知。
+func applyShopPurchasePlan(plan *shopPurchasePlan, accountRecord *pb.AccountRecord, character *character, persist func() error) error {
+	if plan == nil || accountRecord == nil || character == nil || persist == nil || character.record == nil {
 		return errShopPurchaseInvalidArgument
 	}
-	if plan.characterSlot < 0 || plan.characterSlot >= len(accountRecord.GetCharacterRecordList()) || accountRecord.GetCharacterRecordList()[plan.characterSlot] != plan.previousCharacter || character.record != plan.previousCharacter || accountRecord.GetUsedUuid() != plan.previousUsedUUID {
+	if plan.characterSlot < 0 || plan.characterSlot >= len(accountRecord.GetCharacterRecordList()) ||
+		accountRecord.GetCharacterRecordList()[plan.characterSlot] != character.record {
 		return fmt.Errorf("%w: authoritative account state changed before persistence", errShopPurchaseRecordInvalid)
 	}
-	if err := persist(plan.nextAccountRecord); err != nil {
-		return err
+	if character.record.ItemBag == nil {
+		character.record.ItemBag = &pb.ItemContainerRecord{}
 	}
-	accountRecord.CharacterRecordList[plan.characterSlot] = plan.nextCharacter
+	if character.record.ItemBag.ItemCountMap == nil {
+		character.record.ItemBag.ItemCountMap = make(map[uint32]uint64)
+	}
+	if character.record.ItemBag.EquipmentRecordMap == nil {
+		character.record.ItemBag.EquipmentRecordMap = make(map[uint64]*pb.EquipmentRecord)
+	}
+
+	costResultList, err := consumeStoreCostAmounts(character.record, plan.costAmounts)
+	if err != nil {
+		return fmt.Errorf("%w: %v", errShopPurchaseRecordInvalid, err)
+	}
+	plan.costResultList = costResultList
+
+	if plan.isEquipment {
+		for _, equipmentRecord := range plan.equipmentRecordList {
+			character.record.ItemBag.EquipmentRecordMap[equipmentRecord.GetUuid()] = equipmentRecord
+		}
+	} else {
+		itemManager := newCharacterItemManager(character.record)
+		if err := itemManager.Add(plan.itemID, plan.totalDelivered); err != nil {
+			return fmt.Errorf("%w: deliver item %d: %v", errShopPurchaseRecordInvalid, plan.itemID, err)
+		}
+		plan.itemRemainingCount = itemManager.Count(plan.itemID)
+	}
 	accountRecord.UsedUuid = plan.nextUsedUUID
-	character.record = plan.nextCharacter
-	return nil
+	return persist()
 }
 
 func shopPurchaseResultID(err error) uint32 {

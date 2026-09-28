@@ -6,6 +6,7 @@ option go_package = "server/proto/pb;pb";
 import "msg.character.proto";
 import "equipment.proto";
 import "asset.proto";
+import "weapon.proto";
 
 // 消息范围 [0x100000, 0x11ffff]
 
@@ -84,7 +85,9 @@ message CombatUnit {
   CombatUnitKey key = 3; // 战斗单位身份 key; 玩家单位由 aid + character_uuid + pet_uuid 唯一确定
   uint32 character_id = 10; // 角色资源 ID; 怪物/NPC 为 0
   uint32 pet_id = 11; // 宠物或怪物资源 ID; 纯角色单位为 0
+  string display_name = 12; // 敌方单位的最终显示名称; 玩家单位可为空并由客户端按档案回退
   uint32 mount_pet_id = 13; // 骑宠资源 ID; 没有骑宠时为 0
+  CharacterWeaponType weapon_type = 14; // 角色单位入场时的权威武器类型快照; 宠物单位为Unspecified
   CombatUnitAttribute attribute = 20; // 开战时可见战斗属性快照
   CharacterEquipmentRecord equipment = 30; // 入场时的完整装备状态; 换装效果执行后由客户端全量覆盖
   repeated uint32 skill_id_list = 40; // 仅玩家战宠的固定7槽开战快照; 角色和敌人单位为空
@@ -349,8 +352,24 @@ message CombatAbductDetail {
   bool success = 1; // 是否成功带走目标; 无论成败施法者都会离场
 }
 
+enum CombatEquipmentChangeResult {
+  CombatEquipmentChangeResult_Unspecified = 0;
+  CombatEquipmentChangeResult_Success = 1;
+  CombatEquipmentChangeResult_Failed = 2;
+}
+
+enum CombatEquipmentChangeFailureReason {
+  CombatEquipmentChangeFailureReason_None = 0;
+  CombatEquipmentChangeFailureReason_StateChanged = 1;
+  CombatEquipmentChangeFailureReason_Persistence = 2;
+}
+
 message CombatEquipmentChangedDetail {
-  CharacterEquipmentRecord equipment = 1; // 目标单位变化后的完整装备状态
+  CharacterEquipmentRecord equipment = 1; // 成功时目标单位变化后的完整装备状态
+  CombatEquipmentChangeResult result = 2; // 本次换装是否成功
+  CombatEquipmentChangeFailureReason failure_reason = 3; // 失败时的结构化原因
+  CharacterWeaponType weapon_type = 4; // 成功后的武器类型
+  CombatUnitAttribute attribute = 5; // 成功后的公开战斗属性; hp表示新的最大生命
 }
 
 message CombatReactionDetail {

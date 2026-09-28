@@ -118,7 +118,7 @@ func (r *CombatRoom) processCombatPoisonBeforeAction(action *combatAction, steps
 		UnitKey: cloneCombatUnitKey(state.unit.GetKey()),
 		AssetDeltaList: []*pb.CombatAssetDelta{{
 			AssetType: pb.CombatAssetType_CombatAssetType_HP,
-			Delta:     combatClampDelta(damage),
+			Delta:     combatClampDecreaseDelta(damage),
 			After:     combatClampUint32(state.hp),
 		}},
 		StatusDeltaList: []*pb.CombatStatusDelta{statusDelta},

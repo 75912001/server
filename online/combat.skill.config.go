@@ -34,8 +34,9 @@ func cloneEnemyBattleAI(ai *gameconfig.BattleAIEntry) *gameconfig.BattleAIEntry 
 // 通用配置层负责结构、引用和AI权重, 这里负责拒绝online尚未实现的技能行为.
 func validateEnemyCombatSkillConfig() error {
 	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Enemy == nil ||
-		gameconfig.GGameConfig.Pet == nil || gameconfig.GGameConfig.Skill == nil {
-		return fmt.Errorf("enemy, pet or skill config is not loaded")
+		gameconfig.GGameConfig.Pet == nil || gameconfig.GGameConfig.Character == nil ||
+		gameconfig.GGameConfig.Skill == nil {
+		return fmt.Errorf("enemy, appearance or skill config is not loaded")
 	}
 
 	var validationErr error
@@ -46,31 +47,34 @@ func validateEnemyCombatSkillConfig() error {
 		}
 		for enemyIndex := range group.Enemies {
 			enemy := &group.Enemies[enemyIndex]
-			if enemy.ID == nil {
-				validationErr = fmt.Errorf("enemy pet id is nil: group:%d index:%d", groupID, enemyIndex)
+			assetID := enemy.AssetID()
+			if assetID == 0 {
+				validationErr = fmt.Errorf("enemy appearance id is nil: group:%d index:%d", groupID, enemyIndex)
 				return false
 			}
-			petID := *enemy.ID
-			pet := gameconfig.GGameConfig.Pet.Get(petID)
-			if pet == nil {
-				validationErr = fmt.Errorf("enemy pet config is missing: group:%d pet:%d", groupID, petID)
+			if enemy.IsPet() && gameconfig.GGameConfig.Pet.Get(assetID) == nil {
+				validationErr = fmt.Errorf("enemy pet config is missing: group:%d pet:%d", groupID, assetID)
+				return false
+			}
+			if enemy.IsCharacter() && gameconfig.GGameConfig.Character.Get(assetID) == nil {
+				validationErr = fmt.Errorf("enemy character config is missing: group:%d character:%d", groupID, assetID)
 				return false
 			}
 			if enemy.BattleAI == nil {
-				validationErr = fmt.Errorf("enemy AI config is missing: group:%d pet:%d", groupID, petID)
+				validationErr = fmt.Errorf("enemy AI config is missing: group:%d enemy:%d", groupID, assetID)
 				return false
 			}
 			for _, action := range enemy.BattleAI.Skills {
 				skillID := *action.ID
 				skill := gameconfig.GGameConfig.Skill.Get(skillID)
 				if skill == nil {
-					validationErr = fmt.Errorf("enemy skill config is missing: group:%d pet:%d skill:%d",
-						groupID, petID, skillID)
+					validationErr = fmt.Errorf("enemy skill config is missing: group:%d enemy:%d skill:%d",
+						groupID, assetID, skillID)
 					return false
 				}
 				if !enemyCombatSkillSupported(skillID, skill) {
-					validationErr = fmt.Errorf("enemy skill is not supported by online: group:%d pet:%d skill:%d",
-						groupID, petID, skillID)
+					validationErr = fmt.Errorf("enemy skill is not supported by online: group:%d enemy:%d skill:%d",
+						groupID, assetID, skillID)
 					return false
 				}
 			}
@@ -93,6 +97,7 @@ func enemyCombatSkillSupported(skillID uint32, skill *gameconfig.SkillEntry) boo
 			(skill.PoisonAttack != nil && skill.PoisonAttack.DurationActions != nil && skill.PoisonAttack.AttackPercentModifier != nil) ||
 			(skill.StoneAttack != nil && skill.StoneAttack.DurationActions != nil && skill.StoneAttack.AttackPercentModifier != nil) ||
 			(skill.ConfusionAttack != nil && skill.ConfusionAttack.DurationActions != nil && skill.ConfusionAttack.AttackPercentModifier != nil) ||
+			(skill.DrunkAttack != nil && skill.DrunkAttack.DurationActions != nil && skill.DrunkAttack.AttackPercentModifier != nil) ||
 			(skill.SleepAttack != nil && skill.SleepAttack.DurationActions != nil && skill.SleepAttack.AttackPercentModifier != nil) ||
 			(skill.ChargeAttack != nil && skill.ChargeAttack.ChargeRounds != nil && skill.ChargeAttack.AttackPercentModifier != nil) ||
 			(skill.EarthRound != nil && skill.EarthRound.DamagePercentModifier != nil) ||

@@ -22,6 +22,7 @@ enum CharacterRebirthNameColor {
 }
 
 enum Constants {
+  option allow_alias = true;
   Constants_Unspecified = 0;
   Constants_Level_Min = 1; // 角色和宠物等级下限
   Constants_Level_Max = 140; // 角色和宠物等级上限
@@ -29,6 +30,10 @@ enum Constants {
   Constants_Elemental_Total_Point = 100; // 地水火风元素总百分比
   Constants_Character_Name_Max_Length = 12; // 角色名称最大长度
   Constants_Mail_Title_Max_Length = 30; // 系统邮件主题最大 Unicode 字符数
+  Constants_Map_Move_Max_Steps = 30; // 单次地图移动请求最多包含的位移步数
+  Constants_Map_Path_Search_Window_Size = 30; // 客户端局部寻路窗口的格子边长
+  Constants_Map_Visibility_Broadcast_Range = 30; // 地图角色视野广播范围
+  Constants_Map_Walking_Draw_Range = 30; // 地图行走时的绘制范围
   Constants_Mail_Expire_Days = 365; // 系统邮件固定有效天数
   Constants_Mail_Content_Max_Length = 500; // 系统邮件正文最大 Unicode 字符数
   Constants_Mail_System_Inbox_Max_Count = 1000; // 单角色系统邮箱最多保存的未过期邮件数

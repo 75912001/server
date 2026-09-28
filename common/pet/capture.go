@@ -11,24 +11,37 @@ import (
 // CaptureSnapshot 保存敌人创建时的个体与出生技能, 捕获时不重抽四维, 也不重读可热更新的模板.
 // savedBase 是原版 CHAR_ALLOCPOINT: 四项独立随机偏移后, 追加十点初始属性之前的值.
 type CaptureSnapshot struct {
-	assetID   uint32
-	level     uint32
-	exp       uint64
-	grade     pb.PetGrade
-	savedBase [4]int32
-	raw       [4]int32
-	skills    []uint32
+	assetID           uint32
+	growthAttributeID uint32
+	level             uint32
+	exp               uint64
+	grade             pb.PetGrade
+	savedBase         [4]int32
+	raw               [4]int32
+	skills            []uint32
 }
 
-// NewCaptureSnapshot 冻结可捕获敌人的持久化输入. 此时不分配账号 UUID, 不创建宠物档案.
+// NewCaptureSnapshot 使用宠物默认成长属性冻结可捕获敌人的持久化输入.
+// 敌群捕获必须调用NewCaptureSnapshotWithGrowthAttribute传入成员实际选择的成长属性.
 func NewCaptureSnapshot(entry *gameconfig.PetEntry, level uint32, savedBase, raw [4]int32) (*CaptureSnapshot, error) {
+	if entry == nil {
+		return nil, fmt.Errorf("capture pet template is invalid")
+	}
+	return NewCaptureSnapshotWithGrowthAttribute(entry, entry.GrowthAttribute, level, savedBase, raw)
+}
+
+// NewCaptureSnapshotWithGrowthAttribute 冻结敌人创建时实际使用的成长属性ID.
+func NewCaptureSnapshotWithGrowthAttribute(entry *gameconfig.PetEntry, growthAttribute *gameconfig.GrowthAttributeEntry, level uint32, savedBase, raw [4]int32) (*CaptureSnapshot, error) {
 	if entry == nil || entry.ID == nil || *entry.ID == 0 || !entry.SupportsOrdinaryCreation() {
 		return nil, fmt.Errorf("capture pet template is invalid")
+	}
+	if growthAttribute == nil || growthAttribute.ID == nil || *growthAttribute.ID == 0 {
+		return nil, fmt.Errorf("capture growth attribute is invalid: pet:%d", *entry.ID)
 	}
 	if level < uint32(pb.Constants_Constants_Level_Min) || level > uint32(pb.Constants_Constants_Level_Max) {
 		return nil, fmt.Errorf("capture pet level is out of range: %d", level)
 	}
-	growth := entry.Growth
+	growth := growthAttribute.Growth
 	if growth == nil || growth.BaseVital == nil || growth.BaseStr == nil || growth.BaseTough == nil || growth.BaseDex == nil {
 		return nil, fmt.Errorf("capture pet growth is incomplete: %d", *entry.ID)
 	}
@@ -55,7 +68,7 @@ func NewCaptureSnapshot(entry *gameconfig.PetEntry, level uint32, savedBase, raw
 		return nil, err
 	}
 	return &CaptureSnapshot{
-		assetID: *entry.ID, level: level, exp: exp,
+		assetID: *entry.ID, growthAttributeID: *growthAttribute.ID, level: level, exp: exp,
 		grade:     petGradeFromRandomOffsetTotal(totalOffset),
 		savedBase: savedBase, raw: raw,
 		skills: append([]uint32(nil), entry.SkillSlots...),
@@ -69,8 +82,9 @@ func (s *CaptureSnapshot) NewRecord(uuid uint64) (*pb.PetRecord, error) {
 	}
 	record := &pb.PetRecord{
 		Uuid: uuid, AssetId: s.assetID, Exp: s.exp, Grade: s.grade,
-		CarryStatus: pb.PetCarryStatus_PetCarryStatus_Wait,
-		Loyalty:     100, SkillIdList: append([]uint32(nil), s.skills...),
+		GrowthAttributeId: s.growthAttributeID,
+		CarryStatus:       pb.PetCarryStatus_PetCarryStatus_Wait,
+		Loyalty:           100, SkillIdList: append([]uint32(nil), s.skills...),
 		SavedBaseVitality: s.savedBase[0], SavedBaseStrength: s.savedBase[1],
 		SavedBaseToughness: s.savedBase[2], SavedBaseDexterity: s.savedBase[3],
 		RawVitality: s.raw[0], RawStrength: s.raw[1], RawToughness: s.raw[2], RawDexterity: s.raw[3],

@@ -50,7 +50,7 @@ func (p *Account) onPetWarehouseDepositReq(gateway *Gateway, pkt *pb.OnlineClien
 		return
 	}
 	if err := persistPetWarehouseTransfer(plan, p.accountRecord.GetPetWarehouseRecordMap(), func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+		return p.deferAccountRecordPersist()
 	}); err != nil {
 		xlog.GLog.Errorf(
 			"persist pet warehouse deposit failed aid:%d character:%d pet:%d err:%v",
@@ -93,7 +93,7 @@ func (p *Account) onPetWarehouseWithdrawReq(gateway *Gateway, pkt *pb.OnlineClie
 		return
 	}
 	if err := persistPetWarehouseTransfer(plan, p.accountRecord.GetPetWarehouseRecordMap(), func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+		return p.deferAccountRecordPersist()
 	}); err != nil {
 		xlog.GLog.Errorf(
 			"persist pet warehouse withdraw failed aid:%d character:%d pet:%d err:%v",

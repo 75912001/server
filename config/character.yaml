@@ -194,6 +194,9 @@ character:
         spriteId: 879
       - petId: 4000292 # 格尔格
         spriteId: 880
+      - petId: 4000668 # 瑞里西尔
+        spriteId: 404
+
 ######
   - id: 1000025
     name: "罗伦斯"
@@ -231,6 +234,8 @@ character:
         spriteId: 879
       - petId: 4000292 # 格尔格
         spriteId: 880
+      - petId: 4000668 # 瑞里西尔
+        spriteId: 404
 ######
   - id: 1000030
     name: "罗伦斯"
@@ -268,6 +273,8 @@ character:
         spriteId: 879
       - petId: 4000292 # 格尔格
         spriteId: 880
+      - petId: 4000668 # 瑞里西尔
+        spriteId: 404
 ######
   - id: 1000035
     name: "罗伦斯"
@@ -305,6 +312,8 @@ character:
         spriteId: 879
       - petId: 4000292 # 格尔格
         spriteId: 880
+      - petId: 4000668 # 瑞里西尔
+        spriteId: 404
 ############################################################
   - id: 1000040
     name: "强普"
@@ -1637,6 +1646,7 @@ character:
         spriteId: 951
       - petId: 4000292 # 格尔格
         spriteId: 952
+
 ############################################################
   - id: 1000220
     name: "露露"
@@ -1786,3 +1796,417 @@ character:
       - petId: 4000292 # 格尔格
         spriteId: 960
 ############################################################
+# 新的角色
+
+  - id: 1600200
+    name: "米亚"
+    isRole: false
+    description: "米亚-绿"
+    color: "green"
+    sprite: #[92823,94350] 1528 个文件
+      unarmed: 600200
+      axe: 600201
+      stick: 600202
+      spear: 600203
+      bow: 600204
+    mounts:
+#      - petId: 4000304 #金格萨贝鲁-金虎
+#        spriteId: 791
+#      - petId: 4000323 #布拉奇多斯-红雷
+#        spriteId: 787
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 793
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 792
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 945
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 946
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 947
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 948
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 949
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 950
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 951
+      - petId: 4000292 # 格尔格
+        spriteId: 952
+
+  - id: 1600210
+    name: "米亚"
+    isRole: false
+    description: "米亚-全白"
+    color: "all-white"
+    sprite: #[94351,95878] 1528 个文件
+      unarmed: 600210
+      axe: 600211
+      stick: 600212
+      spear: 600213
+      bow: 600214
+    mounts:
+#      - petId: 4000304 #金格萨贝鲁-金虎
+#        spriteId: 791
+#      - petId: 4000323 #布拉奇多斯-红雷
+#        spriteId: 787
+      - petId: 4000339 # 巴朵兰恩
+        spriteId: 793
+      - petId: 4000338 # 左迪洛斯
+        spriteId: 792
+      - petId: 4000340 # 帖拉所伊朵
+        spriteId: 945
+      - petId: 4000328 # 玛恩摩洛斯
+        spriteId: 946
+      - petId: 4000332 # 朵拉比斯
+        spriteId: 947
+      - petId: 4000269 # 拉奇鲁哥
+        spriteId: 948
+      - petId: 4000278 # 扬奇洛斯
+        spriteId: 949
+      - petId: 4000273 # 卡达鲁卡斯
+        spriteId: 950
+      - petId: 4000316 # 卡卡金宝
+        spriteId: 951
+      - petId: 4000292 # 格尔格
+        spriteId: 952
+
+  - id: 1600300
+    name: "141号人形角色"
+    isRole: false
+    description: "141号人形角色-黄"
+    color: "yellow"
+    sprite: #[86743,88270] 1528 个文件
+      unarmed: 600300
+      axe: 600301
+      stick: 600302
+      spear: 600303
+      bow: 600304
+    mounts: []
+
+  - id: 1600400
+    name: "142号人形角色"
+    isRole: false
+    description: "142号人形角色-绿"
+    color: "green"
+    sprite: #[88271,89798] 1528 个文件
+      unarmed: 600400
+      axe: 600401
+      stick: 600402
+      spear: 600403
+      bow: 600404
+    mounts: []
+
+
+  - id: 1600500
+    name: "吉米"
+    isRole: false
+    description: "吉米-全白"
+    color: "all-white"
+    sprite: #[126377,127904] 1528 个文件
+      unarmed: 600500
+      axe: 600501
+      stick: 600502
+      spear: 600503
+      bow: 600504
+    mounts: []
+
+  - id: 1600600
+    name: "吉米"
+    isRole: false
+    description: "吉米-黑"
+    color: "black"
+    sprite: #[127905,129432] 1528 个文件
+      unarmed: 600600
+      axe: 600601
+      stick: 600602
+      spear: 600603
+      bow: 600604
+    mounts: []
+
+  - id: 1600700
+    name: "罗伦斯"
+    isRole: false
+    description: "罗伦斯-白"
+    color: "white"
+    sprite: #[129433,130960] 1528 个文件
+      unarmed: 600700
+      axe: 600701
+      stick: 600702
+      spear: 600703
+      bow: 600704
+    mounts: []
+
+  - id: 1600800
+    name: "罗伦斯"
+    isRole: false
+    description: "罗伦斯-黑"
+    color: "black"
+    sprite: #[130961,132488] 1528 个文件
+      unarmed: 600800
+      axe: 600801
+      stick: 600802
+      spear: 600803
+      bow: 600804
+    mounts: []
+
+  - id: 1600900
+    name: "强普"
+    isRole: false
+    description: "强普-白"
+    color: "white"
+    sprite: #[132489,134016] 1528 个文件
+      unarmed: 600900
+      axe: 600901
+      stick: 600902
+      spear: 600903
+      bow: 600904
+    mounts: []
+
+  - id: 1601000
+    name: "强普"
+    isRole: false
+    description: "强普-黑"
+    color: "black"
+    sprite: #[134017,135544] 1528 个文件
+      unarmed: 601000
+      axe: 601001
+      stick: 601002
+      spear: 601003
+      bow: 601004
+    mounts: []
+
+  - id: 1601100
+    name: "库比"
+    isRole: false
+    description: "库比-白"
+    color: "white"
+    sprite: #[135545,137072] 1528 个文件
+      unarmed: 601100
+      axe: 601101
+      stick: 601102
+      spear: 601103
+      bow: 601104
+    mounts: []
+
+  - id: 1601200
+    name: "库比"
+    isRole: false
+    description: "库比-黑"
+    color: "black"
+    sprite: #[137073,138600] 1528 个文件
+      unarmed: 601200
+      axe: 601201
+      stick: 601202
+      spear: 601203
+      bow: 601204
+    mounts: []
+
+  - id: 1601300
+    name: "卡伯菲"
+    isRole: false
+    description: "卡伯菲-白"
+    color: "white"
+    sprite: #[138601,140128] 1528 个文件
+      unarmed: 601300
+      axe: 601301
+      stick: 601302
+      spear: 601303
+      bow: 601304
+    mounts: []
+
+  - id: 1601400
+    name: "卡伯菲"
+    isRole: false
+    description: "卡伯菲-黑"
+    color: "black"
+    sprite: #[140129,141656] 1528 个文件
+      unarmed: 601400
+      axe: 601401
+      stick: 601402
+      spear: 601403
+      bow: 601404
+    mounts: []
+
+  - id: 1601500
+    name: "酋力安"
+    isRole: false
+    description: "酋力安-白"
+    color: "white"
+    sprite: #[141657,143184] 1528 个文件
+      unarmed: 601500
+      axe: 601501
+      stick: 601502
+      spear: 601503
+      bow: 601504
+    mounts: []
+
+  - id: 1601600
+    name: "酋力安"
+    isRole: false
+    description: "酋力安-黑"
+    color: "black"
+    sprite: #[143185,144712] 1528 个文件
+      unarmed: 601600
+      axe: 601601
+      stick: 601602
+      spear: 601603
+      bow: 601604
+    mounts: []
+
+  - id: 1601700
+    name: "爱伦"
+    isRole: false
+    description: "爱伦-白"
+    color: "white"
+    sprite: #[144713,146240] 1528 个文件
+      unarmed: 601700
+      axe: 601701
+      stick: 601702
+      spear: 601703
+      bow: 601704
+    mounts: []
+
+  - id: 1601800
+    name: "爱伦"
+    isRole: false
+    description: "爱伦-黑"
+    color: "black"
+    sprite: #[146241,147768] 1528 个文件
+      unarmed: 601800
+      axe: 601801
+      stick: 601802
+      spear: 601803
+      bow: 601804
+    mounts: []
+
+  - id: 1601900
+    name: "玛蕾菲雅"
+    isRole: false
+    description: "玛蕾菲雅-白"
+    color: "white"
+    sprite: #[147769,149296] 1528 个文件
+      unarmed: 601900
+      axe: 601901
+      stick: 601902
+      spear: 601903
+      bow: 601904
+    mounts: []
+
+  - id: 1602000
+    name: "玛蕾菲雅"
+    isRole: false
+    description: "玛蕾菲雅-黑"
+    color: "black"
+    sprite: #[149297,150824] 1528 个文件
+      unarmed: 602000
+      axe: 602001
+      stick: 602002
+      spear: 602003
+      bow: 602004
+    mounts: []
+
+  - id: 1602100
+    name: "希希亚"
+    isRole: false
+    description: "希希亚-白"
+    color: "white"
+    sprite: #[150825,152352] 1528 个文件
+      unarmed: 602100
+      axe: 602101
+      stick: 602102
+      spear: 602103
+      bow: 602104
+    mounts: []
+
+  - id: 1602200
+    name: "希希亚"
+    isRole: false
+    description: "希希亚-黑"
+    color: "black"
+    sprite: #[152353,153880] 1528 个文件
+      unarmed: 602200
+      axe: 602201
+      stick: 602202
+      spear: 602203
+      bow: 602204
+    mounts: []
+
+  - id: 1602300
+    name: "菲莉雅"
+    isRole: false
+    description: "菲莉雅-白"
+    color: "white"
+    sprite: #[153881,155408] 1528 个文件
+      unarmed: 602300
+      axe: 602301
+      stick: 602302
+      spear: 602303
+      bow: 602304
+    mounts: []
+
+  - id: 1602400
+    name: "菲莉雅"
+    isRole: false
+    description: "菲莉雅-黑"
+    color: "black"
+    sprite: #[155409,156936] 1528 个文件
+      unarmed: 602400
+      axe: 602401
+      stick: 602402
+      spear: 602403
+      bow: 602404
+    mounts: []
+
+  - id: 1602500
+    name: "米亚"
+    isRole: false
+    description: "米亚-白"
+    color: "white"
+    sprite: #[156937,158464] 1528 个文件
+      unarmed: 602500
+      axe: 602501
+      stick: 602502
+      spear: 602503
+      bow: 602504
+    mounts: []
+
+  - id: 1602600
+    name: "米亚"
+    isRole: false
+    description: "米亚-黑"
+    color: "black"
+    sprite: #[158465,159992] 1528 个文件
+      unarmed: 602600
+      axe: 602601
+      stick: 602602
+      spear: 602603
+      bow: 602604
+    mounts: []
+
+  - id: 1602700
+    name: "露露"
+    isRole: false
+    description: "露露-白"
+    color: "white"
+    sprite: #[159993,161520] 1528 个文件
+      unarmed: 602700
+      axe: 602701
+      stick: 602702
+      spear: 602703
+      bow: 602704
+    mounts: []
+
+  - id: 1602800
+    name: "露露"
+    isRole: false
+    description: "露露-黑"
+    color: "black"
+    sprite: #[161521,163048] 1528 个文件
+      unarmed: 602800
+      axe: 602801
+      stick: 602802
+      spear: 602803
+      bow: 602804
+    mounts: []

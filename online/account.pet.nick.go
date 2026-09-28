@@ -58,7 +58,7 @@ func (p *Account) onPetNickSetReq(gateway *Gateway, pkt *pb.OnlineClientPacket) 
 	}
 
 	if err := persistPetNickSet(plan, func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+		return p.deferAccountRecordPersist()
 	}); err != nil {
 		xlog.GLog.Errorf(
 			"persist pet nick set failed aid:%d character:%d pet:%d err:%v",

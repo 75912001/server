@@ -22,6 +22,15 @@ type ItemConfig struct {
 	*xmap.MapMgr[uint32, *ItemEntry]
 }
 
+type ItemBattleTargetScope string
+
+const (
+	ItemBattleTargetSingleAlly     ItemBattleTargetScope = "singleAlly"
+	ItemBattleTargetSingleDeadAlly ItemBattleTargetScope = "singleDeadAlly"
+	ItemBattleTargetSingleOpponent ItemBattleTargetScope = "singleOpponent"
+	ItemBattleTargetNone           ItemBattleTargetScope = "none"
+)
+
 type ItemEntry struct {
 	ID            *uint32                `yaml:"-"`
 	Name          *string                `yaml:"name"`
@@ -82,7 +91,8 @@ type ItemEntry struct {
 	// GrantedSkillID只表示装备授予的现代技能ID, 耗蓝由技能.yaml中的技能独立配置.
 	GrantedSkillID uint32 `yaml:"magicid"`
 
-	Use *ItemUseEntry `yaml:"use"`
+	Use       *ItemUseEntry       `yaml:"use"`
+	BattleUse *ItemBattleUseEntry `yaml:"battleUse"`
 
 	legacyRangeFields bool `yaml:"-"`
 }
@@ -206,9 +216,41 @@ func assignInt32Range(name string, values []int32, minimum, maximum *int32) erro
 }
 
 type ItemUseEntry struct {
-	Target  *ItemUseTarget `yaml:"target"`
-	Exp     *uint64        `yaml:"exp"`
-	Loyalty *uint32        `yaml:"loyalty"`
+	Target   *ItemUseTarget `yaml:"target"`
+	Exp      *uint64        `yaml:"exp"`
+	Loyalty  *uint32        `yaml:"loyalty"`
+	RewardID *uint32        `yaml:"rewardId"`
+}
+
+// ItemBattleUseEntry描述战斗内消耗品的权威效果. 每件道具只能配置一种效果,
+// 客户端仅提交道具ID和目标, 数值、目标范围和表现资源均由配置决定.
+type ItemBattleUseEntry struct {
+	TargetScope     ItemBattleTargetScope     `yaml:"targetScope"`
+	UserEffectID    uint32                    `yaml:"userEffectId"`
+	ReceiveEffectID uint32                    `yaml:"receiveEffectId"`
+	HPRecovery      uint32                    `yaml:"hpRecovery"`
+	MPRecovery      uint32                    `yaml:"mpRecovery"`
+	Resurrection    uint32                    `yaml:"resurrection"`
+	StatusRecovery  *ItemBattleStatusRecovery `yaml:"statusRecovery"`
+	StatusChange    *ItemBattleStatusChange   `yaml:"statusChange"`
+	FieldAttribute  *ItemBattleFieldAttribute `yaml:"fieldAttribute"`
+}
+
+type ItemBattleStatusRecovery struct {
+	StatusID uint32 `yaml:"statusId"`
+}
+
+type ItemBattleStatusChange struct {
+	StatusID             uint32 `yaml:"statusId"`
+	DurationActions      uint32 `yaml:"durationActions"`
+	BaseSuccess          uint32 `yaml:"baseSuccess"`
+	LevelDifferenceRange uint32 `yaml:"levelDifferenceRange"`
+}
+
+type ItemBattleFieldAttribute struct {
+	Element        pb.AssetElemental `yaml:"element"`
+	Power          uint32            `yaml:"power"`
+	DurationRounds uint32            `yaml:"durationRounds"`
 }
 
 type itemGroupDefinition struct {
@@ -355,6 +397,9 @@ func (p *ItemConfig) load(dir string) error {
 			if err := validateItemUse(itemID, entry, group.equipment); err != nil {
 				return err
 			}
+			if err := validateItemBattleUse(itemID, entry, group.equipment); err != nil {
+				return err
+			}
 			if err := validateItemAttributes(itemID, entry); err != nil {
 				return err
 			}
@@ -479,8 +524,85 @@ func validateItemUse(itemID uint32, entry *ItemEntry, equipment bool) error {
 		}
 		effectCount++
 	}
+	if entry.Use.RewardID != nil {
+		if *entry.Use.RewardID == 0 {
+			return errors.Errorf("道具使用奖励包ID必须大于0: id:%d %v", itemID, xruntime.Location())
+		}
+		if *entry.Use.Target != ItemUseTargetCharacter {
+			return errors.Errorf("奖励包道具只能用于角色: id:%d target:%q %v", itemID, *entry.Use.Target, xruntime.Location())
+		}
+		effectCount++
+	}
 	if effectCount != 1 {
 		return errors.Errorf("道具必须且只能配置一种使用效果: id:%d %v", itemID, xruntime.Location())
+	}
+	return nil
+}
+
+func validateItemBattleUse(itemID uint32, entry *ItemEntry, equipment bool) error {
+	if entry.BattleUse == nil {
+		return nil
+	}
+	if equipment {
+		return errors.Errorf("装备不能配置战斗使用效果: id:%d %v", itemID, xruntime.Location())
+	}
+	battleUse := entry.BattleUse
+	switch battleUse.TargetScope {
+	case ItemBattleTargetSingleAlly, ItemBattleTargetSingleDeadAlly, ItemBattleTargetSingleOpponent, ItemBattleTargetNone:
+	default:
+		return errors.Errorf("战斗道具目标范围无效: id:%d targetScope:%q %v", itemID, battleUse.TargetScope, xruntime.Location())
+	}
+	effectCount := 0
+	for _, value := range []uint32{battleUse.HPRecovery, battleUse.MPRecovery, battleUse.Resurrection} {
+		if value > 0 {
+			effectCount++
+		}
+	}
+	if battleUse.StatusRecovery != nil {
+		effectCount++
+		if battleUse.StatusRecovery.StatusID < uint32(pb.CombatStatusType_CombatStatusType_Poison) || battleUse.StatusRecovery.StatusID > uint32(pb.CombatStatusType_CombatStatusType_Confusion) {
+			return errors.Errorf("战斗道具净化状态无效: id:%d statusId:%d %v", itemID, battleUse.StatusRecovery.StatusID, xruntime.Location())
+		}
+	}
+	if battleUse.StatusChange != nil {
+		effectCount++
+		status := battleUse.StatusChange
+		if status.StatusID != uint32(pb.CombatStatusType_CombatStatusType_Poison) || status.DurationActions == 0 || status.BaseSuccess == 0 || status.LevelDifferenceRange == 0 {
+			return errors.Errorf("战斗道具异常状态配置无效: id:%d %v", itemID, xruntime.Location())
+		}
+	}
+	if battleUse.FieldAttribute != nil {
+		effectCount++
+		field := battleUse.FieldAttribute
+		if field.Element <= pb.AssetElemental_AssetElemental_Unspecified || field.Element >= pb.AssetElemental_AssetElemental_Max || field.Power == 0 || field.DurationRounds == 0 {
+			return errors.Errorf("战斗道具场地属性配置无效: id:%d %v", itemID, xruntime.Location())
+		}
+	}
+	if effectCount != 1 {
+		return errors.Errorf("战斗道具必须且只能配置一种效果: id:%d %v", itemID, xruntime.Location())
+	}
+	if battleUse.FieldAttribute != nil {
+		if battleUse.TargetScope != ItemBattleTargetNone || battleUse.UserEffectID != 0 || battleUse.ReceiveEffectID != 0 {
+			return errors.Errorf("场地属性道具必须无目标且不播放单位特效: id:%d %v", itemID, xruntime.Location())
+		}
+		return nil
+	}
+	if battleUse.UserEffectID == 0 || battleUse.ReceiveEffectID == 0 {
+		return errors.Errorf("战斗道具单位特效不能为空: id:%d %v", itemID, xruntime.Location())
+	}
+	switch {
+	case battleUse.Resurrection > 0:
+		if battleUse.TargetScope != ItemBattleTargetSingleDeadAlly {
+			return errors.Errorf("复活道具只能指定单个倒下友方: id:%d %v", itemID, xruntime.Location())
+		}
+	case battleUse.StatusChange != nil:
+		if battleUse.TargetScope != ItemBattleTargetSingleOpponent {
+			return errors.Errorf("异常状态道具只能指定单个敌方: id:%d %v", itemID, xruntime.Location())
+		}
+	default:
+		if battleUse.TargetScope != ItemBattleTargetSingleAlly {
+			return errors.Errorf("回复或净化道具只能指定单个存活友方: id:%d %v", itemID, xruntime.Location())
+		}
 	}
 	return nil
 }
@@ -488,6 +610,12 @@ func validateItemUse(itemID uint32, entry *ItemEntry, equipment bool) error {
 func (p *ItemConfig) check() error {
 	var checkErr error
 	p.Foreach(func(itemID uint32, entry *ItemEntry) bool {
+		if entry != nil && entry.Use != nil && entry.Use.RewardID != nil {
+			if GGameConfig == nil || GGameConfig.Reward == nil || GGameConfig.Reward.Get(*entry.Use.RewardID) == nil {
+				checkErr = errors.Errorf("道具引用不存在的奖励包: item:%d reward:%d %v", itemID, *entry.Use.RewardID, xruntime.Location())
+				return false
+			}
+		}
 		if entry == nil || entry.GrantedSkillID == 0 {
 			return true
 		}

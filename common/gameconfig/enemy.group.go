@@ -2,6 +2,7 @@ package gameconfig
 
 import (
 	"math"
+	"strings"
 
 	xmap "github.com/75912001/xlib/map"
 	xruntime "github.com/75912001/xlib/runtime"
@@ -42,20 +43,66 @@ type EnemyGroupEntry struct {
 }
 
 type EnemyEntry struct {
-	// ID 来自 enemies[].id, 表示作为敌人模板的宠物ID, 必须能在 pet.yaml 中找到.
-	ID *uint32 `yaml:"id"`
+	// ID 仅保留给Go内存构造的兼容测试和旧内部调用; YAML中的id始终由UnmarshalYAML拒绝.
+	ID *uint32 `yaml:"-"`
+	// PetID 和 CharacterID 必须且只能配置一个, 决定敌人的外观和捕获资格.
+	PetID       *uint32 `yaml:"petId"`
+	CharacterID *uint32 `yaml:"characterId"`
+	// GrowthAttributeID 为所有敌人成员必填, 决定四维、元素、抗性、经验和固有特性.
+	GrowthAttributeID *uint32 `yaml:"growthAttributeId"`
+	// GrowthAttribute 在assemble阶段挂载已校验的只读成长属性.
+	GrowthAttribute *GrowthAttributeEntry `yaml:"-"`
+	// Weapon 仅角色外观必填, 使用unarmed/axe/stick/spear/bow.
+	Weapon *string `yaml:"weapon"`
+	// WeaponType 是角色敌人的协议和战斗运行态快照, 宠物保持Unspecified.
+	WeaponType pb.CharacterWeaponType `yaml:"-"`
+	// DisplayName 可选覆盖敌人在战斗中的显示名称; 省略时使用外观配置名称.
+	DisplayName *string `yaml:"displayName"`
 	// Weight 来自 enemies[].weight, 表示普通敌人组随机选择权重, 缺省为0且代表必定出现; Boss 组不允许配置.
 	Weight *uint32 `yaml:"weight"`
 	// Level 来自 enemies[].level, 表示固定敌人等级; 与 LevelRange 互斥, Boss 组必须配置其中一个, 值必须处于协议等级范围.
 	Level *uint32 `yaml:"level"`
 	// LevelRange 来自 enemies[].levelRange, 表示本成员的随机等级闭区间; 普通组未配置成员等级时使用组级规则.
 	LevelRange *IntRange `yaml:"levelRange"`
+	// GradeRange 可选限制敌人实际品阶的闭区间; 省略时保持原有完全随机品阶.
+	GradeRange *IntRange `yaml:"gradeRange"`
+	// AttributeModifiers 可选覆盖该敌人成员相对宠物模板的八项战斗属性修正.
+	AttributeModifiers *EnemyAttributeModifierEntry `yaml:"attributeModifiers"`
 	// BattleAIID 来自 enemies[].battleAI, 必须显式引用ai.yaml; 敌人不单独配置技能.
 	BattleAIID *uint32 `yaml:"battleAI"`
 	// BattleAI 在assemble阶段挂载已校验的只读AI配置, 供建房时复制为独立快照.
 	BattleAI *BattleAIEntry `yaml:"-"`
 	// NormalDrops 来自 enemies[].normalDrops, 每项按万分比在敌人实例创建时独立判定一次.
 	NormalDrops []EnemyNormalDropEntry `yaml:"normalDrops"`
+}
+
+// EnemyAttributeModifierEntry保存敌人成员相对宠物模板的战斗属性修正值.
+// 零值表示不修正, 最终运行值不截断, 直接使用宠物原值与修正值之和.
+type EnemyAttributeModifierEntry struct {
+	PoisonResist    int32 `yaml:"poisonResist"`
+	ParalysisResist int32 `yaml:"paralysisResist"`
+	SleepResist     int32 `yaml:"sleepResist"`
+	StoneResist     int32 `yaml:"stoneResist"`
+	DrunkResist     int32 `yaml:"drunkResist"`
+	ConfusionResist int32 `yaml:"confusionResist"`
+	Critical        int32 `yaml:"critical"`
+	Counter         int32 `yaml:"counter"`
+}
+
+// UnmarshalYAML拒绝拼写错误或未开放的敌人成员属性修正字段.
+func (p *EnemyAttributeModifierEntry) UnmarshalYAML(node *yaml.Node) error {
+	allowed := map[string]struct{}{
+		"poisonResist": {}, "paralysisResist": {}, "sleepResist": {}, "stoneResist": {},
+		"drunkResist": {}, "confusionResist": {}, "critical": {}, "counter": {},
+	}
+	for index := 0; index+1 < len(node.Content); index += 2 {
+		field := node.Content[index].Value
+		if _, ok := allowed[field]; !ok {
+			return errors.Errorf("enemy attributeModifiers 字段未知: %s", field)
+		}
+	}
+	type modifierEntry EnemyAttributeModifierEntry
+	return node.Decode((*modifierEntry)(p))
 }
 
 // EnemyNormalDropEntry定义普通PVE敌人的一个原版掉落槽.
@@ -65,16 +112,50 @@ type EnemyNormalDropEntry struct {
 	Probability *uint32 `yaml:"probability"`
 }
 
-// UnmarshalYAML拒绝旧的技能覆盖字段, 敌人技能必须由所引用的AI统一定义.
+var enemyCharacterWeaponTypes = map[string]pb.CharacterWeaponType{
+	"unarmed": pb.CharacterWeaponType_CharacterWeaponType_Unarmed,
+	"axe":     pb.CharacterWeaponType_CharacterWeaponType_Axe,
+	"stick":   pb.CharacterWeaponType_CharacterWeaponType_Stick,
+	"spear":   pb.CharacterWeaponType_CharacterWeaponType_Spear,
+	"bow":     pb.CharacterWeaponType_CharacterWeaponType_Bow,
+}
+
+// UnmarshalYAML拒绝旧ID和技能覆盖字段, 避免迁移遗漏被静默忽略.
 func (p *EnemyEntry) UnmarshalYAML(node *yaml.Node) error {
 	for index := 0; index+1 < len(node.Content); index += 2 {
-		if node.Content[index].Value == "skill" {
+		switch node.Content[index].Value {
+		case "id":
+			return errors.New("enemy.group.yaml 不再允许 enemies[].id, 请使用 petId 或 characterId")
+		case "skill":
 			return errors.New("enemy.group.yaml 不再允许 enemies[].skill, 请在 ai.yaml 配置战斗技能")
 		}
 	}
 	type enemyEntry EnemyEntry
 	return node.Decode((*enemyEntry)(p))
 }
+
+// AssetID 返回敌人外观资源ID. 调用前必须已通过互斥校验.
+func (p *EnemyEntry) AssetID() uint32 {
+	if p == nil {
+		return 0
+	}
+	if p.PetID != nil {
+		return *p.PetID
+	}
+	if p.CharacterID != nil {
+		return *p.CharacterID
+	}
+	if p.ID != nil {
+		return *p.ID
+	}
+	return 0
+}
+
+func (p *EnemyEntry) IsPet() bool {
+	return p != nil && (p.PetID != nil || (p.PetID == nil && p.CharacterID == nil && p.ID != nil))
+}
+
+func (p *EnemyEntry) IsCharacter() bool { return p != nil && p.CharacterID != nil }
 
 type IntRange struct {
 	// Min 表示闭区间最小值, 由 YAML 中二元数组的第一个元素解析得到.
@@ -201,10 +282,54 @@ func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 		}
 		for enemyIndex := range group.Enemies {
 			enemy := &group.Enemies[enemyIndex]
-			if enemy.ID == nil {
-				return errors.Errorf("敌人组 enemy 缺少 id: group:%d index:%d %v", *group.ID, enemyIndex, xruntime.Location())
+			if enemy.PetID == nil && enemy.CharacterID == nil && enemy.ID != nil {
+				enemy.PetID = enemy.ID
 			}
-			enemyID := *enemy.ID
+			if enemy.ID == nil {
+				if enemy.PetID != nil {
+					enemy.ID = enemy.PetID
+				} else if enemy.CharacterID != nil {
+					enemy.ID = enemy.CharacterID
+				}
+			}
+			if (enemy.PetID == nil) == (enemy.CharacterID == nil) {
+				return errors.Errorf("敌人组 enemy petId 和 characterId 必须且只能配置一个: group:%d index:%d %v",
+					*group.ID, enemyIndex, xruntime.Location())
+			}
+			enemyID := enemy.AssetID()
+			if enemyID == 0 || (enemy.IsPet() && !isPetID(enemyID)) || (enemy.IsCharacter() && !isCharacterID(enemyID)) {
+				return errors.Errorf("敌人组 enemy 外观ID非法: group:%d enemy:%d %v", *group.ID, enemyID, xruntime.Location())
+			}
+			if enemy.GrowthAttributeID == nil || *enemy.GrowthAttributeID == 0 {
+				return errors.Errorf("敌人组 enemy 缺少有效 growthAttributeId: group:%d enemy:%d %v",
+					*group.ID, enemyID, xruntime.Location())
+			}
+			if enemy.IsPet() {
+				if enemy.Weapon != nil {
+					return errors.Errorf("宠物敌人不允许配置 weapon: group:%d pet:%d %v", *group.ID, enemyID, xruntime.Location())
+				}
+				enemy.WeaponType = pb.CharacterWeaponType_CharacterWeaponType_Unspecified
+			} else {
+				if enemy.Weapon == nil {
+					return errors.Errorf("角色敌人缺少 weapon: group:%d character:%d %v", *group.ID, enemyID, xruntime.Location())
+				}
+				weapon := strings.TrimSpace(*enemy.Weapon)
+				weaponType, exists := enemyCharacterWeaponTypes[weapon]
+				if !exists {
+					return errors.Errorf("角色敌人 weapon 非法: group:%d character:%d weapon:%q %v",
+						*group.ID, enemyID, weapon, xruntime.Location())
+				}
+				enemy.Weapon = &weapon
+				enemy.WeaponType = weaponType
+			}
+			if enemy.DisplayName != nil {
+				displayName := strings.TrimSpace(*enemy.DisplayName)
+				if displayName == "" {
+					return errors.Errorf("敌人组 enemy displayName 不能为空: group:%d enemy:%d %v",
+						*group.ID, enemyID, xruntime.Location())
+				}
+				enemy.DisplayName = &displayName
+			}
 			if enemy.BattleAIID == nil || *enemy.BattleAIID == 0 {
 				return errors.Errorf("敌人组 enemy 缺少有效 battleAI 引用: group:%d enemy:%d %v",
 					*group.ID, enemyID, xruntime.Location())
@@ -226,6 +351,34 @@ func (p *EnemyGroupConfig) configure(entries []*EnemyGroupEntry) error {
 					*enemy.LevelRange.Min > *enemy.LevelRange.Max) {
 				return errors.Errorf("敌人组 enemy levelRange 无效: group:%d enemy:%d %v",
 					*group.ID, enemyID, xruntime.Location())
+			}
+			if enemy.GradeRange != nil &&
+				(enemy.GradeRange.Min == nil || enemy.GradeRange.Max == nil ||
+					*enemy.GradeRange.Min < int(pb.PetGrade_PetGrade_Common) ||
+					*enemy.GradeRange.Max >= int(pb.PetGrade_PetGrade_Max) ||
+					*enemy.GradeRange.Min > *enemy.GradeRange.Max) {
+				return errors.Errorf("敌人组 enemy gradeRange 无效: group:%d enemy:%d %v",
+					*group.ID, enemyID, xruntime.Location())
+			}
+			if enemy.AttributeModifiers != nil {
+				for _, modifier := range []struct {
+					field string
+					value int32
+				}{
+					{field: "poisonResist", value: enemy.AttributeModifiers.PoisonResist},
+					{field: "paralysisResist", value: enemy.AttributeModifiers.ParalysisResist},
+					{field: "sleepResist", value: enemy.AttributeModifiers.SleepResist},
+					{field: "stoneResist", value: enemy.AttributeModifiers.StoneResist},
+					{field: "drunkResist", value: enemy.AttributeModifiers.DrunkResist},
+					{field: "confusionResist", value: enemy.AttributeModifiers.ConfusionResist},
+					{field: "critical", value: enemy.AttributeModifiers.Critical},
+					{field: "counter", value: enemy.AttributeModifiers.Counter},
+				} {
+					if modifier.value < -100 || modifier.value > 100 {
+						return errors.Errorf("敌人组 enemy attributeModifiers.%s 超出范围: group:%d enemy:%d value:%d expected:[-100,100] %v",
+							modifier.field, *group.ID, enemyID, modifier.value, xruntime.Location())
+					}
+				}
 			}
 			if len(enemy.NormalDrops) > enemyNormalDropMaxCount {
 				return errors.Errorf("敌人组 enemy normalDrops 超过最大槽位数量: group:%d enemy:%d size:%d %v",
@@ -297,22 +450,29 @@ func (p *EnemyGroupConfig) check() error {
 	var checkErr error
 	p.Foreach(func(_ uint32, group *EnemyGroupEntry) bool {
 		for _, enemy := range group.Enemies {
-			petID := *enemy.ID
-			pet := GGameConfig.Pet.Get(petID)
-			if pet == nil {
-				checkErr = errors.Errorf("敌人组引用了未定义宠物: group:%d pet:%d %v",
-					*group.ID, petID, xruntime.Location())
+			assetID := enemy.AssetID()
+			if enemy.IsPet() && GGameConfig.Pet.Get(assetID) == nil {
+				checkErr = errors.Errorf("敌人组引用了未定义宠物: group:%d pet:%d %v", *group.ID, assetID, xruntime.Location())
+				return false
+			}
+			if enemy.IsCharacter() && GGameConfig.Character.Get(assetID) == nil {
+				checkErr = errors.Errorf("敌人组引用了未定义角色: group:%d character:%d %v", *group.ID, assetID, xruntime.Location())
+				return false
+			}
+			if GGameConfig.GrowthAttribute.Get(*enemy.GrowthAttributeID) == nil {
+				checkErr = errors.Errorf("敌人组引用了未定义成长属性: group:%d enemy:%d growthAttribute:%d %v",
+					*group.ID, assetID, *enemy.GrowthAttributeID, xruntime.Location())
 				return false
 			}
 			if GGameConfig.AI == nil || GGameConfig.AI.Get(*enemy.BattleAIID) == nil {
-				checkErr = errors.Errorf("敌人组引用了未定义AI: group:%d pet:%d ai:%d %v",
-					*group.ID, petID, *enemy.BattleAIID, xruntime.Location())
+				checkErr = errors.Errorf("敌人组引用了未定义AI: group:%d enemy:%d ai:%d %v",
+					*group.ID, assetID, *enemy.BattleAIID, xruntime.Location())
 				return false
 			}
 			for _, drop := range enemy.NormalDrops {
 				if GGameConfig.Item == nil || GGameConfig.Item.Get(*drop.ItemID) == nil {
-					checkErr = errors.Errorf("敌人组普通掉落引用了未定义道具: group:%d pet:%d item:%d %v",
-						*group.ID, petID, *drop.ItemID, xruntime.Location())
+					checkErr = errors.Errorf("敌人组普通掉落引用了未定义道具: group:%d enemy:%d item:%d %v",
+						*group.ID, assetID, *drop.ItemID, xruntime.Location())
 					return false
 				}
 			}
@@ -327,6 +487,7 @@ func (p *EnemyGroupConfig) assemble() error {
 		for index := range group.Enemies {
 			enemy := &group.Enemies[index]
 			enemy.BattleAI = GGameConfig.AI.Get(*enemy.BattleAIID)
+			enemy.GrowthAttribute = GGameConfig.GrowthAttribute.Get(*enemy.GrowthAttributeID)
 		}
 		return true
 	})

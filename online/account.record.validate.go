@@ -240,6 +240,13 @@ func validatePetRecord(record *pb.PetRecord, warehouse bool) error {
 	if !assetIDInRange(uint64(record.GetAssetId()), pb.AssetID_AssetIDRange_Pet_Start, pb.AssetID_AssetIDRange_Pet_End) {
 		return fmt.Errorf("asset id %d is invalid", record.GetAssetId())
 	}
+	if record.GetGrowthAttributeId() == 0 {
+		return fmt.Errorf("growth attribute id is empty")
+	}
+	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.GrowthAttribute == nil ||
+		gameconfig.GGameConfig.GrowthAttribute.Get(record.GetGrowthAttributeId()) == nil {
+		return fmt.Errorf("growth attribute config %d is missing", record.GetGrowthAttributeId())
+	}
 	if record.GetGrade() <= pb.PetGrade_PetGrade_Unspecified || record.GetGrade() >= pb.PetGrade_PetGrade_Max {
 		return fmt.Errorf("grade %s is invalid", record.GetGrade())
 	}

@@ -23,17 +23,16 @@ var (
 
 const characterAttributeResetMaxTotalPoint uint64 = 1000
 
+// characterAttributeAddPlan 描述一次加点. 校验阶段不修改权威档案.
 type characterAttributeAddPlan struct {
 	characterUUID uint64
 	attributeType pb.CharacterAttributeType
-	previous      *pb.CharacterRecord
-	next          *pb.CharacterRecord
 }
 
+// characterAttributeResetPlan 描述一次洗点. 校验阶段不修改权威档案.
 type characterAttributeResetPlan struct {
 	characterUUID uint64
-	previous      *pb.CharacterRecord
-	next          *pb.CharacterRecord
+	target        *pb.CharacterAttributePoints
 }
 
 func (p *Account) onCharacterAttributeAddReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
@@ -73,9 +72,7 @@ func (p *Account) onCharacterAttributeAddReq(gateway *Gateway, pkt *pb.OnlineCli
 		return
 	}
 
-	if err := persistCharacterAttributeAddPlan(plan, p.accountRecord, character, func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
-	}); err != nil {
+	if err := applyCharacterAttributeAddPlan(plan, p.accountRecord, character, p.deferAccountRecordPersist); err != nil {
 		xlog.GLog.Errorf(
 			"persist character attribute add failed aid:%d character:%d attribute:%s err:%v",
 			p.aid,
@@ -88,7 +85,7 @@ func (p *Account) onCharacterAttributeAddReq(gateway *Gateway, pkt *pb.OnlineCli
 	}
 
 	// 先下发持久化后的角色基础权威快照, 再解除客户端单请求等待状态.
-	p.sendCharacterBaseChangedNotify(gateway, plan.next)
+	p.sendCharacterBaseChangedNotify(gateway, character.record)
 	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterAttributeAddRes_CMD), xerror.Success.Code(), &pb.CharacterAttributeAddRes{
 		CharacterUuid: req.GetCharacterUuid(),
 		AttributeType: plan.attributeType,
@@ -131,9 +128,7 @@ func (p *Account) onCharacterAttributeResetReq(gateway *Gateway, pkt *pb.OnlineC
 		return
 	}
 
-	if err := persistCharacterAttributeResetPlan(plan, p.accountRecord, character, func(nextAccountRecord *pb.AccountRecord) error {
-		return unaryCacheSetAccountRecord(p.aid, nextAccountRecord)
-	}); err != nil {
+	if err := applyCharacterAttributeResetPlan(plan, p.accountRecord, character, p.deferAccountRecordPersist); err != nil {
 		xlog.GLog.Errorf(
 			"persist character attribute reset failed aid:%d character:%d err:%v",
 			p.aid,
@@ -144,13 +139,13 @@ func (p *Account) onCharacterAttributeResetReq(gateway *Gateway, pkt *pb.OnlineC
 		return
 	}
 
-	p.sendCharacterBaseChangedNotify(gateway, plan.next)
+	p.sendCharacterBaseChangedNotify(gateway, character.record)
 	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterAttributeResetRes_CMD), xerror.Success.Code(), &pb.CharacterAttributeResetRes{
 		CharacterUuid: req.GetCharacterUuid(),
 	})
 }
 
-// prepareCharacterAttributeAddPlan 只在副本上计算加点结果, 不提前修改 actor 或账号档案.
+// prepareCharacterAttributeAddPlan 只校验并计算加点目标, 不提前修改 actor 或账号档案.
 func prepareCharacterAttributeAddPlan(record *pb.CharacterRecord, attributeType pb.CharacterAttributeType) (*characterAttributeAddPlan, error) {
 	if record == nil || record.GetBase() == nil || record.GetBase().GetUuid() == 0 {
 		return nil, errCharacterAttributeAddInvalidArgument
@@ -159,47 +154,93 @@ func prepareCharacterAttributeAddPlan(record *pb.CharacterRecord, attributeType 
 		return nil, fmt.Errorf("%w: no available point", errCharacterAttributeAddFailedPrecondition)
 	}
 
-	next := proto.Clone(record).(*pb.CharacterRecord)
-	base := next.GetBase()
-	attribute := base.GetAttribute()
-	if attribute == nil {
-		attribute = &pb.CharacterAttributePoints{}
-		base.Attribute = attribute
-	}
+	attribute := record.GetBase().GetAttribute()
 	switch attributeType {
 	case pb.CharacterAttributeType_CharacterAttributeType_Vitality:
 		if attribute.GetVitality() == math.MaxUint32 {
 			return nil, fmt.Errorf("%w: vitality overflows uint32", errCharacterAttributeAddFailedPrecondition)
 		}
-		attribute.Vitality++
 	case pb.CharacterAttributeType_CharacterAttributeType_Strength:
 		if attribute.GetStrength() == math.MaxUint32 {
 			return nil, fmt.Errorf("%w: strength overflows uint32", errCharacterAttributeAddFailedPrecondition)
 		}
-		attribute.Strength++
 	case pb.CharacterAttributeType_CharacterAttributeType_Toughness:
 		if attribute.GetToughness() == math.MaxUint32 {
 			return nil, fmt.Errorf("%w: toughness overflows uint32", errCharacterAttributeAddFailedPrecondition)
 		}
-		attribute.Toughness++
 	case pb.CharacterAttributeType_CharacterAttributeType_Dexterity:
 		if attribute.GetDexterity() == math.MaxUint32 {
 			return nil, fmt.Errorf("%w: dexterity overflows uint32", errCharacterAttributeAddFailedPrecondition)
 		}
-		attribute.Dexterity++
 	default:
 		return nil, fmt.Errorf("%w: attribute %d", errCharacterAttributeAddInvalidArgument, attributeType)
 	}
-	base.AvailablePoint--
 	return &characterAttributeAddPlan{
 		characterUUID: record.GetBase().GetUuid(),
 		attributeType: attributeType,
-		previous:      record,
-		next:          next,
 	}, nil
 }
 
-// prepareCharacterAttributeResetPlan 根据权威总点数校验客户端提交的四项最终属性, 并在档案副本上计算剩余可加点.
+// applyCharacterAttributeAddPlan 把加点原地写入权威角色档案, 再通知落盘.
+func applyCharacterAttributeAddPlan(plan *characterAttributeAddPlan, accountRecord *pb.AccountRecord, character *character, persist func() error) error {
+	if plan == nil || accountRecord == nil || character == nil || persist == nil || character.record == nil {
+		return errCharacterAttributeAddInvalidArgument
+	}
+	if !accountRecordHasCharacterRecord(accountRecord, character.record, plan.characterUUID) {
+		return fmt.Errorf("%w: character %d record slot not found", errCharacterAttributeAddRecordInvalid, plan.characterUUID)
+	}
+
+	base := character.record.GetBase()
+	if base.GetAvailablePoint() == 0 {
+		return fmt.Errorf("%w: no available point", errCharacterAttributeAddFailedPrecondition)
+	}
+	attribute := base.GetAttribute()
+	if attribute == nil {
+		attribute = &pb.CharacterAttributePoints{}
+		base.Attribute = attribute
+	}
+	switch plan.attributeType {
+	case pb.CharacterAttributeType_CharacterAttributeType_Vitality:
+		if attribute.GetVitality() == math.MaxUint32 {
+			return fmt.Errorf("%w: vitality overflows uint32", errCharacterAttributeAddFailedPrecondition)
+		}
+		attribute.Vitality++
+	case pb.CharacterAttributeType_CharacterAttributeType_Strength:
+		if attribute.GetStrength() == math.MaxUint32 {
+			return fmt.Errorf("%w: strength overflows uint32", errCharacterAttributeAddFailedPrecondition)
+		}
+		attribute.Strength++
+	case pb.CharacterAttributeType_CharacterAttributeType_Toughness:
+		if attribute.GetToughness() == math.MaxUint32 {
+			return fmt.Errorf("%w: toughness overflows uint32", errCharacterAttributeAddFailedPrecondition)
+		}
+		attribute.Toughness++
+	case pb.CharacterAttributeType_CharacterAttributeType_Dexterity:
+		if attribute.GetDexterity() == math.MaxUint32 {
+			return fmt.Errorf("%w: dexterity overflows uint32", errCharacterAttributeAddFailedPrecondition)
+		}
+		attribute.Dexterity++
+	default:
+		return fmt.Errorf("%w: attribute %d", errCharacterAttributeAddInvalidArgument, plan.attributeType)
+	}
+	base.AvailablePoint--
+	return persist()
+}
+
+// accountRecordHasCharacterRecord 判断角色记录是否仍是账号档案中该 UUID 的槽位记录.
+func accountRecordHasCharacterRecord(accountRecord *pb.AccountRecord, record *pb.CharacterRecord, characterUUID uint64) bool {
+	if accountRecord == nil || record == nil {
+		return false
+	}
+	for _, candidate := range accountRecord.GetCharacterRecordList() {
+		if candidate == record && candidate.GetBase().GetUuid() == characterUUID {
+			return true
+		}
+	}
+	return false
+}
+
+// prepareCharacterAttributeResetPlan 根据权威总点数校验客户端提交的四项最终属性, 只计算不修改档案.
 func prepareCharacterAttributeResetPlan(record *pb.CharacterRecord, target *pb.CharacterAttributePoints) (*characterAttributeResetPlan, error) {
 	if record == nil || record.GetBase() == nil || record.GetBase().GetUuid() == 0 || target == nil {
 		return nil, errCharacterAttributeResetInvalidArgument
@@ -219,84 +260,42 @@ func prepareCharacterAttributeResetPlan(record *pb.CharacterRecord, target *pb.C
 	if targetAllocatedPoint > currentTotalPoint {
 		return nil, fmt.Errorf("%w: target allocated point %d exceeds current total %d", errCharacterAttributeResetFailedPrecondition, targetAllocatedPoint, currentTotalPoint)
 	}
-	availablePoint := uint32(currentTotalPoint - targetAllocatedPoint)
 
-	next := proto.Clone(record).(*pb.CharacterRecord)
-	nextBase := next.GetBase()
-	nextAttribute := nextBase.GetAttribute()
-	if nextAttribute == nil {
-		nextAttribute = &pb.CharacterAttributePoints{}
-		nextBase.Attribute = nextAttribute
-	}
-	nextAttribute.Vitality = target.GetVitality()
-	nextAttribute.Strength = target.GetStrength()
-	nextAttribute.Toughness = target.GetToughness()
-	nextAttribute.Dexterity = target.GetDexterity()
-	nextBase.AvailablePoint = availablePoint
 	return &characterAttributeResetPlan{
 		characterUUID: base.GetUuid(),
-		previous:      record,
-		next:          next,
+		target:        target,
 	}, nil
 }
 
-// persistCharacterAttributeAddPlan 在 cache 成功前只临时替换账号槽位, 失败时恢复原记录.
-func persistCharacterAttributeAddPlan(
-	plan *characterAttributeAddPlan,
-	accountRecord *pb.AccountRecord,
-	character *character,
-	persist func() error,
-) error {
-	if plan == nil || accountRecord == nil || character == nil || persist == nil {
-		return errCharacterAttributeAddInvalidArgument
-	}
-	slot := -1
-	for index, record := range accountRecord.GetCharacterRecordList() {
-		if record == plan.previous && record.GetBase().GetUuid() == plan.characterUUID {
-			slot = index
-			break
-		}
-	}
-	if slot < 0 {
-		return fmt.Errorf("%w: character %d record slot not found", errCharacterAttributeAddRecordInvalid, plan.characterUUID)
-	}
-
-	accountRecord.CharacterRecordList[slot] = plan.next
-	if err := persist(); err != nil {
-		accountRecord.CharacterRecordList[slot] = plan.previous
-		return err
-	}
-	character.record = plan.next
-	return nil
-}
-
-// persistCharacterAttributeResetPlan 使用独立账号副本写 cache, 成功前不修改 online 权威档案.
-func persistCharacterAttributeResetPlan(
-	plan *characterAttributeResetPlan,
-	accountRecord *pb.AccountRecord,
-	character *character,
-	persist func(*pb.AccountRecord) error,
-) error {
-	if plan == nil || accountRecord == nil || character == nil || persist == nil {
+// applyCharacterAttributeResetPlan 把洗点结果原地写入权威角色档案, 再通知落盘.
+// 与改造前的区别: 不再克隆整个 AccountRecord, 也不再做事后差分解算通知.
+func applyCharacterAttributeResetPlan(plan *characterAttributeResetPlan, accountRecord *pb.AccountRecord, character *character, persist func() error) error {
+	if plan == nil || accountRecord == nil || character == nil || persist == nil || character.record == nil || plan.target == nil {
 		return errCharacterAttributeResetInvalidArgument
 	}
-	slot := -1
-	for index, record := range accountRecord.GetCharacterRecordList() {
-		if record == plan.previous && record.GetBase().GetUuid() == plan.characterUUID {
-			slot = index
-			break
-		}
-	}
-	if slot < 0 {
+	if !accountRecordHasCharacterRecord(accountRecord, character.record, plan.characterUUID) {
 		return fmt.Errorf("%w: character %d record slot not found", errCharacterAttributeResetRecordInvalid, plan.characterUUID)
 	}
 
-	nextAccountRecord := proto.Clone(accountRecord).(*pb.AccountRecord)
-	nextAccountRecord.CharacterRecordList[slot] = plan.next
-	if err := persist(nextAccountRecord); err != nil {
-		return err
+	base := character.record.GetBase()
+	attribute := base.GetAttribute()
+	currentTotalPoint := uint64(attribute.GetVitality()) + uint64(attribute.GetStrength()) + uint64(attribute.GetToughness()) + uint64(attribute.GetDexterity()) + uint64(base.GetAvailablePoint())
+	if currentTotalPoint < uint64(pb.CharacterLimit_CharacterLimit_CreateAttributeTotalPoint) || currentTotalPoint > characterAttributeResetMaxTotalPoint {
+		return fmt.Errorf("%w: current total point %d is outside [%d,%d]", errCharacterAttributeResetFailedPrecondition, currentTotalPoint, pb.CharacterLimit_CharacterLimit_CreateAttributeTotalPoint, characterAttributeResetMaxTotalPoint)
 	}
-	accountRecord.CharacterRecordList[slot] = plan.next
-	character.record = plan.next
-	return nil
+	targetAllocatedPoint := uint64(plan.target.GetVitality()) + uint64(plan.target.GetStrength()) + uint64(plan.target.GetToughness()) + uint64(plan.target.GetDexterity())
+	if targetAllocatedPoint < uint64(pb.CharacterLimit_CharacterLimit_CreateAttributeTotalPoint) || targetAllocatedPoint > currentTotalPoint {
+		return fmt.Errorf("%w: target allocated point %d is outside [%d,%d]", errCharacterAttributeResetFailedPrecondition, targetAllocatedPoint, pb.CharacterLimit_CharacterLimit_CreateAttributeTotalPoint, currentTotalPoint)
+	}
+
+	if attribute == nil {
+		attribute = &pb.CharacterAttributePoints{}
+		base.Attribute = attribute
+	}
+	attribute.Vitality = plan.target.GetVitality()
+	attribute.Strength = plan.target.GetStrength()
+	attribute.Toughness = plan.target.GetToughness()
+	attribute.Dexterity = plan.target.GetDexterity()
+	base.AvailablePoint = uint32(currentTotalPoint - targetAllocatedPoint)
+	return persist()
 }

@@ -145,20 +145,41 @@ type characterItemUsePlan struct {
 	targetPetUUID        uint64
 	previous             *pb.CharacterRecord
 	next                 *pb.CharacterRecord
+	previousUsedUUID     uint64
+	nextUsedUUID         uint64
+	rewardUsed           bool
 	characterChanged     bool
 	petChangedUUIDs      []uint64
 	changedTaskRecordMap map[uint32]*pb.CharacterTaskRecord
 }
 
 func prepareCharacterItemUsePlan(record *pb.CharacterRecord, itemID uint32, targetPetUUID uint64) (*characterItemUsePlan, error) {
-	if record == nil || record.GetBase().GetUuid() == 0 || itemID == 0 {
+	return prepareCharacterItemUsePlanWithAccount(
+		&pb.AccountRecord{CharacterRecordList: []*pb.CharacterRecord{record}},
+		record,
+		itemID,
+		targetPetUUID,
+		time.Now().UnixMilli(),
+		randomCharacterRewardIndex,
+	)
+}
+
+func prepareCharacterItemUsePlanWithAccount(
+	accountRecord *pb.AccountRecord,
+	record *pb.CharacterRecord,
+	itemID uint32,
+	targetPetUUID uint64,
+	nowMs int64,
+	randomIndex func(uint64) uint64,
+) (*characterItemUsePlan, error) {
+	if accountRecord == nil || record == nil || record.GetBase().GetUuid() == 0 || itemID == 0 {
 		return nil, fmt.Errorf("%w: character or item id is empty", errItemUseInvalidArgument)
 	}
 	entry, err := configuredItem(itemID)
 	if err != nil {
 		return nil, err
 	}
-	if entry.Use == nil || entry.Use.Target == nil || (entry.Use.Exp == nil) == (entry.Use.Loyalty == nil) {
+	if entry.Use == nil || entry.Use.Target == nil || boolCount(entry.Use.Exp != nil, entry.Use.Loyalty != nil, entry.Use.RewardID != nil) != 1 {
 		return nil, fmt.Errorf("%w: item %d use config is incomplete", errItemUseRecordInvalid, itemID)
 	}
 	if newCharacterItemManager(record).Count(itemID) == 0 {
@@ -167,11 +188,39 @@ func prepareCharacterItemUsePlan(record *pb.CharacterRecord, itemID uint32, targ
 
 	next := proto.Clone(record).(*pb.CharacterRecord)
 	plan := &characterItemUsePlan{
-		characterUUID: record.GetBase().GetUuid(),
-		itemID:        itemID,
-		targetPetUUID: targetPetUUID,
-		previous:      record,
-		next:          next,
+		characterUUID:    record.GetBase().GetUuid(),
+		itemID:           itemID,
+		targetPetUUID:    targetPetUUID,
+		previous:         record,
+		next:             next,
+		previousUsedUUID: accountRecord.GetUsedUuid(),
+		nextUsedUUID:     accountRecord.GetUsedUuid(),
+	}
+	if entry.Use.RewardID != nil {
+		if *entry.Use.Target != gameconfig.ItemUseTargetCharacter || targetPetUUID != 0 || gameconfig.GGameConfig.Reward == nil {
+			return nil, fmt.Errorf("%w: reward item target or config is invalid", errItemUseRecordInvalid)
+		}
+		reward := gameconfig.GGameConfig.Reward.Get(*entry.Use.RewardID)
+		if reward == nil {
+			return nil, fmt.Errorf("%w: reward %d not found", errItemUseRecordInvalid, *entry.Use.RewardID)
+		}
+		if err := newCharacterItemManager(next).Consume(itemID, 1); err != nil {
+			return nil, err
+		}
+		rewardManager := &characterRewardManager{record: next, usedUUID: accountRecord.GetUsedUuid()}
+		if _, err := rewardManager.Apply(reward, nowMs, randomIndex); err != nil {
+			if errors.Is(err, errCharacterRewardResourceExhausted) {
+				return nil, fmt.Errorf("%w: %v", errItemUseFailedPrecondition, err)
+			}
+			return nil, fmt.Errorf("%w: %v", errItemUseRecordInvalid, err)
+		}
+		plan.nextUsedUUID = rewardManager.usedUUID
+		plan.rewardUsed = true
+		plan.changedTaskRecordMap, err = newCharacterTaskManager(next).Refresh(nowMs)
+		if err != nil {
+			return nil, fmt.Errorf("advance task after reward item use: %w", err)
+		}
+		return plan, nil
 	}
 	switch *entry.Use.Target {
 	case gameconfig.ItemUseTargetCharacter:
@@ -229,11 +278,21 @@ func prepareCharacterItemUsePlan(record *pb.CharacterRecord, itemID uint32, targ
 	if err := newCharacterItemManager(next).Consume(itemID, 1); err != nil {
 		return nil, err
 	}
-	plan.changedTaskRecordMap, err = newCharacterTaskManager(next).Refresh(time.Now().UnixMilli())
+	plan.changedTaskRecordMap, err = newCharacterTaskManager(next).Refresh(nowMs)
 	if err != nil {
 		return nil, fmt.Errorf("advance task after item use: %w", err)
 	}
 	return plan, nil
+}
+
+func boolCount(values ...bool) int {
+	count := 0
+	for _, value := range values {
+		if value {
+			count++
+		}
+	}
+	return count
 }
 
 func persistCharacterItemUsePlan(
@@ -252,12 +311,14 @@ func persistCharacterItemUsePlan(
 			break
 		}
 	}
-	if slot < 0 {
+	if slot < 0 || character.record != plan.previous || accountRecord.GetUsedUuid() != plan.previousUsedUUID {
 		return fmt.Errorf("character %d record slot not found", plan.characterUUID)
 	}
 	accountRecord.CharacterRecordList[slot] = plan.next
+	accountRecord.UsedUuid = plan.nextUsedUUID
 	if err := persist(); err != nil {
 		accountRecord.CharacterRecordList[slot] = plan.previous
+		accountRecord.UsedUuid = plan.previousUsedUUID
 		return err
 	}
 	character.record = plan.next
@@ -279,7 +340,7 @@ func (p *Account) onItemUseReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		p.sendClientErr(gateway, uint32(pb.MsgID_ItemUseRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
-	plan, err := prepareCharacterItemUsePlan(character.record, req.GetItemId(), req.GetTargetPetUuid())
+	plan, err := prepareCharacterItemUsePlanWithAccount(p.accountRecord, character.record, req.GetItemId(), req.GetTargetPetUuid(), time.Now().UnixMilli(), randomCharacterRewardIndex)
 	if err != nil {
 		resultID := xerror.Internal.Code()
 		switch {
@@ -295,13 +356,21 @@ func (p *Account) onItemUseReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 		return
 	}
 	if err := persistCharacterItemUsePlan(plan, p.accountRecord, character, func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+		return p.deferAccountRecordPersist()
 	}); err != nil {
 		xlog.GLog.Errorf("persist item use failed aid:%d character:%d item:%d pet:%d err:%v", p.aid, req.GetCharacterUuid(), req.GetItemId(), req.GetTargetPetUuid(), err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_ItemUseRes_CMD), xerror.Internal.Code())
 		return
 	}
 	// 先下发持久化后的权威增量, 再回复道具使用成功, 客户端不会看到部分成功状态.
+	if plan.rewardUsed {
+		p.sendCharacterSettlementNotify(gateway, plan.characterUUID, plan.previous, plan.next, plan.previousUsedUUID, plan.nextUsedUUID)
+		p.sendCharacterTaskChangedNotify(gateway, plan.characterUUID, plan.changedTaskRecordMap)
+		p.sendClientRes(gateway, uint32(pb.MsgID_ItemUseRes_CMD), xerror.Success.Code(), &pb.ItemUseRes{
+			CharacterUuid: req.GetCharacterUuid(), ItemId: req.GetItemId(), TargetPetUuid: 0,
+		})
+		return
+	}
 	if plan.characterChanged {
 		p.sendCharacterBaseChangedNotify(gateway, plan.next)
 	}

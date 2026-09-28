@@ -1,15 +1,18 @@
-# 共享游戏配置
+# 服务端运行配置
 
-本目录是 server 和 sa.desktop 共享游戏配置的唯一源头. 客户端需要使用这些配置时, 从本目录单向同步到 sa.desktop 的 `config/` 目录, 不反向维护独立副本.
+任务步骤 `navigation` 可附带 `x` 和 `y` 指定进入地图的落点, 两者必须同时配置; 不填时使用地图默认出生格. 地图 NPC 挑战选项可配置 `victoryTeleport: {mapId, x, y}`, 只有从该选项发起并获胜的战斗才将整队传到目标坐标. 任务60第1步使用 110007 (29,48) 进入, 110007 的3名守卫挑战胜利后到 110007 (30,30). 服务端场景由地图编辑器发布生成.
+
+本目录保存 server 运行配置. 仍由 server 维护的共享配置可单向同步到 sa.desktop 的 `config/` 目录; 已迁移到编辑器 RAW 的配置由对应编辑器分别生成双端运行文件, 不允许反向编辑.
 
 ## 配置文件
 
-- `character.yaml`: 角色资源配置和独立的编辑器测试状态.
-- `character.sprite.yaml`: 角色及角色骑宠动画帧、逐动作 FPS、攻击声音、命中表现、原版 Raw 参考配置和独立的编辑器测试状态.
-- `ai.yaml`: 服务端战斗 AI 配置, 由敌人组显式引用, 保存技能 ID、相对权重和目标策略.
+- `character.yaml`: 角色编辑器从`../../sa.desktop/config.raw/character.yaml`确定性生成的服务端角色资源配置; `mounts` 是必填但允许为空的骑乘能力集合.
+- `character.sprite.yaml`: 角色编辑器从`../../sa.desktop/config.raw/character.sprite.yaml`确定性生成的角色及骑宠动画运行配置.
+- `ai.yaml`: AI编辑器从`../../sa.desktop/config.raw/ai.yaml`确定性生成的服务端战斗AI配置, 由敌人组显式引用, 保存技能ID、相对权重和目标策略.
 - `common.sprite.yaml`: 通用精灵资源配置; `atlas` 使用相对 `assets` 的无扩展名路径并且必须以 `common/` 开头, `value` 保存客户端逐帧消费的有序帧号, 8702-8710和347511-347513是地水火风的大中小属性图标, 242302是设置窗口角色随身物品位置的原版背景板, 暴击8723条目合并保存前14帧小星和后13帧大星的60Hz时间线; 9195和9196分别是设置窗口角色属性加点按钮的未按下和按下状态. 900000100/900000110/900000120/900000130分别是普通伤害、暴击伤害、HP恢复和MP恢复的数字精灵组, 每组`value`按0-9顺序保存十帧.
 - `技能.yaml`: 角色和宠物共用的技能配置.
-- `enemy.group.yaml`: 敌人编组、宠物模板、数量、等级、普通掉落和必填的战斗 AI 引用.
+- `growth.attribute.yaml`: 成长属性编辑器从`../../sa.desktop/config.raw/growth.attribute.yaml`确定性生成的共享数值配置, 保存元素、固有属性、成长参数和只读面板参考值.
+- `enemy.group.yaml`: 敌人编组、宠物或角色外观、成长属性、数量、等级、普通掉落和必填的战斗 AI 引用.
 - `enemy.exp.yaml`: 敌人等级基础经验配置.
 - `exp.yaml`: 角色和宠物等级经验配置.
 - `information.yaml`: 从 STW1.13 `Mission.txt` 转换的 UTF-8 石器情报树和正文, 由 sa.desktop 只读展示.
@@ -17,16 +20,24 @@
 - `道具.素材.yaml`: 合成素材运行配置, 使用 `items.material.<id>` 分组, 当前发布34个素材系的120条素材.
 - `item.currency.yaml`: 货币配置, 使用 `items.currency.<id>` 分组, 与普通道具、素材和装备独立维护.
 - `item.synthesis.yaml`: 已暂停的旧原子合成数据, 保留合成规则、50种原子定义、20档材料等级和道具资格. Online运行时不读取或校验该文件.
-- `道具.天工司.yaml`: 宠物技能“加工”的基础武器制造、附技能及附元素配方. Online分别按`recipes.<weaponId>.materials`、`enchantments.<skillId>.materials`和`attributes.<ground|water|fire|wind>.materials`精确匹配素材. 基础配方允许多个产物使用相同素材签名, 命中后在候选产物间等概率随机; 服务启动时仍校验武器、素材和技能引用, 拒绝未知元素键、超过4种元素以及同一装备下同类附技能或附元素素材签名重复. 附加技能只要求技能存在, 不使用`usableBy`限制写入装备档案; 附元素命中时把对应地、水、火、风元素以固定值20写入装备实例.
+- `道具.天工司.yaml`: 宠物技能“加工”的基础装备制造、附技能及附元素配方. Online分别按`recipes.<equipmentId>.materials`、`enchantments.<skillId>.materials`和`attributes.<ground|water|fire|wind>.materials`精确匹配素材. 成品可为已配置的武器、铠甲、头盔、盾牌、手套、腰带、鞋子或首饰. 基础配方允许多个产物使用相同素材签名, 命中后在候选产物间等概率随机; 服务启动时仍校验装备、素材和技能引用, 拒绝未知元素键、超过4种元素以及同一装备下同类附技能或附元素素材签名重复. 附加技能只要求技能存在, 不使用`usableBy`限制写入装备档案; 附元素命中时把对应地、水、火、风元素以固定值20写入装备实例.
 - `item.equipment.<类型>.yaml`: 铠甲, 头盔, 盾牌, 手套, 腰带, 鞋子和首饰共7个运行输出, 分别使用 `items.equipmentChest`, `equipmentHelmet`, `equipmentShield`, `equipmentGloves`, `equipmentBelt`, `equipmentBoots` 和 `equipmentAccessory`. 首饰的 `accessory_type` 必须匹配协议类型及 ID 子区间. 七类文件允许空发布分组, 不能配置 use; 服务端展示字段按编辑器 C/S 归属独立裁剪, 已提供的 sprite 必须为正数, 已提供的 atlas 必须合法.
 - `道具.武器.<类型>.yaml`: 8个武器配置文件, 每个文件只保存对应的 `items.<weaponGroup>.<id>` 分组; 武器ID必须位于对应协议分组区间. 武器条目保存名称、说明、装备等级、职业限制、套装编号、攻击次数、能力随机范围、元素和异常抗性; 是否上架及售价统一由 `商店.yaml` 决定.
 - `商店.yaml`: 服务端开放商品配置, 使用无 `type` 的扁平 `items`. 商品 `id` 直接使用道具或技能资源 ID, 服务端按 ID 范围区分道具与技能; 道具商品配置 `item_count`, `costs[]` 是购买时同时消耗的资源列表, 显式空数组表示免费. 如后续配置敬请期待商品, 仅导出到客户端; 当前商店配置不包含此类条目.
 - `task.yaml`: 运行任务、串行步骤、循环规则、NPC/对话/地图入口、接取/开始/完成条件、提交扣除和奖励包引用.
 - `reward.yaml`: 可复用奖励包, `items`支持普通道具、角色资产和装备实例, `pets`支持指定等级与随机品质的宠物实例.
-- `pet.yaml`: 宠物主体、成长、图鉴面板参考值、出生技能槽和编辑器测试状态配置.
+- `pet.yaml`: 宠物外观主体、默认`growthAttributeId`、出生技能槽和编辑器测试状态配置; 不再内联成长数值.
 - `pet.sprite.yaml`: 宠物八方向的 `attack/faint/hurt/defense/stand/walk` 六个动画帧、攻击表现和独立的编辑器测试状态配置.
-- `scene/*.yaml`: 与客户端 `map_id` 一致的地图尺寸、阻挡、平铺遇敌规则、NPC功能选项和传送配置.
+- `scene/*.yaml`: 与客户端 `map_id` 一致的地图尺寸、阻挡、全地图默认与矩形区域遇敌规则、NPC功能选项和传送配置.
 - `../docs/offset.yaml`: 全局帧视觉元数据总表, 格式为 `frame_id: [offset_x, offset_y, width, height]`.
+
+## 成长属性与敌人外观
+
+`growth.attribute.yaml`是`elemental/attribute/growth/panelReference`的唯一运行来源. 服务端先加载并完成元素分配、整数边界、Rank派生和面板重算核验, 再装配宠物默认引用及敌人成员引用. `pet.yaml`中的`growthAttributeId`只用于之后普通创建、奖励创建和图鉴默认展示; 已存在宠物始终使用`PetRecord.growth_attribute_id`, 缺失或引用不存在会明确失败, 不回退到宠物默认值.
+
+`enemy.group.yaml enemies[]`必须在`petId`与`characterId`中且仅配置一个, 旧`id`字段严格拒绝; 所有成员必须显式配置`growthAttributeId`. 角色成员还必须配置`weapon: unarmed|axe|stick|spear|bow`, 宠物成员禁止配置`weapon`. 武器决定角色动画和既有武器类型战斗分支, 但角色敌人的`equipment`保持为空. `displayName`省略时分别回退到宠物名或角色名, 等级、品质、属性修正、AI和掉落规则同时适用于两种外观.
+
+宠物敌人可以选择不同于宠物默认值的成长属性. 捕获快照把敌人成员实际选择的ID写入档案, 后续升级、元素和固有战斗特性继续读取该ID; 角色外观永不创建捕获快照.
 
 ## 敌人成员等级
 
@@ -36,29 +47,35 @@
 
 阿布洞窟敌群70000的五名守护者全部使用成员级 `levelRange`: 4900294为 `[39,41]`, 4900295为 `[38,40]`, 4900296为 `[37,39]`, 4900297为 `[35,38]`, 4900298为 `[40,43]`. 这些区间来自8.0原版 `gmsv/data/enemy1.txt` 的294-298号敌人. 服务端每次创建敌人时独立抽取等级, 客户端只展示区间.
 
+琉璃洞窟九楼敌群70003固定包含10名Boss成员: `4000258`三只、`4000267`两只、主怪`4000308`一只、`4000300`两只及`4000307`两只. 主怪固定67级并引用AI 20, 其余成员独立抽取62-65级并按类型引用AI 21-24. 该组不可捕获且不配置普通掉落.
+
+琉璃洞窟十四楼敌群70004固定包含10名Boss成员, 顺序为`4000321,4000277,4000277,4000276,4000276,4000281,4000262,4000262,4000300,4000300`, 对应引用AI`30,25,25,26,26,27,28,28,29,29`. 主怪固定73级, `4000277`和`4000276`独立抽取65-66级, 其余随从独立抽取62-65级. 全组固定5品质、不可捕获且不配置普通掉落.
+
+漆黑洞窟地下6楼抓宠敌群70012按原版组754配置为1-3只50级普通敌人, 在任务专用宠物`4100000-4100003`中等权生成大地、水、火、风守护兽. 该组允许捕获且`babyRate=0`, 捕获后保留50级和对应任务宠物ID. 地下6楼目前只提供可选捕宠, 任务不检查也不消耗守护兽; 未来真正执行角色转生时, 必须在服务端点击处理阶段重新校验并成功后消费对应50级任务宠物, 不得使用同形象的普通宠物ID.
+
 Godot `make_enemy`以客户端项目的`config.raw/enemy.group.yaml`作为敌群唯一编辑源. 顶部`发布/草稿`保存目录整体状态; `保存RAW`只更新编辑源, `同步C/S`校验敌群结构以及宠物、AI和普通掉落道具引用后, 事务写入本文件及客户端`config/enemy.group.yaml`. 任一目标提交失败会回滚全部已提交文件, 外部修改会阻止覆盖. 本文件为生成结果, 不手工编辑, 也不再通过`cp.config.from.server.sh`同步.
 
 ## 运行任务与奖励包
 
 Godot `make_task`以客户端项目的`config.raw/task.yaml`作为任务和奖励包唯一编辑源. `保存RAW`只更新编辑源, `同步C/S`校验结构和跨表引用后, 将`task.yaml`、`reward.yaml`事务写入本目录及客户端`config/`; 任一目标提交失败会回滚全部已提交文件. 本目录两份文件为生成结果, 不手工编辑, 也不再通过`cp.config.from.server.sh`同步. `../docs/任务/task.yaml`仍为原版调研资料, 不由服务端加载或自动转换.
 
-任务使用`tasks: [...]`, 每项包含`id/name/description/isMain/repeatable/sort/acceptConditions/steps`, 并可保存客户端展示用的`npc/dialogue`. 多个任务可并行接取, 内部步骤按数组顺序串行推进, 步骤ID从1连续递增. 步骤包含`id/name/description/startConditions/completionConditions/completionMode/consumeItems/consumePets/dialogue/rewardId`, 可选`navigation: {mapId, label}`配置该步骤的客户端地图入口, 也可配置挑战入口.
+任务使用`tasks: [...]`, 每项包含`id/name/description/isMain/repeatable/sort/acceptConditions/steps`, 可选`completionRequiresRewardsClaimed`要求领奖后才完成, 并可保存客户端展示用的`npc/dialogue`. 多个任务可并行接取, 内部步骤按数组顺序串行推进, 步骤ID从1连续递增. 步骤包含`id/name/description/startConditions/completionConditions/completionMode/consumeItems/consumePets/dialogue/rewardId`, 可选`navigation: {mapId, label}`配置该步骤的客户端地图入口, 也可配置挑战入口. `persistent`只允许用于最后一步, 必须没有完成条件、挑战、消耗和奖励且配置`interactions`; 服务端只启动该步骤, 永不自动完成并拒绝Submit. 当前`characterRebirth`仅支持`unavailable`占位状态及0至4转的宠物需求说明, 不提供网络请求或服务端转生实现.
 
-条件数组全部使用AND语义. 支持`characterLevel(level)`、`itemPossession(itemId, quantity)`、`petPossession(petId, level, quantity)`、`taskCompleted(taskId)`、`taskRewardsClaimed(taskId)`和`battleVictory(enemyGroupId)`. `itemPossession`对装备按实例数量检查, `petPossession`要求宠物ID和实际等级同时匹配; 两者都只检查持有. 战斗胜利只用于automatic步骤的完成条件; 接取和开始条件不接受瞬时战斗事件. `completionMode`省略即`automatic`, `submit`由玩家主动提交. `consumeItems`和`consumePets`只允许配置在submit步骤中, 提交成功后才扣除符合条件的实例.
+条件数组全部使用AND语义. 支持`characterLevel(level)`、`itemPossession(itemId, quantity)`、`petPossession(petId, level, quantity)`、`taskCompleted(taskId)`、`taskRewardsClaimed(taskId)`、`anyTaskRewardsClaimed(taskIds)`和`battleVictory(enemyGroupId)`. `anyTaskRewardsClaimed`在单个条件内部按OR判断任一任务已经完成并领取全部奖励, `taskIds`必须非空、无重复且不能引用当前任务. `itemPossession`对装备按实例数量检查, `petPossession`要求宠物ID和实际等级同时匹配; 两者都只检查持有. 战斗胜利只用于automatic步骤的完成条件; 接取和开始条件不接受瞬时战斗事件. `completionMode`省略即`automatic`, `submit`由玩家主动提交. `consumeItems`和`consumePets`只允许配置在submit步骤中, 提交成功后才扣除符合条件的实例. 任务68的四大证明使用`itemPossession`且不写`consumeItems`, 因此只检查持有而不消耗. 任务70的金布伊资格使用`petPossession(petId=4000245, level=77, quantity=1)`且不写`consumePets`, 按原版`PET=77-12`且无对应`DelPet`的规则精确检查77级宠物并保留其实例.
 
 奖励包使用`rewards: [...]`, 每项包含`id/name/items/pets`. `items`可发普通道具、角色资产或独立装备实例; `pets`使用`petId/level/grade/quantity`, 当前`grade`只接受`random`. 数量必须大于0, 同类列表不得重复ID. 任务步骤以非0`rewardId`引用奖励包; `rewardId: 0`必须显式填写, 表示无奖励, 步骤完成时同时记为已领取. 已领取状态不因后来扩展奖励包或补配奖励而重置.
 
-任务60“阿布洞窟”保留单步骤挑战: 战胜敌群70000后完成且无额外奖励. 任务61`[任务][卡坦的愿望][1]`在地图70001分两批交付4只25级宠物, 第一批奖励火难的戒指, 第二批交回戒指后奖励1级随机品质修宝. 任务62`[任务][卡坦的愿望][2]`要求任务61的全部奖励已经领取, 在地图70002按相同两批流程奖励1级随机品质朵拉比斯; `repeatable: true`使最后一步领奖后重置记录并立即开始下一轮.
+任务60“阿布洞窟”保留单步骤挑战: 战胜敌群70000后完成且无额外奖励. 任务61`[任务][卡坦的愿望][1]`在地图70001分两批交付4只25级宠物, 第一批奖励火难的戒指, 第二批交回戒指后奖励1级随机品质修宝. 任务62`[任务][卡坦的愿望][2]`要求任务61的全部奖励已经领取, 在地图70002按相同两批流程奖励1级随机品质朵拉比斯; `repeatable: true`使最后一步领奖后重置记录并立即开始下一轮. 主线任务64“琉璃洞窟”要求任务63“成人仪式”全部领奖, 依次发放拉鲁的项链和雅哈奴的日记, 战胜敌群70003、70004后同时提交两件信物, 最终奖励大地的羁绊; 任务不配置地图入口或信物补领. 主线任务65“玄黄洞窟”也以任务63全部领奖为前置, 按顺序挑战敌群70005、70007、70008、70009, 从梦德处领取风的竖琴并向威尔提交, 最终奖励风的锁[风]; 风的竖琴是首饰实例, 不配置仅支持普通道具的`rewardReissue`. 主线任务68“漆黑洞窟”要求80级且任务64至67全部领奖, 先挑战70016, 再持有四大证明向考古家领取精灵王之弓; `completionRequiresRewardsClaimed: true`保证领取弓后才完成. 主线任务69“漆黑洞窟之精灵王”以前者全部领奖为前置, 地图70012入口仅供捕宠, 战胜70017后启动拜见精灵王的常驻步骤且不会完成. 支线任务70“金布伊任务”30级起可接取且无最高等级限制: 伊那多先发放1级随机品质金布伊, 猜谜大师精确检查1只77级金布伊但不消耗并发放谜之箱子, 大师的弟子消耗谜之箱子后发放1级随机品质左迪洛斯和猜之箱子; 猜之箱子仍通过奖励包3000303开出1级随机品质金布伊.
 
-任务挑战BGM配置在`task.yaml`的`tasks[].steps[].challenge.battleBgmIndex`, 阿布洞窟使用索引6; 该字段仅供客户端选择音乐, 不放在`reward.yaml`或`enemy.group.yaml`. 场景NPC挑战仍使用客户端NPC表现配置, 服务端不选择或播放BGM.
+任务挑战BGM配置在`task.yaml`的`tasks[].steps[].challenge.battleBgmIndex`, 阿布洞窟、琉璃洞窟两场挑战及玄黄洞窟四场挑战均使用索引6; 该字段仅供客户端选择音乐, 不放在`reward.yaml`或`enemy.group.yaml`. 场景NPC挑战仍使用客户端NPC表现配置, 服务端不选择或播放BGM.
 
-步骤通过可选`challenge`配置挑战入口, 服务端只读取其中的`enemyGroupId`; `npcs`中的宠物显示名、动作、方向和`battleBgmIndex`由客户端消费. 每个挑战NPC必须对应当前敌群成员, 但不会改变实际参战成员. 任务级`npc.visual`可配置静态帧、宠物动作或带武器的角色动作, 同样只属于客户端表现. 已接任务中已经开始的挑战步骤可重复挑战, 已完成后也保留入口, 无需新增重复挑战配置.
+步骤通过可选`challenge`配置挑战入口, 服务端只读取其中的`enemyGroupId`; `npcs`中的宠物显示名、动作、方向和`battleBgmIndex`由客户端消费. 每个挑战NPC必须对应当前敌群成员, 但不会改变实际参战成员. 任务和步骤的`npc.visual`可配置静态帧、宠物动作、带武器的角色动作或`characterMount`骑乘动作; 动画表现由客户端消费, 服务端仅对`characterMount`的角色、宠物及骑乘许可做跨表校验. 已接任务中已经开始的挑战步骤可重复挑战, 已完成后也保留入口, 无需新增重复挑战配置.
 
 ## 武器目录与导出
 
-`../../sa.desktop/config.raw/道具.武器.<类型>.yaml` 是八类武器的8个编辑来源, 每个文件只保存一种武器. 8个文件合计保存5137条完整武器记录. `status: draft` 表示只保存在源文件中, 可以暂缺现代ID、名称或帧资源; `status: published` 表示必须具备完整运行字段并通过ID区间、重复ID、数值范围和客户端图集帧校验.
+`../../sa.desktop/config.raw/道具.武器.<类型>.yaml` 是八类武器的8个编辑来源, 每个文件只保存一种武器. 8个文件合计保存730条武器记录, 其中164条已发布、566条草稿. `status: draft` 表示只保存在源文件中, 可以暂缺现代ID、名称或帧资源; `status: published` 表示必须具备完整运行字段并通过ID区间、重复ID、数值范围和客户端图集帧校验.
 
-目录采用领域字段, `modernId`、`frameId`、`effectString`、`profession`、`elementType`和各项`*Min/*Max`在导出时映射到8个`道具.武器.<类型>.yaml`的既有服务端字段. 每个源文件独立保存字段导出归属, 编辑器字段名称后的下拉框作用于当前类型文件的全部记录. `idTier`固定导出到C/S, 供客户端显示武器等级及服务端判定配方档位; `originalId`只保留原版追溯关系. 原版`hirt`和`neguard`分别保存为`legacyHitRight`和`legacyNeglectGuard`; 当前运行配置尚未支持这两个字段, 任一值非0都会阻止发布, 不会被静默丢弃或修补. 图集路径按`weaponType`固定派生, 不在目录中重复编辑.
+目录采用领域字段, `modernId`、`frameId`、`effectString`、`profession`、`elementType`和各项`*Min/*Max`在导出时映射到8个`道具.武器.<类型>.yaml`的既有运行字段. 武器与非武器装备的`effectString/effectstring`在编辑器中统一显示为`说明`, 只保存无法由结构化参数生成的客户端补充文案, 服务端不导出也不消费. 每个源文件独立保存可配置字段的导出归属, 编辑器字段名称后的下拉框作用于当前类型文件的全部记录. `idTier`固定导出到C/S, 供客户端显示武器等级及服务端判定配方档位; `originalId`只保留原版追溯关系. 原版`hirt`和`neguard`分别保存为`legacyHitRight`和`legacyNeglectGuard`; 当前运行配置尚未支持这两个字段, 任一值非0都会阻止发布, 不会被静默丢弃或修补. 图集路径按`weaponType`固定派生, 不在目录中重复编辑.
 
 sa.desktop 的 Godot `make_weapon` 主屏一次保存8个源目录文件, 不在发布按钮或保存目录时改写运行配置. 用户必须单独点击“导出双版本”, 且目录存在未保存修改时导出会被拒绝. 导出先完成全部published条目和8类非空校验, 再把16个候选写入暂存文件、重新解析、检查目录与目标文件外部指纹, 最后事务替换服务端和客户端各8个文件; 草稿永不进入运行配置. 导出不会运行Go测试.
 
@@ -106,6 +123,8 @@ python -m unittest tool.test_pet_synthesis_correction
 
 `../../sa.desktop/config.raw/item.armor.meta.yaml`、7 个 `道具.装备.<类型>.yaml` 和 2 个 `item.armor.<类型>.yaml` 是装备和首饰的编辑来源. 首饰在记录元数据中保存 `accessoryType`, `values` 保留当前支持的 79 个字段; 因尚不支持合成, 10 个材料字段已从 RAW 移除. Godot `make_armor` 右侧显示六类首饰及 proto ID 子区间, 类型和 ID 同次校验与保存; 装备分类由当前类型页签和对应源文件决定, 表单内不可修改.
 
+头盔基础系列1-10级固定使用`防具[n] = 3500000 + n * 100`, `兜[n] = 防具[n] + 50`. 目标区间原有冲突装备保存在`3501668-3501685`, 原子合成目录独占冲突记录保存在`3501686`. `item.equipment.helmet.yaml`和`item.synthesis.yaml`必须分别由装备编辑器和合成目录工具重新生成, 不维护旧ID运行时映射.
+
 发布后先使用编辑器的 `保存RAW`, 再使用 `导出C/S`. 导出器按铠甲, 头盔, 盾牌, 手套, 腰带, 鞋子和首饰直接生成 server/client 两端共14个 `item.equipment.<类型>.yaml`; 每个文件只包含对应唯一分组. 14份输出全部暂存并校验后才提交, 失败会回滚已提交部分. 宠装和参考资料不进入运行导出. 导出不调用同步脚本.
 
 ## 石器情报配置
@@ -116,17 +135,19 @@ python -m unittest tool.test_pet_synthesis_correction
 
 ## 角色动画元数据生成
 
-`../tool/character_sprite_metadata.py` 从原版 `spr_115.bin` 和 `spradrn_115.bin` 审计 `character.sprite.yaml` 的104个方向动作, 并生成13动作FPS、当前攻击声音、Throw投射物释放帧、Throw动作声音及原版Raw参考数据. 默认只读审计, 明确传入 `--write` 才会并发校验后原子写入:
+`../tool/character_sprite_metadata.py` 从原版 `spr_115.bin` 和 `spradrn_115.bin` 审计角色动画RAW的104个方向动作, 并生成13动作FPS、当前攻击声音、Throw投射物释放帧、Throw动作声音及原版Raw参考数据. 默认只读审计, 明确传入 `--write` 才会并发校验后原子写入:
 
 ```bash
 python tool/character_sprite_metadata.py \
   --spr D:/csa_8.0/data/spr_115.bin \
   --spr-address D:/csa_8.0/data/spradrn_115.bin \
-  --config config/character.sprite.yaml \
+  --config ../sa.desktop/config.raw/character.sprite.yaml \
   --write
 ```
 
 `throwReleaseFrameNumber`记录原版Throw动作中10000-10099投射物事件映射后的1-based帧位置, 没有该事件时为0; `throwActionSoundFrameNumberList`和`throwActionSoundIdList`记录生效Throw动作的逐帧声音事件. 默认值来自原版事件, 新版另对吉米四种颜色实战复用的unarmed sprite 0/5/10/15在原版第5项释放前的第4项补充声音ID 4. 生成器要求同一sprite八方向映射完全一致, 不允许客户端用固定帧或“倒数第几帧”猜测释放时点.
+
+角色攻击命中事件按原版声音分派表映射, 不按事件尾号线性加到250. `10005/10006`保留命中帧时机, Raw声音ID使用无WAV哨兵255, 生效声音列表为空; `101xx`先减100再使用同一分派规则.
 
 4个事件字段以 `Raw` 结尾, 记录原版攻击事件的1-based帧位置和声音ID. 当前方向动作与原版帧序列不同时, 生成器还会在生效动作后写入 `<action>Raw`, 例如 `attackRaw`. 所有Raw字段只供后期对照, 客户端只校验而不创建播放缓存; 修改生效动作前必须同时确认当前图集帧、`.tpsheet`和offset完整, 不能直接用Raw覆盖.
 
@@ -134,11 +155,11 @@ python tool/character_sprite_metadata.py \
 
 `character.yaml` 的 `character[]` 和 `character.sprite.yaml` 的 `sprite[]` 都可保存可选编辑器元数据 `testStatus`. 缺省或0表示未测试, 1表示通过, 2表示未通过; 状态0不落盘. 角色状态只表示主体字段已验证, sprite状态表示整套sprite已在全部角色本体、武器和骑宠引用上下文中人工验证. 该字段不参与 server 或客户端运行时业务.
 
-sa.desktop 的 Godot `make_character` 编辑器直接把本目录的 `character.yaml` 和 `character.sprite.yaml` 作为权威源. 它只编辑、查阅和测试已有条目, 不新增、删除或重排角色、sprite及骑宠行. 角色 ID、名称、sprite ID和所有 `*Raw` 参考字段只读; 骑宠只能选择当前实际存在的资源, sprite引用只能选择目标图集中包含全部生效帧的兼容项.
+sa.desktop 的 Godot `make_character` 编辑器把`config.raw/character.yaml`和`config.raw/character.sprite.yaml`作为唯一编辑源. 它只编辑、查阅和测试已有条目, 不新增、删除或重排角色、sprite及骑宠行. `mounts` 必须显式存在且允许0-N条, 每个唯一 `petId` 表示该角色具备对应骑乘能力, `mounts: []` 表示没有骑乘能力; 服务端校验宠物引用并据此授权进入骑乘状态. 角色 ID、名称、sprite ID和所有 `*Raw` 参考字段只读; 骑宠只能选择当前实际存在的资源, sprite引用只能选择目标图集中包含全部生效帧的兼容项.
 
-显式保存时先校验完整双表、资源、跨表引用、8方向x13动作帧、FPS、声音及事件边界, 再以双文件事务替换原文件. 外部修改会阻止覆盖, 单文件提交失败会回滚. 编辑器不会自动同步 `sa.desktop/config` 运行时副本.
+`保存RAW`先校验完整双表、资源、跨表引用、8方向x13动作帧、FPS、声音及事件边界, 再以双文件事务替换唯一编辑源. `同步C/S`要求RAW已保存, 重新校验后以单次事务更新本目录和`sa.desktop/config`的4个运行文件. 外部修改会阻止覆盖, 任一文件提交失败会回滚.
 
-online 启动会加载 `character.yaml`, `技能.yaml`, `ai.yaml`, `enemy.group.yaml`, `enemy.exp.yaml`, `exp.yaml`, `item.yaml`, `道具.素材.yaml`, `item.currency.yaml`, `道具.天工司.yaml`, 8个`道具.武器.<类型>.yaml`, 7个`item.equipment.<类型>.yaml`, `reward.yaml`, `task.yaml`, `pet.yaml`, `商店.yaml` 和 `scene/*.yaml`. 旧 `item.synthesis.yaml` 不在启动加载链路中. 任一必需文件缺失, 字段非法或跨表引用无效时, 服务必须直接启动失败.
+online 启动会加载 `character.yaml`, `技能.yaml`, `ai.yaml`, `enemy.group.yaml`, `enemy.exp.yaml`, `exp.yaml`, `item.yaml`, `道具.素材.yaml`, `item.currency.yaml`, `道具.天工司.yaml`, 8个`道具.武器.<类型>.yaml`, 7个`item.equipment.<类型>.yaml`, `reward.yaml`, `task.yaml`, `pet.yaml`, `商店.yaml` 和 `scene/`中已发布新图的 YAML. 原图与旧任务、测试、练级地图文件保留但不加载. 旧 `item.synthesis.yaml` 不在启动加载链路中. 任一必需文件缺失, 字段非法或跨表引用无效时, 服务必须直接启动失败.
 
 ## 统一技能配置
 
@@ -172,16 +193,19 @@ python tool/skill_catalog.py --write
 - `showMercy`: 可选. 手下留情只接受空对象 `{}`, 不接受空值或参数. 先完成一次普通物理判定, 本次伤害若致死则限制为目标当前HP减1, 目标1HP时允许0伤害. 不形成持续保命状态.
 - `poisonSpirit`, `stoneSpirit`, `confusionSpirit`, `drunkSpirit`, `sleepSpirit`: 五类角色装备异常精灵的独立参数块, 分别固定对应状态ID 1、4、6、5、3. 每个技能同时配置自己的 `mpCost`, `targetScope`, 行动时长、基础成功率、等级差范围及施放/受术/持续状态特效ID. 五类参数块彼此互斥, 也不能与其他技能行为块并存.
 - `healingSpirit`, `moistureSpirit`, `graceSpirit`: 治愈、滋润、恩惠三类角色治疗精灵的独立参数块. 每条技能集中保存 `mpCost`, `targetScope`, `healPower`, `castEffectId` 和 `healEffectId`; 目标范围依次固定为 `self`, `singleAlly`, `allyCamp`. 三类参数块彼此互斥, 也不能与其他技能行为块并存.
+- `poisonRecovery`, `stoneRecovery`, `confusionRecovery`, `drunkRecovery`, `sleepRecovery`: 五类角色净化精灵的独立参数块, 状态ID分别固定为1、4、6、5、3. 每条技能保存`statusId`, `castEffectId`和`cleanseEffectId`; 顶层只允许角色使用, Lv1使用`mpCost: 3`和`singleAlly`, Lv2使用`mpCost: 9`和`allyCamp`. 五类参数块彼此互斥, 也不能与其他技能行为块并存.
 
 装备条目的 `magicid` 只授予一个现代技能ID, 不保存技能耗蓝或成功率. 原版130-139、150-159、160-169、170-179、180-189依次迁移到 `8200130-8200139`、`8200150-8200159`、`8200160-8200169`、`8200170-8200179`、`8200180-8200189`; 耗蓝和全部行为参数只在上述技能条目中维护.
 
 原版治愈0-4、滋润10-19、恩惠20-31分别迁移到 `8200000-8200004`、`8200010-8200019`、`8200020-8200031`. 共1915条装备引用只保留现代技能ID, 历史 `magicMp/magicusemp` 已移除. 迁移工具对旧ID 0额外要求同时匹配“治愈的精灵 Lv1”和MP 5, 不修改普通零值装备.
 
+原版净化毒70/71、石化90/91、混乱100/101、酒醉110/111、睡眠120/121分别迁移到`8200070/8200071`、`8200090/8200091`、`8200100/8200101`、`8200110/8200111`、`8200120/8200121`. 当前权威RAW中的1100条装备引用只保留现代技能ID, 历史`magicMp/magicusemp`已移除. 普通毒和DeepPoison是独立运行状态, 毒净化只清除前者; 硬化、石化和石化攻击共用Stone状态, 均由石化净化清除.
+
 `商店.yaml` 当前开放的 21 个宠物技能价格来自原版8.0 `gmsv/data/petskill2.txt` 的价格列, 并由8.5服务端 `npc_petskillshop.c` 读取 `PETSKILL_COST` 的逻辑交叉确认: 待机500, 攻击/防御各1000, 破除防御1500, 二至十段攻击依次为2000, 5000, 15000, 25000, 225000, 625000, 625000, 1625000, 2005000; 一击必杀2500, 一击必杀改和改2各25000, 猛毒攻击4000, 突击4000, 双重突击8000, 加工1500, 手下留情10000. 本项目按商品 `costs` 直接扣款, 不应用原版NPC可选的 `skill_rate` 倍率.
 
-三重突击605已在编辑器RAW中映射为 `8100605`, 保存 `chargeRounds: 3` 和 `attackPercentModifier: 250`, 原版学习价证据为8500石币. 当前状态为 `pending_test`, 因而不进入本目录的正式 `技能.yaml` 或 `商店.yaml`; 自动化测试通过临时配置注入验证通用 `chargeAttack` 链路, 不代表已开放学习、出生模板或敌方AI.
+三重突击605已在编辑器RAW中映射为 `8100605`, 保存 `chargeRounds: 3` 和 `attackPercentModifier: 250`, 原版学习价证据为8500石币. 当前状态为 `published`, 已进入本目录的正式`技能.yaml`和`商店.yaml`; 出生模板和敌方AI仍只按各自显式引用开放, 自动化测试直接使用正式配置验证通用`chargeAttack`链路.
 
-原版宠物121“地球一周”已映射为`8100121`, RAW保存`earthRound.damagePercentModifier: 200`, 原说明和2000石币证据继续保留. 原版120是被GM取消并替换为背水之战其之2的历史记录, 只从技能编辑器目录排除, 逆向审计资料继续保留. 121当前为`pending_test`, 因而正式`技能.yaml`、客户端配置、商店、出生模板和敌方AI均不包含它.
+原版宠物121“地球一周”已映射为`8100121`, RAW保存`earthRound.damagePercentModifier: 200`, 原说明和2000石币证据继续保留. 原版120是被GM取消并替换为背水之战其之2的历史记录, 只从技能编辑器目录排除, 逆向审计资料继续保留. 121当前为`published`, 已进入正式`技能.yaml`、客户端配置和商店配置; 出生模板和敌方AI仍只按各自显式引用开放.
 
 原版60“毒攻击”和61“猛毒攻击”是同一`PETSKILL_StatusChange`的两个参数等级, 不是重复记录. 60映射`8100060`, RAW使用`poisonAttack: {durationActions: 3, attackPercentModifier: -30}`, 保留2500石币证据并标记`pending_test`; 因此正式C/S技能配置、商店、出生模板和敌方AI均不包含`8100060`. 61保持已发布的`8100061`, 5次/-30%和4000石币, 不被60覆盖.
 
@@ -199,9 +223,9 @@ python tool/skill_catalog.py --write
 | 8000002 | 防御 | 支持 | 支持 | 支持 |
 | 8000003 | 逃跑 | 支持 | 不支持 | 支持 |
 | 8000004 | 捕获 | 支持, 校验敌方目标 | 不支持 | 启动拒绝 |
-| 8000005 | 换宠 | 未开放 | 不支持 | 启动拒绝 |
+| 8000005 | 换宠 | 已实现 | 不支持 | 启动拒绝 |
 | 8000006 | 使用道具 | 未开放 | 不支持 | 启动拒绝 |
-| 8000007 | 更换装备 | 未开放 | 不支持 | 启动拒绝 |
+| 8000007 | 更换装备 | 支持 | 不支持 | 启动拒绝 |
 | 8100000 | 待机 | 不支持 | 支持 | 支持 |
 | 8100003 | 破除防御 | 不支持 | 支持 | 支持 |
 | 8100010-8100018 | 连续攻击 | 不支持 | 按 `segmentCount` 支持 | 按 `segmentCount` 支持 |
@@ -256,7 +280,9 @@ server 消费的主要字段:
 
 此外, `pet.yaml` 和 `pet.sprite.yaml` 的条目都可保存可选的编辑器元数据 `testStatus`. 缺省或0表示未测试, 1表示通过, 2表示未通过; 状态0不落盘. 该字段不参与 server 或客户端运行时业务, 宠物主体和 sprite 的测试状态相互独立.
 
-`ai.yaml` 使用 `ai: [...]` 保存共享配置, `skills[]` 将技能 `id` 与相对 `weight` 放在同一条记录中. 攻击、防御、逃跑及特殊技能使用同一种结构, 不要求凑满7槽. 技能 ID 不得重复, 权重范围为 `[1,2147483647]`, 不使用的技能直接移除, 总权重必须处于 `[1,2147483647]`. `targetScope`、`targetSelection` 和可选 `targetRandomRollMax` 保留现有目标选择语义.
+`../../sa.desktop/config.raw/ai.yaml`是AI唯一编辑源, 顶层和单条配置分别保存编辑状态, 单条`name/note`只用于编辑器识别与检索. `保存RAW`不修改运行文件; `导出S`只把已发布AI确定性写入本文件, 并剥离格式、状态、名称和备注. 敌人编辑器同样直接读取RAW中的已发布AI, 不反向依赖本运行输出.
+
+`ai.yaml`使用`ai: [...]`保存运行配置, `skills[]`将技能`id`与相对`weight`放在同一条记录中. 攻击、防御、逃跑及特殊技能使用同一种结构, 不要求凑满7槽. 技能ID不得重复, 权重范围为`[1,2147483647]`, 不使用的技能直接移除, 总权重必须处于`[1,2147483647]`. `targetScope`、`targetSelection`和可选`targetRandomRollMax`保留现有目标选择语义.
 
 `enemy.group.yaml enemies[].weight` 控制出怪时选择哪种敌人, `ai.yaml skills[].weight` 控制战斗时选择哪个技能. 要给同一种宠物设置不同的技能概率, 定义不同 AI 并在对应敌人条目中引用.
 
@@ -283,8 +309,9 @@ scene/*.yaml
        -> ai.yaml (战斗技能及权重 -> 技能.yaml)
 ```
 
-- `scene/*.yaml` 不设置格式版本字段, 地图 ID 与客户端 `map_id` 一致; `collision.blockedRows` 保存服务端阻挡, `encounter.enabled` 和 `encounter.enemyGroups` 定义全地图遇敌开关与敌人组权重, `npcs` 保存NPC实体及其独立功能选项, `warps` 保存传送起点与目标. 当前目录包含70000至70002这3张任务地图, 80000、80001、80010、80020、80030、80040、80050、80060、80070这9张测试地图, 以及从90001开始的14张练级地图: 90001和90010至90130按10递增. 正常角色地图进入允许任务范围`[70000,79999]`、测试范围`[80000,89999]`和练级范围`[90000,99999]`. 可进入地图必须启用遇敌并配置有效敌人组.
-- `encounter.enabled` 必须显式配置; 启用遇敌时 `encounter.enemyGroups` 不能为空且总权重必须大于0.
+- `scene/*.yaml` 不设置格式版本字段, 地图 ID 与客户端 `map_id` 一致; `collision.blockedRows` 保存服务端阻挡, `encounter.enabled` 和 `encounter.enemyGroups` 定义全地图默认规则, 可选的 `encounter.regions` 按 `x/y/width/height` 定义互不重叠的矩形覆盖规则, 每个区域独立设置 `enabled` 与 `enemyGroups`. 区域外回退全地图规则; 关闭的区域是安全区. `npcs` 保存NPC实体及其独立功能选项, `warps` 保存传送起点与目标. 运行时只加载并允许进入已发布的`[100000,200000]`新图; 原图和旧任务、测试、练级地图文件仅保留为历史配置.
+- Godot地图编辑器的新地图ID范围为`[100000,200000]`. 保存草稿只写客户端编辑源, 发布时才生成此目录下同ID的`scene/<map_id>.yaml`; 撤回时移除该文件. 新图允许关闭遇敌. Online仅在下次启动加载目录, 已运行进程不会热更新发布状态.
+- 全地图和每个区域的 `enabled` 必须显式配置; 启用遇敌时对应的 `enemyGroups` 不能为空且总权重必须大于0, 关闭时敌人组列表为空. 旧配置缺少 `regions` 时视为没有区域覆盖. 全地图关闭但有启用区域时仍可开启自动遇敌; 安全区跳过本轮并保持开关.
 - `enemy.group.yaml enemies[].id` 引用宠物模板, `enemies[].battleAI` 必填且引用 `ai.yaml`.
 - `ai.yaml skills[].id` 引用 `技能.yaml`, 权重与技能 ID 在同一条记录中.
 - `pet.yaml` 的非0出生技能槽引用 `技能.yaml`, 不参与敌人 AI 的技能选择.

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"sort"
@@ -38,12 +39,14 @@ const (
 	// 新版敌群配置使用万分比, 随机范围固定为[0,9999].
 	combatPVENormalDropProbabilityMax = 10000
 
-	// 战斗技能ID只来自技能.yaml. 8000005至8000007虽然是有效配置,
-	// 但当前online没有对应处理器, 请求会返回不支持技能错误.
+	// 战斗技能ID只来自技能.yaml. 道具的实际效果继续由item.yaml权威配置.
 	combatSkillAttack     = gameconfig.BattleSkillIDAttack
 	combatSkillDefense    = gameconfig.BattleSkillIDDefense
 	combatSkillEscape     = gameconfig.BattleSkillIDEscape
 	combatSkillCapture    = gameconfig.BattleSkillIDCapture
+	combatSkillSwitchPet  = uint32(8000005)
+	combatSkillItem       = uint32(8000006)
+	combatSkillEquipment  = uint32(8000007)
 	combatSkillStandby    = 8100000
 	combatSkillGuardBreak = 8100003
 )
@@ -156,39 +159,91 @@ type combatUnitRuntimeState struct {
 	weaponAttackNumberMax   uint32
 }
 
-// applyPetBattleTraits把宠物模板中不进入协议的8.5固有战斗特性冻结到单位运行态.
-//
-// 玩家宠物和敌方宠物都按PetId读取同一份服务器配置. 角色没有PetId, 因而保持
-// 零值. 配置只在建房时读取一次, 后续即使热更新PetEntry也不会改变进行中的战斗;
-// 客户端提交的技能ID、目标或表现资源同样不能覆盖这些特性.
+// applyPetBattleTraits保留默认宠物模板调用兼容, 新运行链路使用applyGrowthAttributeBattleTraits.
 func applyPetBattleTraits(state *combatUnitRuntimeState, pet *gameconfig.PetEntry) {
-	if state == nil || pet == nil || pet.Attribute == nil {
+	if pet == nil {
 		return
 	}
-	if pet.Attribute.Rare != nil {
-		state.rare = *pet.Attribute.Rare
+	growthAttribute := pet.GrowthAttribute
+	if growthAttribute == nil && pet.Attribute != nil {
+		growthAttribute = &gameconfig.GrowthAttributeEntry{Attribute: pet.Attribute}
 	}
-	state.ultimateKnockbackImmune = pet.Attribute.UltimateKnockbackImmune
-	state.inanimate = pet.Attribute.Inanimate
+	applyGrowthAttributeBattleTraits(state, growthAttribute)
+}
+
+// applyGrowthAttributeBattleTraits把成长属性中不进入协议的8.5固有战斗特性冻结到单位运行态.
+func applyGrowthAttributeBattleTraits(state *combatUnitRuntimeState, growthAttribute *gameconfig.GrowthAttributeEntry) {
+	if state == nil || growthAttribute == nil || growthAttribute.Attribute == nil {
+		return
+	}
+	attribute := growthAttribute.Attribute
+	if attribute.Rare != nil {
+		state.rare = *attribute.Rare
+	}
+	state.ultimateKnockbackImmune = attribute.UltimateKnockbackImmune
+	state.inanimate = attribute.Inanimate
 	if state.statusResistance == nil {
 		state.statusResistance = make(map[pb.CombatStatusType]int64)
 	}
-	if pet.Attribute.PoisonResist != nil {
-		state.poisonResistance = int64(*pet.Attribute.PoisonResist)
+	if attribute.PoisonResist != nil {
+		state.poisonResistance = int64(*attribute.PoisonResist)
 		state.statusResistance[pb.CombatStatusType_CombatStatusType_Poison] = state.poisonResistance
 	}
-	if pet.Attribute.SleepResist != nil {
-		state.statusResistance[pb.CombatStatusType_CombatStatusType_Sleep] = int64(*pet.Attribute.SleepResist)
+	if attribute.ParalysisResist != nil {
+		state.statusResistance[pb.CombatStatusType_CombatStatusType_Paralysis] = int64(*attribute.ParalysisResist)
 	}
-	if pet.Attribute.StoneResist != nil {
-		state.statusResistance[pb.CombatStatusType_CombatStatusType_Stone] = int64(*pet.Attribute.StoneResist)
+	if attribute.SleepResist != nil {
+		state.statusResistance[pb.CombatStatusType_CombatStatusType_Sleep] = int64(*attribute.SleepResist)
 	}
-	if pet.Attribute.DrunkResist != nil {
-		state.statusResistance[pb.CombatStatusType_CombatStatusType_Drunk] = int64(*pet.Attribute.DrunkResist)
+	if attribute.StoneResist != nil {
+		state.statusResistance[pb.CombatStatusType_CombatStatusType_Stone] = int64(*attribute.StoneResist)
 	}
-	if pet.Attribute.ConfusionResist != nil {
-		state.statusResistance[pb.CombatStatusType_CombatStatusType_Confusion] = int64(*pet.Attribute.ConfusionResist)
+	if attribute.DrunkResist != nil {
+		state.statusResistance[pb.CombatStatusType_CombatStatusType_Drunk] = int64(*attribute.DrunkResist)
 	}
+	if attribute.ConfusionResist != nil {
+		state.statusResistance[pb.CombatStatusType_CombatStatusType_Confusion] = int64(*attribute.ConfusionResist)
+	}
+}
+
+// applyEnemyAttributeModifiers把敌人成员修正叠加到宠物模板原值并冻结到本场运行态.
+// 该修正只属于当前敌人条目, 不修改共享宠物模板、玩家宠物或捕获后的宠物档案.
+func applyEnemyAttributeModifiers(
+	state *combatUnitRuntimeState,
+	pet *gameconfig.PetEntry,
+	modifiers *gameconfig.EnemyAttributeModifierEntry,
+) {
+	if pet == nil {
+		return
+	}
+	growthAttribute := pet.GrowthAttribute
+	if growthAttribute == nil && pet.Attribute != nil {
+		growthAttribute = &gameconfig.GrowthAttributeEntry{Attribute: pet.Attribute}
+	}
+	applyGrowthAttributeEnemyModifiers(state, growthAttribute, modifiers)
+}
+
+func applyGrowthAttributeEnemyModifiers(
+	state *combatUnitRuntimeState,
+	growthAttribute *gameconfig.GrowthAttributeEntry,
+	modifiers *gameconfig.EnemyAttributeModifierEntry,
+) {
+	if state == nil || growthAttribute == nil || growthAttribute.Attribute == nil {
+		return
+	}
+	if modifiers == nil {
+		modifiers = &gameconfig.EnemyAttributeModifierEntry{}
+	}
+	attribute := growthAttribute.Attribute
+	state.poisonResistance = int64(*attribute.PoisonResist) + int64(modifiers.PoisonResist)
+	state.statusResistance[pb.CombatStatusType_CombatStatusType_Poison] = state.poisonResistance
+	state.statusResistance[pb.CombatStatusType_CombatStatusType_Paralysis] = int64(*attribute.ParalysisResist) + int64(modifiers.ParalysisResist)
+	state.statusResistance[pb.CombatStatusType_CombatStatusType_Sleep] = int64(*attribute.SleepResist) + int64(modifiers.SleepResist)
+	state.statusResistance[pb.CombatStatusType_CombatStatusType_Stone] = int64(*attribute.StoneResist) + int64(modifiers.StoneResist)
+	state.statusResistance[pb.CombatStatusType_CombatStatusType_Drunk] = int64(*attribute.DrunkResist) + int64(modifiers.DrunkResist)
+	state.statusResistance[pb.CombatStatusType_CombatStatusType_Confusion] = int64(*attribute.ConfusionResist) + int64(modifiers.ConfusionResist)
+	state.criticalModifier = int64(*attribute.Critical) + int64(modifiers.Critical)
+	state.counterModifier = int64(*attribute.Counter) + int64(modifiers.Counter)
 }
 
 // onAutoEncounterSetReq 按角色 UUID 设置自动遇敌开关, 普通队员不能操作, 开启前校验目标角色和场景状态.
@@ -280,6 +335,32 @@ func (p *Account) onCombatRoundActionReq(gateway *Gateway, pkt *pb.OnlineClientP
 		p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundActionRes_CMD), xerror.FailedPrecondition.Code())
 		return
 	}
+	// 道具库存属于账号actor. 投递房间前先拒绝不存在、不可战斗使用或数量不足的请求;
+	// 实际扣除仍延迟到行动执行, 避免单位未能出手时提前消耗.
+	if req.GetSkillId() == combatSkillItem {
+		itemID := req.GetArgItemId()
+		item := (*gameconfig.ItemEntry)(nil)
+		if gameconfig.GGameConfig != nil && gameconfig.GGameConfig.Item != nil {
+			item = gameconfig.GGameConfig.Item.Get(itemID)
+		}
+		if unitKey.GetPetUuid() != 0 || itemID == 0 || req.GetArgItemUuid() != 0 || req.GetArgItemCount() != 1 ||
+			item == nil || item.BattleUse == nil || newCharacterItemManager(character.record).Count(itemID) < 1 {
+			p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundActionRes_CMD), xerror.FailedPrecondition.Code())
+			return
+		}
+	}
+	// 战斗换装与普通换装复用同一候选档案校验, 但这里只做预检.
+	// 实际持久化延迟到行动执行, 单位中途失去行动时不能提前改变装备.
+	if req.GetSkillId() == combatSkillEquipment {
+		if unitKey.GetPetUuid() != 0 {
+			p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundActionRes_CMD), xerror.FailedPrecondition.Code())
+			return
+		}
+		if _, err := prepareCharacterEquipmentReplacePlan(p.accountRecord, character.record, req.GetArgEquipmentType(), req.GetArgEquipmentUuid()); err != nil {
+			p.sendClientErr(gateway, uint32(pb.MsgID_CombatRoundActionRes_CMD), characterEquipmentResultID(err))
+			return
+		}
+	}
 	postCombatRoomRoundAction(character.combatRoom, combatRoomParticipantKey{
 		aid:           p.aid,
 		characterUUID: characterUUID,
@@ -363,9 +444,15 @@ func (r *CombatRoom) onCombatRoundActionReq(key combatRoomParticipantKey, gatewa
 
 // combatSkillInput 是服务端内部技能输入, 隔离传输请求和敌方AI的参数来源.
 type combatSkillInput struct {
-	SkillId       uint32
-	ArgTargetUnit *pb.CombatUnitKey
-	ArgTargetCamp pb.CombatCamp
+	SkillId          uint32
+	ArgTargetUnit    *pb.CombatUnitKey
+	ArgTargetCamp    pb.CombatCamp
+	ArgSwitchPetUUID uint64
+	ArgItemID        uint32
+	ArgItemUUID      uint64
+	ArgItemCount     uint32
+	ArgEquipmentType pb.EquipmentType
+	ArgEquipmentUUID uint64
 }
 
 func combatSkillInputFromRequest(req *pb.CombatRoundActionReq) *combatSkillInput {
@@ -373,10 +460,58 @@ func combatSkillInputFromRequest(req *pb.CombatRoundActionReq) *combatSkillInput
 		return nil
 	}
 	return &combatSkillInput{
-		SkillId:       req.GetSkillId(),
-		ArgTargetUnit: req.GetArgTargetUnit(),
-		ArgTargetCamp: req.GetArgTargetCamp(),
+		SkillId:          req.GetSkillId(),
+		ArgTargetUnit:    req.GetArgTargetUnit(),
+		ArgTargetCamp:    req.GetArgTargetCamp(),
+		ArgSwitchPetUUID: req.GetArgSwitchPetUuid(),
+		ArgItemID:        req.GetArgItemId(),
+		ArgItemUUID:      req.GetArgItemUuid(),
+		ArgItemCount:     req.GetArgItemCount(),
+		ArgEquipmentType: req.GetArgEquipmentType(),
+		ArgEquipmentUUID: req.GetArgEquipmentUuid(),
 	}
+}
+
+func (input *combatSkillInput) GetArgEquipmentType() pb.EquipmentType {
+	if input == nil {
+		return pb.EquipmentType_EquipmentType_Unspecified
+	}
+	return input.ArgEquipmentType
+}
+
+func (input *combatSkillInput) GetArgEquipmentUUID() uint64 {
+	if input == nil {
+		return 0
+	}
+	return input.ArgEquipmentUUID
+}
+
+func (input *combatSkillInput) GetArgSwitchPetUUID() uint64 {
+	if input == nil {
+		return 0
+	}
+	return input.ArgSwitchPetUUID
+}
+
+func (input *combatSkillInput) GetArgItemID() uint32 {
+	if input == nil {
+		return 0
+	}
+	return input.ArgItemID
+}
+
+func (input *combatSkillInput) GetArgItemUUID() uint64 {
+	if input == nil {
+		return 0
+	}
+	return input.ArgItemUUID
+}
+
+func (input *combatSkillInput) GetArgItemCount() uint32 {
+	if input == nil {
+		return 0
+	}
+	return input.ArgItemCount
 }
 
 func (input *combatSkillInput) GetSkillId() uint32 {
@@ -433,6 +568,81 @@ func (r *CombatRoom) characterCombatSkillAction(unit *pb.CombatUnit, input *comb
 		}
 		action.kind = combatActionKindCapture
 		action.targetKey = target
+	case combatSkillSwitchPet:
+		participant := r.participant(combatRoomParticipantKey{
+			aid: unit.GetKey().GetAid(), characterUUID: unit.GetKey().GetCharacterUuid(),
+		})
+		if participant == nil || participant.playerCharacter != unit {
+			return nil, fmt.Errorf("only the controlled player character can switch pets")
+		}
+		targetPetUUID := input.GetArgSwitchPetUUID()
+		if participant.playerPet == nil && targetPetUUID == 0 {
+			return nil, fmt.Errorf("there is no active pet to recall")
+		}
+		if participant.playerPet != nil && participant.playerPet.GetKey().GetPetUuid() == targetPetUUID {
+			return nil, fmt.Errorf("switch target is already active")
+		}
+		if targetPetUUID != 0 {
+			targetState := participant.petStates[targetPetUUID]
+			if targetState == nil || !targetState.alive || targetState.hp == 0 {
+				return nil, fmt.Errorf("switch target pet is unavailable: %d", targetPetUUID)
+			}
+			if r.stateByKey(targetState.unit.GetKey()) != nil {
+				return nil, fmt.Errorf("switch target pet is already on battlefield: %d", targetPetUUID)
+			}
+		}
+		action.kind = combatActionKindSwitchPet
+		action.switchPetUUID = targetPetUUID
+	case combatSkillItem:
+		if input.GetArgItemID() == 0 || input.GetArgItemUUID() != 0 || input.GetArgItemCount() != 1 {
+			return nil, fmt.Errorf("combat item arguments are invalid")
+		}
+		if gameconfig.GGameConfig.Item == nil {
+			return nil, fmt.Errorf("item config is not loaded")
+		}
+		item := gameconfig.GGameConfig.Item.Get(input.GetArgItemID())
+		if item == nil || item.BattleUse == nil {
+			return nil, fmt.Errorf("item is not usable in combat: %d", input.GetArgItemID())
+		}
+		action.kind = combatActionKindItem
+		action.itemID = input.GetArgItemID()
+		action.itemBattleUse = *item.BattleUse
+		switch item.BattleUse.TargetScope {
+		case gameconfig.ItemBattleTargetSingleAlly:
+			target, err := r.validAllyTarget(input.GetArgTargetUnit(), unit.GetKey())
+			if err != nil {
+				return nil, err
+			}
+			action.targetKey = target
+		case gameconfig.ItemBattleTargetSingleDeadAlly:
+			target, err := r.validDeadAllyTarget(input.GetArgTargetUnit(), unit.GetKey())
+			if err != nil {
+				return nil, err
+			}
+			action.targetKey = target
+		case gameconfig.ItemBattleTargetSingleOpponent:
+			target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+			if err != nil {
+				return nil, err
+			}
+			action.targetKey = target
+		case gameconfig.ItemBattleTargetNone:
+			if input.GetArgTargetUnit() != nil && !combatUnitKeyEmpty(input.GetArgTargetUnit()) {
+				return nil, fmt.Errorf("field item does not accept a target")
+			}
+		default:
+			return nil, fmt.Errorf("unsupported combat item target scope: %s", item.BattleUse.TargetScope)
+		}
+	case combatSkillEquipment:
+		if characterEquipmentSlot(unit.GetEquipment(), input.GetArgEquipmentType()) == nil ||
+			(input.ArgTargetUnit != nil && !combatUnitKeyEmpty(input.ArgTargetUnit)) ||
+			input.ArgTargetCamp != pb.CombatCamp_CombatCamp_Initiator || input.ArgSwitchPetUUID != 0 ||
+			input.ArgItemID != 0 || input.ArgItemUUID != 0 || input.ArgItemCount != 0 {
+			return nil, fmt.Errorf("combat equipment arguments are invalid")
+		}
+		action.kind = combatActionKindEquipment
+		action.equipmentType = input.GetArgEquipmentType()
+		action.equipmentUUID = input.GetArgEquipmentUUID()
 	default:
 		if !skill.CanBeUsedBy("character") || skill.MPCost == nil {
 			return nil, fmt.Errorf("unsupported character combat skill: %d", skillID)
@@ -483,6 +693,25 @@ func (r *CombatRoom) characterCombatSkillAction(unit *pb.CombatUnit, input *comb
 			default:
 				return nil, fmt.Errorf("unsupported healing target scope: %s", skill.TargetScope)
 			}
+		} else if parameters, ok := skill.StatusRecoveryParameters(); ok {
+			action.kind = combatActionKindStatusRecovery
+			action.recoveryStatusType = pb.CombatStatusType(parameters.StatusID)
+			action.recoveryTargetScope = skill.TargetScope
+			action.recoveryMPCost = *skill.MPCost
+			switch skill.TargetScope {
+			case "singleAlly":
+				target, err := r.validAllyTarget(input.GetArgTargetUnit(), unit.GetKey())
+				if err != nil {
+					return nil, err
+				}
+				action.targetKey = target
+			case "allyCamp":
+				if input.GetArgTargetUnit() != nil && !combatUnitKeyEmpty(input.GetArgTargetUnit()) {
+					return nil, fmt.Errorf("ally camp recovery skill does not accept a target")
+				}
+			default:
+				return nil, fmt.Errorf("unsupported recovery target scope: %s", skill.TargetScope)
+			}
 		} else {
 			return nil, fmt.Errorf("unsupported character combat skill: %d", skillID)
 		}
@@ -512,10 +741,8 @@ func (r *CombatRoom) characterUnitOwnsEquippedSkill(unit *pb.CombatUnit, skillID
 		if entry != nil && entry.GrantedSkillID == skillID {
 			return true
 		}
-		for _, additionalSkillID := range record.GetAdditionalSkillIdList() {
-			if additionalSkillID == skillID {
-				return true
-			}
+		if record.GetAdditionalSkillId() == skillID {
+			return true
 		}
 	}
 	return false
@@ -647,6 +874,18 @@ func (r *CombatRoom) petCombatSkillAction(unit *pb.CombatUnit, input *combatSkil
 		action.targetKey = target
 		action.confusionDurationActions = *skill.ConfusionAttack.DurationActions
 		action.confusionAttackPercentModifier = *skill.ConfusionAttack.AttackPercentModifier
+	case skill.DrunkAttack != nil:
+		if skill.DrunkAttack.DurationActions == nil || skill.DrunkAttack.AttackPercentModifier == nil {
+			return nil, fmt.Errorf("drunk attack skill config is incomplete: %d", skillID)
+		}
+		target, err := r.validOpponentTarget(input.GetArgTargetUnit(), unit.GetKey())
+		if err != nil {
+			return nil, err
+		}
+		action.kind = combatActionKindDrunkAttack
+		action.targetKey = target
+		action.drunkDurationActions = *skill.DrunkAttack.DurationActions
+		action.drunkAttackPercentModifier = *skill.DrunkAttack.AttackPercentModifier
 	case skill.SleepAttack != nil:
 		if skill.SleepAttack.DurationActions == nil || skill.SleepAttack.AttackPercentModifier == nil {
 			return nil, fmt.Errorf("sleep attack skill config is incomplete: %d", skillID)
@@ -761,7 +1000,7 @@ func petCombatSkillIsSupported(skillID uint32, skill *gameconfig.SkillEntry) boo
 	if skillID == combatSkillStandby || skillID == combatSkillAttack || skillID == combatSkillDefense || skillID == combatSkillGuardBreak {
 		return true
 	}
-	return skill.ContinuationAttack != nil || skill.MightyAttack != nil || skill.PoisonAttack != nil || skill.StoneAttack != nil || skill.ConfusionAttack != nil || skill.SleepAttack != nil || skill.DeepPoisonAttack != nil ||
+	return skill.ContinuationAttack != nil || skill.MightyAttack != nil || skill.PoisonAttack != nil || skill.StoneAttack != nil || skill.ConfusionAttack != nil || skill.DrunkAttack != nil || skill.SleepAttack != nil || skill.DeepPoisonAttack != nil ||
 		skill.ChargeAttack != nil || skill.EarthRound != nil || skill.Guardian != nil || skill.NoGuard != nil || skill.PowerBalance != nil || skill.ShowMercy != nil || skill.Abduct != nil
 }
 
@@ -769,14 +1008,14 @@ func petCombatSkillIsSupported(skillID uint32, skill *gameconfig.SkillEntry) boo
 // 玩家七槽复制到CombatUnit供客户端选招, 敌方AI仅保留在服务端运行态;
 // 两者在战斗期间都不再查询宠物模板或实时档案.
 func (r *CombatRoom) petUnitOwnsConfiguredSkill(unit *pb.CombatUnit, skillID uint32) bool {
-	if r == nil || unit == nil || unit.GetPetId() == 0 || skillID == 0 {
+	if r == nil || unit == nil || skillID == 0 {
 		return false
 	}
 	state := r.stateByKey(unit.GetKey())
 	if state == nil {
 		return false
 	}
-	if combatKind(unit) != combatUnitKindPet {
+	if combatKind(unit) == combatUnitKindEnemy {
 		if state.enemyAI == nil {
 			return false
 		}
@@ -785,6 +1024,9 @@ func (r *CombatRoom) petUnitOwnsConfiguredSkill(unit *pb.CombatUnit, skillID uin
 				return true
 			}
 		}
+		return false
+	}
+	if unit.GetPetId() == 0 || combatKind(unit) != combatUnitKindPet {
 		return false
 	}
 	for _, ownedSkillID := range state.skillSlots {
@@ -852,23 +1094,40 @@ func arrangeCombatPVEEnemyUnits(enemyUnits []*pb.CombatUnit) {
 // 从而锁定8.5在“目标数量、候选权重、逐敌人等级”三个阶段的抽数顺序.
 type combatPVERandomRange func(min uint32, max uint32) uint32
 
-// selectCombatPVEMapEnemyGroup 使用当前地图的全局遇敌规则,
-// 复刻ENEMY_getEnemy选择敌组的累计权重算法.
+var errCombatPVEEncounterDisabled = errors.New("current map coordinate has no encounter")
+
+// selectCombatPVEMapEnemyGroup 先按权威地图格选择区域规则, 未命中时使用全地图规则,
+// 再复刻ENEMY_getEnemy选择敌组的累计权重算法.
 //
 // 8.5先把当前地图内所有可用组的权重相加, 再执行一次RAND(0,total-1).
 // 权重为0的组仍可保留在配置中, 但没有自己的随机区间, 因而不会被抽中.
 func selectCombatPVEMapEnemyGroup(
 	scene *gameconfig.SceneEntry,
+	x uint32,
+	y uint32,
 	random combatPVERandomRange,
 ) (gameconfig.SceneEnemyGroupEntry, error) {
-	if scene == nil || scene.ID == nil || scene.Encounter == nil || scene.Encounter.Enabled == nil || !*scene.Encounter.Enabled {
-		return gameconfig.SceneEnemyGroupEntry{}, fmt.Errorf("scene encounter is disabled")
+	if scene == nil || scene.ID == nil || scene.Encounter == nil || scene.Encounter.Enabled == nil {
+		return gameconfig.SceneEnemyGroupEntry{}, fmt.Errorf("scene encounter is missing")
 	}
 	if random == nil {
 		return gameconfig.SceneEnemyGroupEntry{}, fmt.Errorf("combat PVE random source is nil")
 	}
+	enabled := scene.Encounter.Enabled
+	groups := scene.Encounter.EnemyGroups
+	for index := range scene.Encounter.Regions {
+		region := &scene.Encounter.Regions[index]
+		if x >= *region.X && x-*region.X < *region.Width && y >= *region.Y && y-*region.Y < *region.Height {
+			enabled = region.Enabled
+			groups = region.EnemyGroups
+			break
+		}
+	}
+	if !*enabled {
+		return gameconfig.SceneEnemyGroupEntry{}, errCombatPVEEncounterDisabled
+	}
 	totalWeight := uint64(0)
-	for index, group := range scene.Encounter.EnemyGroups {
+	for index, group := range groups {
 		if group.ID == nil || group.Weight == nil {
 			return gameconfig.SceneEnemyGroupEntry{}, fmt.Errorf(
 				"scene enemy group is incomplete: scene:%d index:%d", *scene.ID, index,
@@ -883,7 +1142,7 @@ func selectCombatPVEMapEnemyGroup(
 	}
 	roll := random(0, uint32(totalWeight)-1)
 	currentWeight := uint64(0)
-	for _, group := range scene.Encounter.EnemyGroups {
+	for _, group := range groups {
 		currentWeight += uint64(*group.Weight)
 		if uint64(roll) < currentWeight {
 			return group, nil
@@ -927,7 +1186,7 @@ func selectCombatPVEEnemyEntries(
 	selected := make([]gameconfig.EnemyEntry, 0, targetCount)
 	totalWeight := uint64(0)
 	for index, enemy := range group.Enemies {
-		if enemy.ID == nil || enemy.Weight == nil {
+		if enemy.AssetID() == 0 || enemy.Weight == nil {
 			return nil, fmt.Errorf("normal enemy group entry is incomplete: group:%d index:%d", *group.ID, index)
 		}
 		if *enemy.Weight == 0 {
@@ -977,7 +1236,7 @@ func combatPVEEnemyLevel(
 	roleLevel uint32,
 	random combatPVERandomRange,
 ) (uint32, error) {
-	if group == nil || group.ID == nil || group.IsBoss == nil || enemy.ID == nil {
+	if group == nil || group.ID == nil || group.IsBoss == nil || enemy.AssetID() == 0 {
 		return 0, fmt.Errorf("enemy group or enemy level field is incomplete")
 	}
 	if enemy.Level != nil {
@@ -999,7 +1258,7 @@ func combatPVEEnemyLevel(
 		levelMin = int(roleLevel) + *group.RoleLevelOffset.Min
 		levelMax = int(roleLevel) + *group.RoleLevelOffset.Max
 	} else {
-		return 0, fmt.Errorf("enemy level range is invalid: group:%d enemy:%d", *group.ID, *enemy.ID)
+		return 0, fmt.Errorf("enemy level range is invalid: group:%d enemy:%d", *group.ID, enemy.AssetID())
 	}
 	if levelMin < int(pb.Constants_Constants_Level_Min) {
 		levelMin = int(pb.Constants_Constants_Level_Min)
@@ -1042,7 +1301,8 @@ type combatPVEEnemyAttributes struct {
 // createCombatPVEEnemyAttributes复刻8.5 ENEMY_createEnemy的无装备敌人属性生成链.
 //
 // 随机顺序和整数层级都属于战斗规则, 不能合并或交换:
-//  1. 按体力、腕力、耐力、速度顺序各执行一次RAND(0,4), 映射为-2至+2.
+//  1. 未限制品阶时按体力、腕力、耐力、速度顺序各执行一次RAND(0,4), 映射为-2至+2;
+//     限制品阶时改为从符合范围的原始等概率组合中抽取一次.
 //  2. 在四项已经偏移的基础值上执行10次RAND(0,3), 每次为命中的一项加1.
 //  3. 旧服用atoi读取enemybase的LVUPPOINT, 因而文本4.50实际取整数4.
 //  4. 使用int64中间值计算(initNum+(level-1)*lvupPointEffective)*最终基础值,
@@ -1052,42 +1312,43 @@ type combatPVEEnemyAttributes struct {
 // 当前敌人组和宠物模板没有敌人装备或style字段, 因此本函数只生成无装备属性.
 // 旧服style武器和敌人掉落装备需要正式配置模型及ITEM_equipEffect管线;
 // 在数据归属明确前, 不在这里用临时倍率伪造装备效果.
-func createCombatPVEEnemyAttributes(
-	enemyPet *gameconfig.PetEntry,
+func createCombatPVEEnemyAttributesFromGrowth(
+	growthAttribute *gameconfig.GrowthAttributeEntry,
 	level uint32,
+	gradeRange *gameconfig.IntRange,
 	random combatPVERandomRange,
 ) (combatPVEEnemyAttributes, error) {
 	var attributes combatPVEEnemyAttributes
-	if enemyPet == nil || enemyPet.ID == nil || enemyPet.Growth == nil {
-		return attributes, fmt.Errorf("enemy pet or growth is nil")
+	if growthAttribute == nil || growthAttribute.ID == nil || growthAttribute.Growth == nil {
+		return attributes, fmt.Errorf("enemy growth attribute is nil")
 	}
 	if level < uint32(pb.Constants_Constants_Level_Min) || level > uint32(pb.Constants_Constants_Level_Max) {
-		return attributes, fmt.Errorf("enemy level is out of range: pet:%d level:%d", *enemyPet.ID, level)
+		return attributes, fmt.Errorf("enemy level is out of range: growthAttribute:%d level:%d", *growthAttribute.ID, level)
 	}
 	if random == nil {
 		return attributes, fmt.Errorf("combat PVE random source is nil")
 	}
 
-	growth := enemyPet.Growth
+	growth := growthAttribute.Growth
 	if growth.InitNum == nil ||
 		growth.LvupPointSource == nil ||
 		growth.BaseVital == nil ||
 		growth.BaseStr == nil ||
 		growth.BaseTough == nil ||
 		growth.BaseDex == nil {
-		return attributes, fmt.Errorf("enemy growth field is incomplete: pet:%d", *enemyPet.ID)
+		return attributes, fmt.Errorf("enemy growth field is incomplete: growthAttribute:%d", *growthAttribute.ID)
 	}
 	if *growth.InitNum == 0 || *growth.InitNum > uint32(math.MaxInt32) {
-		return attributes, fmt.Errorf("enemy init number is outside C int range: pet:%d value:%d",
-			*enemyPet.ID, *growth.InitNum)
+		return attributes, fmt.Errorf("enemy init number is outside C int range: growthAttribute:%d value:%d",
+			*growthAttribute.ID, *growth.InitNum)
 	}
 	lvupPointSource := *growth.LvupPointSource
 	if math.IsNaN(lvupPointSource) ||
 		math.IsInf(lvupPointSource, 0) ||
 		lvupPointSource <= 0 ||
 		lvupPointSource > float64(math.MaxInt32) {
-		return attributes, fmt.Errorf("enemy level-up point is outside C int range: pet:%d value:%v",
-			*enemyPet.ID, lvupPointSource)
+		return attributes, fmt.Errorf("enemy level-up point is outside C int range: growthAttribute:%d value:%v",
+			*growthAttribute.ID, lvupPointSource)
 	}
 
 	// pet.yaml保留原文本的数值语义. 对正数直接转为int64等价于旧服atoi在小数点
@@ -1095,8 +1356,8 @@ func createCombatPVEEnemyAttributes(
 	lvupPointEffective := int64(lvupPointSource)
 	factor := int64(*growth.InitNum) + int64(level-1)*lvupPointEffective
 	if factor <= 0 || factor > int64(math.MaxInt32) {
-		return attributes, fmt.Errorf("enemy growth factor is outside C int range: pet:%d level:%d factor:%d",
-			*enemyPet.ID, level, factor)
+		return attributes, fmt.Errorf("enemy growth factor is outside C int range: growthAttribute:%d level:%d factor:%d",
+			*growthAttribute.ID, level, factor)
 	}
 
 	baseValues := [4]int64{
@@ -1105,14 +1366,16 @@ func createCombatPVEEnemyAttributes(
 		int64(*growth.BaseTough),
 		int64(*growth.BaseDex),
 	}
+	offsets, err := combatPVEEnemyBaseOffsets(gradeRange, random)
+	if err != nil {
+		return attributes, fmt.Errorf("create enemy base offsets: %w", err)
+	}
 	for index := range baseValues {
-		// RAND(0,4)-2必须分别调用四次. 合并成一次品阶偏移会让四维完全相关,
-		// 既改变个体分布, 也会破坏后续共享随机流的顺序.
-		baseValues[index] += int64(random(0, 4)) - 2
+		baseValues[index] += int64(offsets[index])
 		if baseValues[index] < int64(math.MinInt32) || baseValues[index] > int64(math.MaxInt32) {
 			return attributes, fmt.Errorf(
-				"enemy randomized base attribute is outside C int range: pet:%d index:%d value:%d",
-				*enemyPet.ID, index, baseValues[index],
+				"enemy randomized base attribute is outside C int range: growthAttribute:%d index:%d value:%d",
+				*growthAttribute.ID, index, baseValues[index],
 			)
 		}
 	}
@@ -1122,14 +1385,14 @@ func createCombatPVEEnemyAttributes(
 	for point := 0; point < combatPVEEnemyInitialBonusPointCount; point++ {
 		index := random(0, 3)
 		if index > 3 {
-			return attributes, fmt.Errorf("enemy bonus attribute random result is invalid: pet:%d value:%d",
-				*enemyPet.ID, index)
+			return attributes, fmt.Errorf("enemy bonus attribute random result is invalid: growthAttribute:%d value:%d",
+				*growthAttribute.ID, index)
 		}
 		baseValues[index]++
 		if baseValues[index] > int64(math.MaxInt32) {
 			return attributes, fmt.Errorf(
-				"enemy bonus base attribute is outside C int range: pet:%d index:%d value:%d",
-				*enemyPet.ID, index, baseValues[index],
+				"enemy bonus base attribute is outside C int range: growthAttribute:%d index:%d value:%d",
+				*growthAttribute.ID, index, baseValues[index],
 			)
 		}
 	}
@@ -1139,8 +1402,8 @@ func createCombatPVEEnemyAttributes(
 		rawValue := factor * baseValue
 		if rawValue < int64(math.MinInt32) || rawValue > int64(math.MaxInt32) {
 			return attributes, fmt.Errorf(
-				"enemy raw attribute is outside C int range: pet:%d index:%d value:%d",
-				*enemyPet.ID, index, rawValue,
+				"enemy raw attribute is outside C int range: growthAttribute:%d index:%d value:%d",
+				*growthAttribute.ID, index, rawValue,
 			)
 		}
 		rawValues[index] = int32(rawValue)
@@ -1158,13 +1421,13 @@ func createCombatPVEEnemyAttributes(
 		int64(attributes.rawDexterity)
 	if hpInput < int64(math.MinInt32) || hpInput > int64(math.MaxInt32) {
 		return combatPVEEnemyAttributes{}, fmt.Errorf(
-			"enemy max HP input is outside C int range: pet:%d value:%d", *enemyPet.ID, hpInput,
+			"enemy max HP input is outside C int range: growthAttribute:%d value:%d", *growthAttribute.ID, hpInput,
 		)
 	}
 	calculatedHP := int64(float32(float64(hpInput) * 0.01))
 	if calculatedHP <= 0 {
-		return combatPVEEnemyAttributes{}, fmt.Errorf("enemy max HP is not positive: pet:%d level:%d value:%d",
-			*enemyPet.ID, level, calculatedHP)
+		return combatPVEEnemyAttributes{}, fmt.Errorf("enemy max HP is not positive: growthAttribute:%d level:%d value:%d",
+			*growthAttribute.ID, level, calculatedHP)
 	}
 	attributes.hp = uint32(calculatedHP)
 
@@ -1177,8 +1440,8 @@ func createCombatPVEEnemyAttributes(
 			float64(attributes.rawDexterity)*0.01*0.05,
 	)
 	if calculatedAttack <= 0 || calculatedAttack > int64(math.MaxInt32) {
-		return combatPVEEnemyAttributes{}, fmt.Errorf("enemy attack is outside C int range: pet:%d value:%d",
-			*enemyPet.ID, calculatedAttack)
+		return combatPVEEnemyAttributes{}, fmt.Errorf("enemy attack is outside C int range: growthAttribute:%d value:%d",
+			*growthAttribute.ID, calculatedAttack)
 	}
 	calculatedDefense := int64(
 		float64(attributes.rawToughness)*0.01*1.0 +
@@ -1190,8 +1453,8 @@ func createCombatPVEEnemyAttributes(
 	if calculatedDefense < int64(math.MinInt32) || calculatedDefense > int64(math.MaxInt32) ||
 		calculatedAgility < int64(math.MinInt32) || calculatedAgility > int64(math.MaxInt32) {
 		return combatPVEEnemyAttributes{}, fmt.Errorf(
-			"enemy signed combat attribute is outside C int range: pet:%d defense:%d agility:%d",
-			*enemyPet.ID, calculatedDefense, calculatedAgility,
+			"enemy signed combat attribute is outside C int range: growthAttribute:%d defense:%d agility:%d",
+			*growthAttribute.ID, calculatedDefense, calculatedAgility,
 		)
 	}
 	attributes.attack = uint32(calculatedAttack)
@@ -1200,20 +1463,139 @@ func createCombatPVEEnemyAttributes(
 	return attributes, nil
 }
 
-// combatPVEEnemyExperience根据宠物模板和等级生成敌人经验.
-//
-// enemy.group.yaml直接引用pet.yaml, 因此敌人经验只依赖共享宠物模板和
-// enemy.exp.yaml, 不再经过独立敌人记录.
-func combatPVEEnemyExperience(petID uint32, level uint32) (uint32, error) {
+// createCombatPVEEnemyAttributes保留默认宠物模板的测试/内部兼容入口.
+func createCombatPVEEnemyAttributes(
+	enemyPet *gameconfig.PetEntry,
+	level uint32,
+	gradeRange *gameconfig.IntRange,
+	random combatPVERandomRange,
+) (combatPVEEnemyAttributes, error) {
+	if enemyPet == nil {
+		return combatPVEEnemyAttributes{}, fmt.Errorf("enemy pet is nil")
+	}
+	growthAttribute := enemyPet.GrowthAttribute
+	if growthAttribute == nil && enemyPet.Growth != nil {
+		growthAttribute = &gameconfig.GrowthAttributeEntry{ID: enemyPet.ID, Growth: enemyPet.Growth}
+	}
+	return createCombatPVEEnemyAttributesFromGrowth(growthAttribute, level, gradeRange, random)
+}
+
+// combatPVEEnemyBaseOffsets生成四维的-2至+2基础偏移.
+// 未配置品阶范围时保留原版四次独立随机顺序. 配置范围时则从
+// 625种等概率组合中均匀选择一个符合品阶的组合, 等价于原分布在该范围上的条件分布.
+func combatPVEEnemyBaseOffsets(
+	gradeRange *gameconfig.IntRange,
+	random combatPVERandomRange,
+) ([4]int32, error) {
+	var offsets [4]int32
+	if random == nil {
+		return offsets, fmt.Errorf("combat PVE random source is nil")
+	}
+	if gradeRange == nil {
+		for index := range offsets {
+			offsets[index] = int32(random(0, 4)) - 2
+		}
+		return offsets, nil
+	}
+	if gradeRange.Min == nil || gradeRange.Max == nil {
+		return offsets, fmt.Errorf("enemy grade range is incomplete")
+	}
+	minimum := pb.PetGrade(*gradeRange.Min)
+	maximum := pb.PetGrade(*gradeRange.Max)
+	if minimum < pb.PetGrade_PetGrade_Common || maximum >= pb.PetGrade_PetGrade_Max || minimum > maximum {
+		return offsets, fmt.Errorf("enemy grade range is invalid: [%d,%d]", minimum, maximum)
+	}
+
+	candidates := make([][4]int32, 0, 625)
+	for vitality := int32(-2); vitality <= 2; vitality++ {
+		for strength := int32(-2); strength <= 2; strength++ {
+			for toughness := int32(-2); toughness <= 2; toughness++ {
+				for dexterity := int32(-2); dexterity <= 2; dexterity++ {
+					candidate := [4]int32{vitality, strength, toughness, dexterity}
+					grade := commonpet.GradeFromSavedBaseOffsetTotal(int(vitality + strength + toughness + dexterity))
+					if grade >= minimum && grade <= maximum {
+						candidates = append(candidates, candidate)
+					}
+				}
+			}
+		}
+	}
+	if len(candidates) == 0 {
+		return offsets, fmt.Errorf("enemy grade range has no base offset candidates: [%d,%d]", minimum, maximum)
+	}
+	selected := random(0, uint32(len(candidates)-1))
+	if selected >= uint32(len(candidates)) {
+		return offsets, fmt.Errorf("enemy grade candidate index is invalid: %d/%d", selected, len(candidates))
+	}
+	return candidates[selected], nil
+}
+
+func combatPVEEnemyDisplayName(enemy gameconfig.EnemyEntry, enemyPet *gameconfig.PetEntry) (string, error) {
+	if enemyPet == nil || enemyPet.ID == nil || enemyPet.Name == nil {
+		return "", fmt.Errorf("enemy pet display name is incomplete")
+	}
+	if enemy.DisplayName != nil {
+		return *enemy.DisplayName, nil
+	}
+	return *enemyPet.Name, nil
+}
+
+func combatPVEEnemyAppearanceDisplayName(
+	enemy gameconfig.EnemyEntry,
+	pet *gameconfig.PetEntry,
+	character *gameconfig.CharacterEntry,
+) (string, error) {
+	if enemy.DisplayName != nil {
+		return *enemy.DisplayName, nil
+	}
+	if enemy.IsPet() && pet != nil && pet.Name != nil {
+		return *pet.Name, nil
+	}
+	if enemy.IsCharacter() && character != nil && character.Name != nil {
+		return *character.Name, nil
+	}
+	return "", fmt.Errorf("enemy appearance display name is incomplete: asset:%d", enemy.AssetID())
+}
+
+// combatPVEEnemyExperience根据成长属性和等级生成敌人经验.
+func combatPVEEnemyExperience(growthAttributeID uint32, level uint32) (uint32, error) {
 	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.EnemyExp == nil {
 		return 0, fmt.Errorf("enemy experience config is not loaded")
 	}
-	experience, err := gameconfig.GGameConfig.EnemyExp.GenerateEnemyExp(petID, level)
+	experience, err := gameconfig.GGameConfig.EnemyExp.GenerateEnemyExp(growthAttributeID, level)
 	if err != nil {
-		return 0, fmt.Errorf("generate enemy experience failed pet:%d level:%d: %w",
-			petID, level, err)
+		return 0, fmt.Errorf("generate enemy experience failed growthAttribute:%d level:%d: %w",
+			growthAttributeID, level, err)
 	}
 	return experience, nil
+}
+
+// newCombatPVEEnemyUnit组装不带装备实例的敌人协议快照. 外观只决定pet_id或
+// character_id; 数值取成长属性, 角色武器直接写入weapon_type供客户端表现和战斗规则使用.
+func newCombatPVEEnemyUnit(
+	index int,
+	enemy gameconfig.EnemyEntry,
+	displayName string,
+	level uint32,
+	attributes combatPVEEnemyAttributes,
+) *pb.CombatUnit {
+	unit := &pb.CombatUnit{
+		Camp:        pb.CombatCamp_CombatCamp_Defender,
+		Position:    uint32(index),
+		Key:         &pb.CombatUnitKey{PetUuid: uint64(index) + 1},
+		DisplayName: displayName,
+		WeaponType:  enemy.WeaponType,
+		Attribute: &pb.CombatUnitAttribute{
+			Hp: attributes.hp, Attack: attributes.attack, Defense: attributes.defense, Agility: attributes.agility,
+			Elemental: combatGrowthAttributeElementalPoints(enemy.GrowthAttribute), Level: level,
+		},
+	}
+	if enemy.IsPet() {
+		unit.PetId = enemy.AssetID()
+	} else if enemy.IsCharacter() {
+		unit.CharacterId = enemy.AssetID()
+	}
+	return unit
 }
 
 // rollCombatPVEEnemyDropAssetIDs在敌人实例创建阶段按配置顺序抽取普通掉落.
@@ -1228,10 +1610,7 @@ func rollCombatPVEEnemyDropAssetIDs(
 	if random == nil {
 		return nil, fmt.Errorf("combat PVE normal drop random source is nil")
 	}
-	enemyID := uint32(0)
-	if enemy.ID != nil {
-		enemyID = *enemy.ID
-	}
+	enemyID := enemy.AssetID()
 	dropAssetIDs := make([]uint32, 0, len(enemy.NormalDrops))
 	for index, drop := range enemy.NormalDrops {
 		if drop.ItemID == nil || drop.Probability == nil || *drop.Probability == 0 || *drop.Probability > combatPVENormalDropProbabilityMax {
@@ -1246,6 +1625,11 @@ func rollCombatPVEEnemyDropAssetIDs(
 
 // startCombatPVE 使用指定敌人组创建并启动一场PVE战斗.
 func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error {
+	return c.startCombatPVEWithTeleport(gateway, enemyGroupID, nil)
+}
+
+// NPC 挑战在建房前冻结胜利落点; 其他 PVE 入口传入 nil.
+func (c *character) startCombatPVEWithTeleport(gateway *Gateway, enemyGroupID uint32, teleport *combatVictoryTeleport) error {
 	if c == nil || c.account == nil || c.record == nil || c.record.GetBase() == nil {
 		return fmt.Errorf("character is incomplete")
 	}
@@ -1268,8 +1652,10 @@ func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error 
 	if err != nil {
 		return err
 	}
-	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Enemy == nil || gameconfig.GGameConfig.Pet == nil {
-		return fmt.Errorf("enemy group or pet config is not loaded")
+	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Enemy == nil ||
+		gameconfig.GGameConfig.Pet == nil || gameconfig.GGameConfig.Character == nil ||
+		gameconfig.GGameConfig.GrowthAttribute == nil {
+		return fmt.Errorf("enemy appearance or growth config is not loaded")
 	}
 	enemyGroup := gameconfig.GGameConfig.Enemy.Get(enemyGroupID)
 	if enemyGroup == nil {
@@ -1297,28 +1683,39 @@ func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error 
 	enemyExperiences := make(map[string]uint32, len(selectedEnemies))
 	enemyDropAssetIDs := make(map[string][]uint32, len(selectedEnemies))
 	enemyAIs := make(map[string]*gameconfig.BattleAIEntry, len(selectedEnemies))
+	enemyAttributeModifiers := make(map[string]*gameconfig.EnemyAttributeModifierEntry, len(selectedEnemies))
+	enemyGrowthAttributes := make(map[string]*gameconfig.GrowthAttributeEntry, len(selectedEnemies))
 	captureSnapshots := make(map[string]*commonpet.CaptureSnapshot, len(selectedEnemies))
 	for index, enemy := range selectedEnemies {
-		if enemy.ID == nil {
-			return fmt.Errorf("selected enemy pet id is nil")
+		assetID := enemy.AssetID()
+		if assetID == 0 {
+			return fmt.Errorf("selected enemy appearance id is nil")
 		}
-		petID := *enemy.ID
-		if enemy.BattleAI == nil {
-			return fmt.Errorf("selected enemy AI is not assembled: group:%d pet:%d", enemyGroupID, petID)
+		if enemy.BattleAI == nil || enemy.GrowthAttribute == nil || enemy.GrowthAttribute.ID == nil {
+			return fmt.Errorf("selected enemy AI or growth attribute is not assembled: group:%d enemy:%d", enemyGroupID, assetID)
 		}
 		level, err := combatPVEEnemyLevel(enemyGroup, enemy, characterLevel, xutil.RandomU32)
 		if err != nil {
 			return err
 		}
-		enemyPet := gameconfig.GGameConfig.Pet.Get(petID)
-		if enemyPet == nil {
-			return fmt.Errorf("enemy pet config not found: pet:%d", petID)
+		var enemyPet *gameconfig.PetEntry
+		var enemyCharacter *gameconfig.CharacterEntry
+		if enemy.IsPet() {
+			enemyPet = gameconfig.GGameConfig.Pet.Get(assetID)
+			if enemyPet == nil {
+				return fmt.Errorf("enemy pet config not found: pet:%d", assetID)
+			}
+		} else {
+			enemyCharacter = gameconfig.GGameConfig.Character.Get(assetID)
+			if enemyCharacter == nil {
+				return fmt.Errorf("enemy character config not found: character:%d", assetID)
+			}
 		}
-		enemyAttributes, err := createCombatPVEEnemyAttributes(enemyPet, level, xutil.RandomU32)
+		enemyAttributes, err := createCombatPVEEnemyAttributesFromGrowth(enemy.GrowthAttribute, level, enemy.GradeRange, xutil.RandomU32)
 		if err != nil {
 			return err
 		}
-		enemyExperience, err := combatPVEEnemyExperience(petID, level)
+		enemyExperience, err := combatPVEEnemyExperience(*enemy.GrowthAttribute.ID, level)
 		if err != nil {
 			return err
 		}
@@ -1327,32 +1724,25 @@ func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error 
 			return err
 		}
 		// 敌方没有账号内的持久化宠物 UUID, 使用从 1 开始的本场序号生成战斗内唯一的单位键.
-		enemyUnit := &pb.CombatUnit{
-			Camp:     pb.CombatCamp_CombatCamp_Defender,
-			Position: uint32(index),
-			Key:      &pb.CombatUnitKey{PetUuid: uint64(index) + 1},
-			PetId:    petID,
-			Attribute: &pb.CombatUnitAttribute{
-				Hp:        enemyAttributes.hp,
-				Attack:    enemyAttributes.attack,
-				Defense:   enemyAttributes.defense,
-				Agility:   enemyAttributes.agility,
-				Elemental: combatPetElementalPoints(enemyPet),
-				Level:     level,
-			},
+		displayName, err := combatPVEEnemyAppearanceDisplayName(enemy, enemyPet, enemyCharacter)
+		if err != nil {
+			return fmt.Errorf("resolve enemy display name: group:%d enemy:%d: %w", enemyGroupID, assetID, err)
 		}
+		enemyUnit := newCombatPVEEnemyUnit(index, enemy, displayName, level, enemyAttributes)
 		enemyUnits = append(enemyUnits, enemyUnit)
 		enemyKey := combatUnitKeyMapKey(enemyUnit.GetKey())
 		pveEnemyKeys[enemyKey] = struct{}{}
 		enemyExperiences[enemyKey] = enemyExperience
 		enemyDropAssetIDs[enemyKey] = normalDropAssetIDs
 		enemyAIs[enemyKey] = cloneEnemyBattleAI(enemy.BattleAI)
-		if enemyGroup.Captured != nil && *enemyGroup.Captured && enemyPet.SupportsOrdinaryCreation() {
-			snapshot, snapshotErr := commonpet.NewCaptureSnapshot(enemyPet, level, enemyAttributes.savedBase, [4]int32{
+		enemyAttributeModifiers[enemyKey] = enemy.AttributeModifiers
+		enemyGrowthAttributes[enemyKey] = enemy.GrowthAttribute
+		if enemy.IsPet() && enemyGroup.Captured != nil && *enemyGroup.Captured && enemyPet.SupportsOrdinaryCreation() {
+			snapshot, snapshotErr := commonpet.NewCaptureSnapshotWithGrowthAttribute(enemyPet, enemy.GrowthAttribute, level, enemyAttributes.savedBase, [4]int32{
 				enemyAttributes.rawVitality, enemyAttributes.rawStrength, enemyAttributes.rawToughness, enemyAttributes.rawDexterity,
 			})
 			if snapshotErr != nil {
-				return fmt.Errorf("freeze capture pet:%d: %w", petID, snapshotErr)
+				return fmt.Errorf("freeze capture pet:%d: %w", assetID, snapshotErr)
 			}
 			captureSnapshots[enemyKey] = snapshot
 		}
@@ -1385,13 +1775,14 @@ func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error 
 		maxHP := uint64(unit.GetAttribute().GetHp())
 		maxMP := uint64(unit.GetAttribute().GetMaxMp())
 		state := &combatUnitRuntimeState{
-			unit:    unit,
-			enemyAI: enemyAIs[combatUnitKeyMapKey(unit.GetKey())],
-			hp:      maxHP,
-			maxHP:   maxHP,
-			mp:      maxMP,
-			maxMP:   maxMP,
-			alive:   maxHP > 0,
+			unit:       unit,
+			enemyAI:    enemyAIs[combatUnitKeyMapKey(unit.GetKey())],
+			hp:         maxHP,
+			maxHP:      maxHP,
+			mp:         maxMP,
+			maxMP:      maxMP,
+			alive:      maxHP > 0,
+			weaponType: unit.GetWeaponType(),
 		}
 		targetAttribute := targetAttributes[combatUnitKeyMapKey(unit.GetKey())]
 		state.rawVitality = targetAttribute.vitality
@@ -1403,22 +1794,24 @@ func (c *character) startCombatPVE(gateway *Gateway, enemyGroupID uint32) error 
 		state.enemyExperience = enemyExperiences[unitKey]
 		state.enemyDropAssetIDs = append([]uint32(nil), enemyDropAssetIDs[unitKey]...)
 		state.captureSnapshot = captureSnapshots[unitKey]
-		if unit.GetPetId() != 0 {
-			petEntry := gameconfig.GGameConfig.Pet.Get(unit.GetPetId())
-			applyPetBattleTraits(state, petEntry)
-			if petEntry.Attribute != nil && petEntry.Attribute.Get != nil {
-				state.captureBase = *petEntry.Attribute.Get
-			}
+		growthAttribute := enemyGrowthAttributes[unitKey]
+		applyGrowthAttributeBattleTraits(state, growthAttribute)
+		applyGrowthAttributeEnemyModifiers(state, growthAttribute, enemyAttributeModifiers[unitKey])
+		if unit.GetPetId() != 0 && growthAttribute != nil && growthAttribute.Attribute != nil && growthAttribute.Attribute.Get != nil {
+			state.captureBase = *growthAttribute.Attribute.Get
 		}
 		unitStates[combatUnitKeyMapKey(unit.GetKey())] = state
 	}
 
 	// 队长读取、建房和指针绑定都发生在当前 Account actor 的同一次消息中,
 	// 其他账号消息无法在中间改写其角色运行态. 房间启动前再逐个接收冻结名单中的队员.
-	room, err := newCombatRoom(battleID, enemyGroupID, leaderAdmission.participant, battleStart, enemyUnits, unitStates)
+	room, err := newCombatRoom(battleID, enemyGroupID, leaderAdmission.participant, battleStart, enemyUnits, unitStates, teleport)
 	if err != nil {
 		return err
 	}
+	p.sendMapStopEvents(c.sceneID,
+		GScenePresenceMgr.stopCharacterMove(c.sceneID, leaderKey),
+		pb.EntityStopReason_EntityStopReason_Interrupted)
 	c.combatRoom = room.actor
 	p.refreshCharacterPresence(c)
 	for _, candidate := range candidateMembers[1:] {
@@ -1476,8 +1869,15 @@ func (c *character) restartAutoEncounterTimer(gateway *Gateway) {
 		if !characterMapEncounterEnabled(sceneEntry) {
 			encounterErr = fmt.Errorf("scene encounter is disabled")
 		} else {
-			selectedGroup, err := selectCombatPVEMapEnemyGroup(sceneEntry, xutil.RandomU32)
-			if err != nil {
+			key := sceneCharacterKey{aid: p.aid, characterUUID: characterUUID}
+			movement := GScenePresenceMgr.movementSnapshot(c.sceneID, key)
+			if movement == nil || movement.Position == nil {
+				encounterErr = fmt.Errorf("character map position is missing")
+			} else if selectedGroup, err := selectCombatPVEMapEnemyGroup(sceneEntry, movement.Position.X, movement.Position.Y, xutil.RandomU32); errors.Is(err, errCombatPVEEncounterDisabled) {
+				// 安全区跳过本轮, 保持开关以便离开后继续遇敌.
+				c.restartAutoEncounterTimer(gateway)
+				return nil
+			} else if err != nil {
 				encounterErr = err
 			} else {
 				encounterErr = c.startCombatPVE(gateway, uint32(*selectedGroup.ID))
@@ -1669,8 +2069,9 @@ func (c *character) newCombatRoomParticipantAdmission(gateway *Gateway) (combatR
 	if character == nil || character.GetBase().GetUuid() == 0 || character.GetBase().GetAssetId() == 0 {
 		return admission, fmt.Errorf("character record invalid")
 	}
-	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Exp == nil || gameconfig.GGameConfig.Pet == nil {
-		return admission, fmt.Errorf("exp or pet config is not loaded")
+	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Exp == nil ||
+		gameconfig.GGameConfig.Pet == nil || gameconfig.GGameConfig.GrowthAttribute == nil {
+		return admission, fmt.Errorf("exp, pet or growth attribute config is not loaded")
 	}
 
 	attribute := character.GetBase().GetAttribute()
@@ -1732,6 +2133,7 @@ func (c *character) newCombatRoomParticipantAdmission(gateway *Gateway) (combatR
 		Key:         &pb.CombatUnitKey{Aid: p.aid, CharacterUuid: character.GetBase().GetUuid()},
 		CharacterId: uint32(character.GetBase().GetAssetId()),
 		Equipment:   equipmentSnapshot,
+		WeaponType:  effectiveAttribute.GetWeaponType(),
 		Attribute: &pb.CombatUnitAttribute{
 			Hp:        effectiveAttribute.GetMaxHp(),
 			Attack:    effectiveAttribute.GetAttack(),
@@ -1767,7 +2169,9 @@ func (c *character) newCombatRoomParticipantAdmission(gateway *Gateway) (combatR
 		},
 		characterDuelPoint:    character.GetBase().GetDuelPoint(),
 		charm:                 effectiveAttribute.GetEffectiveCharm(),
+		dodgeModifier:         int64(effectiveAttribute.GetEffectiveAvoid()),
 		criticalModifier:      int64(effectiveAttribute.GetCriticalModifier()),
+		counterModifier:       int64(effectiveAttribute.GetCounterModifier()),
 		otherDamagePower:      int64(effectiveAttribute.GetDamageBonusPercent()),
 		otherDefensePower:     characterOtherDefensePower,
 		weaponType:            effectiveAttribute.GetWeaponType(),
@@ -1783,72 +2187,93 @@ func (c *character) newCombatRoomParticipantAdmission(gateway *Gateway) (combatR
 		account:         p,
 		gateway:         gateway,
 		playerCharacter: characterUnit,
+		petStates:       make(map[uint64]*combatUnitRuntimeState),
 	}
 	unitStates := map[string]*combatUnitRuntimeState{
 		combatUnitKeyMapKey(characterUnit.GetKey()): characterState,
 	}
-	if battlePet != nil {
-		if battlePet.GetUuid() == 0 || battlePet.GetAssetId() == 0 {
-			return admission, fmt.Errorf("pet record invalid")
+	for _, petRecord := range character.GetPetRecordList() {
+		if petRecord == nil || (petRecord.GetCarryStatus() != pb.PetCarryStatus_PetCarryStatus_Battle &&
+			petRecord.GetCarryStatus() != pb.PetCarryStatus_PetCarryStatus_Wait) {
+			continue
 		}
-		petEntry := gameconfig.GGameConfig.Pet.Get(battlePet.GetAssetId())
-		if petEntry == nil {
-			return admission, fmt.Errorf("pet config not found: %d", battlePet.GetAssetId())
+		petState, stateErr := newPlayerPetCombatState(p.aid, character, petRecord)
+		if stateErr != nil {
+			return admission, stateErr
 		}
-		petLevel, levelErr := gameconfig.GGameConfig.Exp.GetLevel(battlePet.GetExp())
-		if levelErr != nil {
-			return admission, levelErr
+		participant.petStates[petRecord.GetUuid()] = petState
+		if battlePet != petRecord {
+			continue
 		}
-		rawVitality := battlePet.GetRawVitality()
-		rawStrength := battlePet.GetRawStrength()
-		rawToughness := battlePet.GetRawToughness()
-		rawDexterity := battlePet.GetRawDexterity()
-		petHP := gameconfig.CalculatePetPanelHP(rawVitality, rawStrength, rawToughness, rawDexterity)
-		petAttack := gameconfig.CalculatePetPanelAttack(rawVitality, rawStrength, rawToughness, rawDexterity)
-		petDefense := gameconfig.CalculatePetPanelDefense(rawVitality, rawStrength, rawToughness, rawDexterity)
-		petAgility := gameconfig.CalculatePetPanelAgility(rawDexterity)
-		if petHP <= 0 || petAttack <= 0 {
-			return admission, fmt.Errorf("pet combat attribute invalid pet:%d hp:%d attack:%d defense:%d agility:%d", battlePet.GetUuid(), petHP, petAttack, petDefense, petAgility)
-		}
-		petUnit := &pb.CombatUnit{
-			Camp:        pb.CombatCamp_CombatCamp_Initiator,
-			Position:    initiatorPetPosition,
-			Key:         &pb.CombatUnitKey{Aid: p.aid, CharacterUuid: character.GetBase().GetUuid(), PetUuid: battlePet.GetUuid()},
-			CharacterId: uint32(character.GetBase().GetAssetId()),
-			PetId:       battlePet.GetAssetId(),
-			SkillIdList: append([]uint32(nil), battlePet.GetSkillIdList()...),
-			Attribute: &pb.CombatUnitAttribute{
-				Hp:        uint32(petHP),
-				Attack:    uint32(petAttack),
-				Defense:   petDefense,
-				Agility:   petAgility,
-				Loyalty:   battlePet.GetLoyalty(),
-				Elemental: combatPetElementalPoints(petEntry),
-				Level:     petLevel,
-			},
-		}
-		petMaxHP := uint64(petUnit.GetAttribute().GetHp())
-		if petMaxHP == 0 {
-			return admission, fmt.Errorf("pet combat hp is zero pet:%d", battlePet.GetUuid())
-		}
-		petState := &combatUnitRuntimeState{
-			unit:         petUnit,
-			skillSlots:   append([]uint32(nil), battlePet.GetSkillIdList()...),
-			hp:           petMaxHP,
-			maxHP:        petMaxHP,
-			alive:        true,
-			rawVitality:  int64(rawVitality),
-			rawStrength:  int64(rawStrength),
-			rawToughness: int64(rawToughness),
-			rawDexterity: int64(rawDexterity),
-		}
-		applyPetBattleTraits(petState, petEntry)
-		participant.playerPet = petUnit
-		unitStates[combatUnitKeyMapKey(petUnit.GetKey())] = petState
+		participant.playerPet = petState.unit
+		unitStates[combatUnitKeyMapKey(petState.unit.GetKey())] = petState
 	}
 	admission.participant = participant
 	admission.unitStates = unitStates
 	return admission, nil
+}
+
+// newPlayerPetCombatState把角色携带宠物冻结为本场独占运行态. Battle和Wait宠物
+// 共用同一构造路径, 防止首次出场与换宠入场使用不同属性公式.
+func newPlayerPetCombatState(aid uint64, character *pb.CharacterRecord, petRecord *pb.PetRecord) (*combatUnitRuntimeState, error) {
+	if aid == 0 || character == nil || character.GetBase() == nil || petRecord == nil || petRecord.GetUuid() == 0 || petRecord.GetAssetId() == 0 {
+		return nil, fmt.Errorf("pet record invalid")
+	}
+	if gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Exp == nil || gameconfig.GGameConfig.Pet == nil || gameconfig.GGameConfig.GrowthAttribute == nil {
+		return nil, fmt.Errorf("exp, pet or growth attribute config is not loaded")
+	}
+	if gameconfig.GGameConfig.Pet.Get(petRecord.GetAssetId()) == nil {
+		return nil, fmt.Errorf("pet config not found: %d", petRecord.GetAssetId())
+	}
+	growthAttribute := gameconfig.GGameConfig.GrowthAttribute.Get(petRecord.GetGrowthAttributeId())
+	if petRecord.GetGrowthAttributeId() == 0 || growthAttribute == nil {
+		return nil, fmt.Errorf("pet growth attribute config not found: pet:%d growthAttribute:%d", petRecord.GetUuid(), petRecord.GetGrowthAttributeId())
+	}
+	petLevel, err := gameconfig.GGameConfig.Exp.GetLevel(petRecord.GetExp())
+	if err != nil {
+		return nil, err
+	}
+	rawVitality := petRecord.GetRawVitality()
+	rawStrength := petRecord.GetRawStrength()
+	rawToughness := petRecord.GetRawToughness()
+	rawDexterity := petRecord.GetRawDexterity()
+	petHP := gameconfig.CalculatePetPanelHP(rawVitality, rawStrength, rawToughness, rawDexterity)
+	petAttack := gameconfig.CalculatePetPanelAttack(rawVitality, rawStrength, rawToughness, rawDexterity)
+	petDefense := gameconfig.CalculatePetPanelDefense(rawVitality, rawStrength, rawToughness, rawDexterity)
+	petAgility := gameconfig.CalculatePetPanelAgility(rawDexterity)
+	if petHP <= 0 || petAttack <= 0 {
+		return nil, fmt.Errorf("pet combat attribute invalid pet:%d hp:%d attack:%d defense:%d agility:%d", petRecord.GetUuid(), petHP, petAttack, petDefense, petAgility)
+	}
+	petUnit := &pb.CombatUnit{
+		Camp:        pb.CombatCamp_CombatCamp_Initiator,
+		Position:    initiatorPetPosition,
+		Key:         &pb.CombatUnitKey{Aid: aid, CharacterUuid: character.GetBase().GetUuid(), PetUuid: petRecord.GetUuid()},
+		CharacterId: uint32(character.GetBase().GetAssetId()),
+		PetId:       petRecord.GetAssetId(),
+		SkillIdList: append([]uint32(nil), petRecord.GetSkillIdList()...),
+		Attribute: &pb.CombatUnitAttribute{
+			Hp:        uint32(petHP),
+			Attack:    uint32(petAttack),
+			Defense:   petDefense,
+			Agility:   petAgility,
+			Loyalty:   petRecord.GetLoyalty(),
+			Elemental: combatGrowthAttributeElementalPoints(growthAttribute),
+			Level:     petLevel,
+		},
+	}
+	petState := &combatUnitRuntimeState{
+		unit:         petUnit,
+		skillSlots:   append([]uint32(nil), petRecord.GetSkillIdList()...),
+		hp:           uint64(petHP),
+		maxHP:        uint64(petHP),
+		alive:        true,
+		rawVitality:  int64(rawVitality),
+		rawStrength:  int64(rawStrength),
+		rawToughness: int64(rawToughness),
+		rawDexterity: int64(rawDexterity),
+	}
+	applyGrowthAttributeBattleTraits(petState, growthAttribute)
+	return petState, nil
 }
 
 // tryBindCombatRoom 在所属 Account actor 的一次消息中完成读取、房间接收和指针绑定.
@@ -1887,6 +2312,10 @@ func (p *Account) tryBindCombatRoom(input combatRoomTryBindInput) combatRoomTryB
 		result.err = err
 		return result
 	}
+	key := sceneCharacterKey{aid: p.aid, characterUUID: input.characterUUID}
+	p.sendMapStopEvents(character.sceneID,
+		GScenePresenceMgr.stopCharacterMove(character.sceneID, key),
+		pb.EntityStopReason_EntityStopReason_Interrupted)
 	character.combatRoom = input.room.actor
 	p.refreshCharacterPresence(character)
 	result.bound = true
@@ -1972,6 +2401,7 @@ type combatParticipantBattleReward struct {
 	characterDuelPointDelta int64
 	battlePetUUID           uint64
 	battlePetExperience     uint64
+	petExperienceByUUID     map[uint64]uint64
 	itemAssetIDs            []uint32
 }
 
@@ -2023,18 +2453,28 @@ func (r *CombatRoom) playerCombatBattleReward(
 	}
 	reward.itemAssetIDs = append([]uint32(nil), characterState.battleDropAssetIDs...)
 	reward.characterExperience = characterState.battleExperience
-	if participant.playerPet == nil {
+	if len(participant.petStates) == 0 && participant.playerPet != nil {
+		petState := r.stateByKey(participant.playerPet.GetKey())
+		if petState != nil && petState.alive {
+			reward.battlePetUUID = participant.playerPet.GetKey().GetPetUuid()
+			reward.battlePetExperience = petState.battleExperience
+		}
 		return reward, nil
 	}
-	petState := r.stateByKey(participant.playerPet.GetKey())
-	if petState == nil {
-		return reward, nil
+	for petUUID, petState := range participant.petStates {
+		if petState == nil || petState.battleExperience == 0 {
+			continue
+		}
+		if participant.playerPet != nil && participant.playerPet.GetKey().GetPetUuid() == petUUID {
+			reward.battlePetUUID = petUUID
+			reward.battlePetExperience = petState.battleExperience
+			continue
+		}
+		if reward.petExperienceByUUID == nil {
+			reward.petExperienceByUUID = make(map[uint64]uint64)
+		}
+		reward.petExperienceByUUID[petUUID] = petState.battleExperience
 	}
-	if !petState.alive {
-		return reward, nil
-	}
-	reward.battlePetUUID = participant.playerPet.GetKey().GetPetUuid()
-	reward.battlePetExperience = petState.battleExperience
 	return reward, nil
 }
 
@@ -2050,6 +2490,7 @@ type combatParticipantPersistenceInput struct {
 	characterDuelPointDelta   int64
 	battlePetUUID             uint64
 	battlePetExperience       uint64
+	petExperienceByUUID       map[uint64]uint64
 	itemAssetIDs              []uint32
 }
 
@@ -2059,8 +2500,10 @@ type combatParticipantPersistenceResult struct {
 	duelPointChanged          bool
 	itemBagChanged            bool
 	changedPet                *pb.PetRecord
+	changedPets               []*pb.PetRecord
 	characterExperience       experienceSettlement
 	battlePetExperience       experienceSettlement
+	petExperienceByUUID       map[uint64]experienceSettlement
 	characterDuelPointDelta   int64
 	characterDuelPointAfter   uint32
 	receivedItemAssetIDs      []uint32
@@ -2230,22 +2673,32 @@ func persistCombatParticipantResult(
 		)
 	}
 
-	var target *pb.PetRecord
-	targetPetUUID := input.battlePetUUID
-	if targetPetUUID != 0 {
-		for _, petRecord := range characterRecord.GetPetRecordList() {
-			if petRecord == nil || petRecord.GetUuid() != targetPetUUID {
-				continue
-			}
-			if target != nil {
-				return result, fmt.Errorf("combat battle pet uuid duplicated pet:%d", targetPetUUID)
-			}
-			target = petRecord
+	petExperienceByUUID := make(map[uint64]uint64, len(input.petExperienceByUUID)+1)
+	for petUUID, experience := range input.petExperienceByUUID {
+		if petUUID == 0 {
+			return result, fmt.Errorf("combat pet experience has empty uuid character:%d", base.GetUuid())
 		}
-		if target == nil {
-			return result, fmt.Errorf("combat battle pet not found pet:%d", targetPetUUID)
-		}
+		petExperienceByUUID[petUUID] = experience
 	}
+	if input.battlePetUUID != 0 {
+		petExperienceByUUID[input.battlePetUUID] += input.battlePetExperience
+	}
+	petRecordByUUID := make(map[uint64]*pb.PetRecord, len(characterRecord.GetPetRecordList()))
+	for _, petRecord := range characterRecord.GetPetRecordList() {
+		if petRecord == nil || petRecord.GetUuid() == 0 || petRecordByUUID[petRecord.GetUuid()] != nil {
+			return result, fmt.Errorf("combat pet record is invalid or duplicated")
+		}
+		petRecordByUUID[petRecord.GetUuid()] = petRecord
+	}
+	petUUIDs := make([]uint64, 0, len(petExperienceByUUID))
+	for petUUID := range petExperienceByUUID {
+		if petRecordByUUID[petUUID] == nil {
+			return result, fmt.Errorf("combat battle pet not found pet:%d", petUUID)
+		}
+		petUUIDs = append(petUUIDs, petUUID)
+	}
+	sort.Slice(petUUIDs, func(left, right int) bool { return petUUIDs[left] < petUUIDs[right] })
+	target := petRecordByUUID[input.battlePetUUID]
 
 	// EXP升级会同时改动多个角色字段和宠物成长字段, 掉落还会改动背包及账号
 	// used_uuid. 逐字段手写回滚很容易在后续增加成长字段时遗漏, 因此对本函数
@@ -2260,9 +2713,9 @@ func persistCombatParticipantResult(
 	if accountRecord != nil {
 		previousUsedUUID = accountRecord.GetUsedUuid()
 	}
-	var previousPet *pb.PetRecord
-	if target != nil {
-		previousPet = proto.Clone(target).(*pb.PetRecord)
+	previousPets := make(map[uint64]*pb.PetRecord, len(petUUIDs))
+	for _, petUUID := range petUUIDs {
+		previousPets[petUUID] = proto.Clone(petRecordByUUID[petUUID]).(*pb.PetRecord)
 	}
 	previousTaskRecordMap := cloneCharacterTaskRecordMap(characterRecord.GetTaskRecordMap())
 	rollback := func() {
@@ -2280,9 +2733,10 @@ func persistCombatParticipantResult(
 		if accountRecord != nil {
 			accountRecord.UsedUuid = previousUsedUUID
 		}
-		if target != nil {
-			proto.Reset(target)
-			proto.Merge(target, previousPet)
+		for petUUID, previousPet := range previousPets {
+			petRecord := petRecordByUUID[petUUID]
+			proto.Reset(petRecord)
+			proto.Merge(petRecord, previousPet)
 		}
 		characterRecord.TaskRecordMap = cloneCharacterTaskRecordMap(previousTaskRecordMap)
 	}
@@ -2299,16 +2753,26 @@ func persistCombatParticipantResult(
 		}
 		result.characterExperience = settlement
 	}
-	if target != nil && input.battlePetExperience > 0 {
-		settlement, err := applyPetExperience(target, base, input.battlePetExperience)
+	for _, petUUID := range petUUIDs {
+		experience := petExperienceByUUID[petUUID]
+		if experience == 0 {
+			continue
+		}
+		settlement, err := applyPetExperience(petRecordByUUID[petUUID], base, experience)
 		if err != nil {
 			rollback()
 			return combatParticipantPersistenceResult{}, fmt.Errorf(
 				"apply combat pet experience failed character:%d pet:%d: %w",
-				base.GetUuid(), target.GetUuid(), err,
+				base.GetUuid(), petUUID, err,
 			)
 		}
-		result.battlePetExperience = settlement
+		if result.petExperienceByUUID == nil {
+			result.petExperienceByUUID = make(map[uint64]experienceSettlement)
+		}
+		result.petExperienceByUUID[petUUID] = settlement
+		if petUUID == input.battlePetUUID {
+			result.battlePetExperience = settlement
+		}
 	}
 	if len(dropPlan.accepted) > 0 {
 		if characterRecord.ItemBag == nil {
@@ -2366,11 +2830,18 @@ func persistCombatParticipantResult(
 		base.GetDuelPoint() != previousBase.GetDuelPoint()
 	result.characterDuelPointDelta = int64(base.GetDuelPoint()) - int64(previousBase.GetDuelPoint())
 	result.characterDuelPointAfter = base.GetDuelPoint()
-	if target != nil && !proto.Equal(target, previousPet) {
-		result.changedPet = target
+	for _, petUUID := range petUUIDs {
+		petRecord := petRecordByUUID[petUUID]
+		if proto.Equal(petRecord, previousPets[petUUID]) {
+			continue
+		}
+		result.changedPets = append(result.changedPets, petRecord)
+		if petRecord == target {
+			result.changedPet = petRecord
+		}
 	}
 	if !result.baseChanged && !result.itemBagChanged &&
-		result.changedPet == nil && len(result.changedTaskRecordMap) == 0 {
+		len(result.changedPets) == 0 && len(result.changedTaskRecordMap) == 0 {
 		return result, nil
 	}
 	if err := persist(); err != nil {
@@ -2498,6 +2969,22 @@ func (r *CombatRoom) validAllyTarget(requested *pb.CombatUnitKey, source *pb.Com
 	}
 	if sourceCamp != targetCamp {
 		return nil, fmt.Errorf("target must be ally")
+	}
+	return cloneCombatUnitKey(requested), nil
+}
+
+// validDeadAllyTarget只接受仍在战斗运行态中的倒下友方, 供复活道具使用.
+func (r *CombatRoom) validDeadAllyTarget(requested *pb.CombatUnitKey, source *pb.CombatUnitKey) (*pb.CombatUnitKey, error) {
+	if requested == nil || combatUnitKeyEmpty(requested) {
+		return nil, fmt.Errorf("target is required")
+	}
+	targetState := r.stateByKey(requested)
+	if targetState == nil || targetState.alive || targetState.escaped {
+		return nil, fmt.Errorf("target is not a defeated unit")
+	}
+	sourceCamp, ok := r.unitCamp(source)
+	if !ok || targetState.unit.GetCamp() != sourceCamp {
+		return nil, fmt.Errorf("target must be defeated ally")
 	}
 	return cloneCombatUnitKey(requested), nil
 }

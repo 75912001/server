@@ -1,7 +1,6 @@
 package gameconfig
 
 import (
-	"math"
 	"strings"
 
 	xmap "github.com/75912001/xlib/map"
@@ -25,23 +24,27 @@ type PetEntry struct {
 	CreationMode PetCreationMode `yaml:"creationMode,omitempty"`
 	// Rarity 来自 pet.<family>[].rarity, 使用协议 PetRarity 的整数值, 当前范围为普通到神话.
 	Rarity *uint32 `yaml:"rarity"`
-	// Elemental 来自pet.<family>[].elemental, key转为协议元素类型, 值范围[0,100], 总和必须为100.
-	Elemental PetElementalEntry `yaml:"elemental"`
-	// Attribute 来自 pet.<family>[].attribute, 保存宠物抗性和战斗附加属性, 字段必须为非负值.
-	Attribute *PetAttributeEntry `yaml:"attribute"`
-	// Growth 来自 pet.<family>[].growth, 保存宠物生成和升级时使用的基础成长参数.
-	Growth *PetGrowthEntry `yaml:"growth"`
-	// PanelReference 保存供客户端图鉴直接展示的预计算四维和总成长参考值; 服务端启动时按权威成长规则重新计算并逐项核验.
-	PanelReference *PetPanelReferenceEntry `yaml:"panelReference"`
+	// GrowthAttributeID 指定普通创建时使用的默认成长属性, 必须引用growth.attribute.yaml.
+	GrowthAttributeID *uint32 `yaml:"growthAttributeId"`
+	// GrowthAttribute 是assemble阶段挂载的只读默认成长属性, 档案和敌人成员仍以各自冻结的ID为准.
+	GrowthAttribute *GrowthAttributeEntry `yaml:"-"`
+	// 以下四项是默认成长属性的只读兼容视图, 不参与YAML解析. 新运行链路必须按档案或敌人成员ID查询.
+	Elemental      PetElementalEntry       `yaml:"-"`
+	Attribute      *PetAttributeEntry      `yaml:"-"`
+	Growth         *PetGrowthEntry         `yaml:"-"`
+	PanelReference *PetPanelReferenceEntry `yaml:"-"`
 	// SkillSlots 保存新宠物出生时的固定七槽技能; 0表示空槽, 创建后以实例技能为准.
 	SkillSlots []uint32 `yaml:"skill"`
 }
 
-// UnmarshalYAML拒绝旧的宠物AI字段, 防止迁移遗漏被YAML解析器静默忽略.
+// UnmarshalYAML拒绝旧AI和已迁出的成长字段, 防止迁移遗漏被YAML解析器静默忽略.
 func (p *PetEntry) UnmarshalYAML(node *yaml.Node) error {
 	for index := 0; index+1 < len(node.Content); index += 2 {
-		if node.Content[index].Value == "battleAI" {
+		switch node.Content[index].Value {
+		case "battleAI":
 			return errors.New("pet.yaml 不再允许 battleAI, 请在 enemy.group.yaml 的敌人条目中配置")
+		case "elemental", "attribute", "growth", "panelReference":
+			return errors.Errorf("pet.yaml 不再允许 %s, 请迁移到 growth.attribute.yaml", node.Content[index].Value)
 		}
 	}
 	type petEntry PetEntry
@@ -136,51 +139,6 @@ type PetGrowthEntry struct {
 	Rank uint32 `yaml:"-"`
 }
 
-// validatePetSignedRawRange验证普通创建和逐级升级的全部随机结果都能写入PetRecord的int32 Raw字段.
-// 基础值本身允许在叠加品阶偏移后为0或负数; 这里只拒绝真正越过协议整数边界的配置.
-func validatePetSignedRawRange(pet *PetEntry) error {
-	initNum := int64(*pet.Growth.InitNum)
-	if initNum <= 0 || initNum > math.MaxInt32 {
-		return errors.Errorf("宠物 growth.initNum 超出有符号计算范围: ID:%d value:%d %v",
-			*pet.ID, *pet.Growth.InitNum, xruntime.Location())
-	}
-
-	rankMin, rankMax := PetRankGrowthRange(pet.Growth.Rank)
-	upgradeCount := int64(pb.Constants_Constants_Level_Max - pb.Constants_Constants_Level_Min)
-	attributes := []struct {
-		name  string
-		value uint32
-	}{
-		{name: "baseVital", value: *pet.Growth.BaseVital},
-		{name: "baseStr", value: *pet.Growth.BaseStr},
-		{name: "baseTough", value: *pet.Growth.BaseTough},
-		{name: "baseDex", value: *pet.Growth.BaseDex},
-	}
-	for _, attribute := range attributes {
-		minimumSavedBase := int64(attribute.value) + int64(petSavedBaseGradeOffsetMin)
-		maximumSavedBase := int64(attribute.value) + int64(petSavedBaseGradeOffsetMax)
-		if minimumSavedBase < math.MinInt32 || maximumSavedBase > math.MaxInt32 {
-			return errors.Errorf("宠物 growth.%s 品阶偏移后超出int32: ID:%d value:%d %v",
-				attribute.name, *pet.ID, attribute.value, xruntime.Location())
-		}
-
-		minimumUpgradeMultiplier := rankMin
-		if minimumSavedBase < 0 {
-			minimumUpgradeMultiplier = rankMax
-		}
-		minimumUpgrade := int64(float64(minimumSavedBase) * minimumUpgradeMultiplier)
-		maximumRandomBase := maximumSavedBase + 10
-		maximumUpgrade := int64(float64(maximumRandomBase) * rankMax)
-		minimumRaw := minimumSavedBase*initNum + minimumUpgrade*upgradeCount
-		maximumRaw := maximumRandomBase*initNum + maximumUpgrade*upgradeCount
-		if minimumRaw < math.MinInt32 || maximumRaw > math.MaxInt32 {
-			return errors.Errorf("宠物 growth.%s 在1至%d级随机范围内超出int32: ID:%d min:%d max:%d %v",
-				attribute.name, pb.Constants_Constants_Level_Max, *pet.ID, minimumRaw, maximumRaw, xruntime.Location())
-		}
-	}
-	return nil
-}
-
 func newPetConfig() *PetConfig {
 	return &PetConfig{
 		MapMgr: xmap.NewMapMgr[uint32, *PetEntry](),
@@ -215,19 +173,6 @@ func (p *PetConfig) load(dir string) error {
 			return err
 		}
 	}
-	panelReferenceErrors := make([]string, 0)
-	for _, pets := range root.Pet {
-		for _, pet := range pets {
-			expected := calculatePetPanelReference(pet)
-			if !petPanelReferenceEqual(pet.PanelReference, &expected) {
-				panelReferenceErrors = append(panelReferenceErrors, formatPetPanelReferenceError(pet, &expected))
-			}
-		}
-	}
-	if len(panelReferenceErrors) > 0 {
-		return errors.Errorf("宠物 panelReference 核验失败: count:%d\n%s %v",
-			len(panelReferenceErrors), strings.Join(panelReferenceErrors, "\n"), xruntime.Location())
-	}
 	return nil
 }
 
@@ -253,106 +198,8 @@ func (p *PetConfig) configure(entries []*PetEntry) error {
 		if *pet.Rarity < uint32(pb.PetRarity_PetRarity_Common) || *pet.Rarity > uint32(pb.PetRarity_PetRarity_Mythic) {
 			return errors.Errorf("宠物稀有度非法: ID:%d rarity:%d %v", *pet.ID, *pet.Rarity, xruntime.Location())
 		}
-		if pet.Elemental == nil {
-			return errors.Errorf("宠物缺少 elemental: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		for elementalType := pb.AssetElemental_AssetElemental_Unspecified + 1; elementalType < pb.AssetElemental_AssetElemental_Max; elementalType++ {
-			if pet.Elemental[elementalType] == nil {
-				pet.Elemental[elementalType] = valuePtr(uint32(0))
-			}
-		}
-		sum := uint32(0)
-		activeIndexes := []int{}
-		for elementalType := pb.AssetElemental_AssetElemental_Unspecified + 1; elementalType < pb.AssetElemental_AssetElemental_Max; elementalType++ {
-			value := *pet.Elemental[elementalType]
-			if value > uint32(pb.Constants_Constants_Elemental_Total_Point) {
-				return errors.Errorf("宠物 elemental 值必须在[0,100]: ID:%d value:%d %v", *pet.ID, value, xruntime.Location())
-			}
-			sum += value
-			if value > 0 {
-				index := int(elementalType - pb.AssetElemental_AssetElemental_Unspecified - 1)
-				activeIndexes = append(activeIndexes, index)
-			}
-		}
-		if sum != uint32(pb.Constants_Constants_Elemental_Total_Point) {
-			return errors.Errorf("宠物元素分配总和须为100: ID:%d sum:%d %v", *pet.ID, sum, xruntime.Location())
-		}
-		if len(activeIndexes) != 1 && len(activeIndexes) != 2 {
-			return errors.Errorf("宠物 elemental 只能是单元素或两个相邻元素: ID:%d %v", *pet.ID, xruntime.Location())
-		}
-		if len(activeIndexes) == 2 {
-			distance := activeIndexes[0] - activeIndexes[1]
-			if distance < 0 {
-				distance = -distance
-			}
-			wrapDistance := int(pb.AssetElemental_AssetElemental_Max - pb.AssetElemental_AssetElemental_Unspecified - 2)
-			if distance != 1 && distance != wrapDistance {
-				return errors.Errorf("宠物 elemental 两个元素必须相邻: ID:%d %v", *pet.ID, xruntime.Location())
-			}
-		}
-
-		if pet.Attribute == nil {
-			return errors.Errorf("宠物缺少 attribute: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Attribute.PoisonResist == nil {
-			return errors.Errorf("宠物缺少 attribute.poisonResist: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Attribute.ParalysisResist == nil {
-			return errors.Errorf("宠物缺少 attribute.paralysisResist: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Attribute.SleepResist == nil {
-			return errors.Errorf("宠物缺少 attribute.sleepResist: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Attribute.StoneResist == nil {
-			return errors.Errorf("宠物缺少 attribute.stoneResist: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Attribute.DrunkResist == nil {
-			return errors.Errorf("宠物缺少 attribute.drunkResist: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Attribute.ConfusionResist == nil {
-			return errors.Errorf("宠物缺少 attribute.confusionResist: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Attribute.Critical == nil {
-			return errors.Errorf("宠物缺少 attribute.critical: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Attribute.Counter == nil {
-			return errors.Errorf("宠物缺少 attribute.counter: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Attribute.Get == nil {
-			return errors.Errorf("宠物缺少 attribute.get: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Attribute.Rare == nil {
-			return errors.Errorf("宠物缺少 attribute.rate: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-
-		if pet.Growth == nil {
-			return errors.Errorf("宠物缺少 growth: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Growth.InitNum == nil {
-			return errors.Errorf("宠物缺少 growth.initNum: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Growth.LvupPointSource == nil {
-			return errors.Errorf("宠物缺少 growth.lvupPointSource: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		lvupPointSource := *pet.Growth.LvupPointSource
-		if lvupPointSource <= 0 {
-			return errors.Errorf("宠物 growth.lvupPointSource 必须大于0: ID:%d value:%v %v", *pet.ID, lvupPointSource, xruntime.Location())
-		}
-		if pet.Growth.BaseVital == nil {
-			return errors.Errorf("宠物缺少 growth.baseVital: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Growth.BaseStr == nil {
-			return errors.Errorf("宠物缺少 growth.baseStr: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Growth.BaseTough == nil {
-			return errors.Errorf("宠物缺少 growth.baseTough: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		if pet.Growth.BaseDex == nil {
-			return errors.Errorf("宠物缺少 growth.baseDex: pet:%d %v", *pet.ID, xruntime.Location())
-		}
-		pet.Growth.Rank = petRankFromBaseSum(uint64(*pet.Growth.BaseVital) + uint64(*pet.Growth.BaseStr) + uint64(*pet.Growth.BaseTough) + uint64(*pet.Growth.BaseDex))
-		if err := validatePetSignedRawRange(pet); err != nil {
-			return err
+		if pet.GrowthAttributeID == nil || *pet.GrowthAttributeID == 0 {
+			return errors.Errorf("宠物缺少有效 growthAttributeId: pet:%d %v", *pet.ID, xruntime.Location())
 		}
 
 		if pet.SkillSlots == nil {
@@ -406,6 +253,11 @@ func petRankFromBaseSum(baseSum uint64) uint32 {
 func (p *PetConfig) check() error {
 	var err error
 	p.Foreach(func(petID uint32, pet *PetEntry) bool {
+		if GGameConfig.GrowthAttribute == nil || GGameConfig.GrowthAttribute.Get(*pet.GrowthAttributeID) == nil {
+			err = errors.Errorf("宠物引用了未定义成长属性: pet:%d growthAttribute:%d %v",
+				petID, *pet.GrowthAttributeID, xruntime.Location())
+			return false
+		}
 		for _, skillID := range pet.SkillSlots {
 			if skillID == 0 {
 				continue
@@ -429,5 +281,13 @@ func (p *PetConfig) check() error {
 }
 
 func (p *PetConfig) assemble() error {
+	p.Foreach(func(_ uint32, pet *PetEntry) bool {
+		pet.GrowthAttribute = GGameConfig.GrowthAttribute.Get(*pet.GrowthAttributeID)
+		pet.Elemental = pet.GrowthAttribute.Elemental
+		pet.Attribute = pet.GrowthAttribute.Attribute
+		pet.Growth = pet.GrowthAttribute.Growth
+		pet.PanelReference = pet.GrowthAttribute.PanelReference
+		return true
+	})
 	return nil
 }

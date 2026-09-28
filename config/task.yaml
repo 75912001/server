@@ -20,29 +20,38 @@ tasks:
             enemyGroupId: 70000
         challenge:
           enemyGroupId: 70000
+          showTaskButton: false
           npcs:
             - name: 查罕·吉鲁
               visual:
-                type: pet
-                petId: 4900295
+                type: character
+                characterId: 1600400
+                weapon: spear
                 action: stand
-                direction: down
+                direction: downright
             - name: 查罕·乌尔夫
               visual:
-                type: pet
-                petId: 4900294
+                type: character
+                characterId: 1600300
+                weapon: unarmed
                 action: stand
-                direction: down
+                direction: downright
             - name: 查罕·鲁多
               visual:
-                type: pet
-                petId: 4900296
+                type: character
+                characterId: 1600400
+                weapon: unarmed
                 action: stand
-                direction: down
+                direction: downright
           battleBgmIndex: 6
         consumeItems: []
         consumePets: []
         rewardId: 0
+        navigation:
+          mapId: 110007
+          x: 29
+          y: 48
+          label: 进入阿布洞窟地下7楼
   - id: 61
     name: "[任务][卡坦的愿望][1]"
     description: >-
@@ -78,8 +87,10 @@ tasks:
         name: 收集加格和邦恩吉
         description: 捕捉并交付1只25级加格和1只25级邦恩吉.
         navigation:
-          mapId: 70001
-          label: 进入任务地图
+          mapId: 110203
+          label: 进入海底通路地下1楼
+          x: 27
+          y: 27
         startConditions: []
         completionConditions:
           - kind: petPossession
@@ -122,8 +133,10 @@ tasks:
         name: 收集克邦凯斯和加克拉
         description: "领取火难的戒指后, 捕捉并交付1只25级克邦凯斯和1只25级加克拉, 同时交回戒指."
         navigation:
-          mapId: 70001
+          mapId: 110203
           label: 进入任务地图
+          x: 27
+          y: 27
         startConditions:
           - kind: itemPossession
             itemId: 3630347
@@ -331,8 +344,6 @@ tasks:
           ready: "很有精神嘛, 这些仪玉拿去吧."
           completed: "已取得15个仪的玉, 请小心保管并交给仪式的审判."
         rewardId: 6301
-        rewardReissue:
-          whenItemAbsent: 3000301
       - id: 2
         name: 交付仪的玉
         description: "回到柯澳海底通路地下2楼(14,6), 将15个仪的玉交给仪式的审判, 由他见证成人仪式."
@@ -359,3 +370,1052 @@ tasks:
           ready: "还挺厉害的嘛！走到这里, 让我来为你进阶为成人做见证."
           completed: "这么一来, 你也是个顶天立地的成人了. 年轻小伙子, 为老人尽点力量可是精进自我程度的捷径."
         rewardId: 6302
+  - id: 64
+    name: 琉璃洞窟
+    description: >-
+      必须条件:完成成人仪式并领取全部奖励
+
+      接受拉鲁的委托, 从伊布处取得雅哈奴的日记, 战胜琉璃洞窟九楼和十四楼的大地守护兽, 最后将项链与日记交给女神蒂亚特.
+    isMain: true
+    repeatable: false
+    sort: 64
+    npc:
+      name: 拉鲁
+      visual:
+        type: character
+        characterId: 1600400
+        weapon: unarmed
+        action: stand
+        direction: downright
+    dialogue:
+      offer: >-
+        你的“成人的仪式”应该已经完成了吧.
+
+        我的儿子伊布带着母亲雅哈奴的日记离家出走了, 一定是去寻找雅哈奴的行踪. 请你找到伊布, 并把日记和这条充满思念的项链一起转交给雅哈奴.
+    acceptConditions:
+      - kind: taskRewardsClaimed
+        taskId: 63
+    steps:
+      - id: 1
+        name: 取得拉鲁的项链
+        description: "接受拉鲁的委托, 收下充满他思念的项链."
+        startConditions: []
+        completionConditions:
+          - kind: characterLevel
+            level: 1
+        completionMode: automatic
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "请听听我的请求, 帮我找到离家出走的伊布."
+          ready: "请收下这条项链, 把它和日记一起转交给雅哈奴."
+          completed: "已取得拉鲁的项链, 接下来去寻找伊布."
+        rewardId: 3000304
+        npc:
+          name: 拉鲁
+          visual:
+            type: character
+            characterId: 1600400
+            weapon: unarmed
+            action: stand
+            direction: downright
+      - id: 2
+        name: 寻找伊布
+        description: "找到伊布, 告诉他拉鲁所说的事情并取得雅哈奴的日记."
+        npc:
+          name: 伊布
+          visual:
+            type: character
+            characterId: 1000075
+            weapon: unarmed
+            action: stand
+            direction: downleft
+        startConditions:
+          - kind: itemPossession
+            itemId: 3660578
+            quantity: 1
+        completionConditions:
+          - kind: itemPossession
+            itemId: 3660578
+            quantity: 1
+        completionMode: submit
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: >-
+            你有遇到我爸爸吗？
+
+            以我现在的能力, 即使去了母亲所在的琉璃洞窟, 也没有办法见到她吧.
+          ready: "请你拿着这本日记到母亲那里, 转告她有一天我一定会用自己的力量去见她."
+          completed: "已取得雅哈奴的日记, 前往琉璃洞窟寻找雅哈奴."
+        rewardId: 3000305
+      - id: 3
+        name: 挑战九楼大地的守护兽
+        description: 战胜琉璃洞窟九楼的大地守护兽.
+        startConditions:
+          - kind: itemPossession
+            itemId: 3000304
+            quantity: 1
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70003
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70003
+          npcs:
+            - name: 大地的守护兽
+              visual:
+                type: pet
+                petId: 4000308
+                action: stand
+                direction: downleft
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "想要继续深入琉璃洞窟, 就先证明你有战胜守护兽的力量."
+          ready: ""
+          completed: "已战胜九楼大地的守护兽, 继续向十四楼前进."
+        rewardId: 0
+      - id: 4
+        name: 挑战十四楼大地的守护兽
+        description: 战胜琉璃洞窟十四楼的大地守护兽.
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70004
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70004
+          npcs:
+            - name: 大地的守护兽
+              visual:
+                type: pet
+                petId: 4000321
+                action: stand
+                direction: downright
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "战胜最后的大地守护兽, 前往琉璃洞窟顶楼."
+          ready: ""
+          completed: "已战胜十四楼大地的守护兽, 前去拜见女神蒂亚特."
+        rewardId: 0
+      - id: 5
+        name: 拜见女神蒂亚特
+        description: 将拉鲁的项链和雅哈奴的日记交给女神蒂亚特.
+        npc:
+          name: 女神蒂亚特
+          visual:
+            type: character
+            characterId: 1600200
+            weapon: unarmed
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions:
+          - kind: itemPossession
+            itemId: 3660578
+            quantity: 1
+          - kind: itemPossession
+            itemId: 3000304
+            quantity: 1
+        completionMode: submit
+        consumeItems:
+          - itemId: 3660578
+            quantity: 1
+          - itemId: 3000304
+            quantity: 1
+        consumePets: []
+        dialogue:
+          active: >-
+            竟然能控制住琉璃洞窟. 这个日记是……难不成你见过拉鲁跟伊布吗？
+
+            请把他们托付的项链和日记交给我.
+          ready: >-
+            拉鲁跟伊布遭遇了这种事……我在完成使命之前不能离开这里, 但我会一直为他们祈祷.
+
+            请收下“大地的羁绊”, 希望你从今以后的未来能够受到大地的庇佑.
+          completed: "已制服琉璃洞窟的大地守护兽, 得到了征服大地的证明."
+        rewardId: 3000306
+  - id: 65
+    name: 玄黄洞窟
+    description: >-
+      必须条件:完成成人仪式并领取全部奖励
+
+      穿越玄黄洞窟的两名风之守护兽, 接受威尔的委托, 追查萨伊那斯及盗贼基地, 取回风的竖琴并交给威尔, 获得风的锁[风].
+    isMain: true
+    repeatable: false
+    sort: 65
+    acceptConditions:
+      - kind: taskRewardsClaimed
+        taskId: 63
+    steps:
+      - id: 1
+        name: 挑战地下8楼风的守护兽
+        description: 战胜玄黄洞窟地下8楼的风之守护兽.
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70005
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70005
+          npcs:
+            - name: 风的守护兽
+              visual:
+                type: pet
+                petId: 4000360
+                action: stand
+                direction: downleft
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "想要继续前进的话, 只要把我打倒就可以!"
+          ready: ""
+          completed: "已战胜地下8楼风的守护兽, 继续向地下14楼前进."
+        rewardId: 0
+      - id: 2
+        name: 挑战地下14楼风的守护兽
+        description: 战胜玄黄洞窟地下14楼的风之守护兽.
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70007
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70007
+          npcs:
+            - name: 风的守护兽
+              visual:
+                type: pet
+                petId: 4000313
+                action: stand
+                direction: downright
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "想要继续前进的话, 只要把我打倒就可以了!"
+          ready: ""
+          completed: "已战胜地下14楼风的守护兽, 前往顶楼寻找威尔."
+        rewardId: 0
+      - id: 3
+        name: 接受威尔的委托
+        description: 在玄黄洞窟顶楼与掌控风的威尔交谈.
+        npc:
+          name: 威尔
+          visual:
+            type: character
+            characterId: 1600210
+            weapon: unarmed
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions:
+          - kind: characterLevel
+            level: 1
+        completionMode: submit
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: 前往玄黄洞窟顶楼寻找威尔.
+          ready: >-
+            真不简单, 你居然可以找到这里, 我是威尔, 掌控这个世界的风的人.
+
+            你愿意帮我一件事吗?
+          completed: >-
+            其实在这个洞窟里的风之竖琴, 不知道被谁给偷走了.
+
+            我想请你帮我把竖琴找回来. 那就拜托你了.
+        rewardId: 0
+      - id: 4
+        name: 击败萨伊那斯盗贼
+        description: "前往萨伊那斯玄黄洞窟外, 击败围攻姆哈萨的盗贼."
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70008
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70008
+          npcs:
+            - name: 戴斯
+              visual:
+                type: character
+                characterId: 1600300
+                weapon: axe
+                action: stand
+                direction: upright
+            - name: 波卡
+              visual:
+                type: character
+                characterId: 1600400
+                weapon: unarmed
+                action: stand
+                direction: upright
+            - name: 达姿
+              visual:
+                type: character
+                characterId: 1600300
+                weapon: spear
+                action: stand
+                direction: upright
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: >-
+            什么! 给我滚到旁边去! 还是你打算阻挠我们!
+
+            我们的等级可都是LV65以上的呀! 即使这样还是有赢的自信的话, 就放马过来吧!
+          ready: ""
+          completed: "已击败萨伊那斯的盗贼, 与获救的姆哈萨交谈."
+        rewardId: 0
+      - id: 5
+        name: 与姆哈萨交谈
+        description: "与获救的姆哈萨交谈, 继续追查风的竖琴."
+        npc:
+          name: 姆哈萨
+          visual:
+            type: character
+            characterId: 1000110
+            weapon: unarmed
+            action: stand
+            direction: downleft
+        startConditions: []
+        completionConditions:
+          - kind: characterLevel
+            level: 1
+        completionMode: submit
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: 与获救的姆哈萨交谈.
+          ready: "谢谢你在我危急的时候救我, 真的非常感谢你."
+          completed: >-
+            刚才那些人吗? 我的宝贝差一点就被胖特族给抢走了.
+
+            进入胖特族洞窟的暗号, 他们要我教他们, 可是这...我真倒霉遇到这种事.
+        rewardId: 0
+      - id: 6
+        name: 击败唐和悟
+        description: "前往盗贼的基地最底层, 击败守卫唐和悟."
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70009
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70009
+          npcs:
+            - name: 唐
+              visual:
+                type: character
+                characterId: 1600300
+                weapon: axe
+                action: stand
+                direction: downright
+            - name: 悟
+              visual:
+                type: character
+                characterId: 1600400
+                weapon: spear
+                action: stand
+                direction: downright
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: 试试你的力量. 入境随吾.
+          ready: ""
+          completed: "已击败唐和悟, 前往盗贼基地最底层拜见梦德."
+        rewardId: 0
+      - id: 7
+        name: 向梦德取得风的竖琴
+        description: 与梦德交谈并取回被盗的风之竖琴.
+        npc:
+          name: 梦德
+          visual:
+            type: static
+            frameId: 5903
+        startConditions: []
+        completionConditions:
+          - kind: characterLevel
+            level: 1
+        completionMode: submit
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "与梦德交谈, 取回风之竖琴."
+          ready: 我的事就是风的竖琴啊.
+          completed: >-
+            打倒那边的悟跟唐的人就是你嘛. 这真是无可奈何啊.
+
+            算了, 跟那两个没有用的盗贼比起来, 还是你比较会活用它啊. 不过你还真厉害啊.
+        rewardId: 6501
+      - id: 8
+        name: 将风的竖琴交给威尔
+        description: "返回玄黄洞窟顶楼, 将风的竖琴交给威尔."
+        npc:
+          name: 威尔
+          visual:
+            type: character
+            characterId: 1600210
+            weapon: unarmed
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions:
+          - kind: itemPossession
+            itemId: 3640190
+            quantity: 1
+        completionMode: submit
+        consumeItems:
+          - itemId: 3640190
+            quantity: 1
+        consumePets: []
+        dialogue:
+          active: >-
+            风之竖琴是替这个世界带来风的东西.
+
+            我期待你可以帮我把东西找回来, 一路上多小心啊.
+          ready: >-
+            你已经达成我的要求, 把风之竖琴给拿回来了.
+
+            你真不简单, 居然通过玄黄洞窟的考验啊.
+          completed: >-
+            既然你把风之竖琴拿回来的话, 我就承认你是征服风的人吧.
+
+            这个风的锁你就拿去吧. 以后你就有风的庇佑了.
+        rewardId: 6502
+  - id: 66
+    name: 碧青洞窟
+    description: >-
+      必须条件:等级65、完成成人仪式并领取全部奖励、完成琉璃洞窟或玄黄洞窟并领取全部奖励
+
+      穿越碧青洞窟地下8楼和地下14楼的水之守护兽, 接受女神艾妮基的委托, 收集深蓝色石头与群青的水并请贤者合成碧青水晶, 最后取得水的戒指[水].
+    isMain: true
+    repeatable: false
+    sort: 66
+    npc:
+      name: 水的使者
+      visual:
+        type: character
+        characterId: 1000195
+        weapon: unarmed
+        action: stand
+        direction: downleft
+    dialogue:
+      offer: >-
+        你已经接受过大地或风的加护了.
+
+        最近全世界的水逐渐变得污浊, 掌控水的女神艾妮基为此十分困扰. 请前往碧青洞窟的地底湖, 听听她的愿望.
+    acceptConditions:
+      - kind: characterLevel
+        level: 65
+      - kind: taskRewardsClaimed
+        taskId: 63
+      - kind: anyTaskRewardsClaimed
+        taskIds:
+          - 64
+          - 65
+    steps:
+      - id: 1
+        name: 挑战地下8楼水的守护兽
+        description: 战胜碧青洞窟地下8楼的水之守护兽.
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70010
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70010
+          npcs:
+            - name: 水的守护兽
+              visual:
+                type: pet
+                petId: 4000346
+                action: stand
+                direction: upright
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "想要继续前进的话, 那你就打倒我吧."
+          ready: ""
+          completed: "已战胜地下8楼水的守护兽, 继续向地下14楼前进."
+        rewardId: 0
+      - id: 2
+        name: 挑战地下14楼水的守护兽
+        description: 战胜碧青洞窟地下14楼的水之守护兽.
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70011
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70011
+          npcs:
+            - name: 水的守护兽
+              visual:
+                type: pet
+                petId: 4000338
+                action: stand
+                direction: downright
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "想要继续前进的话, 那你就打倒我吧."
+          ready: ""
+          completed: "已战胜地下14楼水的守护兽, 前往顶楼拜见女神艾妮基."
+        rewardId: 0
+      - id: 3
+        name: 拜见女神艾妮基
+        description: "在碧青洞窟顶楼与女神艾妮基交谈, 听取净化世界之水的委托."
+        npc:
+          name: 女神艾妮基
+          visual:
+            type: character
+            characterId: 1000210
+            weapon: unarmed
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions:
+          - kind: characterLevel
+            level: 1
+        completionMode: submit
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "真不简单, 你成功闯过这个碧青洞窟了."
+          ready: "世界的水正逐日变得污浊. 为了净化这些水, 我需要由深蓝色石头和群青的水合成的碧青水晶."
+          completed: "找到石头和水后, 请交给后方洞窟里的贤者合成水晶, 再把碧青水晶带来给我."
+        rewardId: 0
+      - id: 4
+        name: 取得深蓝色石头
+        description: "前往吉鲁洞窟3F, 从地图遇敌的资源怪物身上取得深蓝色石头."
+        navigation:
+          mapId: 70006
+          label: 进入吉鲁洞窟3F
+        npc:
+          name: 深蓝色石头
+          visual:
+            type: pet
+            petId: 4000433
+            action: stand
+            direction: downleft
+        startConditions: []
+        completionConditions:
+          - kind: itemPossession
+            itemId: 3000306
+            quantity: 1
+        completionMode: submit
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "在吉鲁洞窟3F遇敌, 寻找会掉落深蓝色石头的资源怪物."
+          ready: "已经取得深蓝色石头, 将它妥善保管."
+          completed: "已确认取得深蓝色石头, 接下来寻找群青的水."
+        rewardId: 0
+      - id: 5
+        name: 向菲伊取得群青的水
+        description: "在奇努伊海底隧道一带的洞窟中找到菲伊, 向她取得群青的水."
+        npc:
+          name: 菲伊
+          visual:
+            type: character
+            characterId: 1000195
+            weapon: unarmed
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions:
+          - kind: characterLevel
+            level: 1
+        completionMode: submit
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: 这里的湖水被称为群青的水.
+          ready: "你需要这个湖水吗? 如果能帮上忙, 就请拿去吧."
+          completed: "已取得群青的水. 容器容易破损, 请小心保管."
+        rewardId: 3000307
+      - id: 6
+        name: 请贤者合成碧青水晶
+        description: "将深蓝色石头和群青的水交给水苍洞窟地下8楼的贤者, 合成碧青水晶."
+        npc:
+          name: 贤者
+          visual:
+            type: static
+            frameId: 5870
+        startConditions: []
+        completionConditions:
+          - kind: itemPossession
+            itemId: 3000306
+            quantity: 1
+          - kind: itemPossession
+            itemId: 3000305
+            quantity: 1
+        completionMode: submit
+        consumeItems:
+          - itemId: 3000306
+            quantity: 1
+          - itemId: 3000305
+            quantity: 1
+        consumePets: []
+        dialogue:
+          active: 我的拿手本领就是合成水晶. 把深蓝色石头和群青的水带来吧.
+          ready: "你要我制造碧青水晶吗? 把石头和水交给我就好了."
+          completed: "完成了, 这就是碧青水晶. 不用道谢, 快拿给女神艾妮基吧."
+        rewardId: 3000308
+      - id: 7
+        name: 将碧青水晶交给女神艾妮基
+        description: "返回碧青洞窟顶楼, 将碧青水晶交给女神艾妮基."
+        npc:
+          name: 女神艾妮基
+          visual:
+            type: character
+            characterId: 1000210
+            weapon: unarmed
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions:
+          - kind: itemPossession
+            itemId: 3000307
+            quantity: 1
+        completionMode: submit
+        consumeItems:
+          - itemId: 3000307
+            quantity: 1
+        consumePets: []
+        dialogue:
+          active: "请把碧青水晶带来, 我要用它净化全世界的水."
+          ready: 把碧青水晶交给我吧. 你已经证明自己能够接受水的加护.
+          completed: "非常感谢你. 请收下水的戒指[水], 愿水的加护陪伴你未来的旅程."
+        rewardId: 3000309
+  - id: 67
+    name: 深红洞窟
+    description: >-
+      必须条件:完成成人仪式并领取全部奖励
+
+      在达那村接受真红的精灵仪式, 前往拉多拉山山顶战胜守卫并取得不死鸟的羽毛[火], 穿越深红洞窟地下7楼与地下9楼的火之守护兽, 最后将羽毛献给伊拉, 获得火的羽毛饰品[火].
+    isMain: true
+    repeatable: false
+    sort: 67
+    npc:
+      name: 真红
+      visual:
+        type: static
+        frameId: 5877
+    dialogue:
+      offer: >-
+        欢迎来到达那村. 你就是想要接受精灵仪式的人吗?
+
+        想让伊拉大人承认你的力量, 就要奉献不死鸟的羽毛. 前往拉多拉山山顶取得羽毛, 再穿过深红洞窟去见伊拉大人吧.
+    acceptConditions:
+      - kind: taskRewardsClaimed
+        taskId: 63
+    steps:
+      - id: 1
+        name: 挑战不死鸟的守卫
+        description: "前往拉多拉山山顶, 战胜守护不死鸟的敌人."
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70013
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70013
+          npcs:
+            - name: 不死鸟的守卫
+              visual:
+                type: pet
+                petId: 4000336
+                action: stand
+                direction: downright
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "不把这只恐龙打倒的话, 就没有办法到不死鸟所在的地方. 打倒它之后再往前进吗?"
+          ready: ""
+          completed: "已战胜不死鸟的守卫, 前往拉多拉山山顶寻找不死鸟."
+        rewardId: 0
+      - id: 2
+        name: 向不死鸟取得羽毛
+        description: "与拉多拉山山顶的不死鸟交谈, 取得不死鸟的羽毛[火]."
+        npc:
+          name: 不死鸟
+          visual:
+            type: pet
+            petId: 4000336
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions:
+          - kind: characterLevel
+            level: 1
+        completionMode: automatic
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "你期望接受精灵的仪式吗? 先证明你能够制服守护此地的精灵."
+          ready: 你已经战胜守卫. 带着我的羽毛前往女神伊拉所在之处吧.
+          completed: "已取得不死鸟的羽毛[火], 前往深红洞窟寻找伊拉."
+        rewardId: 6701
+      - id: 3
+        name: 挑战地下7楼火的守护兽
+        description: "携带不死鸟的羽毛[火], 战胜深红洞窟地下7楼火的守护兽."
+        startConditions:
+          - kind: itemPossession
+            itemId: 3000308
+            quantity: 1
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70014
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70014
+          npcs:
+            - name: 火的守护兽
+              visual:
+                type: pet
+                petId: 4000280
+                action: stand
+                direction: upleft
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "想要继续前进的话, 只要把我打倒就可以!"
+          ready: ""
+          completed: "已战胜地下7楼火的守护兽, 继续向地下9楼前进."
+        rewardId: 0
+      - id: 4
+        name: 挑战地下9楼火的守护兽
+        description: 战胜深红洞窟地下9楼火的守护兽.
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70015
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70015
+          npcs:
+            - name: 火的守护兽
+              visual:
+                type: pet
+                petId: 4000339
+                action: stand
+                direction: downright
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "想要继续前进的话, 只要把我打倒就可以!"
+          ready: ""
+          completed: "已战胜地下9楼火的守护兽, 前往洞窟顶楼拜见伊拉."
+        rewardId: 0
+      - id: 5
+        name: 向伊拉献上羽毛
+        description: "将不死鸟的羽毛[火]献给深红洞窟顶楼的伊拉."
+        npc:
+          name: 伊拉
+          visual:
+            type: character
+            characterId: 1000230
+            weapon: unarmed
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions:
+          - kind: itemPossession
+            itemId: 3000308
+            quantity: 1
+        completionMode: submit
+        consumeItems:
+          - itemId: 3000308
+            quantity: 1
+        consumePets: []
+        dialogue:
+          active: "想要控制住深红洞窟, 需要得到火之精灵的认可. 请将不死鸟的羽毛带给我."
+          ready: "你已经带来了不死鸟的羽毛. 将它献上, 证明你能够征服火之精灵吧."
+          completed: "手持不死鸟羽毛的人将被视为征服火者. 请收下火的羽毛饰品[火]."
+        rewardId: 6702
+  - id: 68
+    name: 漆黑洞窟
+    description: "达到80级并完成四大洞窟后, 挑战漆黑的守护兽, 再携带四大证明向地下16楼考古家领取精灵王之弓."
+    isMain: true
+    repeatable: false
+    completionRequiresRewardsClaimed: true
+    sort: 68
+    acceptConditions:
+      - kind: characterLevel
+        level: 80
+      - kind: taskRewardsClaimed
+        taskId: 64
+      - kind: taskRewardsClaimed
+        taskId: 65
+      - kind: taskRewardsClaimed
+        taskId: 66
+      - kind: taskRewardsClaimed
+        taskId: 67
+    steps:
+      - id: 1
+        name: 挑战漆黑的守护兽
+        description: "前往漆黑的洞窟地下10楼, 战胜漆黑的守护兽洛克斯."
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70016
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70016
+          npcs:
+            - name: 漆黑的守护兽
+              visual:
+                type: pet
+                petId: 4000355
+                action: stand
+                direction: downleft
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "这里由我守护. 想继续前进, 就先证明你的力量."
+          ready: ""
+          completed: "已战胜漆黑的守护兽, 前往地下16楼寻找考古家."
+        rewardId: 0
+      - id: 2
+        name: 领取精灵王之弓
+        description: "携带大地、水、火、风四大证明, 向地下16楼考古家领取精灵王之弓. 证明只作检查, 不会被消耗."
+        npc:
+          name: 考古家
+          visual:
+            type: character
+            characterId: 1600400
+            weapon: spear
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions:
+          - kind: itemPossession
+            itemId: 3660577
+            quantity: 1
+          - kind: itemPossession
+            itemId: 3630145
+            quantity: 1
+          - kind: itemPossession
+            itemId: 3660575
+            quantity: 1
+          - kind: itemPossession
+            itemId: 3660576
+            quantity: 1
+        completionMode: submit
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "集齐四大证明再来找我, 我会把精灵王留下的弓交给你."
+          ready: "四大证明都在你身上. 它们不会被收走, 请领取精灵王之弓."
+          completed: 精灵王之弓已经交给你. 带着它继续向洞窟深处前进吧.
+        rewardId: 6801
+  - id: 69
+    name: 漆黑洞窟之精灵王
+    description: "可先前往地下6楼捕捉转生所需的守护兽, 再挑战地下20楼帖拉所伊朵并拜见精灵王. 地下6楼捕宠不作为任务完成条件."
+    isMain: true
+    repeatable: false
+    sort: 69
+    acceptConditions:
+      - kind: taskRewardsClaimed
+        taskId: 68
+    steps:
+      - id: 1
+        name: 挑战帖拉所伊朵
+        description: "挑战漆黑的洞窟地下20楼守卫. 可通过入口前往地下6楼捕捉守护兽, 但任务不会检查是否进入或持有宠物."
+        navigation:
+          mapId: 70012
+          label: 前往地下6楼捕捉守护兽
+        startConditions: []
+        completionConditions:
+          - kind: battleVictory
+            enemyGroupId: 70017
+        completionMode: automatic
+        challenge:
+          enemyGroupId: 70017
+          npcs:
+            - name: 帖拉所伊朵
+              visual:
+                type: pet
+                petId: 4000340
+                action: stand
+                direction: downright
+          battleBgmIndex: 6
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "只有战胜我, 才能到精灵王面前."
+          ready: ""
+          completed: "已战胜帖拉所伊朵, 前往精灵王所在之处."
+        rewardId: 0
+      - id: 2
+        name: 拜见精灵王
+        description: 拜见精灵王并查看当前角色转生所需的50级任务宠物. 转生功能暂未开放.
+        npc:
+          name: 精灵王
+          visual:
+            type: characterMount
+            characterId: 1000020
+            petId: 4000668
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions: []
+        completionMode: persistent
+        consumeItems: []
+        consumePets: []
+        interactions:
+          - id: characterRebirth
+            label: 转生
+            state: unavailable
+            unavailableMessage: 转生功能暂未开放.
+            requirementsByRebirth:
+              - rebirthCount: 0
+                pets:
+                  - petId: 4100000
+                    level: 50
+                    quantity: 1
+              - rebirthCount: 1
+                pets:
+                  - petId: 4100001
+                    level: 50
+                    quantity: 1
+              - rebirthCount: 2
+                pets:
+                  - petId: 4100002
+                    level: 50
+                    quantity: 1
+              - rebirthCount: 3
+                pets:
+                  - petId: 4100003
+                    level: 50
+                    quantity: 1
+              - rebirthCount: 4
+                pets:
+                  - petId: 4100000
+                    level: 50
+                    quantity: 1
+                  - petId: 4100001
+                    level: 50
+                    quantity: 1
+                  - petId: 4100002
+                    level: 50
+                    quantity: 1
+                  - petId: 4100003
+                    level: 50
+                    quantity: 1
+        dialogue:
+          active: "你已经来到这里. 角色转生的力量尚未开放, 可以先查看未来所需的守护兽."
+          ready: ""
+          completed: ""
+        rewardId: 0
+  - id: 70
+    name: 金布伊任务
+    description: "从伊那多处取得金布伊并培养到恰好LV77, 由猜谜大师确认资格后把谜之箱子交给大师的弟子. LV77金布伊只作资格验证, 不会被收走."
+    isMain: false
+    repeatable: false
+    completionRequiresRewardsClaimed: true
+    sort: 70
+    acceptConditions:
+      - kind: characterLevel
+        level: 30
+    npc:
+      name: 伊那多
+      visual:
+        type: character
+        characterId: 1000015
+        weapon: unarmed
+        action: stand
+        direction: downright
+    dialogue:
+      offer: "想成为猜谜大师吗? 先收下这只金布伊, 把它培养到恰好LV77后带给猜谜大师. 资格确认不会收走金布伊."
+    steps:
+      - id: 1
+        name: 领取金布伊
+        description: "从伊那多处领取1级金布伊, 并把它培养到恰好LV77."
+        npc:
+          name: 伊那多
+          visual:
+            type: character
+            characterId: 1000015
+            weapon: unarmed
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions:
+          - kind: characterLevel
+            level: 30
+        completionMode: automatic
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: "先收下这只金布伊, 把它培养到恰好LV77吧."
+          ready: "这只金布伊就交给你了. 培养到恰好LV77后, 再带给猜谜大师确认资格."
+          completed: "已取得金布伊. 猜谜大师只会确认它达到LV77, 不会收走它."
+        rewardId: 7001
+      - id: 2
+        name: 猜谜大师的资格确认
+        description: "向猜谜大师出示恰好77级的金布伊. 金布伊只作持有检查, 不会被消耗."
+        npc:
+          name: 猜谜大师
+          visual:
+            type: character
+            characterId: 1000010
+            weapon: unarmed
+            action: stand
+            direction: downright
+        startConditions: []
+        completionConditions:
+          - kind: petPossession
+            petId: 4000245
+            level: 77
+            quantity: 1
+        completionMode: submit
+        consumeItems: []
+        consumePets: []
+        dialogue:
+          active: 把金布伊培养到恰好LV77后再来. 等级不足或超过LV77都不符合资格.
+          ready: "你的金布伊正好是LV77. 我只确认资格, 不会收走它. 这个谜之箱子交给你."
+          completed: "已取得谜之箱子, LV77金布伊仍由你保留. 把箱子交给大师的弟子."
+        rewardId: 7002
+      - id: 3
+        name: 打开谜之箱子
+        description: "把谜之箱子交给大师的弟子, 领取左迪洛斯和猜之箱子."
+        npc:
+          name: 大师的弟子
+          visual:
+            type: character
+            characterId: 1000000
+            weapon: unarmed
+            action: stand
+            direction: downleft
+        startConditions: []
+        completionConditions:
+          - kind: itemPossession
+            itemId: 3000302
+            quantity: 1
+        completionMode: submit
+        consumeItems:
+          - itemId: 3000302
+            quantity: 1
+        consumePets: []
+        dialogue:
+          active: 带着猜谜大师交给你的谜之箱子再来找我.
+          ready: 这正是猜谜大师的谜之箱子. 把它交给我打开吧.
+          completed: 谜之箱子已经打开. 左迪洛斯和猜之箱子是你的奖励.
+        rewardId: 6303

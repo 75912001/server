@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"sort"
 	"time"
+
+	"server/common/gameconfig"
 
 	pb "server/proto/pb"
 
@@ -14,15 +17,20 @@ import (
 )
 
 const (
-	OnlineAccountActorCmdBind         xactor.CMD = 101
-	OnlineAccountActorCmdUnbind       xactor.CMD = 102
-	OnlineAccountActorCmdClientPacket xactor.CMD = 103
-	OnlineAccountActorCmdStop         xactor.CMD = 104
-	OnlineAccountActorCmdRoomFinished xactor.CMD = 105
-	OnlineAccountActorCmdTeamScene    xactor.CMD = 106
-	OnlineAccountActorCmdTryBindRoom  xactor.CMD = 107
-	OnlineAccountActorCmdRoomLeft     xactor.CMD = 108
-	OnlineAccountActorCmdCapturePet   xactor.CMD = 109
+	OnlineAccountActorCmdBind            xactor.CMD = 101
+	OnlineAccountActorCmdUnbind          xactor.CMD = 102
+	OnlineAccountActorCmdClientPacket    xactor.CMD = 103
+	OnlineAccountActorCmdStop            xactor.CMD = 104
+	OnlineAccountActorCmdRoomFinished    xactor.CMD = 105
+	OnlineAccountActorCmdTeamScene       xactor.CMD = 106
+	OnlineAccountActorCmdTryBindRoom     xactor.CMD = 107
+	OnlineAccountActorCmdRoomLeft        xactor.CMD = 108
+	OnlineAccountActorCmdCapturePet      xactor.CMD = 109
+	OnlineAccountActorCmdSwitchPet       xactor.CMD = 110
+	OnlineAccountActorCmdCombatItem      xactor.CMD = 111
+	OnlineAccountActorCmdCombatEquipment xactor.CMD = 112
+	OnlineAccountActorCmdMoveTick        xactor.CMD = 113
+	OnlineAccountActorCmdVictoryTeleport xactor.CMD = 114
 )
 
 func (p *Account) PostBind(req *pb.OnlineBindAccountReq, accountRecord *pb.AccountRecord) (*pb.OnlineBindAccountRes, error) {
@@ -58,6 +66,17 @@ func (p *Account) PostCombatRoomFinishedSync(input combatRoomFinishInput) error 
 	}
 	if finishErr, ok := resp.(error); ok {
 		return finishErr
+	}
+	return nil
+}
+
+func (p *Account) PostCombatVictoryTeleportSync(target combatVictoryTeleport) error {
+	resp, err := p.actor.SendMsgSync(xactor.NewMsg(context.Background(), OnlineAccountActorCmdVictoryTeleport, target))
+	if err != nil {
+		return err
+	}
+	if result, ok := resp.(error); ok {
+		return result
 	}
 	return nil
 }
@@ -124,6 +143,7 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 			p.clientIP = req.GetClientIp()
 			p.accountRecord = accountRecord
 			p.characterManager = characterManager
+			p.resetAccountRecordFlushState()
 			GAccountMgr.accounts.Add(p.aid, p)
 			resp = &pb.OnlineBindAccountRes{}
 		case OnlineAccountActorCmdUnbind:
@@ -164,6 +184,19 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 				continue
 			}
 			p.applyCharacterTeamSceneState(presence)
+		case OnlineAccountActorCmdMoveTick:
+			if len(msg.Args) != 2 {
+				continue
+			}
+			characterUUID, ok := msg.Args[0].(uint64)
+			if !ok {
+				continue
+			}
+			version, ok := msg.Args[1].(uint64)
+			if !ok {
+				continue
+			}
+			p.onCharacterMoveTick(characterUUID, version)
 		case OnlineAccountActorCmdTryBindRoom:
 			if len(msg.Args) != 1 {
 				continue
@@ -182,6 +215,33 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 				continue
 			}
 			resp = p.captureCombatPet(input)
+		case OnlineAccountActorCmdSwitchPet:
+			if len(msg.Args) != 1 {
+				continue
+			}
+			input, ok := msg.Args[0].(combatRoomPetSwitchInput)
+			if !ok {
+				continue
+			}
+			resp = p.switchCombatPet(input)
+		case OnlineAccountActorCmdCombatItem:
+			if len(msg.Args) != 1 {
+				continue
+			}
+			input, ok := msg.Args[0].(combatRoomItemUseInput)
+			if !ok {
+				continue
+			}
+			resp = p.consumeCombatItem(input)
+		case OnlineAccountActorCmdCombatEquipment:
+			if len(msg.Args) != 1 {
+				continue
+			}
+			input, ok := msg.Args[0].(combatRoomEquipmentChangeInput)
+			if !ok {
+				continue
+			}
+			resp = p.changeCombatEquipment(input)
 		case OnlineAccountActorCmdRoomLeft:
 			if len(msg.Args) != 1 {
 				continue
@@ -238,21 +298,23 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if battleReward.victory {
 				battleVictoryEnemyGroupID = finishInput.enemyGroupID
 			}
+			settledAtMs := time.Now().UnixMilli()
 			persistenceResult, persistErr := persistCombatParticipantResult(
 				p.accountRecord,
 				character.record,
 				combatParticipantPersistenceInput{
-					settledAtMs:               time.Now().UnixMilli(),
+					settledAtMs:               settledAtMs,
 					battleVictoryEnemyGroupID: battleVictoryEnemyGroupID,
 					characterExperience:       battleReward.characterExperience,
 					settleDuelPoint:           battleReward.duelPointBattle,
 					characterDuelPointDelta:   battleReward.characterDuelPointDelta,
 					battlePetUUID:             battleReward.battlePetUUID,
 					battlePetExperience:       battleReward.battlePetExperience,
+					petExperienceByUUID:       battleReward.petExperienceByUUID,
 					itemAssetIDs:              battleReward.itemAssetIDs,
 				},
 				func() error {
-					return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+					return p.deferAccountRecordPersist()
 				},
 			)
 			if persistErr != nil {
@@ -265,8 +327,8 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 			if persistenceResult.baseChanged {
 				p.sendCharacterBaseChangedNotify(gateway, character.record)
 			}
-			if persistenceResult.changedPet != nil {
-				p.sendCharacterPetChangedNotify(gateway, characterUUID, []*pb.PetRecord{persistenceResult.changedPet})
+			if len(persistenceResult.changedPets) > 0 {
+				p.sendCharacterPetChangedNotify(gateway, characterUUID, persistenceResult.changedPets)
 			}
 			if len(persistenceResult.receivedItemFinalCountMap) > 0 {
 				// 现有道具变化通知只同步可堆叠普通道具的最终数量. 装备实例
@@ -311,6 +373,23 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 						},
 					)
 				}
+				petUUIDs := make([]uint64, 0, len(persistenceResult.petExperienceByUUID))
+				for petUUID := range persistenceResult.petExperienceByUUID {
+					if petUUID != battleReward.battlePetUUID {
+						petUUIDs = append(petUUIDs, petUUID)
+					}
+				}
+				sort.Slice(petUUIDs, func(left, right int) bool { return petUUIDs[left] < petUUIDs[right] })
+				for _, petUUID := range petUUIDs {
+					settlement := persistenceResult.petExperienceByUUID[petUUID]
+					if settlement.AppliedExp == 0 {
+						continue
+					}
+					result.Settlement.ExpRewardList = append(result.Settlement.ExpRewardList, &pb.CombatSettlementExpReward{
+						UnitKey:  &pb.CombatUnitKey{Aid: settlementUnitKey.GetAid(), CharacterUuid: settlementUnitKey.GetCharacterUuid(), PetUuid: petUUID},
+						ExpDelta: settlement.AppliedExp,
+					})
+				}
 				if persistenceResult.duelPointChanged {
 					result.Settlement.DuelPointChange = &pb.CombatSettlementDuelPointChange{
 						UnitKey: cloneCombatUnitKey(settlementUnitKey),
@@ -340,6 +419,28 @@ func (p *Account) behavior(messages ...any) (xactor.Behavior, any, error) {
 			p.refreshCharacterPresence(character)
 			p.sendClientRes(gateway, uint32(pb.MsgID_CombatRoundResultNotify_CMD), xerror.Success.Code(), result)
 			resp = true
+		case OnlineAccountActorCmdVictoryTeleport:
+			if len(msg.Args) != 1 {
+				continue
+			}
+			target, ok := msg.Args[0].(combatVictoryTeleport)
+			if !ok || target.sourceSceneID == 0 || target.targetSceneID == 0 || gameconfig.GGameConfig == nil || gameconfig.GGameConfig.Scene == nil {
+				resp = fmt.Errorf("战斗胜利传送参数无效")
+				continue
+			}
+			character := p.characterManager.find(target.leader.characterUUID)
+			if character == nil || !character.online || character.combatRoom != nil || character.sceneID != target.sourceSceneID {
+				resp = fmt.Errorf("战斗胜利传送角色状态已变化")
+				continue
+			}
+			GCharacterTeamMgr.sequenceMu.Lock()
+			moved := p.teleportCharacterMapTeamTo(target.sourceSceneID, target.leader, target.targetSceneID, &pb.MapPathPoint{X: target.x, Y: target.y})
+			GCharacterTeamMgr.sequenceMu.Unlock()
+			if !moved {
+				resp = fmt.Errorf("战斗胜利传送队伍失败")
+			} else {
+				resp = true
+			}
 		case OnlineAccountActorCmdStop:
 			// Stop 也必须在 Account actor 内完成批量持久化和运行态清理,
 			// 避免服务关闭与尚未处理完的角色请求并发读写同一聚合根.
@@ -375,8 +476,18 @@ func (p *Account) updateCharacterLogout() {
 	}
 }
 
+// updateAccountRecord 强制同步落盘账号档案, 供登出与账号停止使用.
+// 失败时保留脏标记, 交给后续重试或停服 drain 再次尝试.
 func (p *Account) updateAccountRecord() {
-	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
-		xlog.GLog.Errorf("set account record after account offline failed aid:%d err:%v", p.aid, err)
+	p.cancelAccountRecordFlush()
+	if p.accountRecord == nil {
+		return
 	}
+	if err := accountRecordPersistFunc(p.aid, p.accountRecord); err != nil {
+		xlog.GLog.Errorf("set account record after account offline failed aid:%d err:%v", p.aid, err)
+		p.accountRecordDirty = true
+		return
+	}
+	p.accountRecordDirty = false
+	p.accountRecordWriteCount = 0
 }

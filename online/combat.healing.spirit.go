@@ -45,7 +45,7 @@ func (r *CombatRoom) executeHealingSpirit(action *combatAction, events *[]*comba
 	sourceDelta := combatHealingUnitDelta(deltasByToken, &unitDeltas, action.unitKey)
 	sourceDelta.AssetDeltaList = append(sourceDelta.AssetDeltaList, &pb.CombatAssetDelta{
 		AssetType: pb.CombatAssetType_CombatAssetType_MP,
-		Delta:     combatClampDelta(uint64(action.healMPCost)),
+		Delta:     combatClampDecreaseDelta(uint64(action.healMPCost)),
 		After:     combatClampUint32(attacker.mp),
 	})
 
@@ -65,7 +65,7 @@ func (r *CombatRoom) executeHealingSpirit(action *combatAction, events *[]*comba
 		targetDelta := combatHealingUnitDelta(deltasByToken, &unitDeltas, targetKey)
 		targetDelta.AssetDeltaList = append(targetDelta.AssetDeltaList, &pb.CombatAssetDelta{
 			AssetType: pb.CombatAssetType_CombatAssetType_HP,
-			Delta:     combatClampDelta(recovered),
+			Delta:     combatClampIncreaseDelta(recovered),
 			After:     combatClampUint32(target.hp),
 		})
 	}

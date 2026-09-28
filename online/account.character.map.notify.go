@@ -167,6 +167,7 @@ func mapCharacterInfo(presence sceneCharacterPresence) *pb.MapCharacterInfo {
 		MountPetId:   presence.mountPetID,
 		TeamEnabled:  presence.teamEnabled,
 		InCombat:     presence.inCombat,
+		Movement:     GScenePresenceMgr.movementSnapshot(presence.sceneID, presence.key),
 	}
 }
 
@@ -183,6 +184,16 @@ func characterMountedPetID(record *pb.CharacterRecord) uint64 {
 }
 
 func characterMapEncounterEnabled(scene *gameconfig.SceneEntry) bool {
-	return scene != nil && scene.Encounter != nil && scene.Encounter.Enabled != nil &&
-		*scene.Encounter.Enabled && len(scene.Encounter.EnemyGroups) > 0
+	if scene == nil || scene.Encounter == nil || scene.Encounter.Enabled == nil {
+		return false
+	}
+	if *scene.Encounter.Enabled && len(scene.Encounter.EnemyGroups) > 0 {
+		return true
+	}
+	for _, region := range scene.Encounter.Regions {
+		if region.Enabled != nil && *region.Enabled && len(region.EnemyGroups) > 0 {
+			return true
+		}
+	}
+	return false
 }

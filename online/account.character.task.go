@@ -3,11 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
-	"math"
 	"time"
 
 	"server/common/gameconfig"
-	petlogic "server/common/pet"
 	pb "server/proto/pb"
 
 	xerror "github.com/75912001/xlib/error"
@@ -233,56 +231,15 @@ func (p *characterTaskManager) ClaimStepReward(taskID uint32, stepID uint32, now
 	if reward == nil {
 		return nil, nil, fmt.Errorf("%w: reward %d", errTaskRecordInvalid, *step.RewardID)
 	}
-	if err := p.validateRewardCapacity(reward); err != nil {
-		return nil, nil, err
-	}
-	itemManager := newCharacterItemManager(p.record)
-	changedItemCountMap := make(map[uint32]uint64, len(reward.Items))
-	for _, item := range reward.Items {
-		if isTaskEquipmentID(*item.ItemID) {
-			if p.record.ItemBag == nil {
-				p.record.ItemBag = &pb.ItemContainerRecord{}
-			}
-			if p.record.ItemBag.EquipmentRecordMap == nil {
-				p.record.ItemBag.EquipmentRecordMap = make(map[uint64]*pb.EquipmentRecord)
-			}
-			for quantity := uint64(0); quantity < *item.Quantity; quantity++ {
-				equipmentUUID, err := p.allocateUUID()
-				if err != nil {
-					return nil, nil, err
-				}
-				equipmentRecord, err := newEquipmentRecord(equipmentUUID, *item.ItemID)
-				if err != nil {
-					return nil, nil, fmt.Errorf("%w: create reward equipment %d: %v", errTaskRecordInvalid, *item.ItemID, err)
-				}
-				p.record.ItemBag.EquipmentRecordMap[equipmentUUID] = equipmentRecord
-			}
-			continue
+	rewardManager := &characterRewardManager{record: p.record, usedUUID: p.usedUUID}
+	changedItemCountMap, err := rewardManager.Apply(reward, nowMs, randomCharacterRewardIndex)
+	if err != nil {
+		if errors.Is(err, errCharacterRewardResourceExhausted) {
+			return nil, nil, fmt.Errorf("%w: %v", errTaskResourceExhausted, err)
 		}
-		if err := itemManager.Add(*item.ItemID, *item.Quantity); err != nil {
-			if errors.Is(err, errItemUseFailedPrecondition) {
-				return nil, nil, fmt.Errorf("%w: add reward item %d: %v", errTaskResourceExhausted, *item.ItemID, err)
-			}
-			return nil, nil, fmt.Errorf("%w: add reward item %d: %v", errTaskRecordInvalid, *item.ItemID, err)
-		}
-		changedItemCountMap[*item.ItemID] = itemManager.Count(*item.ItemID)
+		return nil, nil, fmt.Errorf("%w: %v", errTaskRecordInvalid, err)
 	}
-	for _, rewardPet := range reward.Pets {
-		petEntry := gameconfig.GGameConfig.Pet.Get(*rewardPet.PetID)
-		for quantity := uint32(0); quantity < *rewardPet.Quantity; quantity++ {
-			petUUID, err := p.allocateUUID()
-			if err != nil {
-				return nil, nil, err
-			}
-			petRecord, err := petlogic.NewRecord(petEntry, petUUID, *rewardPet.Level, pb.PetGrade_PetGrade_Unspecified)
-			if err != nil {
-				return nil, nil, fmt.Errorf("%w: create reward pet %d: %v", errTaskRecordInvalid, *rewardPet.PetID, err)
-			}
-			petRecord.CarryStatus = pb.PetCarryStatus_PetCarryStatus_Wait
-			petRecord.CreateTimestampMs = nowMs
-			p.record.PetRecordList = append(p.record.PetRecordList, petRecord)
-		}
-	}
+	p.usedUUID = rewardManager.usedUUID
 	// 补领也刷新领奖时间, 让本次库存与任务记录在同一原子变更中持久化.
 	stepRecord.RewardClaimedAtMs = nowMs
 	changed := map[uint32]*pb.CharacterTaskRecord{taskID: taskRecord}
@@ -487,6 +444,17 @@ func (p *characterTaskManager) conditionsMet(conditions []gameconfig.TaskConditi
 			if condition.TaskID == nil || !characterTaskRewardsClaimed(p.record, *condition.TaskID) {
 				return false, nil
 			}
+		case gameconfig.TaskConditionKindAnyTaskRewardsClaimed:
+			matched := false
+			for _, taskID := range condition.TaskIDs {
+				if characterTaskRewardsClaimed(p.record, taskID) {
+					matched = true
+					break
+				}
+			}
+			if !matched {
+				return false, nil
+			}
 		case gameconfig.TaskConditionKindBattleVictory:
 			if condition.EnemyGroupID == nil || event.battleVictoryEnemyGroupID != *condition.EnemyGroupID {
 				return false, nil
@@ -510,6 +478,13 @@ func characterTaskCompleted(record *pb.CharacterRecord, taskID uint32) bool {
 	for index, stepRecord := range taskRecord.GetStepRecordList() {
 		if stepRecord == nil || stepRecord.GetStepId() != uint32(index+1) || stepRecord.GetCompletedAtMs() == 0 {
 			return false
+		}
+	}
+	if task.CompletionRequiresRewardsClaimed != nil && *task.CompletionRequiresRewardsClaimed {
+		for _, stepRecord := range taskRecord.GetStepRecordList() {
+			if stepRecord.GetRewardClaimedAtMs() == 0 {
+				return false
+			}
 		}
 	}
 	return true
@@ -627,41 +602,6 @@ func (p *characterTaskManager) findPetUUIDs(pets []gameconfig.TaskPetEntry) (map
 		}
 	}
 	return selected, nil
-}
-
-func (p *characterTaskManager) validateRewardCapacity(reward *gameconfig.RewardEntry) error {
-	if reward == nil {
-		return fmt.Errorf("%w: reward is nil", errTaskRecordInvalid)
-	}
-	petCount := uint64(len(p.record.GetPetRecordList()))
-	for _, rewardPet := range reward.Pets {
-		petCount += uint64(*rewardPet.Quantity)
-	}
-	if petCount > uint64(pb.PetRecordLimit_PetRecordLimit_MaxCarryCount) {
-		return fmt.Errorf("%w: pet carry capacity exhausted", errTaskResourceExhausted)
-	}
-	bagCount := uint64(itemContainerCount(p.record.GetItemBag()))
-	for _, item := range reward.Items {
-		if isTaskEquipmentID(*item.ItemID) {
-			bagCount += *item.Quantity
-			continue
-		}
-		if !isCharacterAssetItemID(*item.ItemID) && newCharacterItemManager(p.record).Count(*item.ItemID) == 0 {
-			bagCount++
-		}
-	}
-	if bagCount > uint64(pb.CharacterLimit_CharacterLimit_MaxItemBagCount) {
-		return fmt.Errorf("%w: item bag capacity exhausted", errTaskResourceExhausted)
-	}
-	return nil
-}
-
-func (p *characterTaskManager) allocateUUID() (uint64, error) {
-	if p.usedUUID == math.MaxUint64 {
-		return 0, fmt.Errorf("%w: account uuid exhausted", errTaskResourceExhausted)
-	}
-	p.usedUUID++
-	return p.usedUUID, nil
 }
 
 func mergeChangedTaskRecords(target map[uint32]*pb.CharacterTaskRecord, source map[uint32]*pb.CharacterTaskRecord) {
@@ -832,7 +772,7 @@ func (p *Account) onTaskAcceptReq(gateway *Gateway, pkt *pb.OnlineClientPacket) 
 		return
 	}
 	if err := persistCharacterTaskMutationPlan(plan, p.accountRecord, character, func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+		return p.deferAccountRecordPersist()
 	}); err != nil {
 		xlog.GLog.Errorf("persist task accept failed aid:%d character:%d task:%d err:%v", p.aid, req.GetCharacterUuid(), req.GetTaskId(), err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_TaskAcceptRes_CMD), xerror.Internal.Code())
@@ -859,7 +799,7 @@ func (p *Account) onTaskSubmitReq(gateway *Gateway, pkt *pb.OnlineClientPacket) 
 		return
 	}
 	if err := persistCharacterTaskMutationPlan(plan, p.accountRecord, character, func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+		return p.deferAccountRecordPersist()
 	}); err != nil {
 		xlog.GLog.Errorf("persist task submit failed aid:%d character:%d task:%d step:%d err:%v", p.aid, req.GetCharacterUuid(), req.GetTaskId(), req.GetStepId(), err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_TaskSubmitRes_CMD), xerror.Internal.Code())
@@ -890,7 +830,7 @@ func (p *Account) onTaskStepRewardClaimReq(gateway *Gateway, pkt *pb.OnlineClien
 		return
 	}
 	if err := persistCharacterTaskMutationPlan(plan, p.accountRecord, character, func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+		return p.deferAccountRecordPersist()
 	}); err != nil {
 		xlog.GLog.Errorf("persist task reward claim failed aid:%d character:%d task:%d step:%d err:%v", p.aid, req.GetCharacterUuid(), req.GetTaskId(), req.GetStepId(), err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_TaskStepRewardClaimRes_CMD), xerror.Internal.Code())

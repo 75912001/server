@@ -41,7 +41,7 @@ message EquipmentRecord {
   uint32 asset_id = 2; // 装备资产 ID, 对应装备配置 ID
   map<int32, int64> record_base_map = 10; // 装备基础属性表, key 使用 EquipmentRecordAttribute; 仅保存非0值, 缺失的已知key按0处理
   map<int32, int64> record_modifier_map = 11; // 装备附加属性修正表, key 使用 EquipmentRecordAttribute; 仅保存非0值, 缺失的已知key按0处理
-  repeated uint32 additional_skill_id_list = 20; // 配置表之外后期添加的技能 ID, 不包含装备配置自带技能
+  uint32 additional_skill_id = 20; // 配置表之外后期添加的唯一技能 ID, 0表示没有附加技能
   EquipmentElementAttribute element_attribute = 21; // 装备元素属性, 未设置表示没有元素属性
   map<int32, RecordPrimary> record_map = 1000; // 装备扩展记录表, key 使用 EquipmentRecordPrimary
 }

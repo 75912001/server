@@ -234,7 +234,7 @@ func (p *Account) onGMCommandReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 			return
 		}
 		if err := persistGMItemAddPlan(plan, p.accountRecord, character, func() error {
-			return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+			return p.deferAccountRecordPersist()
 		}); err != nil {
 			xlog.GLog.Errorf("persist gm item add failed aid:%d character:%d item:%d count:%d err:%v", p.aid, plan.characterUUID, plan.itemID, plan.addedCount, err)
 			p.sendClientErr(gateway, uint32(pb.MsgID_GMCommandRes_CMD), xerror.Internal.Code())
@@ -260,7 +260,7 @@ func (p *Account) onGMCommandReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 			return
 		}
 		if err := persistGMPetAddPlan(plan, p.accountRecord, character, func() error {
-			return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+			return p.deferAccountRecordPersist()
 		}); err != nil {
 			xlog.GLog.Errorf("persist gm pet add failed aid:%d character:%d pet:%d grade:%s level:%d uuid:%d err:%v", p.aid, plan.characterUUID, plan.petID, plan.petGrade, plan.petLevel, plan.petUUID, err)
 			p.sendClientErr(gateway, uint32(pb.MsgID_GMCommandRes_CMD), xerror.Internal.Code())

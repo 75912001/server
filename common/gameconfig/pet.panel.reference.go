@@ -70,14 +70,14 @@ func PetRankGrowthRange(rank uint32) (float64, float64) {
 	}
 }
 
-func calculatePetPanelReference(pet *PetEntry) PetPanelReferenceEntry {
-	rankMin, rankMax := PetRankGrowthRange(pet.Growth.Rank)
+func calculatePetPanelReference(growth *PetGrowthEntry) PetPanelReferenceEntry {
+	rankMin, rankMax := PetRankGrowthRange(growth.Rank)
 	rankAverage := (rankMin + rankMax) / 2.0
 	reference := PetPanelReferenceEntry{
-		Level1CommonAverage:   calculatePetPanelAverage(pet.Growth, 1, petSavedBaseGradeOffsetMin, rankAverage),
-		Level1MythicAverage:   calculatePetPanelAverage(pet.Growth, 1, petSavedBaseGradeOffsetMax, rankAverage),
-		Level140CommonAverage: calculatePetPanelAverage(pet.Growth, uint32(pb.Constants_Constants_Level_Max), petSavedBaseGradeOffsetMin, rankAverage),
-		Level140MythicAverage: calculatePetPanelAverage(pet.Growth, uint32(pb.Constants_Constants_Level_Max), petSavedBaseGradeOffsetMax, rankAverage),
+		Level1CommonAverage:   calculatePetPanelAverage(growth, 1, petSavedBaseGradeOffsetMin, rankAverage),
+		Level1MythicAverage:   calculatePetPanelAverage(growth, 1, petSavedBaseGradeOffsetMax, rankAverage),
+		Level140CommonAverage: calculatePetPanelAverage(growth, uint32(pb.Constants_Constants_Level_Max), petSavedBaseGradeOffsetMin, rankAverage),
+		Level140MythicAverage: calculatePetPanelAverage(growth, uint32(pb.Constants_Constants_Level_Max), petSavedBaseGradeOffsetMax, rankAverage),
 	}
 	reference.GrowthRateMin = valuePtr(calculatePetPanelGrowthRate(reference.Level1CommonAverage, reference.Level140CommonAverage))
 	reference.GrowthRateMax = valuePtr(calculatePetPanelGrowthRate(reference.Level1MythicAverage, reference.Level140MythicAverage))
@@ -191,9 +191,9 @@ func float64PointerEqual(actual *float64, expected *float64) bool {
 	return *actual == *expected
 }
 
-func formatPetPanelReferenceError(pet *PetEntry, expected *PetPanelReferenceEntry) string {
-	return fmt.Sprintf("pet:%d name:%s panelReference不一致\nactual:\n%s\nexpected:\n%s",
-		*pet.ID, *pet.Name, formatPetPanelReference(pet.PanelReference), formatPetPanelReference(expected))
+func formatGrowthAttributePanelReferenceError(entry *GrowthAttributeEntry, expected *PetPanelReferenceEntry) string {
+	return fmt.Sprintf("growthAttribute:%d name:%s panelReference不一致\nactual:\n%s\nexpected:\n%s",
+		*entry.ID, *entry.Name, formatPetPanelReference(entry.PanelReference), formatPetPanelReference(expected))
 }
 
 func formatPetPanelReference(reference *PetPanelReferenceEntry) string {

@@ -40,7 +40,9 @@ type characterTeamMapEvent struct {
 }
 
 type characterTeamMutation struct {
-	mapEvent *characterTeamMapEvent
+	mapEvent         *characterTeamMapEvent
+	compactFrom      sceneCharacterKey
+	compactFollowers []sceneCharacterKey
 }
 
 type characterTeamManager struct {
@@ -235,6 +237,10 @@ func (m *characterTeamManager) joinCandidateLocked(
 
 func (m *characterTeamManager) removeMemberLocked(team *characterTeam, memberIndex int) characterTeamMutation {
 	removed := team.members[memberIndex]
+	followers := make([]sceneCharacterKey, 0, len(team.members)-memberIndex-1)
+	for _, member := range team.members[memberIndex+1:] {
+		followers = append(followers, member.key)
+	}
 	copy(team.members[memberIndex:], team.members[memberIndex+1:])
 	team.members = team.members[:len(team.members)-1]
 	delete(m.byMember, removed.key)
@@ -244,6 +250,8 @@ func (m *characterTeamManager) removeMemberLocked(team *characterTeam, memberInd
 		delete(m.byMember, leader.key)
 		team.members = nil
 		return characterTeamMutation{
+			compactFrom:      removed.key,
+			compactFollowers: followers,
 			mapEvent: &characterTeamMapEvent{
 				eventType: characterTeamMapEventLeave,
 				key:       removed.key,
@@ -252,6 +260,8 @@ func (m *characterTeamManager) removeMemberLocked(team *characterTeam, memberInd
 		}
 	}
 	return characterTeamMutation{
+		compactFrom:      removed.key,
+		compactFollowers: followers,
 		mapEvent: &characterTeamMapEvent{
 			eventType: characterTeamMapEventLeave,
 			key:       removed.key,

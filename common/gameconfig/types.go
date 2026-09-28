@@ -29,6 +29,7 @@ const (
 	FileReward                  = "reward.yaml"
 	FileTask                    = "task.yaml"
 	FileAI                      = "ai.yaml"
+	FileGrowthAttribute         = "growth.attribute.yaml"
 	FilePet                     = "pet.yaml"
 	FileStore                   = "商店.yaml"
 	DirScene                    = "scene"
@@ -62,11 +63,13 @@ type Manager struct {
 	Skill *SkillConfig
 	// AI 是 ai.yaml 的共享战斗AI配置, 由宠物模板通过ID引用.
 	AI *AIConfig
-	// Pet 是 pet.yaml 的宠物业务数值配置, 用于玩家宠物和敌人组引用的基础模板查询.
+	// GrowthAttribute 是 growth.attribute.yaml 的共享成长属性配置, 为宠物实例和敌人提供权威数值.
+	GrowthAttribute *GrowthAttributeConfig
+	// Pet 是 pet.yaml 的宠物外观和出生技能配置, 通过ID引用默认成长属性.
 	Pet *PetConfig
-	// Character 是 character.yaml 的角色资源索引配置, server 只消费角色ID和玩家可选角色标记.
+	// Character 是 character.yaml 的角色资源索引配置, 保存角色ID、玩家可选标记和骑乘宠物权限集合.
 	Character *CharacterConfig
-	// Enemy 是 enemy.group.yaml 的敌人组配置, 用于生成战斗敌人并校验宠物模板引用.
+	// Enemy 是 enemy.group.yaml 的敌人组配置, 用于组合外观、成长属性和战斗AI.
 	Enemy *EnemyGroupConfig
 	// EnemyExp 是 enemy.exp.yaml 的敌人基础经验配置, 用于按敌人模板和等级生成初始 CHAR_EXP.
 	EnemyExp *EnemyExpConfig

@@ -45,8 +45,38 @@ var equipmentBaseAttributeKeys = [...]pb.EquipmentRecordAttribute{
 
 var supportedCharacterEquipmentTypes = [...]pb.EquipmentType{
 	pb.EquipmentType_EquipmentType_Weapon,
+	pb.EquipmentType_EquipmentType_Chest,
+	pb.EquipmentType_EquipmentType_Helmet,
+	pb.EquipmentType_EquipmentType_Shield,
+	pb.EquipmentType_EquipmentType_Belt,
+	pb.EquipmentType_EquipmentType_Boots,
 	pb.EquipmentType_EquipmentType_Accessory1,
 	pb.EquipmentType_EquipmentType_Accessory2,
+}
+
+func isChestEquipmentAssetID(assetID uint32) bool {
+	return assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Chest_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Chest_End)
+}
+
+func isHelmetEquipmentAssetID(assetID uint32) bool {
+	return assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Helmet_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Helmet_End)
+}
+
+func isShieldEquipmentAssetID(assetID uint32) bool {
+	return assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Shield_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Shield_End)
+}
+
+func isBeltEquipmentAssetID(assetID uint32) bool {
+	return assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Belt_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Belt_End)
+}
+
+func isBootsEquipmentAssetID(assetID uint32) bool {
+	return assetID >= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Boots_Start) &&
+		assetID <= uint32(pb.AssetID_AssetIDRange_Item_Equipment_Boots_End)
 }
 
 // isArmorEquipmentAssetID只接受当前协议已分配的六类普通防具区间.
@@ -122,6 +152,16 @@ func characterEquipmentSlot(equipment *pb.CharacterEquipmentRecord, equipmentTyp
 	switch equipmentType {
 	case pb.EquipmentType_EquipmentType_Weapon:
 		return &equipment.Weapon
+	case pb.EquipmentType_EquipmentType_Chest:
+		return &equipment.Chest
+	case pb.EquipmentType_EquipmentType_Helmet:
+		return &equipment.Helmet
+	case pb.EquipmentType_EquipmentType_Shield:
+		return &equipment.Shield
+	case pb.EquipmentType_EquipmentType_Belt:
+		return &equipment.Belt
+	case pb.EquipmentType_EquipmentType_Boots:
+		return &equipment.Boots
 	case pb.EquipmentType_EquipmentType_Accessory1:
 		return &equipment.Accessory1
 	case pb.EquipmentType_EquipmentType_Accessory2:
@@ -254,14 +294,9 @@ func validateEquipmentRecord(record *pb.EquipmentRecord, expectedUUID uint64) er
 			return fmt.Errorf("equipment %d record modifier %d value %d is outside int32", expectedUUID, rawKey, value)
 		}
 	}
-	seenSkillID := make(map[uint32]struct{}, len(record.GetAdditionalSkillIdList()))
-	seenStatusSpirit := make(map[pb.EquipmentRecordAttribute]uint32, len(equipmentStatusSpiritResistanceAttributes))
-	for _, skillID := range record.GetAdditionalSkillIdList() {
-		if skillID == 0 || skillID == entry.GrantedSkillID {
+	if skillID := record.GetAdditionalSkillId(); skillID != 0 {
+		if skillID == entry.GrantedSkillID {
 			return fmt.Errorf("equipment %d additional skill %d is invalid or configured by asset", expectedUUID, skillID)
-		}
-		if _, exists := seenSkillID[skillID]; exists {
-			return fmt.Errorf("equipment %d additional skill %d is duplicated", expectedUUID, skillID)
 		}
 		if gameconfig.GGameConfig.Skill == nil {
 			return fmt.Errorf("equipment %d additional skill config is not loaded", expectedUUID)
@@ -269,13 +304,6 @@ func validateEquipmentRecord(record *pb.EquipmentRecord, expectedUUID uint64) er
 		if gameconfig.GGameConfig.Skill.Get(skillID) == nil {
 			return fmt.Errorf("equipment %d additional skill %d is missing", expectedUUID, skillID)
 		}
-		if attribute, statusSpirit := equipmentStatusSpiritResistanceAttribute(skillID); statusSpirit {
-			if existingSkillID := seenStatusSpirit[attribute]; existingSkillID != 0 {
-				return fmt.Errorf("equipment %d additional status spirit skills %d and %d have the same category", expectedUUID, existingSkillID, skillID)
-			}
-			seenStatusSpirit[attribute] = skillID
-		}
-		seenSkillID[skillID] = struct{}{}
 	}
 	if element := record.GetElementAttribute(); element != nil {
 		if element.GetElement() < pb.AssetElemental_AssetElemental_Earth || element.GetElement() >= pb.AssetElemental_AssetElemental_Max {
@@ -332,12 +360,7 @@ func validateCharacterEquipmentSlots(equipment *pb.CharacterEquipmentRecord) err
 		name   string
 		record *pb.EquipmentRecord
 	}{
-		{name: "helmet", record: equipment.GetHelmet()},
-		{name: "chest", record: equipment.GetChest()},
-		{name: "shield", record: equipment.GetShield()},
 		{name: "gloves", record: equipment.GetGloves()},
-		{name: "belt", record: equipment.GetBelt()},
-		{name: "boots", record: equipment.GetBoots()},
 	}
 	for _, slot := range unsupported {
 		if slot.record != nil {
@@ -354,13 +377,34 @@ func validateCharacterEquipmentSlots(equipment *pb.CharacterEquipmentRecord) err
 			return err
 		}
 		entry := gameconfig.GGameConfig.Item.Get(equipped.GetAssetId())
-		if equipmentType == pb.EquipmentType_EquipmentType_Weapon {
+		switch equipmentType {
+		case pb.EquipmentType_EquipmentType_Weapon:
 			if entry.WeaponType == pb.CharacterWeaponType_CharacterWeaponType_Unspecified {
-				return fmt.Errorf("weapon slot contains accessory %d", equipped.GetAssetId())
+				return fmt.Errorf("weapon slot contains incompatible equipment %d", equipped.GetAssetId())
 			}
-		} else {
+		case pb.EquipmentType_EquipmentType_Chest:
+			if !isChestEquipmentAssetID(equipped.GetAssetId()) {
+				return fmt.Errorf("chest slot contains incompatible equipment %d", equipped.GetAssetId())
+			}
+		case pb.EquipmentType_EquipmentType_Helmet:
+			if !isHelmetEquipmentAssetID(equipped.GetAssetId()) {
+				return fmt.Errorf("helmet slot contains incompatible equipment %d", equipped.GetAssetId())
+			}
+		case pb.EquipmentType_EquipmentType_Shield:
+			if !isShieldEquipmentAssetID(equipped.GetAssetId()) {
+				return fmt.Errorf("shield slot contains incompatible equipment %d", equipped.GetAssetId())
+			}
+		case pb.EquipmentType_EquipmentType_Belt:
+			if !isBeltEquipmentAssetID(equipped.GetAssetId()) {
+				return fmt.Errorf("belt slot contains incompatible equipment %d", equipped.GetAssetId())
+			}
+		case pb.EquipmentType_EquipmentType_Boots:
+			if !isBootsEquipmentAssetID(equipped.GetAssetId()) {
+				return fmt.Errorf("boots slot contains incompatible equipment %d", equipped.GetAssetId())
+			}
+		case pb.EquipmentType_EquipmentType_Accessory1, pb.EquipmentType_EquipmentType_Accessory2:
 			if entry.AccessoryType == pb.AccessoryType_AccessoryType_Unspecified {
-				return fmt.Errorf("accessory slot contains weapon %d", equipped.GetAssetId())
+				return fmt.Errorf("accessory slot contains incompatible equipment %d", equipped.GetAssetId())
 			}
 			if entry.AccessoryType == accessoryType {
 				return fmt.Errorf("cannot equip two accessories of type %s", accessoryType)
@@ -523,13 +567,13 @@ func characterEffectiveAttributeList(record *pb.AccountRecord) ([]*pb.CharacterE
 }
 
 type characterEquipmentReplacePlan struct {
-	characterUUID     uint64
-	equipmentType     pb.EquipmentType
-	characterSlot     int
-	previousCharacter *pb.CharacterRecord
-	nextCharacter     *pb.CharacterRecord
-	nextAccountRecord *pb.AccountRecord
-	effective         *pb.CharacterEffectiveAttribute
+	characterUUID uint64
+	equipmentType pb.EquipmentType
+	characterSlot int
+	// equipmentUUID 为 0 表示卸下当前部位装备.
+	equipmentUUID  uint64
+	unequipCurrent bool
+	effective      *pb.CharacterEffectiveAttribute
 }
 
 func prepareCharacterEquipmentReplacePlan(accountRecord *pb.AccountRecord, characterRecord *pb.CharacterRecord, equipmentType pb.EquipmentType, equipmentUUID uint64) (*characterEquipmentReplacePlan, error) {
@@ -546,31 +590,28 @@ func prepareCharacterEquipmentReplacePlan(accountRecord *pb.AccountRecord, chara
 	if characterSlot < 0 {
 		return nil, fmt.Errorf("%w: character slot not found", errCharacterEquipmentRecordInvalid)
 	}
-
-	nextAccountRecord := proto.Clone(accountRecord).(*pb.AccountRecord)
-	nextCharacter := nextAccountRecord.GetCharacterRecordList()[characterSlot]
-	if nextCharacter.ItemBag == nil || nextCharacter.Equipment == nil {
+	if characterRecord.ItemBag == nil || characterRecord.Equipment == nil {
 		return nil, fmt.Errorf("%w: character equipment container is missing", errCharacterEquipmentRecordInvalid)
 	}
-	if nextCharacter.ItemBag.EquipmentRecordMap == nil {
-		nextCharacter.ItemBag.EquipmentRecordMap = make(map[uint64]*pb.EquipmentRecord)
-	}
-	targetSlot := characterEquipmentSlot(nextCharacter.Equipment, equipmentType)
+
+	// 换装只校验与计算, 不修改权威档案. 有效属性仅依赖 base 与 equipment,
+	// 因此用一份装备槽位浅拷贝预演, 不克隆整个角色档案.
+	probeEquipment := proto.Clone(characterRecord.GetEquipment()).(*pb.CharacterEquipmentRecord)
+	targetSlot := characterEquipmentSlot(characterRecord.Equipment, equipmentType)
 	currentEquipment := *targetSlot
 	if equipmentUUID == 0 {
 		if currentEquipment == nil {
 			return nil, fmt.Errorf("%w: equipment slot is already empty", errCharacterEquipmentFailedPrecondition)
 		}
-		if itemContainerCount(nextCharacter.GetItemBag()) >= int(pb.CharacterLimit_CharacterLimit_MaxItemBagCount) {
+		if itemContainerCount(characterRecord.GetItemBag()) >= int(pb.CharacterLimit_CharacterLimit_MaxItemBagCount) {
 			return nil, errCharacterEquipmentResourceExhausted
 		}
-		if _, exists := nextCharacter.ItemBag.EquipmentRecordMap[currentEquipment.GetUuid()]; exists {
+		if _, exists := characterRecord.ItemBag.GetEquipmentRecordMap()[currentEquipment.GetUuid()]; exists {
 			return nil, fmt.Errorf("%w: equipment %d already exists in bag", errCharacterEquipmentRecordInvalid, currentEquipment.GetUuid())
 		}
-		nextCharacter.ItemBag.EquipmentRecordMap[currentEquipment.GetUuid()] = currentEquipment
-		*targetSlot = nil
+		*characterEquipmentSlot(probeEquipment, equipmentType) = nil
 	} else {
-		nextEquipment := nextCharacter.ItemBag.GetEquipmentRecordMap()[equipmentUUID]
+		nextEquipment := characterRecord.ItemBag.GetEquipmentRecordMap()[equipmentUUID]
 		if nextEquipment == nil {
 			return nil, fmt.Errorf("%w: equipment %d is not in character bag", errCharacterEquipmentTargetNotFound, equipmentUUID)
 		}
@@ -581,17 +622,38 @@ func prepareCharacterEquipmentReplacePlan(accountRecord *pb.AccountRecord, chara
 		if err != nil {
 			return nil, fmt.Errorf("%w: %v", errCharacterEquipmentTargetNotFound, err)
 		}
-		if equipmentType == pb.EquipmentType_EquipmentType_Weapon {
+		switch equipmentType {
+		case pb.EquipmentType_EquipmentType_Weapon:
 			if entry.WeaponType == pb.CharacterWeaponType_CharacterWeaponType_Unspecified {
-				return nil, fmt.Errorf("%w: accessory cannot enter weapon slot", errCharacterEquipmentFailedPrecondition)
+				return nil, fmt.Errorf("%w: equipment cannot enter weapon slot", errCharacterEquipmentFailedPrecondition)
 			}
-		} else {
+		case pb.EquipmentType_EquipmentType_Chest:
+			if !isChestEquipmentAssetID(nextEquipment.GetAssetId()) {
+				return nil, fmt.Errorf("%w: equipment cannot enter chest slot", errCharacterEquipmentFailedPrecondition)
+			}
+		case pb.EquipmentType_EquipmentType_Helmet:
+			if !isHelmetEquipmentAssetID(nextEquipment.GetAssetId()) {
+				return nil, fmt.Errorf("%w: equipment cannot enter helmet slot", errCharacterEquipmentFailedPrecondition)
+			}
+		case pb.EquipmentType_EquipmentType_Shield:
+			if !isShieldEquipmentAssetID(nextEquipment.GetAssetId()) {
+				return nil, fmt.Errorf("%w: equipment cannot enter shield slot", errCharacterEquipmentFailedPrecondition)
+			}
+		case pb.EquipmentType_EquipmentType_Belt:
+			if !isBeltEquipmentAssetID(nextEquipment.GetAssetId()) {
+				return nil, fmt.Errorf("%w: equipment cannot enter belt slot", errCharacterEquipmentFailedPrecondition)
+			}
+		case pb.EquipmentType_EquipmentType_Boots:
+			if !isBootsEquipmentAssetID(nextEquipment.GetAssetId()) {
+				return nil, fmt.Errorf("%w: equipment cannot enter boots slot", errCharacterEquipmentFailedPrecondition)
+			}
+		case pb.EquipmentType_EquipmentType_Accessory1, pb.EquipmentType_EquipmentType_Accessory2:
 			if entry.AccessoryType == pb.AccessoryType_AccessoryType_Unspecified {
-				return nil, fmt.Errorf("%w: weapon cannot enter accessory slot", errCharacterEquipmentFailedPrecondition)
+				return nil, fmt.Errorf("%w: equipment cannot enter accessory slot", errCharacterEquipmentFailedPrecondition)
 			}
-			otherAccessory := nextCharacter.Equipment.GetAccessory1()
+			otherAccessory := characterRecord.Equipment.GetAccessory1()
 			if equipmentType == pb.EquipmentType_EquipmentType_Accessory1 {
-				otherAccessory = nextCharacter.Equipment.GetAccessory2()
+				otherAccessory = characterRecord.Equipment.GetAccessory2()
 			}
 			if otherAccessory != nil {
 				otherEntry, err := configuredEquipmentEntry(otherAccessory.GetAssetId())
@@ -606,7 +668,7 @@ func prepareCharacterEquipmentReplacePlan(accountRecord *pb.AccountRecord, chara
 		if gameconfig.GGameConfig.Exp == nil {
 			return nil, fmt.Errorf("%w: exp config is not loaded", errCharacterEquipmentRecordInvalid)
 		}
-		characterLevel, err := gameconfig.GGameConfig.Exp.GetLevel(nextCharacter.GetBase().GetExp())
+		characterLevel, err := gameconfig.GGameConfig.Exp.GetLevel(characterRecord.GetBase().GetExp())
 		if err != nil {
 			return nil, fmt.Errorf("%w: character level: %v", errCharacterEquipmentRecordInvalid, err)
 		}
@@ -617,45 +679,72 @@ func prepareCharacterEquipmentReplacePlan(accountRecord *pb.AccountRecord, chara
 		if entry.Profession != pb.CharacterProfession_CharacterProfession_None {
 			return nil, fmt.Errorf("%w: equipment requires profession %s", errCharacterEquipmentFailedPrecondition, entry.Profession)
 		}
-		delete(nextCharacter.ItemBag.EquipmentRecordMap, equipmentUUID)
 		if currentEquipment != nil {
-			if _, exists := nextCharacter.ItemBag.EquipmentRecordMap[currentEquipment.GetUuid()]; exists {
+			if _, exists := characterRecord.ItemBag.GetEquipmentRecordMap()[currentEquipment.GetUuid()]; exists {
 				return nil, fmt.Errorf("%w: current equipment %d already exists in bag", errCharacterEquipmentRecordInvalid, currentEquipment.GetUuid())
 			}
-			nextCharacter.ItemBag.EquipmentRecordMap[currentEquipment.GetUuid()] = currentEquipment
 		}
-		*targetSlot = nextEquipment
+		*characterEquipmentSlot(probeEquipment, equipmentType) = nextEquipment
 	}
 
-	effective, err := characterEffectiveAttribute(nextCharacter)
+	effective, err := characterEffectiveAttribute(&pb.CharacterRecord{
+		Base:      characterRecord.GetBase(),
+		Equipment: probeEquipment,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("%w: effective attribute: %v", errCharacterEquipmentRecordInvalid, err)
 	}
 	return &characterEquipmentReplacePlan{
-		characterUUID:     characterRecord.GetBase().GetUuid(),
-		equipmentType:     equipmentType,
-		characterSlot:     characterSlot,
-		previousCharacter: characterRecord,
-		nextCharacter:     nextCharacter,
-		nextAccountRecord: nextAccountRecord,
-		effective:         effective,
+		characterUUID:  characterRecord.GetBase().GetUuid(),
+		equipmentType:  equipmentType,
+		characterSlot:  characterSlot,
+		equipmentUUID:  equipmentUUID,
+		unequipCurrent: equipmentUUID == 0,
+		effective:      effective,
 	}, nil
 }
 
-func persistCharacterEquipmentReplacePlan(plan *characterEquipmentReplacePlan, accountRecord *pb.AccountRecord, character *character, persist func(*pb.AccountRecord) error) error {
-	if plan == nil || accountRecord == nil || character == nil || persist == nil || plan.nextAccountRecord == nil || plan.nextCharacter == nil {
+// applyCharacterEquipmentReplacePlan 把换装结果原地应用到权威角色档案, 再通知落盘。
+// 与改造前的区别: 不再克隆整个 AccountRecord, 也不再做事后差分解算通知。
+func applyCharacterEquipmentReplacePlan(plan *characterEquipmentReplacePlan, accountRecord *pb.AccountRecord, character *character, persist func() error) error {
+	if plan == nil || accountRecord == nil || character == nil || persist == nil || character.record == nil {
 		return errCharacterEquipmentInvalidArgument
 	}
 	if plan.characterSlot < 0 || plan.characterSlot >= len(accountRecord.GetCharacterRecordList()) ||
-		accountRecord.GetCharacterRecordList()[plan.characterSlot] != plan.previousCharacter || character.record != plan.previousCharacter {
+		accountRecord.GetCharacterRecordList()[plan.characterSlot] != character.record {
 		return fmt.Errorf("%w: authoritative character changed before persistence", errCharacterEquipmentRecordInvalid)
 	}
-	if err := persist(plan.nextAccountRecord); err != nil {
-		return err
+	if character.record.ItemBag == nil || character.record.Equipment == nil {
+		return fmt.Errorf("%w: character equipment container is missing", errCharacterEquipmentRecordInvalid)
 	}
-	accountRecord.CharacterRecordList[plan.characterSlot] = plan.nextCharacter
-	character.record = plan.nextCharacter
-	return nil
+	if character.record.ItemBag.EquipmentRecordMap == nil {
+		character.record.ItemBag.EquipmentRecordMap = make(map[uint64]*pb.EquipmentRecord)
+	}
+	targetSlot := characterEquipmentSlot(character.record.Equipment, plan.equipmentType)
+	if targetSlot == nil {
+		return fmt.Errorf("%w: character equipment slot is unavailable", errCharacterEquipmentRecordInvalid)
+	}
+	currentEquipment := *targetSlot
+
+	if plan.unequipCurrent {
+		if currentEquipment == nil {
+			return fmt.Errorf("%w: equipment slot is already empty", errCharacterEquipmentFailedPrecondition)
+		}
+		character.record.ItemBag.EquipmentRecordMap[currentEquipment.GetUuid()] = currentEquipment
+		*targetSlot = nil
+		return persist()
+	}
+
+	nextEquipment := character.record.ItemBag.GetEquipmentRecordMap()[plan.equipmentUUID]
+	if nextEquipment == nil {
+		return fmt.Errorf("%w: equipment %d is not in character bag", errCharacterEquipmentTargetNotFound, plan.equipmentUUID)
+	}
+	delete(character.record.ItemBag.EquipmentRecordMap, plan.equipmentUUID)
+	if currentEquipment != nil {
+		character.record.ItemBag.EquipmentRecordMap[currentEquipment.GetUuid()] = currentEquipment
+	}
+	*targetSlot = nextEquipment
+	return persist()
 }
 
 func (p *Account) onCharacterEquipmentReplaceReq(gateway *Gateway, packet *pb.OnlineClientPacket) {
@@ -679,22 +768,20 @@ func (p *Account) onCharacterEquipmentReplaceReq(gateway *Gateway, packet *pb.On
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterEquipmentReplaceRes_CMD), characterEquipmentResultID(err))
 		return
 	}
-	if err := persistCharacterEquipmentReplacePlan(plan, p.accountRecord, character, func(next *pb.AccountRecord) error {
-		return unaryCacheSetAccountRecord(p.aid, next)
-	}); err != nil {
+	if err := applyCharacterEquipmentReplacePlan(plan, p.accountRecord, character, p.deferAccountRecordPersist); err != nil {
 		xlog.GLog.Errorf("persist character equipment replace failed aid:%d character:%d type:%s equipment:%d err:%v", p.aid, request.GetCharacterUuid(), request.GetEquipmentType(), request.GetEquipmentUuid(), err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterEquipmentReplaceRes_CMD), xerror.Internal.Code())
 		return
 	}
 	// 响应只携带本次替换部位的装备; 卸下目标部位装备时该字段保持未设置.
 	var replacedEquipment *pb.EquipmentRecord
-	if equipped := *characterEquipmentSlot(plan.nextCharacter.GetEquipment(), plan.equipmentType); equipped != nil {
+	if equipped := *characterEquipmentSlot(character.record.GetEquipment(), plan.equipmentType); equipped != nil {
 		replacedEquipment = proto.Clone(equipped).(*pb.EquipmentRecord)
 	}
 	p.sendClientRes(gateway, uint32(pb.MsgID_CharacterEquipmentReplaceRes_CMD), xerror.Success.Code(), &pb.CharacterEquipmentReplaceRes{
 		CharacterUuid:      plan.characterUUID,
 		EquipmentType:      plan.equipmentType,
-		ItemBag:            proto.Clone(plan.nextCharacter.GetItemBag()).(*pb.ItemContainerRecord),
+		ItemBag:            proto.Clone(character.record.GetItemBag()).(*pb.ItemContainerRecord),
 		Equipment:          replacedEquipment,
 		EffectiveAttribute: proto.Clone(plan.effective).(*pb.CharacterEffectiveAttribute),
 	})

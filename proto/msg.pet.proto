@@ -86,6 +86,7 @@ message PetRecord {
   int32 growth_baseline_defense = 111; // 成长率基准防御力; 原版有符号四维可能生成0或负值
   int32 growth_baseline_agility = 112; // 成长率基准敏捷; 原版有符号速度可能生成0或负值
   uint32 growth_baseline_level = 113; // 成长率基准对应等级; 1 表示真实 1 级记录, 高等级首次获得时记录当前等级
+  uint32 growth_attribute_id = 114; // 宠物实例冻结的成长属性ID; 必须非0且引用growth.attribute.yaml, 不回退宠物默认值
 }
 
 // PetCarryStatusChange 表示服务端已持久化的一项宠物携带状态变更.

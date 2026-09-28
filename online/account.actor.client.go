@@ -43,6 +43,9 @@ func (p *Account) onClientPacket(gateway *Gateway, pkt *pb.OnlineClientPacket) {
 	case pb.MsgID_CharacterMapEnterReq_CMD:
 		p.onCharacterMapEnterReq(gateway, pkt)
 		return
+	case pb.MsgID_MovePathReq_CMD:
+		p.onMovePathReq(gateway, pkt)
+		return
 	case pb.MsgID_NpcInteractionReq_CMD:
 		p.onNPCInteractionReq(gateway, pkt)
 		return
@@ -289,6 +292,20 @@ func (p *Account) sendCharacterContainerChangedNotify(gateway *Gateway, characte
 	})
 }
 
+func (p *Account) sendCharacterEquipmentChangedNotify(gateway *Gateway, characterUUID uint64, character *pb.CharacterRecord, effective *pb.CharacterEffectiveAttribute) {
+	if characterUUID == 0 || character == nil || character.GetItemBag() == nil || character.GetEquipment() == nil || effective == nil {
+		return
+	}
+	p.sendCharacterNotify(gateway, &pb.CharacterNotify{
+		CharacterUuid: characterUUID,
+		Change: &pb.CharacterNotify_EquipmentChanged{EquipmentChanged: &pb.CharacterEquipmentChanged{
+			ItemBag:            proto.Clone(character.GetItemBag()).(*pb.ItemContainerRecord),
+			Equipment:          proto.Clone(character.GetEquipment()).(*pb.CharacterEquipmentRecord),
+			EffectiveAttribute: proto.Clone(effective).(*pb.CharacterEffectiveAttribute),
+		}},
+	})
+}
+
 func (p *Account) sendCharacterTaskChangedNotify(gateway *Gateway, characterUUID uint64, taskRecordMap map[uint32]*pb.CharacterTaskRecord) {
 	if characterUUID == 0 || len(taskRecordMap) == 0 {
 		return
@@ -329,25 +346,41 @@ func (p *Account) sendCharacterTaskSettlementNotify(gateway *Gateway, plan *char
 	if plan == nil || !plan.inventoryChanged || plan.previous == nil || plan.next == nil {
 		return
 	}
+	p.sendCharacterSettlementNotify(gateway, plan.characterUUID, plan.previous, plan.next, plan.previousUsedUUID, plan.nextUsedUUID)
+}
+
+// sendCharacterSettlementNotify 按域发送一次角色库存事务的最终权威状态.
+// 任务领奖和可开启道具共用该入口, 保证背包、资产、宠物和UUID的通知顺序一致.
+func (p *Account) sendCharacterSettlementNotify(
+	gateway *Gateway,
+	characterUUID uint64,
+	previous *pb.CharacterRecord,
+	next *pb.CharacterRecord,
+	previousUsedUUID uint64,
+	nextUsedUUID uint64,
+) {
+	if previous == nil || next == nil {
+		return
+	}
 	// 1. 背包容器: item_bag 结构变化(含装备实例增减)或账号 UUID 游标推进时发完整快照.
 	usedUUID := uint64(0)
-	if plan.nextUsedUUID > plan.previousUsedUUID {
-		usedUUID = plan.nextUsedUUID
+	if nextUsedUUID > previousUsedUUID {
+		usedUUID = nextUsedUUID
 	}
-	if !proto.Equal(plan.previous.GetItemBag(), plan.next.GetItemBag()) || usedUUID != 0 {
-		p.sendCharacterContainerChangedNotify(gateway, plan.characterUUID, plan.next.GetItemBag(), usedUUID)
+	if !proto.Equal(previous.GetItemBag(), next.GetItemBag()) || usedUUID != 0 {
+		p.sendCharacterContainerChangedNotify(gateway, characterUUID, next.GetItemBag(), usedUUID)
 	}
 	// 2. 货币资产: 只发变化项的最终数量, 0 表示耗尽.
-	if changedAsset := diffAssetCountMap(plan.previous.GetAssetCountMap(), plan.next.GetAssetCountMap()); len(changedAsset) > 0 {
-		p.sendCharacterItemChangedNotify(gateway, plan.characterUUID, changedAsset)
+	if changedAsset := diffAssetCountMap(previous.GetAssetCountMap(), next.GetAssetCountMap()); len(changedAsset) > 0 {
+		p.sendCharacterItemChangedNotify(gateway, characterUUID, changedAsset)
 	}
 	// 3. 随身宠物: 新增/变化记录与移除 UUID 分开发送(同一分支两个字段独立应用).
-	changedPets, removedPetUUIDs := diffPetRecordList(plan.previous.GetPetRecordList(), plan.next.GetPetRecordList())
+	changedPets, removedPetUUIDs := diffPetRecordList(previous.GetPetRecordList(), next.GetPetRecordList())
 	if len(changedPets) > 0 {
-		p.sendCharacterPetChangedNotify(gateway, plan.characterUUID, changedPets)
+		p.sendCharacterPetChangedNotify(gateway, characterUUID, changedPets)
 	}
 	if len(removedPetUUIDs) > 0 {
-		p.sendCharacterPetRemovedNotify(gateway, plan.characterUUID, removedPetUUIDs)
+		p.sendCharacterPetRemovedNotify(gateway, characterUUID, removedPetUUIDs)
 	}
 }
 
@@ -532,7 +565,7 @@ func (p *Account) onCharacterCreateReq(gateway *Gateway, pkt *pb.OnlineClientPac
 
 	p.accountRecord.CharacterRecordList[slotIndex] = characterRecord
 
-	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
+	if err := p.deferAccountRecordPersist(); err != nil {
 		p.accountRecord.UsedUuid = previousUsedUUID
 		p.accountRecord.CharacterRecordList[slotIndex] = previousCharacterRecord
 		xlog.GLog.Errorf("set account record failed aid:%d err:%v", p.aid, err)
@@ -578,7 +611,7 @@ func (p *Account) onCharacterOnlineReq(gateway *Gateway, pkt *pb.OnlineClientPac
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterOnlineRes_CMD), xerror.Internal.Code())
 		return
 	}
-	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
+	if err := p.deferAccountRecordPersist(); err != nil {
 		backup.restore(character.record)
 		xlog.GLog.Errorf("set account record after character online failed aid:%d character:%d err:%v", p.aid, characterUUID, err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterOnlineRes_CMD), xerror.Internal.Code())
@@ -614,7 +647,7 @@ func (p *Account) onCharacterOfflineReq(gateway *Gateway, pkt *pb.OnlineClientPa
 		return
 	}
 	character.record.Base.LastLogoutTimestampMs = time.Now().UnixMilli()
-	if err := unaryCacheSetAccountRecord(p.aid, p.accountRecord); err != nil {
+	if err := p.deferAccountRecordPersist(); err != nil {
 		xlog.GLog.Errorf("set account record after character offline failed aid:%d character:%d err:%v", p.aid, characterUUID, err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_CharacterOfflineRes_CMD), xerror.Internal.Code())
 		return

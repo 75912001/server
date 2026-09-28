@@ -19,18 +19,17 @@ var (
 	errPetSkillSetRecordInvalid      = errors.New("pet skill set record is invalid")
 )
 
-// petSkillSetPlan 保存技能槽与石币已经同时写入的候选账号快照. cache 成功前不修改在线权威档案.
+// petSkillSetPlan 保存技能槽写入与资源扣除的变更计划. 校验阶段不修改在线权威档案.
 type petSkillSetPlan struct {
-	characterUUID     uint64
-	petUUID           uint64
-	slotIndex         uint32
-	skillID           uint32
-	costResultList    []*pb.ItemCostResult
-	petRecord         *pb.PetRecord
-	characterSlot     int
-	previousCharacter *pb.CharacterRecord
-	nextCharacter     *pb.CharacterRecord
-	nextAccountRecord *pb.AccountRecord
+	characterUUID uint64
+	petUUID       uint64
+	slotIndex     uint32
+	skillID       uint32
+	costAmounts   []storeCostAmount
+	petIndex      int
+	characterSlot int
+	// costResultList 在 apply 阶段按消耗后的权威数量填充, 供响应返回.
+	costResultList []*pb.ItemCostResult
 }
 
 func (p *Account) onPetSkillSetReq(gateway *Gateway, pkt *pb.OnlineClientPacket) {
@@ -67,9 +66,7 @@ func (p *Account) onPetSkillSetReq(gateway *Gateway, pkt *pb.OnlineClientPacket)
 		return
 	}
 
-	if err := persistPetSkillSetPlan(plan, p.accountRecord, character, func(nextAccountRecord *pb.AccountRecord) error {
-		return unaryCacheSetAccountRecord(p.aid, nextAccountRecord)
-	}); err != nil {
+	if err := applyPetSkillSetPlan(plan, p.accountRecord, character, p.deferAccountRecordPersist); err != nil {
 		xlog.GLog.Errorf(
 			"persist pet skill set failed aid:%d character:%d pet:%d slot:%d skill:%d costKinds:%d err:%v",
 			p.aid,
@@ -179,48 +176,43 @@ func preparePetSkillSetPlan(
 	if len(characterRecord.GetPetRecordList()[petIndex].GetSkillIdList()) != int(pb.PetSkillLimit_PetSkillLimit_MaxSlotCount) {
 		return nil, fmt.Errorf("%w: pet %d skill slot count %d", errPetSkillSetRecordInvalid, petUUID, len(characterRecord.GetPetRecordList()[petIndex].GetSkillIdList()))
 	}
-	nextAccountRecord := proto.Clone(accountRecord).(*pb.AccountRecord)
-	nextCharacter := nextAccountRecord.GetCharacterRecordList()[characterSlot]
-	nextPetRecord := nextCharacter.GetPetRecordList()[petIndex]
-	costResultList, err := consumeStoreCostAmounts(nextCharacter, costAmounts)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %v", errPetSkillSetRecordInvalid, err)
-	}
-	nextPetRecord.SkillIdList[slotIndex] = skillID
-
 	return &petSkillSetPlan{
-		characterUUID:     characterRecord.GetBase().GetUuid(),
-		petUUID:           petUUID,
-		slotIndex:         slotIndex,
-		skillID:           skillID,
-		costResultList:    costResultList,
-		petRecord:         nextPetRecord,
-		characterSlot:     characterSlot,
-		previousCharacter: characterRecord,
-		nextCharacter:     nextCharacter,
-		nextAccountRecord: nextAccountRecord,
+		characterUUID: characterRecord.GetBase().GetUuid(),
+		petUUID:       petUUID,
+		slotIndex:     slotIndex,
+		skillID:       skillID,
+		costAmounts:   costAmounts,
+		petIndex:      petIndex,
+		characterSlot: characterSlot,
 	}, nil
 }
 
-// persistPetSkillSetPlan 先持久化完整候选账号快照, 成功后再一次性替换在线角色档案引用.
-func persistPetSkillSetPlan(
-	plan *petSkillSetPlan,
-	accountRecord *pb.AccountRecord,
-	character *character,
-	persist func(*pb.AccountRecord) error,
-) error {
-	if plan == nil || accountRecord == nil || character == nil || persist == nil || plan.nextAccountRecord == nil || plan.nextCharacter == nil || plan.petRecord == nil {
+// applyPetSkillSetPlan 把计划原地应用到权威账号档案, 再通知落盘。
+// 与改造前的区别: 不再克隆整个 AccountRecord, 也不再做事后差分解算通知。
+func applyPetSkillSetPlan(plan *petSkillSetPlan, accountRecord *pb.AccountRecord, character *character, persist func() error) error {
+	if plan == nil || accountRecord == nil || character == nil || persist == nil || character.record == nil {
 		return errPetSkillSetInvalidArgument
 	}
-	if plan.characterSlot < 0 || plan.characterSlot >= len(accountRecord.GetCharacterRecordList()) || accountRecord.GetCharacterRecordList()[plan.characterSlot] != plan.previousCharacter || character.record != plan.previousCharacter {
+	if plan.characterSlot < 0 || plan.characterSlot >= len(accountRecord.GetCharacterRecordList()) ||
+		accountRecord.GetCharacterRecordList()[plan.characterSlot] != character.record {
 		return fmt.Errorf("%w: authoritative account state changed before persistence", errPetSkillSetRecordInvalid)
 	}
-	if err := persist(plan.nextAccountRecord); err != nil {
-		return err
+	petRecordList := character.record.GetPetRecordList()
+	if plan.petIndex < 0 || plan.petIndex >= len(petRecordList) ||
+		petRecordList[plan.petIndex] == nil || petRecordList[plan.petIndex].GetUuid() != plan.petUUID {
+		return fmt.Errorf("%w: carried pet %d changed before apply", errPetSkillSetRecordInvalid, plan.petUUID)
 	}
-	accountRecord.CharacterRecordList[plan.characterSlot] = plan.nextCharacter
-	character.record = plan.nextCharacter
-	return nil
+	if len(petRecordList[plan.petIndex].GetSkillIdList()) != int(pb.PetSkillLimit_PetSkillLimit_MaxSlotCount) {
+		return fmt.Errorf("%w: pet %d skill slot count %d", errPetSkillSetRecordInvalid, plan.petUUID, len(petRecordList[plan.petIndex].GetSkillIdList()))
+	}
+
+	costResultList, err := consumeStoreCostAmounts(character.record, plan.costAmounts)
+	if err != nil {
+		return fmt.Errorf("%w: %v", errPetSkillSetRecordInvalid, err)
+	}
+	plan.costResultList = costResultList
+	petRecordList[plan.petIndex].SkillIdList[plan.slotIndex] = plan.skillID
+	return persist()
 }
 
 func petSkillSetResultID(err error) uint32 {

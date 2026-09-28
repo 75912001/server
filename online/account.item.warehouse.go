@@ -60,7 +60,7 @@ func (p *Account) onItemWarehouseDepositReq(gateway *Gateway, pkt *pb.OnlineClie
 		return
 	}
 	if err := persistItemWarehouseTransfer(plan, func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+		return p.deferAccountRecordPersist()
 	}); err != nil {
 		xlog.GLog.Errorf("persist item warehouse deposit failed aid:%d character:%d err:%v", p.aid, req.GetCharacterUuid(), err)
 		p.sendClientErr(gateway, uint32(pb.MsgID_ItemWarehouseDepositRes_CMD), xerror.Internal.Code())
@@ -105,7 +105,7 @@ func (p *Account) onItemWarehouseWithdrawReq(gateway *Gateway, pkt *pb.OnlineCli
 		return
 	}
 	changedTasks, err := persistCharacterTaskWarehouseWithdraw(plan, character.record, time.Now().UnixMilli(), func() error {
-		return unaryCacheSetAccountRecord(p.aid, p.accountRecord)
+		return p.deferAccountRecordPersist()
 	})
 	if err != nil {
 		xlog.GLog.Errorf("persist item warehouse withdraw failed aid:%d character:%d err:%v", p.aid, req.GetCharacterUuid(), err)
